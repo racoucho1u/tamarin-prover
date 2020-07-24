@@ -161,8 +161,8 @@ lookupArity op = do
         Just (k,priv) -> return (k,priv)
 
 -- | Parse an n-ary operator application for arbitrary n.
-naryOpApp :: Ord l => Bool -> Parser (Term l) -> Parser (Term l)
-naryOpApp eqn plit = do
+naryOpApp :: Ord l => Parser (Term l) -> Parser (Term l)
+naryOpApp plit = do
     op <- identifier
     (k,priv) <- lookupArity op
     ts <- parens $ if k == 1
@@ -176,8 +176,8 @@ naryOpApp eqn plit = do
     return $ app (BC.pack op, (k,priv)) ts
 
 -- | Parse a binary operator written as @op{arg1}arg2@.
-binaryAlgApp :: Ord l => Bool -> Parser (Term l) -> Parser (Term l)
-binaryAlgApp eqn plit = do
+binaryAlgApp :: Ord l => Parser (Term l) -> Parser (Term l)
+binaryAlgApp plit = do
     op <- identifier
     (k,priv) <- lookupArity op
     arg1 <- braced (tupleterm plit)
