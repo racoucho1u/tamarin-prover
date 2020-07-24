@@ -207,16 +207,15 @@ term plit eqn = asum
     , parens (msetterm plit)
     , symbol "1" *> pure fAppOne
     , application <?> "function application"
-    , nullaryApp (eqn)
+    , nullaryApp
     , plit
     ]
     <?> "term"
   where
-    application = asum $ map (try . ($ plit)) [naryOpApp eqn, binaryAlgApp eqn, diffOp eqn]
+    application = asum $ map (try . ($ plit)) [naryOpApp, binaryAlgApp, diffOp eqn]
     pairing = angled (tupleterm plit)
-    nullaryApp eqn = do
+    nullaryApp = do
       maudeSig <- getState
-      --traceM $ show eqn ++ " on est la hein "++ show ((symbol (BC.unpack sym)) *> pure (fApp (NoEq (sym,(0,priv))) [])
       -- FIXME: This try should not be necessary.
       asum [ try (symbol (BC.unpack sym)) *> pure (fApp (NoEq (sym,(0,priv))) [])
            | NoEq (sym,(0,priv)) <- S.toList $ funSyms maudeSig ]
@@ -229,7 +228,7 @@ expterm plit = chainl1 (term plit False) ((\a b -> fAppExp (a,b)) <$ opExp)
 multterm :: Ord l => Parser (Term l) -> Parser (Term l)
 multterm plit = do
     dh <- enableDH <$> getState
-    if dh && not eqn-- if DH is not enabled, do not accept 'multterm's and 'expterm's
+    if dh -- if DH is not enabled, do not accept 'multterm's and 'expterm's
         then chainl1 (expterm plit) ((\a b -> fAppAC Mult [a,b]) <$ opMult)
         else term plit False
 
@@ -237,7 +236,7 @@ multterm plit = do
 xorterm :: Ord l => Parser (Term l) -> Parser (Term l)
 xorterm plit = do
     xor <- enableXor <$> getState
-    if xor && not eqn-- if xor is not enabled, do not accept 'xorterms's
+    if xor -- if xor is not enabled, do not accept 'xorterms's
         then chainl1 (multterm plit) ((\a b -> fAppAC Xor [a,b]) <$ opXor)
         else multterm plit
 
@@ -245,7 +244,7 @@ xorterm plit = do
 msetterm :: Ord l => Parser (Term l) -> Parser (Term l)
 msetterm plit = do
     mset <- enableMSet <$> getState
-    if mset && not eqn -- if multiset is not enabled, do not accept 'msetterms's
+    if mset -- if multiset is not enabled, do not accept 'msetterms's
         then chainl1 (xorterm plit) ((\a b -> fAppAC Union [a,b]) <$ opPlus)
         else xorterm plit
 
@@ -1350,7 +1349,6 @@ theory flags0 = do
     ifdef :: S.Set String -> OpenTheory -> Parser OpenTheory
     ifdef flags thy = do
        flag <- symbol_ "#ifdef" *> identifier
-       traceM $ show flag
        if flag `S.member` flags
          then do thy' <- addItems flags thy
                  symbol_ "#endif"
@@ -1426,7 +1424,6 @@ diffTheory flags0 = do
     ifdef :: S.Set String -> OpenDiffTheory -> Parser OpenDiffTheory
     ifdef flags thy = do
        flag <- symbol_ "#ifdef" *> identifier
-       traceM $ show flag
        if flag `S.member` flags
          then do thy' <- addItems flags thy
                  symbol_ "#endif"
