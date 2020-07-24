@@ -80,8 +80,8 @@ import           Text.Parsec                hiding ((<|>),try)
 -- | Flags for loading a theory.
 theoryLoadFlags :: [Flag Arguments]
 theoryLoadFlags =
-  [ flagOpt "" ["prove"] (updateArg "prove") "LEMMAPREFIX*|LEMMANAME"
-      "Attempt to prove all lemmas that start with LEMMAPREFIX or the lemma which name is LEMMANAME"
+  [ flagOpt "" ["prove"] (updateArg "prove") "LEMMAPREFIX"
+      "Attempt to prove a lemma "
 
   , flagOpt "dfs" ["stop-on-trace"] (updateArg "stopOnTrace") "DFS|BFS|SEQDFS|NONE"
       "How to search for traces (default DFS)"

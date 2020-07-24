@@ -164,9 +164,6 @@ lookupArity op = do
 naryOpApp :: Ord l => Bool -> Parser (Term l) -> Parser (Term l)
 naryOpApp eqn plit = do
     op <- identifier
-    traceM $ show op ++ " " ++ show eqn
-    when (eqn && op `elem` ["mun", "one", "exp", "mult", "inv", "pmult", "em", "zero", "xor"])
-      $ traceM $ "`" ++ show op ++ "` is a reserved function name for builtins."
     (k,priv) <- lookupArity op
     ts <- parens $ if k == 1
                      then return <$> tupleterm plit
@@ -182,9 +179,6 @@ naryOpApp eqn plit = do
 binaryAlgApp :: Ord l => Bool -> Parser (Term l) -> Parser (Term l)
 binaryAlgApp eqn plit = do
     op <- identifier
-    -- traceM $ show op ++ " " ++ show eqn
-    when (eqn && op `elem` ["mun", "one", "exp", "mult", "inv", "pmult", "em", "zero", "xor"])
-      $ traceM $ "`" ++ show op ++ "` is a reserved function name for builtins."
     (k,priv) <- lookupArity op
     arg1 <- braced (tupleterm plit)
     arg2 <- term plit False
@@ -274,7 +268,7 @@ fact' pterm = try (
        i     <- identifier
        case i of
          []                -> fail "empty identifier"
-         (c:_) | isUpper c -> (c:_) | isUpper c -> if (map toUpper i == "FR") && multi == Persistent then fail "fresh facts cannot be persistent" else return ()
+         (c:_) | isUpper c -> return ()
                | otherwise -> fail "facts must start with upper-case letters"
        ts    <- parens (commaSep pterm)
        ann   <- option [] $ list factAnnotation
@@ -1356,13 +1350,12 @@ theory flags0 = do
     ifdef :: S.Set String -> OpenTheory -> Parser OpenTheory
     ifdef flags thy = do
        flag <- symbol_ "#ifdef" *> identifier
-       thy' <- addItems flags thy
-       symbol_ "#endif"
+       traceM $ show flag
        if flag `S.member` flags
-          then do thy' <- addItems flags thy
+         then do thy' <- addItems flags thy
                  symbol_ "#endif"
                  addItems flags thy'
-          else do _ <- manyTill anyChar (try (string "#"))
+         else do _ <- manyTill anyChar (try (string "#"))
                  symbol_ "endif"
                  addItems flags thy
 
@@ -1433,13 +1426,12 @@ diffTheory flags0 = do
     ifdef :: S.Set String -> OpenDiffTheory -> Parser OpenDiffTheory
     ifdef flags thy = do
        flag <- symbol_ "#ifdef" *> identifier
-       thy' <- addItems flags thy
-       symbol_ "#endif"
+       traceM $ show flag
        if flag `S.member` flags
-          then do thy' <- addItems flags thy
+         then do thy' <- addItems flags thy
                  symbol_ "#endif"
                  addItems flags thy'
-          else do _ <- manyTill anyChar (try (string "#"))
+         else do _ <- manyTill anyChar (try (string "#"))
                  symbol_ "endif"
                  addItems flags thy
 
