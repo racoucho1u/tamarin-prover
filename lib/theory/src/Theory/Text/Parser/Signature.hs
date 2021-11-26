@@ -178,9 +178,15 @@ heuristic :: Bool -> Maybe FilePath -> Parser [GoalRanking]
 heuristic diff workDir = symbol "heuristic" *> char ':' *> skipMany (char ' ') *> many1 (goalRanking diff workDir) <* lexeme spaces
 
 goalRanking :: Bool -> Maybe FilePath -> Parser GoalRanking
-goalRanking diff workDir = try oracleRanking <|> regularRanking <?> "goal ranking"
+goalRanking diff workDir = try (tacticRanking <|> oracleRanking) <|> regularRanking <?> "goal ranking"
    where
        regularRanking = toGoalRanking <$> letter <* skipMany (char ' ')
+
+       tacticRanking = do
+           goal <- toGoalRanking <$> oneOf "tT" <* skipMany (char ' ')
+           relPath <- optionMaybe (char '"' *> many1 (noneOf "\"\n\r") <* char '"' <* skipMany (char ' '))
+
+           return $ mapTacticRanking (maybeSetTacticRelPath relPath . maybeSetTacticWorkDir workDir) goal
 
        oracleRanking = do
            goal <- toGoalRanking <$> oneOf "oO" <* skipMany (char ' ')

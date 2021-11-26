@@ -105,8 +105,8 @@ theoryLoadFlags =
   , flagNone ["quit-on-warning"] (addEmptyArg "quit-on-warning")
       "Strict mode that quits on any warning that is emitted."
 
-  , flagOpt "./oracle" ["oraclename"] (updateArg "oraclename") "FILE"
-      "Path to the oracle heuristic (default './oracle')."
+  , flagOpt (oraclePath defaultOracle) ["oraclename"] (updateArg "oraclename") "FILE"
+      ("Path to the oracle heuristic (default '" ++ oraclePath defaultOracle ++ "')")
 
   , flagOpt (tacticPath defaultTactic) ["tacticname"] (updateArg "tacticname") "FILE"
       ("Path to the tactic heuristic (default '" ++ tacticPath defaultTactic ++ "')")
