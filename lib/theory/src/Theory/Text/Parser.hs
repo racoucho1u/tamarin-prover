@@ -44,6 +44,7 @@ import Theory.Text.Parser.Exceptions
 import Theory.Text.Parser.Signature
 import Theory.Text.Parser.Restriction
 import Theory.Text.Parser.Sapic
+import Debug.Trace
 
 ------------------------------------------------------------------------------
 -- Lexing and parsing theory files and proof methods
@@ -167,6 +168,8 @@ theory flags0 inFile = do
     addItems :: S.Set String -> OpenTheory -> Parser OpenTheory
     addItems flags thy = asum
       [ do thy' <- liftedAddHeuristic thy =<< heuristic False workDir
+           _ <- trace ("Fufu " ++ show thy) (addItems flags thy')
+           _ <- trace ("Fafu " ++ show thy') (addItems flags thy')
            addItems flags thy'
       , do thy' <- builtins thy
            msig <- getState
@@ -187,6 +190,8 @@ theory flags0 inFile = do
            addItems flags thy'
            -- add legacy deprecation warning output
       , do thy' <- liftedAddLemma thy =<< lemma workDir
+           --_ <- trace ("Pupu " ++ show thy) (addItems flags thy')
+           --_ <- trace ("Papu " ++ show thy') (addItems flags thy')
            addItems flags thy'
       , do ru <- protoRule
            thy' <- liftedAddProtoRule thy ru

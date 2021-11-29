@@ -277,6 +277,7 @@ import           Theory.Tools.IntruderRules
 import           Term.Positions
 
 import           Utils.Misc
+import           Debug.Trace
 
 ------------------------------------------------------------------------------
 -- Specific proof types
