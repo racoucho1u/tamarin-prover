@@ -625,13 +625,13 @@ nameToFunction (_,_) = (\ _ -> False)
 
 detectLine :: String -> (String, String)
 detectLine s
-    | s =~ "#" = ("","")
-    | s =~ "lemma:"  = ("tactic", (mrAfter $ s =~ "tactic: "))
+    | s =~ "tactic:"  = ("tactic", (mrAfter $ s =~ "tactic: "))
     | s =~ "conditions" = ("condition","")
     | s =~ "prio" = ("prio","")
     | s =~ "regex" = ("regex", (mrAfter $ s =~"regex "))
     | s =~ "isFactName" = ("isFactName", (mrAfter $ s =~ "isFactName "))
     | s =~ "isInFactTerms" = ("isInFactTerms", (mrAfter $ s =~ "isInFactTerms "))
+    -- | s =~ "#" = ("","")
     | otherwise = ("","")
 
 isPrio :: [AnnotatedGoal -> Bool] -> AnnotatedGoal -> Bool
@@ -644,20 +644,40 @@ applyIsPrio (h:t) agoal = (isPrio h agoal):applyIsPrio t agoal
 
 newRanking :: Tactic -> ProofContext -> [AnnotatedGoal] -> [AnnotatedGoal]
 newRanking tactic ctxt ags = 
-	unsafePerformIO $ do
-	    content <- readFile (tacticPath tactic)
-	    -- en vrai tous les noms à changer
-	    let conditions = lines content
-	        functions = map detectLine conditions
-	    -- Techniquement pas un bon nom contient la liste de liste de paires
-	        res = filter (/= []) $ splitWhen (== ("prio","")) $ filter (/= ("","")) functions
-	        tab2tab = map (map nameToFunction) res
-	        resderes = map (findIndex (==True)) $ map (applyIsPrio tab2tab) ags
-	        zippanceOrdonnee = sortOn fst $ zip resderes ags 
-	        unpeuLaFin = groupBy (\(indice1,_) (indice2,_) -> indice1 == indice2) zippanceOrdonnee
-	        alleluia = snd $ unzip $ concat $ (tail unpeuLaFin) ++ [head unpeuLaFin]
+    unsafePerformIO $ do
 
-	    return (alleluia)
+      content <- readFile (tacticPath tactic)
+      -- en vrai tous les noms à changer
+      let conditions = lines content
+          functions = map detectLine conditions
+          lemmaNames = map (\(_,names) -> splitOn "," names) (filter (\(x,_) -> x == "tactic") functions)
+          tacticsSplitByName = filter (/= []) $ splitWhen (\(x,_) -> x == "tactic") $ filter (/= ("","")) functions
+          tacticsSplitByPrio = (filter (/= [])) $ map (filter (/= [])) $ map (splitWhen (\(x,_) -> x == "prio")) tacticsSplitByName
+
+      --guard $ trace (show tacticsSplitByPrio) True
+
+      let currifiedFunction = map (map (map nameToFunction)) tacticsSplitByPrio
+          tacticsByName = zip lemmaNames currifiedFunction
+          fufununu = zip lemmaNames tacticsSplitByPrio
+
+          -- Sélection de la bonne tactic par son nom
+          fufuzuzu = filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) fufununu 
+
+      guard $ trace (show fufununu) True
+
+      let chooseTactic = snd $ head $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) tacticsByName
+
+      -- Techniquement pas un bon nom contient la liste de liste de paires
+          {-res = filter (/= []) $ splitWhen (== ("prio","")) $ filter (/= ("","")) functions
+          tab2tab = map (map nameToFunction) res-}
+          resderes = map (findIndex (==True)) $ map (applyIsPrio chooseTactic) ags
+          zippanceOrdonnee = sortOn fst $ zip resderes ags 
+          unpeuLaFin = groupBy (\(indice1,_) (indice2,_) -> indice1 == indice2) zippanceOrdonnee
+          alleluia = snd $ unzip $ concat $ (tail unpeuLaFin) ++ [head unpeuLaFin]
+
+      return (alleluia)
+
+
 
 tacticSmartRanking :: Tactic
                    -> ProofContext
@@ -667,7 +687,7 @@ tacticSmartRanking tactic ctxt _sys ags0 =
 --  | AvoidInduction == (L.get pcUseInduction ctxt) = ags0
 --  | otherwise =
     unsafePerformIO $ do
-      guard $ trace (tacticPath tactic) True
+      --guard $ trace (tacticPath tactic) True
       let ags = smartRanking ctxt False _sys ags0
       let inp = unlines
                   (map (\(i,ag) -> show i ++": "++ (concat . lines . render $ pgoal ag))
@@ -687,6 +707,7 @@ tacticSmartRanking tactic ctxt _sys ags0 =
                    ++ prettyOut
                    ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Oracle call\n"
       guard $ trace logMsg True
+      --guard $ trace (show ctxt) True
       return (outp)
   where
     pgoal (g,(_nr,_usefulness)) = prettyGoal g
