@@ -656,18 +656,37 @@ newRanking tactic ctxt ags =
 
       let currifiedFunction = map (map (map nameToFunction)) tacticsSplitByPrio
           tacticsByName = zip lemmaNames currifiedFunction
+          fufununu = zip lemmaNames tacticsSplitByPrio
+          -- Sélection de la bonne tactic par son nom
+          fufuzuzu = filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) fufununu 
 
-      -- Sélection de la bonne tactic par son nom
-      let chooseTactic = snd $ head $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) tacticsByName
+      let choosenTactic = chooseTactic $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) tacticsByName
 
       -- Techniquement pas un bon nom contient la liste de liste de paires
-          resderes = map (findIndex (==True)) $ map (applyIsPrio chooseTactic) ags
+          {-res = filter (/= []) $ splitWhen (== ("prio","")) $ filter (/= ("","")) functions
+          tab2tab = map (map nameToFunction) res-}
+          resderes = map (findIndex (==True)) $ map (applyIsPrio choosenTactic) ags
           zippanceOrdonnee = sortOn fst $ zip resderes ags 
           unpeuLaFin = groupBy (\(indice1,_) (indice2,_) -> indice1 == indice2) zippanceOrdonnee
-          alleluia = snd $ unzip $ concat $ (tail unpeuLaFin) ++ [head unpeuLaFin]
+
+          fesse = map (applyIsPrio choosenTactic) ags
+      
+      {-guard $ trace "Ags" True
+      guard $ trace (show ags) True
+      guard $ trace "Fonctions" True-} 
+      guard $ trace (show fufuzuzu) True
+      {-guard $ trace "Res des fonctions" True
+      guard $ trace (show fesse) True
+      guard $ trace (show zippanceOrdonnee) True
+      guard $ trace (show unpeuLaFin) True   -} 
+
+      let alleluia = snd $ unzip $ concat $ (tail unpeuLaFin) ++ [head unpeuLaFin]
 
       return (alleluia)
-
+  where
+    chooseTactic :: [([String], [[AnnotatedGoal -> Bool]])] -> [[AnnotatedGoal -> Bool]]
+    chooseTactic _ = []
+    chooseTactic x = snd $ head x
 
 
 tacticSmartRanking :: Tactic
