@@ -650,26 +650,17 @@ newRanking tactic ctxt ags =
       -- en vrai tous les noms à changer
       let conditions = lines content
           functions = map detectLine conditions
-          lemmaNames = map (\(_,names) -> splitOn "," names) (filter (\(x,_) -> x == "tactic") functions)
+          lemmaNames = map (\(_,names) -> splitOn "," (filter (/= ' ') names)) (filter (\(x,_) -> x == "tactic") functions)
           tacticsSplitByName = filter (/= []) $ splitWhen (\(x,_) -> x == "tactic") $ filter (/= ("","")) functions
           tacticsSplitByPrio = (filter (/= [])) $ map (filter (/= [])) $ map (splitWhen (\(x,_) -> x == "prio")) tacticsSplitByName
 
-      --guard $ trace (show tacticsSplitByPrio) True
-
       let currifiedFunction = map (map (map nameToFunction)) tacticsSplitByPrio
           tacticsByName = zip lemmaNames currifiedFunction
-          fufununu = zip lemmaNames tacticsSplitByPrio
 
-          -- Sélection de la bonne tactic par son nom
-          fufuzuzu = filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) fufununu 
-
-      guard $ trace (show fufununu) True
-
+      -- Sélection de la bonne tactic par son nom
       let chooseTactic = snd $ head $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) tacticsByName
 
       -- Techniquement pas un bon nom contient la liste de liste de paires
-          {-res = filter (/= []) $ splitWhen (== ("prio","")) $ filter (/= ("","")) functions
-          tab2tab = map (map nameToFunction) res-}
           resderes = map (findIndex (==True)) $ map (applyIsPrio chooseTactic) ags
           zippanceOrdonnee = sortOn fst $ zip resderes ags 
           unpeuLaFin = groupBy (\(indice1,_) (indice2,_) -> indice1 == indice2) zippanceOrdonnee
