@@ -518,7 +518,6 @@ roundRobinHeuristic rankings =
     methods
   where
     n = length rankings
-
     methods depth ctxt sys
       | depth < 0 = error $ "roundRobin: negative proof depth " ++ show depth
       | otherwise =
@@ -627,11 +626,12 @@ detectLine :: String -> (String, String)
 detectLine s
     | s =~ "tactic:"  = ("tactic", (mrAfter $ s =~ "tactic: "))
     | s =~ "conditions" = ("condition","")
+    | s =~ "deprio" = ("deprio","")
     | s =~ "prio" = ("prio","")
     | s =~ "regex" = ("regex", (mrAfter $ s =~"regex "))
     | s =~ "isFactName" = ("isFactName", (mrAfter $ s =~ "isFactName "))
     | s =~ "isInFactTerms" = ("isInFactTerms", (mrAfter $ s =~ "isInFactTerms "))
-    -- | s =~ "#" = ("","")
+    | s =~ "#" = ("","")
     | otherwise = ("","")
 
 isPrio :: [AnnotatedGoal -> Bool] -> AnnotatedGoal -> Bool
@@ -651,43 +651,61 @@ newRanking tactic ctxt ags =
       let conditions = lines content
           functions = map detectLine conditions
           lemmaNames = map (\(_,names) -> splitOn "," (filter (/= ' ') names)) (filter (\(x,_) -> x == "tactic") functions)
+          prioList = map concat (map (map (map (\(x,_) -> x))) ((filter (/= [])) $ map (filter (/= [])) $ map (splitWhen (\(x,_) -> not (x == "prio" || x == "deprio"))) tacticsSplitByName))
           tacticsSplitByName = filter (/= []) $ splitWhen (\(x,_) -> x == "tactic") $ filter (/= ("","")) functions
           tacticsSplitByPrio = (filter (/= [])) $ map (filter (/= [])) $ map (splitWhen (\(x,_) -> x == "prio")) tacticsSplitByName
 
       let currifiedFunction = map (map (map nameToFunction)) tacticsSplitByPrio
           tacticsByName = zip lemmaNames currifiedFunction
+          prioByName = zip lemmaNames prioList
           fufununu = zip lemmaNames tacticsSplitByPrio
           -- Sélection de la bonne tactic par son nom
           fufuzuzu = filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) fufununu 
 
-      let choosenTactic = chooseTactic $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) tacticsByName
-
+      let chosenTactic = chooseTactic $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) tacticsByName
+          chosenPrio = choosePrio $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) prioByName
       -- Techniquement pas un bon nom contient la liste de liste de paires
           {-res = filter (/= []) $ splitWhen (== ("prio","")) $ filter (/= ("","")) functions
           tab2tab = map (map nameToFunction) res-}
-          resderes = map (findIndex (==True)) $ map (applyIsPrio choosenTactic) ags
-          zippanceOrdonnee = sortOn fst $ zip resderes ags 
-          unpeuLaFin = groupBy (\(indice1,_) (indice2,_) -> indice1 == indice2) zippanceOrdonnee
+          resderes = map (findIndex (==True)) $ map (applyIsPrio chosenTactic) ags
+          resWithPrio = zip chosenPrio resderes 
+          --ouech = zip resWithPrio ags 
+          resOrderedByPrioFlag = groupBy (\((_,indice1),_) ((_,indice2),_) -> indice1 == indice2) (zip resWithPrio ags)
+          resOrderedByPrio = map (sortOn (snd . fst)) resOrderedByPrioFlag
+          resOrderedByPrioNothingAlaFin = map (\x -> tail x ++ [head x]) resOrderedByPrio
+          --orderedByPrioFlag = groupBy (\((indice1,_),_) ((indice2,_),_) -> indice1 == indice2) unpeuLaFin
 
-          fesse = map (applyIsPrio choosenTactic) ags
-      
+          --fesse = map (applyIsPrio chosenTactic) ags
+          
       {-guard $ trace "Ags" True
       guard $ trace (show ags) True
-      guard $ trace "Fonctions" True-} 
-      guard $ trace (show fufuzuzu) True
+      guard $ trace "Resderes" True 
+      guard $ trace (show resderes) True
+      guard $ trace "chosenPrio" True 
+      guard $ trace (show chosenPrio) True-}
+      guard $ trace "zippanceOrdonnee" True 
+      
+      guard $ trace "unpeuLaFin" True 
+      --guard $ trace (show chosenPrio) True
+      --guard $ trace (show orderedByPrioFlag) True
       {-guard $ trace "Res des fonctions" True
       guard $ trace (show fesse) True
       guard $ trace (show zippanceOrdonnee) True
       guard $ trace (show unpeuLaFin) True   -} 
 
-      let alleluia = snd $ unzip $ concat $ (tail unpeuLaFin) ++ [head unpeuLaFin]
+      let alleluia = snd $ unzip $ concat resOrderedByPrioNothingAlaFin
+
+      guard $ trace (show alleluia) True
 
       return (alleluia)
   where
     chooseTactic :: [([String], [[AnnotatedGoal -> Bool]])] -> [[AnnotatedGoal -> Bool]]
-    chooseTactic _ = []
+    chooseTactic [] = []
     chooseTactic x = snd $ head x
 
+    choosePrio :: [([String],[String])] -> [String]
+    choosePrio [] = []
+    choosePrio x = snd $ head x
 
 tacticSmartRanking :: Tactic
                    -> ProofContext
@@ -1236,4 +1254,3 @@ prettyDiffProofMethod method = case method of
     DiffRuleEquivalence      -> keyword_ "rule-equivalence"
     DiffBackwardSearch       -> keyword_ "backward-search"  
     DiffBackwardSearchStep s -> keyword_ "step(" <-> prettyProofMethod s <-> keyword_ ")"
-
