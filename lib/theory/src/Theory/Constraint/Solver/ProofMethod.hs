@@ -704,16 +704,16 @@ newRanking tactic ctxt ags =
           --rankedGoals = split (whenElt (\(rank,_) -> fstDeprio <= rank)) (concat $ tail groupedByPrioRes)
           rankedGoals = splitPrioDeprio fstDeprio (concat $ tail groupedByPrioRes)
           pute = splitPrioDeprio fstDeprio (concat $ tail groupedByPrioRes)
-          prioRanked =  snd . unzip $ snd rankedGoals
-          deprioRanked =  snd . unzip $ fst rankedGoals
+          prioRanked =  snd . unzip $ fst rankedGoals
+          deprioRanked =  snd . unzip $ snd rankedGoals
           alleluia = prioRanked ++ notRankedGoals ++ deprioRanked
 
-      guard $ trace (show fstDeprio) True
+      guard $ trace (show resderes) True
       {-guard $ trace (show rankedGoals) True
       guard $ trace (show prioRanked) True
       guard $ trace (show deprioRanked) True
       guard $ trace (show alleluia) True-}
-      guard $ trace (show pute) True
+      guard $ trace (show rankedGoals) True
 
       return (alleluia)
   where
