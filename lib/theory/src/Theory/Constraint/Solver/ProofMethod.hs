@@ -44,6 +44,7 @@ import           Data.Maybe                                (catMaybes)
 -- import           Data.Monoid
 import           Data.Ord                                  (comparing)
 import qualified Data.Set                                  as S
+import           Data.Char                                 (isSpace)
 import           Extension.Prelude                         (sortOn)
 import qualified Data.ByteString.Char8 as BC
 
@@ -616,10 +617,21 @@ regexAmoi s agoal = pg =~ s
         pgoal (g,(_nr,_usefulness)) = prettyGoal g
         pg = concat . lines . render $ pgoal agoal
 
+--Je ne sais pas pourquoi je ne peux pas les mettre dans un where après nameToFunction
+fstParam :: String -> [Char] -> (String, String)
+fstParam s "OR" = detectLine $ mrBefore $ s =~" OR"
+fstParam s "&&" = detectLine $ mrBefore $ s =~" &&"
+
+sndParam :: String -> [Char] -> (String, String)
+sndParam s "OR" = detectLine $ mrAfter $ s =~"OR "
+sndParam s "&&" = detectLine $ mrAfter $ s =~"&& "
+
 nameToFunction :: (String, String) -> AnnotatedGoal -> Bool
 nameToFunction ("regex", param) = regexAmoi param
 nameToFunction ("isFactName", param) = isFactName param
 nameToFunction ("isInFactTerms", param) = isInFactTerms param
+nameToFunction ("OR", param) = (\ goal -> ((nameToFunction $ fstParam param "OR") goal) || ((nameToFunction $ sndParam param "OR") goal))
+nameToFunction ("&&", param) = (\ goal -> ((nameToFunction $ fstParam param "&&") goal) && ((nameToFunction $ sndParam param "&&") goal))
 nameToFunction (_,_) = (\ _ -> False)
 
 detectLine :: String -> (String, String)
@@ -628,11 +640,14 @@ detectLine s
     | s =~ "conditions" = ("condition","")
     | s =~ "deprio" = ("deprio","")
     | s =~ "prio" = ("prio","")
+    | s =~ "OR" = ("OR", dropWhile isSpace s)
+    | s =~ "&&" = ("&&", dropWhile isSpace s)
     | s =~ "regex" = ("regex", (mrAfter $ s =~"regex "))
     | s =~ "isFactName" = ("isFactName", (mrAfter $ s =~ "isFactName "))
     | s =~ "isInFactTerms" = ("isInFactTerms", (mrAfter $ s =~ "isInFactTerms "))
     | s =~ "#" = ("","")
     | otherwise = ("","")
+
 
 isPrio :: [AnnotatedGoal -> Bool] -> AnnotatedGoal -> Bool
 isPrio list agoal = or $ (sequenceA list) agoal
@@ -659,9 +674,9 @@ newRanking tactic ctxt ags =
       let currifiedFunction = map (map nameToFunction) tacticsSplitByPrioAndDeprio
           tacticsByName = zip lemmaNames [currifiedFunction]
           prioByName = zip lemmaNames prioList
-          fufununu = zip lemmaNames [tacticsSplitByPrioAndDeprio]
+          --fufununu = zip lemmaNames [tacticsSplitByPrioAndDeprio]
           -- Sélection de la bonne tactic par son nom
-          fufuzuzu = filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) fufununu 
+          --fufuzuzu = filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) fufununu 
 
       let chosenTactic = chooseTactic $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) tacticsByName
           chosenPrio = choosePrio $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) prioByName
@@ -678,9 +693,10 @@ newRanking tactic ctxt ags =
           --resOrderedByPrioNothingAlaFin = map (\x -> tail x ++ [head x]) orderedByPrioRes
           --orderedByPrioFlag = groupBy (\((indice1,_),_) ((indice2,_),_) -> indice1 == indice2) unpeuLaFin
 
+      --guard $ trace (show fufununu) True
+      guard $ trace (show resderes) True
           
       --guard $ trace "orderedByPrioGoal" True
-      guard $ trace (show resderes) True
       --guard $ trace (show tacticsSplitByPrioAndDeprio) True
       --guard $ trace (show groupedByPrioRes) True
       --guard $ trace (show $ tail groupedByPrioRes) True
