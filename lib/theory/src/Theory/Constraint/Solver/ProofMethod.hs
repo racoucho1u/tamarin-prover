@@ -668,15 +668,21 @@ newRanking tactic ctxt ags =
           lemmaNames = map (\(_,names) -> splitOn "," (filter (/= ' ') names)) (filter (\(x,_) -> x == "tactic") functions)
           prioList = map concat (map (map (map (\(x,_) -> x))) ((filter (/= [])) $ map (filter (/= [])) $ map (splitWhen (\(x,_) -> not (x == "prio" || x == "deprio"))) tacticsSplitByName))
           tacticsSplitByName = filter (/= []) $ splitWhen (\(x,_) -> x == "tactic") $ filter (/= ("","")) functions
+      --let chosenTactic = chooseTactic $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) tacticsByName
+      let chosenTactic2 = chooseTactic2 $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) (zip lemmaNames tacticsSplitByName)
+          tacticsSplitByPrio2 = filter (/= []) $ splitWhen (\(x,_) -> x == "prio") chosenTactic2
           tacticsSplitByPrio = (filter (/= [])) $ map (filter (/= [])) $ map (splitWhen (\(x,_) -> x == "prio")) tacticsSplitByName
-          tacticsSplitByPrioAndDeprio = concat . concat $ map (map (splitWhen (\(x,_) -> x == "deprio"))) tacticsSplitByPrio 
+          tacticsSplitByPrioAndDeprio = concat . concat $ map (map (splitWhen (\(x,_) -> x == "deprio"))) tacticsSplitByPrio
+          tacticsSplitByPrioAndDeprio2 = concat $ map (splitWhen (\(x,_) -> x == "deprio")) tacticsSplitByPrio2 
 
       let currifiedFunction = map (map nameToFunction) tacticsSplitByPrioAndDeprio
+          currifiedFunction2 = map (map nameToFunction) tacticsSplitByPrioAndDeprio2
           tacticsByName = zip lemmaNames [currifiedFunction]
           prioByName = zip lemmaNames prioList
-          --fufununu = zip lemmaNames [tacticsSplitByPrioAndDeprio]
+          
+      let fufununu = zip lemmaNames [tacticsSplitByPrioAndDeprio]
           -- Sélection de la bonne tactic par son nom
-          --fufuzuzu = filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) fufununu 
+          fufuzuzu = filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) fufununu 
 
       let chosenTactic = chooseTactic $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) tacticsByName
           chosenPrio = choosePrio $ filter (\(name,_) -> (L.get pcLemmaName ctxt) `elem` name) prioByName
@@ -685,27 +691,29 @@ newRanking tactic ctxt ags =
           {-res = filter (/= []) $ splitWhen (== ("prio","")) $ filter (/= ("","")) functions
           tab2tab = map (map nameToFunction) res-}
           
-          resderes = map (findIndex (==True)) $ map (applyIsPrio chosenTactic) ags
+          resderes = map (findIndex (==True)) $ map (applyIsPrio currifiedFunction2) ags
           orderedByPrioRes = sortOn fst (zip resderes ags)
           groupedByPrioRes = groupBy (\(indice1,_) (indice2,_) -> indice1 == indice2) orderedByPrioRes
           --groupedByPrioGoal = map (snd . unzip) groupedByPrioRes
 
           --resOrderedByPrioNothingAlaFin = map (\x -> tail x ++ [head x]) orderedByPrioRes
           --orderedByPrioFlag = groupBy (\((indice1,_),_) ((indice2,_),_) -> indice1 == indice2) unpeuLaFin
-
-      --guard $ trace (show fufununu) True
-      guard $ trace (show resderes) True
-          
-      --guard $ trace "orderedByPrioGoal" True
-      --guard $ trace (show tacticsSplitByPrioAndDeprio) True
-      --guard $ trace (show groupedByPrioRes) True
-      --guard $ trace (show $ tail groupedByPrioRes) True
+ 
 
       let notRankedGoals = snd . unzip $ head groupedByPrioRes
-          rankedGoals = split (whenElt (\(rank,_) -> fstDeprio <= rank)) (concat $ tail groupedByPrioRes)
-          prioRanked =  snd . unzip $ head rankedGoals
-          deprioRanked =  snd . unzip $ concat $ tail rankedGoals
+          --rankedGoals = split (whenElt (\(rank,_) -> fstDeprio <= rank)) (concat $ tail groupedByPrioRes)
+          rankedGoals = splitPrioDeprio fstDeprio (concat $ tail groupedByPrioRes)
+          pute = splitPrioDeprio fstDeprio (concat $ tail groupedByPrioRes)
+          prioRanked =  snd . unzip $ snd rankedGoals
+          deprioRanked =  snd . unzip $ fst rankedGoals
           alleluia = prioRanked ++ notRankedGoals ++ deprioRanked
+
+      guard $ trace (show fstDeprio) True
+      {-guard $ trace (show rankedGoals) True
+      guard $ trace (show prioRanked) True
+      guard $ trace (show deprioRanked) True
+      guard $ trace (show alleluia) True-}
+      guard $ trace (show pute) True
 
       return (alleluia)
   where
@@ -713,13 +721,17 @@ newRanking tactic ctxt ags =
     chooseTactic [] = []
     chooseTactic x = snd $ head x
 
+    chooseTactic2 :: [([String], [([Char], [Char])])] -> [([Char], [Char])]
+    chooseTactic2 [] = []
+    chooseTactic2 x = snd $ head x
+
     choosePrio :: [([String],[String])] -> [String]
     choosePrio [] = []
     choosePrio x = snd $ head x
 
-    splitAtMaybe :: Maybe(Int) -> [a] -> ([a], [a]) 
-    splitAtMaybe Nothing = splitAt 0
-    splitAtMaybe (Just n)  = splitAt (n-1)
+    splitPrioDeprio :: Maybe(Int) -> [a] -> ([a], [a]) 
+    splitPrioDeprio Nothing = splitAt 0
+    splitPrioDeprio (Just n)  = splitAt (n-1)
 
 tacticSmartRanking :: Tactic
                    -> ProofContext
