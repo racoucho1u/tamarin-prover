@@ -700,20 +700,22 @@ newRanking tactic ctxt ags =
           --orderedByPrioFlag = groupBy (\((indice1,_),_) ((indice2,_),_) -> indice1 == indice2) unpeuLaFin
  
 
-      let notRankedGoals = snd . unzip $ head groupedByPrioRes
+      let notRankedGoals = snd . unzip $ concat $ map (filter (\(rank,_) -> rank == Nothing))  groupedByPrioRes
+          --notReallyRankedGoal = snd . unzip $ concat $ map (filter (\(rank,_) -> rank == Nothing))  groupedByPrioRes
           --rankedGoals = split (whenElt (\(rank,_) -> fstDeprio <= rank)) (concat $ tail groupedByPrioRes)
-          rankedGoals = splitPrioDeprio fstDeprio (concat $ tail groupedByPrioRes)
-          pute = splitPrioDeprio fstDeprio (concat $ tail groupedByPrioRes)
+          rankedGoals = splitPrioDeprio fstDeprio (concat $ map (filter (\(rank,_) -> rank /= Nothing))  groupedByPrioRes)
+          -- Ok j'ai un problème avec le cas Nothing, ça inverse la paire
           prioRanked =  snd . unzip $ fst rankedGoals
           deprioRanked =  snd . unzip $ snd rankedGoals
           alleluia = prioRanked ++ notRankedGoals ++ deprioRanked
 
-      guard $ trace (show resderes) True
-      {-guard $ trace (show rankedGoals) True
-      guard $ trace (show prioRanked) True
+      --guard $ trace (show $ notReallyRankedGoal == notRankedGoals) True
+      --guard $ trace (show notRankedGoals) True
+      {-guard $ trace (show prioRanked) True
       guard $ trace (show deprioRanked) True
       guard $ trace (show alleluia) True-}
-      guard $ trace (show rankedGoals) True
+      --guard $ trace (show prioRanked) True
+      --guard $ trace (show tacticsSplitByPrioAndDeprio) True
 
       return (alleluia)
   where
@@ -730,8 +732,8 @@ newRanking tactic ctxt ags =
     choosePrio x = snd $ head x
 
     splitPrioDeprio :: Maybe(Int) -> [a] -> ([a], [a]) 
-    splitPrioDeprio Nothing = splitAt 0
-    splitPrioDeprio (Just n)  = splitAt (n-1)
+    splitPrioDeprio Nothing l = splitAt (length l) l
+    splitPrioDeprio (Just n) l = splitAt (n-1) l
 
 tacticSmartRanking :: Tactic
                    -> ProofContext
