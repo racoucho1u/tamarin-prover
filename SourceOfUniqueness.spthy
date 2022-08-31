@@ -16,8 +16,7 @@ prio:
 
 tactic: uniqueness
 // Comment
-presort: X
-prio:
+prio: {smallest}
     isFactName "ReceiverKeySimple"
 prio:
     regex "senc\(xsimple" /* test */ | regex "senc\(~xsimple"
