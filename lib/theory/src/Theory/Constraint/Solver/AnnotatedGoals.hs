@@ -14,7 +14,7 @@ module Theory.Constraint.Solver.AnnotatedGoals
   )
 where
 
-import Theory.Constraint.System.Constraints
+import           Theory.Constraint.System.Constraints
 
 data Usefulness =
     Useful
@@ -26,6 +26,7 @@ data Usefulness =
   | CurrentlyDeducible
   -- ^ A message that is deducible for the current solution.
   deriving (Show, Eq, Ord)
+
 
 -- | Goals annotated with their number and usefulness.
 type AnnotatedGoal = (Goal, (Integer, Usefulness))

@@ -39,7 +39,7 @@ import           Data.Binary
 import           Data.Function                             (on)
 import           Data.Label                                hiding (get)
 import qualified Data.Label                                as L
-import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate)
+import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate,elem)
 import qualified Data.Map                                  as M
 import           Data.Maybe                                (catMaybes, fromMaybe)
 -- import           Data.Monoid
@@ -69,6 +69,7 @@ import           Theory.Model
 import           Theory.Text.Pretty
 
 import           Text.Regex.PCRE
+
 
 
 ------------------------------------------------------------------------------
@@ -244,9 +245,9 @@ execProofMethod ctxt method sys =
         Sorry _                  -> return M.empty
         Solved
           | null (plainOpenGoals sys) -> return M.empty
-          | otherwise                 -> Nothing 
+          | otherwise                 -> Nothing
         SolveGoal goal
-          | goal `M.member` L.get sGoals sys -> execSolveGoal goal
+          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
         Simplify                 -> singleCase simplifySystem
         Induction                -> M.map cleanupSystem <$> execInduction
@@ -274,6 +275,20 @@ execProofMethod ctxt method sys =
                return $ M.fromList (zip (map show [(1::Int)..]) syss)
       where check sys' = cleanupSystem sys /= sys'
 
+    freeme :: Goal -> Goal
+    freeme (ActionG v f) = (ActionG (LVar (lvarName v) (lvarSort v) 0) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))) --encore des chose a enlever dans factTerms f
+    freeme (ChainG (ni1, cidx) (ni2, pidx)) = (ChainG ((LVar (lvarName ni1) (lvarSort ni1) 0), cidx) ((LVar (lvarName ni2) (lvarSort ni2) 0), pidx))
+    freeme (PremiseG (ni, pidx) f) = (PremiseG ((LVar (lvarName ni) (lvarSort ni) 0), pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))) --encore des chose a enlever dans factTerms f
+    freeme (SplitG s) = (SplitG s)
+    freeme (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g)))
+
+    checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
+    checkForLoop goal sys
+        | (freeme goal) `elem` (L.get sPathGoals sys) = trace "\n\nOh, la belle boucle que voilà\n\n" (execSolveGoal goal)
+        -- | (freeme goal) `elem` (L.get sPathGoals sys)  = trace "amazing" Nothing
+        | otherwise                          = trace ("\n\nFreeme:\n"++ (show $ freeme goal)++"\nList:\n"++ (show $ L.get sPathGoals sys)) execSolveGoal goal --trace ("\n\nFreeme:\n"++ (show $ freeme goal)++"\nNormal:\n"++ (show goal) )
+        
+
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
     execSolveGoal :: Goal -> Maybe (M.Map CaseName System)
@@ -282,7 +297,8 @@ execProofMethod ctxt method sys =
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        reduc  = runReduction solver ctxt sys (avoid sys)
+        sys'   = L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys
+        reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
                                   (fmap $ concat . intersperse "_")
@@ -474,7 +490,7 @@ rankProofMethods ranking tactics ctxt sys = do
         Just ru -> " (from rule " ++ getRuleName ru ++ ")"
         Nothing -> ""
 
-    solveGoalMethod (goal, (nr, usefulness)) =
+    solveGoalMethod (goal, (nr, usefulness)) = 
       ( SolveGoal goal
       , "nr. " ++ show nr ++ sourceRule goal ++ case usefulness of
                                Useful                -> ""
@@ -694,7 +710,9 @@ internalTacticRanking tactic ctxt _sys ags0 =
       let logMsg = ">>>>>>>>>>>>>>>>>>>>>>>> START INPUT\n"
                    ++ inp
                    ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> START OUTPUT\n"
-                   ++ show prettyOut
+                   ++ prettyOut
+                   -- ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> System\n"
+                   -- ++ show _sys
                    ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Oracle call\n"
       guard $ trace logMsg True
       return (res)

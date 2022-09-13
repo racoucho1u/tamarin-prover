@@ -1036,9 +1036,9 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
     prove !depth sys =
         case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []                         -> node Solved M.empty
-          (method, (cases, _expl)):_ -> node method cases
+          (method, (cases, _expl)):_ -> node method cases --trace (show $ fst . head $ M.toList cases)
       where
-        node method cases =
+        node method cases = -- trace (show $ ((prove (succ depth)) (fst cases)))
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial

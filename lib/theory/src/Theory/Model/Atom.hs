@@ -50,6 +50,10 @@ module Theory.Model.Atom(
   , prettyAtom
   , prettyNAtom
   , prettySyntacticNAtom
+
+  , changeBVarAtom
+  , insideJobi
+
   )
 where
 
@@ -68,7 +72,7 @@ import           Term.Unification
 import           Theory.Model.Fact
 import           Theory.Text.Pretty
 
-
+import Debug.Trace
 ------------------------------------------------------------------------------
 -- Atoms
 ------------------------------------------------------------------------------
@@ -162,7 +166,6 @@ instance (Apply s t, Apply s (syn t)) => Apply s (ProtoAtom syn t) where
     apply subst (Syntactic fa)    = Syntactic (apply subst fa)
 
 
-
 -- Queries
 ----------
 
@@ -194,6 +197,21 @@ toAtom (Action t fa) = Action t fa
 toAtom (EqE t t')    = EqE t t'
 toAtom (Less t t')   = Less t t'
 toAtom (Last t)      = Last t
+
+insideJobi :: VTerm Name LVar -> VTerm Name LVar
+insideJobi (viewTerm -> Lit (Var v )) = termViewToTerm ( Lit (Var ( LVar (lvarName v) (lvarSort v) 0)) )
+insideJobi jobi = jobi
+
+insideJob :: (VTerm Name (BVar LVar)) -> (VTerm Name (BVar LVar))
+insideJob (viewTerm -> Lit (Var v )) = case v of Free f -> termViewToTerm ( Lit (Var (Free ( LVar (lvarName f) (lvarSort f) 0)) )) ; _ -> termViewToTerm ( Lit (Var v ))
+insideJob bound = bound
+
+changeBVarAtom :: Atom (VTerm Name (BVar LVar)) -> Atom (VTerm Name (BVar LVar))
+changeBVarAtom (Action v (Fact t1 t2 t3)) = Action (insideJob v) (Fact t1 t2 t3) -- remplace t3 par [] par def
+changeBVarAtom (Less t1 t2) = Less (insideJob t1) (insideJob t2)
+changeBVarAtom (EqE  t1 t2) = EqE (insideJob t1) (insideJob t2)
+changeBVarAtom (Last t) = Last (insideJob t)
+changeBVarAtom (Syntactic fa) = trace ("\nSyntaxic atom: " ++ show fa) Syntactic fa
 
 ------------------------------------------------------------------------------
 -- Pretty-Printing
