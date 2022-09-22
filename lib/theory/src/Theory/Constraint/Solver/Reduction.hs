@@ -556,12 +556,14 @@ substSystem = do
     substLemmas
     c2 <- substGoals
     substPathGoals
+    substNbLoop
+    substLoopFound
     substNextGoalNr
     return (c1 <> c2)
 
 -- no invariants to maintain here
 substEdges, substLessAtoms, substLastAtom, substFormulas,
-  substSolvedFormulas, substLemmas, substPathGoals, substNextGoalNr :: Reduction ()
+  substSolvedFormulas, substLemmas, substPathGoals, substLoopFound, substNextGoalNr :: Reduction ()
 
 substEdges          = substPart sEdges
 substLessAtoms      = substPart sLessAtoms
@@ -570,6 +572,8 @@ substFormulas       = substPart sFormulas
 substSolvedFormulas = substPart sSolvedFormulas
 substLemmas         = substPart sLemmas
 substPathGoals      = substPart sPathGoals
+substNbLoop         = substPart sNbLoop
+substLoopFound      = substPart sLoopFound
 substNextGoalNr     = return ()
 
 

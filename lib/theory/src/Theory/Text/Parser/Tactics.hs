@@ -110,13 +110,13 @@ deprio = do
     return $ Deprio (nameToRanking ranking) ranking (map fst fs) (map snd fs)
 
 
-tactic :: Bool -> Parser (TacticI ProofContext)
+tactic :: Bool -> Parser (Tactic ProofContext)
 tactic diff = do
     tName <- tacticName
     presort <- option (SmartRanking diff) (selectedPreSort diff)
     prios <- option [] $ many1 prio
     deprios <- option [] $ many1 deprio
-    return $ TacticI tName presort prios deprios
+    return $ Tactic tName presort prios deprios
 
 tacticFunctions :: M.Map String ([String] -> (AnnotatedGoal, ProofContext, System) -> Bool)
 tacticFunctions = M.fromList

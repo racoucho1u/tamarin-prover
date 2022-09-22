@@ -396,7 +396,7 @@ closeTheory version thyOpts sig srcThy = do
 -- | Construct an 'AutoProver' from the given arguments (--bound,
 -- --stop-on-trace).
 constructAutoProver :: TheoryLoadOptions -> AutoProver
-constructAutoProver thyOpts =
+constructAutoProver thyOpts = trace (show $ L.get oProofBound thyOpts)
     AutoProver (L.get oHeuristic thyOpts)
                Nothing
                (L.get oProofBound thyOpts)
