@@ -285,23 +285,23 @@ execProofMethod ctxt method sys =
     freeme (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g)))
 
     foundAt :: Goal -> [Goal] -> Int
-    foundAt _ []    = -1
-    foundAt g (h:t) = if g == h then 1 else foundAt g t
+    foundAt _ []    = 0 - length(L.get sPathGoals sys)
+    foundAt g (h:t) = if g == h then 1 else 1 + foundAt g t
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goal sys = trace (show index) (if index == -1 then execSolveGoal goal False index else execSolveGoal goal True index)
+    checkForLoop goal sys = (if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index) --trace (show goal++"\n"++(show $ L.get sPathGoals sys)) execSolveGoal goal True index
         where
             index = (freeme goal) `foundAt` (L.get sPathGoals sys)
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
     execSolveGoal :: Goal -> Bool -> Int -> Maybe (M.Map CaseName System)
-    execSolveGoal goal loop index = trace ("\n\n" ++ (show $ L.get sNbLoop sys') ++ "  \n" ++ (show $ L.get sLoopFound sys') ++ "\n\n")
+    execSolveGoal goal loop index = 
         return . makeCaseNames . removeRedundantCases ctxt [] snd
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys)) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys)) -- (succ (L.get sNbLoop sys))
+        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys)) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys)) -- (succ (L.get sNbLoop sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
@@ -486,9 +486,8 @@ rankProofMethods ranking tactics ctxt sys = do
         <|> (solveGoalMethod <$> (rankGoals ctxt ranking tactics sys $ openGoals sys))
     case execProofMethod ctxt m sys of
       Just cases -> case M.toList cases of 
-          []                       -> return (m, (cases, expl))
-          -- [(case1,sys)]            -> if L.get sLoopFound sys then return (InLoop 0, (cases, expl)) else return (m, (cases, expl))
-          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop (L.get sNbLoop sys), (cases, expl)) else return (m, (cases, expl)) -- trace (show (L.get sNbLoop sys) ++ " : " ++ show (L.get sLoopFound sys))
+          []                       -> return (m, (cases, expl)) 
+          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop $ L.get sNbLoop sys, (cases, expl)) else return (m, (cases, expl)) -- trace (show (L.get sNbLoop sys) ++ " : " ++ show (L.get sLoopFound sys))
       Nothing    -> []
   where
     contradiction c                    = (Contradiction (Just c), "")
