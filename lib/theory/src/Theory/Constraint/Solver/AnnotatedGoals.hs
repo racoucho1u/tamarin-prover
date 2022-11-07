@@ -25,6 +25,8 @@ data Usefulness =
   -- ^ A goal that is likely to be constructible by the adversary.
   | CurrentlyDeducible
   -- ^ A message that is deducible for the current solution.
+  | InuLoopu
+  -- ^ A goal that have been detected as part of a loop
   deriving (Show, Eq, Ord)
 
 

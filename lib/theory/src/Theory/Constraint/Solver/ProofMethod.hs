@@ -190,7 +190,7 @@ data ProofMethod =
     Sorry (Maybe String)                 -- ^ Proof was not completed
   | Solved                               -- ^ An attack was found.
   | Simplify                             -- ^ A simplification step.
-  | InLoop Int                           -- ^ A goal that has been detected as part as a loop
+  | InLoop (Int, Maybe Goal)             -- ^ A goal that has been detected as part as a loop
   | SolveGoal Goal                       -- ^ A goal that was solved.
   | Contradiction (Maybe Contradiction)  -- ^ A contradiction could be
                                          -- derived, possibly with a reason.
@@ -241,13 +241,16 @@ instance HasFrees DiffProofMethod where
 -- and all variable indices reset.
 execProofMethod :: ProofContext
                 -> ProofMethod -> System -> Maybe (M.Map CaseName System)
-execProofMethod ctxt method sys =
+execProofMethod ctxt method sys = 
       case method of
         Sorry _                  -> return M.empty
         Solved
           | null (plainOpenGoals sys) -> return M.empty
           | otherwise                 -> Nothing
-        InLoop _                      -> return M.empty
+        InLoop (idx, Just goal)               
+          | goal `M.member` L.get sGoals sys -> execSolveGoal goal True (idx+1)
+          | otherwise                        -> Nothing
+        InLoop (_, Nothing)                  -> return M.empty
         SolveGoal goal
           | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
@@ -289,7 +292,7 @@ execProofMethod ctxt method sys =
     foundAt g (h:t) = if g == h then 1 else 1 + foundAt g t
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goal sys = (if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index) --trace (show goal++"\n"++(show $ L.get sPathGoals sys)) execSolveGoal goal True index
+    checkForLoop goal sys = if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index
         where
             index = (freeme goal) `foundAt` (L.get sPathGoals sys)
 
@@ -301,7 +304,8 @@ execProofMethod ctxt method sys =
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys)) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys)) -- (succ (L.get sNbLoop sys))
+        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop sys) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys))
+          -- if loop then L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys)) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
@@ -486,8 +490,8 @@ rankProofMethods ranking tactics ctxt sys = do
         <|> (solveGoalMethod <$> (rankGoals ctxt ranking tactics sys $ openGoals sys))
     case execProofMethod ctxt m sys of
       Just cases -> case M.toList cases of 
-          []                       -> return (m, (cases, expl)) 
-          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop $ L.get sNbLoop sys, (cases, expl)) else return (m, (cases, expl)) -- trace (show (L.get sNbLoop sys) ++ " : " ++ show (L.get sLoopFound sys))
+          []              -> return (m, (cases, expl)) 
+          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop (L.get sNbLoop sys, fromSolveGoal m) , (cases, "InLoop "++ (show $ L.get sNbLoop sys))) else return (m, (cases, expl)) -- trace (show (L.get sNbLoop sys) ++ " : " ++ show (L.get sLoopFound sys))
       Nothing    -> []
   where
     contradiction c                    = (Contradiction (Just c), "")
@@ -503,7 +507,13 @@ rankProofMethods ranking tactics ctxt sys = do
                                LoopBreaker           -> " (loop breaker)"
                                ProbablyConstructible -> " (probably constructible)"
                                CurrentlyDeducible    -> " (currently deducible)"
+                               InuLoopu              -> " (in a loop)"
       )
+
+    fromSolveGoal :: ProofMethod -> Maybe Goal
+    fromSolveGoal (SolveGoal goal) = Just goal
+    fromSolveGoal _ = Nothing
+
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'DiffProofContext' and
@@ -717,8 +727,10 @@ internalTacticRanking tactic ctxt _sys ags0 =
                    ++ inp
                    ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> START OUTPUT\n"
                    ++ prettyOut
-                   -- ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> System\n"
-                   -- ++ show _sys
+                   ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> System\n"
+                   ++ show _sys
+                   ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> ProofContext\n"
+                   ++ show ctxt
                    ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Oracle call\n"
       guard $ trace logMsg True
       return (res)
@@ -1193,7 +1205,8 @@ prettyProofMethod :: HighlightDocument d => ProofMethod -> d
 prettyProofMethod method = case method of
     Solved               -> keyword_ "SOLVED" <-> lineComment_ "trace found"
     Induction            -> keyword_ "induction"
-    InLoop _int          -> keyword_ "InLoop" <-> int _int
+    InLoop (_, Just goal)-> keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")"
+    InLoop (_, Nothing)  -> error "Not supposed to come here"
     Sorry reason         ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
     SolveGoal goal       ->

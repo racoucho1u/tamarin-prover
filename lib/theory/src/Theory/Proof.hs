@@ -766,7 +766,7 @@ selectDiffTactic prover ctx = fromMaybe [defaultTactic]
                                  (apDefaultTactic prover <|> L.get pcTactic (L.get dpcPCLeft ctx))
 
 runAutoProver :: AutoProver -> Prover
-runAutoProver aut@(AutoProver _ _  bound cut) =
+runAutoProver aut@(AutoProver _ _  bound cut) = 
     mapProverProof cutSolved $ maybe id boundProver bound autoProver
   where
     cutSolved = case cut of
@@ -892,7 +892,7 @@ cutOnSolvedSingleThreadDFSDiff prf0 =
 -- FIXME: Note that this function may use a lot of space, as it holds onto the
 -- whole proof tree.
 cutOnSolvedDFS :: Proof (Maybe a) -> Proof (Maybe a)
-cutOnSolvedDFS prf0 =
+cutOnSolvedDFS prf0 = 
     go (4 :: Integer) $ insertPaths prf0
   where
     go dMax prf = case findSolved 0 prf of
@@ -1038,10 +1038,10 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
   where
 
     prove !depth sys = case mimou of --trace (show $ head mimou) (
-          []   -> trace "1" snd $ node Solved M.empty --endNode Solved --
-          (InLoop 1 , (cases, _expl)):_ -> trace "2" endNode (Sorry $ Just "See me rollin, hatin") -- snd $ node (Sorry $ Just "See me rollin, hatin") cases -- endNode (Sorry $ Just "See me rollin, hatin")
-          (InLoop idx , (cases, _expl)):_ -> trace "3" endNode (InLoop (idx-1)) -- snd $ node (InLoop (idx-1)) M.empty --trace (show idx)
-          (method, (cases, _expl)):list -> trace "4" (if fst $ node method cases then parcoursSuite list else snd $ node method cases )-- trace (show $ fst $ node method cases) 
+          []   -> snd $ node Solved M.empty --endNode Solved --
+          (InLoop (1,_) , (cases, _expl)):_   -> endNode (Sorry $ Just "See me rollin, hatin") -- snd $ node (Sorry $ Just "See me rollin, hatin") cases -- endNode (Sorry $ Just "See me rollin, hatin")
+          (InLoop (idx,g) , (cases, _expl)):_ -> endNode (InLoop (idx-1,g)) -- snd $ node (InLoop (idx-1)) M.empty --trace (show idx)
+          (method, (cases, _expl)):list       -> if fst $ node method cases then parcoursSuite list else snd $ node method cases
         -- )() -}
       where
         -- Renvoie des goals
@@ -1056,12 +1056,13 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         --objectif scdaire, garder avoir un noeud qui construit juste le fils calculé déjà mais sans parir en récursion complète
 
-        node methodOrigin cases = trace (show methodOrigin)
+        node methodOrigin cases = 
+            -- Il n'y a plus de cas mais il peut y avoir des goals encore dans la liste
             if cases == M.empty then (False, endNode methodOrigin) else (skip, LNode (ProofStep method ()) successors)
 
             where
                 -- Recursively compute the following child
-                successors = M.map (prove (succ depth)) cases -- if M.toList cases /= [] then M.map (prove (succ depth)) cases else error "cases vide"
+                successors = M.map (prove (succ depth)) cases -- (M.fromList $ tail $ M.toList cases) -- if M.toList cases /= [] then M.map (prove (succ depth)) cases else error "cases vide"
 
                 (method, skip) = methodSkip methodOrigin $ M.toList successors
 
@@ -1072,8 +1073,8 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                 methodSkip meth [] = (method,False) --  error $ "A goal with no cases is supposed to be Contradiction or Solved, not \"" ++ show meth ++ "\"" -- (method,False) -- 
                 methodSkip _ list = case (snd $ head $ list) of 
                     LNode (ProofStep (Sorry _) _ ) _ -> (methodOrigin, True) --True: if my fst son is a Sorry Node, I want to skip it 
-                    LNode (ProofStep (InLoop 1) _) _  -> (Sorry $ Just "Just looping my way out of here, you know", False) --False
-                    LNode (ProofStep (InLoop idx) _) _  -> (InLoop (idx-1), False)
+                    LNode (ProofStep (InLoop (1,_)) _) _  -> (Sorry $ Just "Just looping my way out of here, you know", False) --False
+                    LNode (ProofStep (InLoop (idx,g)) _) _  -> (InLoop (idx-1,g), False)
                     LNode (ProofStep _ _ ) _  -> (methodOrigin, False)
 
                 
