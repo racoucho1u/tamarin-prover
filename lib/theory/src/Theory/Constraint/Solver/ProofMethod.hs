@@ -22,6 +22,7 @@ module Theory.Constraint.Solver.ProofMethod (
   , execDiffProofMethod
 
   -- ** Heuristics
+  , rankWithLoop
   , rankProofMethods
   , rankDiffProofMethods
 
@@ -70,7 +71,7 @@ import           Theory.Text.Pretty
 
 import           Text.Regex.PCRE
 
-
+import Data.Typeable
 
 ------------------------------------------------------------------------------
 -- Utilities
@@ -248,7 +249,7 @@ execProofMethod ctxt method sys =
           | null (plainOpenGoals sys) -> return M.empty
           | otherwise                 -> Nothing
         InLoop (idx, Just goal)               
-          | goal `M.member` L.get sGoals sys -> execSolveGoal goal True (idx+1)
+          | goal `M.member` L.get sGoals sys -> trace ("\nGoal\n"++(show goal)++"\n") execSolveGoal goal True (idx+1)
           | otherwise                        -> Nothing
         InLoop (_, Nothing)                  -> return M.empty
         SolveGoal goal
@@ -474,6 +475,11 @@ rankGoals ctxt ranking tacticsList = case ranking of
       chooseError [] t = error $ "No tactic has been written in the theory file"
       chooseError l  t = error $ "The tactic specified ( "++(show $ _name t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
 
+rankWithLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> [(ProofMethod, (M.Map CaseName System, String))]
+rankWithLoop [] = []
+rankWithLoop ((InLoop (idx,g), cases):l) = (rankWithLoop l)++[(InLoop (idx,g), cases)]
+rankWithLoop (h:t) =  h : rankWithLoop t
+
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'ProofContext' and
 -- for this 'System'. If the resulting list is empty, then the constraint
@@ -487,11 +493,11 @@ rankProofMethods ranking tactics ctxt sys = do
                AvoidInduction -> [(Simplify, ""), (Induction, "")]
                UseInduction   -> [(Induction, ""), (Simplify, "")]
             )
-        <|> (solveGoalMethod <$> (rankGoals ctxt ranking tactics sys $ openGoals sys))
+        <|> solveGoalMethod <$> (rankGoals ctxt ranking tactics sys $ openGoals sys)
     case execProofMethod ctxt m sys of
       Just cases -> case M.toList cases of 
           []              -> return (m, (cases, expl)) 
-          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop (L.get sNbLoop sys, fromSolveGoal m) , (cases, "InLoop "++ (show $ L.get sNbLoop sys))) else return (m, (cases, expl)) -- trace (show (L.get sNbLoop sys) ++ " : " ++ show (L.get sLoopFound sys))
+          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop (L.get sNbLoop sys, fromSolveGoal m) , (cases, "InLoop "++ (show $ L.get sNbLoop sys))) else return (m, (cases, expl))
       Nothing    -> []
   where
     contradiction c                    = (Contradiction (Just c), "")
@@ -530,7 +536,7 @@ rankDiffProofMethods ranking tactics ctxt sys = do
         <|> (case (L.get dsSide sys, L.get dsSystem sys) of
                   (Just s, Just sys') -> map (\x -> (DiffBackwardSearchStep (fst x), "Do backward search step"))
                                           $ filter (\x -> not $ fst x == Induction)
-                                          $ rankProofMethods ranking tactics (eitherProofContext ctxt s) sys'
+                                          $ rankWithLoop $ rankProofMethods ranking tactics (eitherProofContext ctxt s) sys'
                   (_     , _        ) -> [])
     case execDiffProofMethod ctxt m sys of
       Just cases -> return (m, (cases, expl))

@@ -1049,6 +1049,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         -- Parcours la suite de Goals jusqu'à en trouver un qui ne sois pas Sorry
         parcoursSuite [] =  error "No successor to be explored" --endNode (Sorry $ Just "We reached a pb captain")
+        parcoursSuite [(method, (cases, _expl))] = if fst $ node method cases then trace "Warning: cases is detected as part of a loop" snd $ node method cases else snd $ node method cases
         parcoursSuite ((method, (cases, _expl)):list) = if fst $ node method cases then parcoursSuite list else snd $ node method cases
 
         -- Crée un Node sans appeler proof sur ces fils
