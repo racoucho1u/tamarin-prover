@@ -1041,7 +1041,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
           []   -> snd $ node Solved M.empty []
           (InLoop (1,g) , (cases, _expl)):_   -> fst $ endNode (Sorry $ Just "See me rollin, hatin") (L.get sBlackList $ snd $ head $ M.toList cases) 
           (InLoop (idx,g) , (cases, _expl)):_ -> fst $ endNode (InLoop (idx-1,g)) (L.get sBlackList $ snd $ head $ M.toList cases) 
-          (method, (cases, _expl)):list       -> if fst $ node method cases (L.get sBlackList $ snd $ head $ M.toList $ cases) then parcoursSuite list (method, (cases, _expl)) (snd $ node method cases (L.get sBlackList $ snd $ head $ M.toList $ cases)) 
+          (method, (cases, _expl)):list       -> if fst $ node method cases (L.get sBlackList $ snd $ head $ M.toList $ cases) then parcoursSuite list (method, (cases, _expl)) (L.get sBlackList $ snd $ head $ M.toList $ cases) 
                                                                                                                                else (snd $ node method cases (L.get sBlackList $ snd $ head $ M.toList $ cases))
         ) -- () -} trace ("Globule: " ++ (show $ L.get sBlackList $ snd $ head $ M.toList cases))
         -- (L.get sBlackList $ snd $ head $ M.toList $ cases)
@@ -1063,17 +1063,16 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         node methodOrigin cases newBL = 
             -- Il n'y a plus de cas mais il peut y avoir des goals encore dans la liste
-            if cases == M.empty then (False, fst $ endNode methodOrigin []) else (skip, LNode (ProofStep method ()) successors)
+            if cases == M.empty then (False, fst $ endNode methodOrigin newBL) else (skip, LNode (ProofStep method ()) successors)
 
             where
                 -- Recursively compute the following child
-                successors = M.map (prove (succ depth)) cases
+                newCases =  M.map (L.set sBlackList newBL) cases
+                successors = M.map (prove (succ depth)) newCases
                 --previousSBlackList =  L.get sBlackList $ snd $ head $ M.toList $ snd $ head $ M.toList $ M.map snd $ nextChild --snd $ head $ snd $ head $ M.toList $
 
-                (method, skip) = methodSkip methodOrigin $ M.toList successors --trace ("Hermite: " ++ (show $ L.get sBlackList previousSys)) 
+                (method, skip) = trace ("Banquise: " ++ (show $ L.get sBlackList $ snd $ head $ M.toList newCases)++"\nHermite: " ++ (show $ newBL)) methodSkip methodOrigin $ M.toList successors --trace ("Hermite: " ++ (show $ L.get sBlackList previousSys)) 
                 --trace ("Banquise: " ++ (show previousSBlackList))
-
-                previousSBlackList l = L.get sBlackList $ snd $ head $ M.toList l
 
                 -- Recursively looks for the Method in the first child to put the right on in the current node
                 -- If new node is just above a Sorry node, then skip the sorry node and go to the next child
