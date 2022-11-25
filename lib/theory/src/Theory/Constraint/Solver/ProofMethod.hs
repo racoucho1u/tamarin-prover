@@ -293,7 +293,8 @@ execProofMethod ctxt method sys =
     foundAt g (h:t) l = if g == h then 1 else 1 + foundAt g t l
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goal sys = if index <= 0 then (if index_bl <= 0 then execSolveGoal goal False index else execSolveGoal goal True 0) else execSolveGoal goal True index --trace ("\nbl usefulness: "++show index_bl++"\n"++(show $ L.get sBlackList sys)) (if index_bl <= 0 then (if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index) else error "ouiiiiiiii")
+    checkForLoop goal sys = if index <= 0 then (if index_bl <= 0 then execSolveGoal goal False index else trace ("Boucle, nul! "++(show $ freeme goal)) execSolveGoal goal True 1) 
+                                                                                                     else trace ("Boucle, nullosse! "++(show $ freeme goal)) execSolveGoal goal True index --trace ("\nbl usefulness: "++show index_bl++"\n"++(show $ L.get sBlackList sys)) (if index_bl <= 0 then (if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index) else error "ouiiiiiiii")
         -- (if index_bl <= 0 then (if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index) else execSolveGoal goal True 1)
         -- if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index
         --if index <= 0 then (if index_bl <= 0 then execSolveGoal goal False index else execSolveGoal goal True 1) else execSolveGoal goal True index
@@ -309,11 +310,11 @@ execProofMethod ctxt method sys =
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'   = if loop then L.set sBlackList (freeme goal:(L.get sBlackList sys)) (L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys))) 
-                          else (L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys))) --L.set sBlackList (freeme goal:(L.get sBlackList sys)) 
+        sys'   = trace ("\n\nPitié: "++(show $ L.get sBlackList sys)) (if loop then L.set sBlackList (freeme goal:(L.get sBlackList sys)) (L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys)))
+                          else (L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys)))) --L.set sBlackList (freeme goal:(L.get sBlackList sys)) 
               -- if loop then trace (show $ length $ L.get sPathGoals sys) L.set sNbLoop index (L.set sLoopFound loop sys) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys))
               -- if loop then L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys)) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys))
-        reduc  = trace ("Genou: "++ (show $ L.get sBlackList sys')) runReduction solver ctxt sys' (avoid sys')
+        reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
                                   (fmap $ concat . intersperse "_")
