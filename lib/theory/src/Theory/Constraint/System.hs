@@ -231,6 +231,7 @@ module Theory.Constraint.System (
   , sBlackList
   , sNbLoop
   , sLoopFound
+  , sBlackListFound
 
   -- * Formula simplification
   , impliedFormulas
@@ -381,9 +382,10 @@ data System = System
     , _sLemmas         :: S.Set LNGuarded
     , _sGoals          :: M.Map Goal GoalStatus
     , _sPathGoals      :: [Goal]
-    , _sBlackList      :: [Goal]
     , _sNbLoop         :: Int
     , _sLoopFound      :: Bool
+    , _sBlackList      :: [Goal]
+    , _sBlackListFound :: Bool
     , _sNextGoalNr     :: Integer
     , _sSourceKind     :: SourceKind
     , _sDiffSystem     :: Bool
@@ -782,7 +784,7 @@ emptySystem :: SourceKind -> Bool -> System
 emptySystem d isdiff = System
     M.empty S.empty S.empty Nothing emptyEqStore
     S.empty S.empty S.empty
-    M.empty [] [] 0 False 0 d isdiff
+    M.empty [] 0 False [] False 0 d isdiff
 
 -- | The empty diff constraint system.
 emptyDiffSystem :: DiffSystem
@@ -1752,13 +1754,13 @@ instance Apply LNSubst SourceKind where
     apply = const id
 
 instance Apply LNSubst System where
-    apply subst (System a b c d e f g h i j k l m n o p) =
+    apply subst (System a b c d e f g h i j k l m n o p q) =
         System (apply subst a)
         -- we do not apply substitutions to node variables, so we do not apply them to the edges either
         b
         (apply subst c) (apply subst d)
         (apply subst e) (apply subst f) (apply subst g) (apply subst h)
-        i (apply subst j) (apply subst k) (apply subst l) (apply subst m) n (apply subst o) (apply subst p)
+        i (apply subst j) (apply subst k) (apply subst l) (apply subst m) (apply subst n) o (apply subst p) (apply subst q)
 
 instance HasFrees SourceKind where
     foldFrees = const mempty
@@ -1771,7 +1773,7 @@ instance HasFrees GoalStatus where
     mapFrees  = const pure
 
 instance HasFrees System where
-    foldFrees fun (System a b c d e f g h i j k l m n o p) =
+    foldFrees fun (System a b c d e f g h i j k l m n o p q) =
         foldFrees fun a `mappend`
         foldFrees fun b `mappend`
         foldFrees fun c `mappend`
@@ -1787,9 +1789,10 @@ instance HasFrees System where
         foldFrees fun m `mappend`
         foldFrees fun n `mappend`
         foldFrees fun o `mappend`
-        foldFrees fun p
+        foldFrees fun p `mappend`
+        foldFrees fun q
 
-    foldFreesOcc fun ctx (System a _b _c _d _e _f _g _h _i _j _k _l _m _n _o _p) =
+    foldFreesOcc fun ctx (System a _b _c _d _e _f _g _h _i _j _k _l _m _n _o _p _q) =
         foldFreesOcc fun ("a":ctx') a {- `mappend`
         foldFreesCtx fun ("b":ctx') b `mappend`
         foldFreesCtx fun ("c":ctx') c `mappend`
@@ -1803,7 +1806,7 @@ instance HasFrees System where
         foldFreesCtx fun ("k":ctx') k -}
       where ctx' = "system":ctx
 
-    mapFrees fun (System a b c d e f g h i j k l m n o p) =
+    mapFrees fun (System a b c d e f g h i j k l m n o p q) =
         System <$> mapFrees fun a
                <*> mapFrees fun b
                <*> mapFrees fun c
@@ -1820,6 +1823,7 @@ instance HasFrees System where
                <*> mapFrees fun n
                <*> mapFrees fun o
                <*> mapFrees fun p
+               <*> mapFrees fun q
 
 instance HasFrees Source where
     foldFrees f th =
@@ -1852,11 +1856,11 @@ compareNodesUpToNewVars n1 n2 = compareListsUpToNewVars (M.toAscList n1) (M.toAs
 compareSystemsUpToNewVars :: System -> System -> Ordering
 -- when we have trace systems, we can ignore new variable instantiations
 compareSystemsUpToNewVars
-   (System a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 False)
-   (System a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 False)
+   (System a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 False)
+   (System a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 q1 False)
        = if compareNodes == EQ then
-            compare (System M.empty b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 False)
-                (System M.empty b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 False)
+            compare (System M.empty b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 n1 o1 p1 False)
+                (System M.empty b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 n2 o2 q1 False)
          else
             compareNodes
         where

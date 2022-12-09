@@ -101,7 +101,7 @@ applyMethodAtPath thy lemmaName proofPath prover i = do
         heuristic = selectHeuristic prover ctxt
         ranking = useHeuristic heuristic (length proofPath)
         tactic = selectTactic prover ctxt
-    methods <- (map fst . rankProofMethods ranking tactic ctxt) <$> sys
+    methods <- (map fst . rankWithLoop . rankProofMethods ranking tactic ctxt) <$> sys 
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyProverAtPath thy lemmaName proofPath
       (oneStepProver method                        `mappend`
@@ -122,7 +122,7 @@ applyMethodAtPathDiff thy s lemmaName proofPath prover i = do
         heuristic = selectHeuristic prover ctxt
         ranking = useHeuristic heuristic (length proofPath)
         tactic = selectTactic prover ctxt
-    methods <- (map fst . rankProofMethods ranking tactic ctxt) <$> sys
+    methods <- (map fst . rankWithLoop . rankProofMethods ranking tactic ctxt) <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyProverAtPathDiff thy s lemmaName proofPath
       (oneStepProver method                        `mappend`
@@ -577,8 +577,8 @@ subProofSnippet renderUrl tidx ti lemma proofPath ctxt prf =
     depth                   = length proofPath
     heuristic               = selectHeuristic (tiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
-    tactic                 = selectTactic (tiAutoProver ti) ctxt
-    proofMethods            = rankProofMethods ranking tactic ctxt
+    tactic                  = selectTactic (tiAutoProver ti) ctxt
+    proofMethods            = rankWithLoop . rankProofMethods ranking tactic ctxt
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
         [ withTag "h4" [] (text "Case" <-> text name)
@@ -670,8 +670,8 @@ subProofDiffSnippet renderUrl tidx ti s lemma proofPath ctxt prf =
     depth                   = length proofPath
     heuristic               = selectHeuristic (dtiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
-    tactic                 = selectTactic (dtiAutoProver ti) ctxt
-    proofMethods            = rankProofMethods ranking tactic ctxt
+    tactic                  = selectTactic (dtiAutoProver ti) ctxt
+    proofMethods            = rankWithLoop . rankProofMethods ranking tactic ctxt
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
         [ withTag "h4" [] (text "Case" <-> text name)
