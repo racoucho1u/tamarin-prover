@@ -293,9 +293,7 @@ execProofMethod ctxt method sys =
     foundAt g (h:t) l = if g == h then 1 else 1 + foundAt g t l
 
     checkForLoop :: Goal -> System -> Bool -> Int -> Maybe (M.Map CaseName System)
-    checkForLoop goal sys foundLoop idx_bl = if index <= 0 then execSolveGoal goal False False index 0 else execSolveGoal goal True False index 0 
-        -- If goal is found to be part of a loop, no need to check for the blacklist
-        -- trace ("Loop patrouille: "++show goal++"\nIndex: "++show index++"\nIndex BL: "++show index_bl++"\nLength bl: "++(show $ length $ L.get sBlackList sys))
+    checkForLoop goal sys foundLoop idx_bl = if index <= 0 then execSolveGoal goal False False index 0 else execSolveGoal goal True False index 0
         where
             index = foundAt (freeme goal) (L.get sPathGoals sys) (length $ L.get sPathGoals sys)
 
@@ -316,7 +314,7 @@ execProofMethod ctxt method sys =
         sys'   = if bl then L.set sLoopFound False (L.set sNbLoop 0 (L.set sBlackListFound True sys))
                     else if loop then L.set sBlackListFound False (L.set sBlackList (freeme goal:(L.get sBlackList sys)) (L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys))))  
                         else L.set sLoopFound False (L.set sNbLoop 0 (L.set sBlackListFound False (L.set sLoopFound False (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys))))
-        reduc  = runReduction solver ctxt sys' (avoid sys') --trace ("Hello my baby: "++(show $ L.get sPathGoals sys)) 
+        reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
                                   (fmap $ concat . intersperse "_")
@@ -743,13 +741,9 @@ internalTacticRanking tactic ctxt _sys ags0 =
       let prettyOut = unlines (map show outp)
       let logMsg = ">>>>>>>>>>>>>>>>>>>>>>>> START INPUT\n"
                    ++ inp
-                   ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> START OUTPUT\n"
-                   ++ prettyOut
-                   ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> System\n"
-                   ++ show _sys
                    ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> ProofContext\n"
                    ++ show ctxt
-                   ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Oracle call\n"
+                   ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Tactic call\n"
       guard $ trace logMsg True
       return (res)
   where
