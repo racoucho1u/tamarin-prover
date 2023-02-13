@@ -1760,7 +1760,7 @@ instance Apply LNSubst System where
         b
         (apply subst c) (apply subst d)
         (apply subst e) (apply subst f) (apply subst g) (apply subst h)
-        i (apply subst j) (apply subst k) (apply subst l) (apply subst m) (apply subst n) o (apply subst p) (apply subst q)
+        i ((apply subst j)++j) (apply subst k) (apply subst l) (fold  (\l x -> if x `elem` l then l else x:l) m (apply subst m)) (apply subst n) o (apply subst p) (apply subst q)
 
 instance HasFrees SourceKind where
     foldFrees = const mempty
