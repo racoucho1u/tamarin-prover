@@ -381,7 +381,7 @@ data System = System
     , _sSolvedFormulas :: S.Set LNGuarded
     , _sLemmas         :: S.Set LNGuarded
     , _sGoals          :: M.Map Goal GoalStatus
-    , _sPathGoals      :: [Goal]
+    , _sPathGoals      :: [[Goal]]
     , _sNbLoop         :: Int
     , _sLoopFound      :: Bool
     , _sBlackList      :: [Goal]
@@ -1103,7 +1103,7 @@ impliedFormulasAndSystems :: MaudeHandle -> System -> LNGuarded -> [(LNGuarded, 
 impliedFormulasAndSystems hnd sys gf = res
   where
     res = case (openGuarded gf `evalFresh` avoid (gf, sys)) of
-      Just (All, _vs, antecedent, succedent) -> map (\x -> apply x (succedent', sys)) subst
+      Just (All, _vs, antecedent, succedent) -> error "milou" --map (\x -> apply x (succedent', sys)) subst --Apply system sert ici
         where
           (actionsEqs, otherAtoms) = first sortGAtoms . partitionEithers $ map prepare antecedent
           succedent'               = gall [] otherAtoms succedent
@@ -1112,7 +1112,7 @@ impliedFormulasAndSystems hnd sys gf = res
                then []
                else (`runReader` hnd) (unifyLNTerm y)) (equalities actionsEqs)
           subst  = map (\x -> freshToFreeAvoiding x ((gf, x), sys)) subst'
-      _ -> []
+      _ -> error "RAAAAh" --[]
 
     prepare (Action i fa) = Left  (GAction i fa)
     prepare (EqE s t)     = Left  (GEqE s t)
@@ -1754,13 +1754,19 @@ instance Apply LNSubst SourceKind where
     apply = const id
 
 instance Apply LNSubst System where
-    apply subst (System a b c d e f g h i j k l m n o p q) =
+    apply subst (System a b c d e f g h i j k l m n o p q) = 
         System (apply subst a)
         -- we do not apply substitutions to node variables, so we do not apply them to the edges either
         b
         (apply subst c) (apply subst d)
         (apply subst e) (apply subst f) (apply subst g) (apply subst h)
-        i ((apply subst j)++j) (apply subst k) (apply subst l) (fold  (\l x -> if x `elem` l then l else x:l) m (apply subst m)) (apply subst n) o (apply subst p) (apply subst q)
+        i (unifyLists j) (apply subst k) (apply subst l) (foldl  (\li x -> if x `elem` li then li else x:li) m (apply subst m)) (apply subst n) o (apply subst p) (apply subst q)
+
+        where
+            unifyLists :: [[Goal]] -> [[Goal]]
+            unifyLists [] = []
+            unifyLists [goal] = [foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)]
+            unifyLists (goal:t) = [foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)]++(unifyLists t)
 
 instance HasFrees SourceKind where
     foldFrees = const mempty

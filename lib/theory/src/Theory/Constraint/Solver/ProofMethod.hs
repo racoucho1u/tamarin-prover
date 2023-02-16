@@ -288,32 +288,36 @@ execProofMethod ctxt method sys =
     freeme (SplitG s) = (SplitG s)
     freeme (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g)))
 
-    foundAt :: Goal -> [Goal] -> Int -> Int
-    foundAt _ [] l   = 0 - l
-    foundAt g (h:t) l = if g == h then 1 else 1 + foundAt g t l
+    foundAtBl :: Goal -> [Goal] -> Int -> Int
+    foundAtBl _ [] l   = 0 - l
+    foundAtBl g (h:t) l = if g == h then 1 else 1 + foundAtBl g t l
+
+    foundAtP :: Goal -> [[Goal]] -> Int -> Int
+    foundAtP _ [] l   = 0 - l
+    foundAtP g (h:t) l = if g `elem` h then 1 else 1 + foundAtP g t l
 
     checkForLoop :: Goal -> System -> Bool -> Int -> Maybe (M.Map CaseName System)
     checkForLoop goal sys foundLoop idx_bl = if index <= 0 then execSolveGoal goal False False index 0 else execSolveGoal goal True False index 0
         where
-            index = foundAt (freeme goal) (map freeme $ L.get sPathGoals sys) (length $ L.get sPathGoals sys) --trace ("OldList: "++ (show $ L.get sPathGoals sys)++"\nFreed goal: "++(show $ freeme goal)++"\nOpen goals: "++(show $ L.get sGoals sys))
+            index = foundAtP (freeme goal) (map (map freeme) (L.get sPathGoals sys)) (length $ L.get sPathGoals sys) --trace ("OldList: "++ (show $ L.get sPathGoals sys)++"\nFreed goal: "++(show $ freeme goal)++"\nOpen goals: "++(show $ L.get sGoals sys))
 
     checkBlackList :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkBlackList goal sys = if index_bl <= 0 then checkForLoop goal sys False index_bl else execSolveGoal goal False True 0 index_bl
+    checkBlackList goal sys = if index_bl <= 0 then checkForLoop goal sys False index_bl else trace ("Detected! "++show goal) execSolveGoal goal False True 0 index_bl
                                                                                                      
         where
-            index_bl = foundAt (freeme goal) (map freeme $ L.get sBlackList sys) (length $ L.get sBlackList sys) --trace ("\nFree goal: "++(show $ freeme goal)++"\n")
+            index_bl = foundAtBl (freeme goal) (map freeme $ L.get sBlackList sys) (length $ L.get sBlackList sys) --trace ("\nFree goal: "++(show $ freeme goal)++"\n")
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
     execSolveGoal :: Goal -> Bool -> Bool -> Int -> Int -> Maybe (M.Map CaseName System)
-    execSolveGoal goal loop bl index idx_bl = --trace ("Open goals:  "++(show $ goal)++"\nBL: "++(show $ length (L.get sBlackList sys'))++" "++(show $ (L.get sBlackList sys')))
+    execSolveGoal goal loop bl index idx_bl = trace ("1:Open goals:  "++(show $ goal)++"\n1:Detected: "++show bl++" "++show loop++"\n1:BL: "++(show $ length (L.get sBlackList sys'))++" "++(show $ (L.get sBlackList sys'))++"\n1:LoopMachin: "++(show $ length (L.get sPathGoals sys'))++" "++(show $ (L.get sPathGoals sys')))
         return . makeCaseNames . removeRedundantCases ctxt [] snd
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
         sys'   = if bl then L.set sLoopFound False (L.set sNbLoop 0 (L.set sBlackListFound True sys))
-                     else if loop then L.set sBlackListFound False (L.set sBlackList (goal:(L.get sBlackList sys)) (L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys))))  --trace (show index) 
-                     else L.set sLoopFound False (L.set sNbLoop 0 (L.set sBlackListFound False (L.set sLoopFound False (L.set sPathGoals (trace ("List:Goal: "++(show goal)++"List:FreedGoal: "++(show $ freeme goal)++"\nList:InLoopList: "++(show $ length $ L.get sPathGoals sys)++" "++(show $ (map freeme $ L.get sPathGoals sys))) freeme goal:(L.get sPathGoals sys)) sys))))
+                     else if loop then trace ("BLnew "++(show $ L.get sBlackList sys)) L.set sBlackListFound False (L.set sBlackList (goal:(L.get sBlackList sys)) (L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys))))  --trace (show index) 
+                     else L.set sLoopFound False (L.set sNbLoop 0 (L.set sBlackListFound False (L.set sLoopFound False (L.set sPathGoals ([freeme goal]:(L.get sPathGoals sys)) sys)))) --("List:Goal: "++(show goal)++"List:FreedGoal: "++(show $ freeme goal)++"\nList:InLoopList: "++(show $ map length $ L.get sPathGoals sys)++" "++(show $ (map (map freeme) $ L.get sPathGoals sys)))
         reduc  =  runReduction solver ctxt sys' (avoid sys')    
         --trace ("List: oui: "++(show $ freeme goal)++" "++(show $ goal)++"\nList: "++(show $ length (L.get sPathGoals sys'))++" "++(show $ (map freeme $ L.get sPathGoals sys'))++"\nBL: "++(show $ length (L.get sBlackList sys'))++" "++(show $ (L.get sBlackList sys')))
         --(show $ length (L.get sPathGoals sys'))++" "++(show $ (map freeme $ L.get sPathGoals sys')))   
@@ -448,7 +452,7 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
                            Just cases -> Just $ M.map (\x -> L.set dsSystem (Just x) sys) cases
 
     isSolved :: Side -> System -> Bool
-    isSolved s sys' = ((rankProofMethods GoalNrRanking [defaultTactic] (eitherProofContext ctxt s) sys') == []) && not (L.get sLoopFound sys') -- checks if the system is solved
+    isSolved s sys' = ((rankProofMethods GoalNrRanking [defaultTactic] (eitherProofContext ctxt s) sys') == []) && not (L.get sLoopFound sys')  && not (L.get sBlackListFound sys') -- checks if the system is solved
 
 ------------------------------------------------------------------------------
 -- Heuristics

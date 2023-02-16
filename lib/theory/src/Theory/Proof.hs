@@ -1034,7 +1034,7 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-    sndOf3 $ prove d0 sys0
+    sndOf3 $ prove d0 sys0 --trace ("Genou mf "++ (show $ sndOf3 $ prove d0 sys0))  
   where
 
     fstOf3 :: (a,b,c) -> a
@@ -1047,10 +1047,10 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
     thdOf3 (_,_,c) = c
 
 
-    prove !depth sys = case mimou of --"\nCurrent blacklist: " ++ (show $ L.get sBlackList sys)++"\nSize of blacklist: " ++ (show $ length $ L.get sBlackList sys)++"\nOpen goals: " ++ (show $ openGoals sys)++"\nNb of open goals: " ++ (show $ length $ openGoals sys)
-          []   -> node "prove solved" Solved M.empty [] 
-          (InLoop (1,g) , (cases, _expl)):_   -> endNode (Sorry $ Just ("See me rollin, hatin: "++show g)) (filtercases $ M.toList cases) 
-          (InLoop (idx,g) , (cases, _expl)):_ -> endNode (InLoop (idx-1,g)) (filtercases $ M.toList cases) 
+    prove !depth sys = case mimou of
+          []   -> node "prove solved" Solved M.empty (L.get sBlackList sys)
+          (InLoop (1,g) , (cases, _expl)):_   -> endNode (Sorry $ Just ("See me rollin, hatin: "++show g)) (filtercases $ M.toList cases) --trace ("BeforeARPM: "++(show $ L.get sBlackList sys)++" "++(show $ filtercases $ M.toList cases)) 
+          (InLoop (idx,g) , (cases, _expl)):_ -> endNode (InLoop (idx-1,g)) (filtercases $ M.toList cases) --trace ("BeforeARPM: "++(show $ L.get sBlackList sys)++" "++(show $ filtercases $ M.toList cases)) 
           (Sorry (Just o), (cases0,_)):(method, (cases, _expl)):list -> if areUWorthy method then parcoursSuite ((method, (cases, _expl)):list) (method, (cases, _expl)) (thdOf3 $ node "deamed worthy" method cases (filtercases $ M.toList cases) )
                                                                                              else parcoursSuite list (method, (cases, _expl)) (filtercases $ M.toList cases)
           [(Sorry (Just o), (cases, _expl))] -> error "Black listed and nowhere else to go"
@@ -1061,8 +1061,10 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         -- Renvoie des goals
         mimou = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys
 
-        filtercases [] = []
-        filtercases cases = L.get sBlackList $ snd $ head $ cases
+        filtercases [] = L.get sBlackList sys
+        filtercases cases = foldl (\l_finale sous_list -> dealWsousList l_finale sous_list) [] (map (L.get sBlackList) (map snd cases)) --trace ("BeforeFiltercase: " ++ (show $ concat $ map (L.get sBlackList) (map snd cases)))
+            where dealWsousList l ssl = foldl  (\li x -> if x `elem` li then li else x:li) l ssl
+        --pour être plus propre: voir comment gérer ça en restant en M.list
 
         --aled = node method cases
         areUWorthy (Sorry (Just o)) = False
@@ -1072,27 +1074,32 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         -- Parcours la suite de Goals jusqu'à en trouver un qui ne sois pas Sorry
         parcoursSuite [] (method0, (cases0, _expl0)) nbl = node "cas qui pue, plus rien" method0 cases0 (trace ("Warning: no other cases, going back to first choice: "++(show $ method0)) nbl) -- error "No successor to be explored"
+        parcoursSuite [(method, (cases, _expl))] (method0, (cases0, _expl0)) nbl = node "cas qui pue, plus qu'un" method cases (trace ("Warning: no other cases, going back to last choice: "++(show $ method)) nbl)
         --parcoursSuite [(method, (cases, _expl))] (method0, (cases0, _expl0)) nbl = if fstOf3 $ node method cases nbl then trace ("Warning: all cases are detected as part of a loop, going back to first choice: "++(show $ method0)) node "cas pas bien" method0 cases0 nbl 
         --                                                                                                             else node "cas bien" method cases nbl
-        parcoursSuite ((InLoop (_,_), (cases, _expl)):list) (method0, (cases0, _expl0)) nbl = parcoursSuite list (method0, (cases0, _expl0)) nbl   
-        parcoursSuite ((Sorry (Just o), (cases, _expl)):list) (method0, (cases0, _expl0)) nbl = parcoursSuite list (method0, (cases0, _expl0)) nbl                                                                                       
-        parcoursSuite ((method, (cases, _expl)):list) (method0, (cases0, _expl0)) nbl = (if fstOf3 $ node "parcours suite test" method cases nbl  then parcoursSuite list (method0, (cases0, _expl0)) nbl else node "Parcours suite abouti" method cases nbl)
+        parcoursSuite ((InLoop (_,_), (cases, _expl)):list) (method0, (cases0, _expl0)) nbl = parcoursSuite list (trace "Should be backtracking" method0, (cases0, _expl0)) nbl   
+        parcoursSuite ((Sorry (Just o), (cases, _expl)):list) (method0, (cases0, _expl0)) nbl = parcoursSuite list (trace "Should be backtracking too" method0, (cases0, _expl0)) nbl                                                                                       
+        parcoursSuite ((method, (cases, _expl)):list) (method0, (cases0, _expl0)) nbl = if fstOf3 $ node "parcours suite test" method cases nbl  then parcoursSuite list (method0, (cases0, _expl0)) nbl else node "Parcours suite abouti" method cases nbl
 
         -- Crée un Node sans appeler proof sur ces fils
-        endNode method lastBL = (False, LNode (ProofStep method ()) M.empty,lastBL)
+        endNode method lastBL = (False, LNode (ProofStep method ()) M.empty,lastBL) --trace ("BeforeMethod: "++show method++" "++show lastBL)
         --objectif scdaire, garder avoir un noeud qui construit juste le fils calculé déjà mais sans parir en récursion complète
 
-        node info methodOrigin cases newBL = 
+        node info methodOrigin cases newBL = --trace ("Nodo:Msg: "++show methodOrigin++" "++show successors++"\nBeforeLASTBL: "++show (newBL++lastBL))
             -- Il n'y a plus de cas mais il peut y avoir des goals encore dans la liste
-            if cases == M.empty then endNode methodOrigin lastBL else (skip, LNode (ProofStep method ()) successors,lastBL)
+            (if cases == M.empty then endNode (trace ("Nodo:Endnode: "++(show methodOrigin)) methodOrigin) (trace ("Nodo:BeforeLASTBL: "++show newBL) newBL) else (skip, LNode (ProofStep method ()) successors, lastBL))
+            --trace ("Nodo:Msg: "++info++" "++show successors) 
+            --trace ("Nodo:Node: "++ (show $ LNode (ProofStep method ()) successors))
+            --trace ("List: "++(show $ length $ M.toList cases)++" "++(show $ map fst $ M.toList cases))
 
             where
                 -- Recursively compute the following child
-                newCases =  M.map (L.set sBlackList newBL) cases
-                afterProof = M.map (prove (succ depth)) newCases
-                successors = M.map sndOf3 afterProof
-                fu = M.toList $ M.map thdOf3 afterProof
-                lastBL = if fu == [] then [] else head $ map snd $ fu
+                --newCases = M.map (L.set sBlackList newBL) cases --trace ("BeforeNewBl"++(show newBL))
+                --afterProof = M.map (prove (succ depth)) newCases --trace ("Before"++(show $ map (L.get sBlackList) (map snd (M.toList newCases))))
+                afterProof = M.fromList $ exploreChild (M.toList cases) newBL
+                successors = M.map sndOf3 afterProof --trace ("After"++(show $ map (L.get sBlackList) (map snd (M.toList newCases)))) 
+                --fu = M.toList $ M.map thdOf3 afterProof
+                lastBL =  trace ("GI: "++(show $ map length (map thdOf3 ((map snd) (M.toList afterProof))))++" "++(show $ map thdOf3 ((map snd) (M.toList afterProof)))) thdOf3 $ snd $ last $ M.toList afterProof--(if fu == [] then [] else concat $ map snd $ fu)
                 --previousSBlackList =  L.get sBlackList $ snd $ head $ M.toList $ snd $ head $ M.toList $ M.map snd $ nextChild --snd $ head $ snd $ head $ M.toList $
 
                 (method, skip) = methodSkip methodOrigin $ M.toList successors 
@@ -1107,6 +1114,13 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                     LNode (ProofStep (InLoop (1,g)) _) _  -> (Sorry $ Just $ "Just looping my way out of here, you know: "++show g, False) --False
                     LNode (ProofStep (InLoop (idx,g)) _) _  -> (InLoop (idx-1,g), False)
                     LNode (ProofStep _ _ ) _  -> (methodOrigin, False)
+
+                parcoursCases current_case updated_bl = prove (succ depth) newCases  --au moment de lancer ici l'info ne peut pas être perdue
+                    where newCases = L.set sBlackList updated_bl current_case --(foldl  (\li x -> if x `elem` li then li else x:li) (L.get sBlackList current_case) updated_bl)
+
+                exploreChild [] _ = []
+                exploreChild ((current_case,sys):t) bl = (current_case,explored_case):(exploreChild t $ thdOf3 explored_case)
+                    where explored_case = parcoursCases sys bl
 
 
 
