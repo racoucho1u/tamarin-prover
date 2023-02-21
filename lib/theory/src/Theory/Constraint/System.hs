@@ -1760,7 +1760,7 @@ instance Apply LNSubst System where
         b
         (apply subst c) (apply subst d)
         (apply subst e) (apply subst f) (apply subst g) (apply subst h)
-        i (unifyLists j) (apply subst k) (apply subst l) (foldl  (\li x -> if x `elem` li then li else x:li) m (apply subst m)) (apply subst n) o (apply subst p) (apply subst q)
+        i j (apply subst k) (apply subst l) (foldl  (\li x -> if x `elem` li then li else x:li) m (apply subst m)) (apply subst n) o (apply subst p) (apply subst q)
 
         where
             unifyLists :: [[Goal]] -> [[Goal]]
