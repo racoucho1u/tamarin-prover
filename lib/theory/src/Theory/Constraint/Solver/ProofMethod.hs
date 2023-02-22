@@ -20,6 +20,7 @@ module Theory.Constraint.Solver.ProofMethod (
   , DiffProofMethod(..)
   , execProofMethod
   , execDiffProofMethod
+  , freeme
 
   -- ** Heuristics
   , rankWithLoop
@@ -238,6 +239,13 @@ instance HasFrees DiffProofMethod where
 -- @execMethod rules method se@ checks first if the @method@ is applicable to
 -- the sequent @se@. Then, it applies the @method@ to the sequent under the
 -- assumption that the @rules@ describe all rewriting rules in scope.
+
+freeme :: Goal -> Goal
+freeme (ActionG v f) = (ActionG (LVar (lvarName v) (lvarSort v) 0) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))) --encore des chose a enlever dans factTerms f
+freeme (ChainG (ni1, cidx) (ni2, pidx)) = (ChainG ((LVar (lvarName ni1) (lvarSort ni1) 0), cidx) ((LVar (lvarName ni2) (lvarSort ni2) 0), pidx))
+freeme (PremiseG (ni, pidx) f) = (PremiseG ((LVar (lvarName ni) (lvarSort ni) 0), pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))) --encore des chose a enlever dans factTerms f
+freeme (SplitG s) = (SplitG s)
+freeme (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g))) 
 --
 -- NOTE that the returned systems have their free substitution fully applied
 -- and all variable indices reset.
@@ -283,13 +291,6 @@ execProofMethod ctxt method sys =
           syss                ->
                return $ M.fromList (zip (map show [(1::Int)..]) syss)
       where check sys' = cleanupSystem sys /= sys'
-
-    freeme :: Goal -> Goal
-    freeme (ActionG v f) = (ActionG (LVar (lvarName v) (lvarSort v) 0) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))) --encore des chose a enlever dans factTerms f
-    freeme (ChainG (ni1, cidx) (ni2, pidx)) = (ChainG ((LVar (lvarName ni1) (lvarSort ni1) 0), cidx) ((LVar (lvarName ni2) (lvarSort ni2) 0), pidx))
-    freeme (PremiseG (ni, pidx) f) = (PremiseG ((LVar (lvarName ni) (lvarSort ni) 0), pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))) --encore des chose a enlever dans factTerms f
-    freeme (SplitG s) = (SplitG s)
-    freeme (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g)))
 
     foundAtBl :: Goal -> [Goal] -> Int -> Int
     foundAtBl _ [] l   = 0 - l

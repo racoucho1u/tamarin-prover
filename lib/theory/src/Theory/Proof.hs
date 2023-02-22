@@ -1051,8 +1051,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
           []   -> node "prove solved" Solved M.empty (L.get sBlackList sys)
           (InLoop (1,g) , (cases, _expl)):_   -> endNode (BlackListed g) (filtercases $ M.toList cases) --trace ("BeforeARPM: "++(show $ L.get sBlackList sys)++" "++(show $ filtercases $ M.toList cases)) 
           (InLoop (idx,g) , (cases, _expl)):_ -> endNode (InLoop (idx-1,g)) (filtercases $ M.toList cases) --trace ("BeforeARPM: "++(show $ L.get sBlackList sys)++" "++(show $ filtercases $ M.toList cases)) 
-          (BlackListed g, (cases0,_)):(method, (cases, _expl)):list -> if areUWorthy method then parcoursSuite ((method, (cases, _expl)):list) (method, (cases, _expl)) (thdOf3 $ node "deamed worthy" method cases (filtercases $ M.toList cases) )
-                                                                                             else parcoursSuite list (method, (cases, _expl)) (filtercases $ M.toList cases)
+          (BlackListed g, (cases,_expl)):list -> parcoursSuite list (BlackListed g, (cases,_expl)) (filtercases $ M.toList cases)
           --[(Sorry (Just o), (cases, _expl))] -> error "Black listed and nowhere else to go"
           (method, (cases, _expl)):list       -> if fstOf3 $ node "prove parcoursSuite, test" method cases (filtercases $ M.toList cases) 
                                                                     then parcoursSuite list (method, (cases, _expl)) (thdOf3 $ (node "Recupération de la bl pour pouvoir continuer" method cases (filtercases $ M.toList cases) )) 
@@ -1062,11 +1061,8 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         mimou = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys --rankWithLoop $ 
 
         filtercases [] = L.get sBlackList sys
-        filtercases cases = foldl (\l_finale sous_list -> dealWsousList l_finale sous_list) [] (map (L.get sBlackList) (map snd cases)) --trace ("BeforeFiltercase: " ++ (show $ concat $ map (L.get sBlackList) (map snd cases)))
-            where dealWsousList l ssl = foldl  (\li x -> if x `elem` li then li else x:li) l ssl
-        --pour être plus propre: voir comment gérer ça en restant en M.list
+        filtercases cases = foldl (\l x -> if freeme x `elem` l then l else (freeme x):l) [] (concat $ map (L.get sBlackList) (map snd cases)) --trace ("BeforeFiltercase: " ++ (show $ concat $ map (L.get sBlackList) (map snd cases)))
 
-        --aled = node method cases
         areUWorthy (BlackListed _) = False
         areUWorthy (InLoop (_,_))  = False
         areUWorthy _ = True
