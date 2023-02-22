@@ -48,7 +48,7 @@ restriction complicate:
  "All x #i. Complicated(x)@i // blabla
    ==> (Ex y #j. Complicated(y)@j & #j < #i) | (Ex y #j. Simpleunique(y)@j & #j < #i)"
 
-lemma uniqueness[heuristic={huhu}]:
+lemma uniqueness:
  "All #i #j x. Unique(x)@i & Unique(x)@j ==> #i=#j"
 
 end

@@ -191,7 +191,7 @@ data ProofMethod =
     Sorry (Maybe String)                 -- ^ Proof was not completed
   | Solved                               -- ^ An attack was found.
   | Simplify                             -- ^ A simplification step.
-  | InLoop (Int, Goal)                   -- ^ A goal that has been detected as part as a loop
+  | InLoop (Int, Goal)             -- ^ A goal that has been detected as part as a loop
   | BlackListed Goal                     -- ^ A goal that has been detected by the blacklist
   | SolveGoal Goal                       -- ^ A goal that was solved.
   | Contradiction (Maybe Contradiction)  -- ^ A contradiction could be
@@ -246,16 +246,15 @@ execProofMethod :: ProofContext
 execProofMethod ctxt method sys = 
       case method of
         Sorry _                  -> return M.empty
-        BlackListed goal
-          | goal `M.member` L.get sGoals sys -> checkBlackList goal sys --execSolveGoal goal True False (idx) 0
-          | otherwise                        -> Nothing
         Solved
           | null (plainOpenGoals sys) -> return M.empty
           | otherwise                 -> Nothing
         InLoop (idx, goal)               
           | goal `M.member` L.get sGoals sys -> checkBlackList goal sys --execSolveGoal goal True False (idx) 0
           | otherwise                        -> Nothing
-        --InLoop (_, Nothing)                  -> return M.empty
+        BlackListed goal
+          | goal `M.member` L.get sGoals sys -> checkBlackList goal sys --execSolveGoal goal True False (idx) 0
+          | otherwise                        -> Nothing
         SolveGoal goal
           | goal `M.member` L.get sGoals sys -> checkBlackList goal sys
           | otherwise                        -> Nothing
@@ -314,8 +313,7 @@ execProofMethod ctxt method sys =
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
     execSolveGoal :: Goal -> Bool -> Bool -> Int -> Int -> Maybe (M.Map CaseName System)
-    execSolveGoal goal loop bl index idx_bl = --trace ("Freeage: "++show index++" "++(show goal)++" "++(show $ freeme goal)++" "++(show $ (map (map freeme) (L.get sPathGoals sys)))) 
-    --trace ("1:BL: "++(show $ length (L.get sBlackList sys'))++" "++(show $ (L.get sBlackList sys'))++"\n1:LoopMachin: "++(show $ map length (L.get sPathGoals sys'))++" "++(show $ (L.get sPathGoals sys'))) --trace ("1:Open goals:  "++show bl++" "++show loop++" "++(show $ goal)"\n1:BL: "++(show $ length (L.get sBlackList sys'))++" "++(show $ (L.get sBlackList sys'))++"\n1:LoopMachin: "++(show $ map length (L.get sPathGoals sys'))++" "++(show $ (L.get sPathGoals sys')))
+    execSolveGoal goal loop bl index idx_bl = 
         return . makeCaseNames . removeRedundantCases ctxt [] snd
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
@@ -505,7 +503,7 @@ rankWithLoop (h:t) =  h : rankWithLoop t
 -- system is solved.
 rankProofMethods :: GoalRanking ProofContext -> [Tactic ProofContext] -> ProofContext -> System
                  -> [(ProofMethod, (M.Map CaseName System, String))]
-rankProofMethods ranking tactics ctxt sys = trace ("openGoals: "++(show $ openGoals sys)) (do 
+rankProofMethods ranking tactics ctxt sys = do
     (m, expl) <-
             (contradiction <$> contradictions ctxt sys)
         <|> (case L.get pcUseInduction ctxt of
@@ -517,9 +515,9 @@ rankProofMethods ranking tactics ctxt sys = trace ("openGoals: "++(show $ openGo
       Just cases -> case M.toList cases of 
           []              -> return (m, (cases, expl)) 
           ((case1,sys):_) -> if (L.get sBlackListFound sys) then return (BlackListed $ fromJust $ fromSolveGoal m, (cases, expl))
-                               else if (L.get sLoopFound sys) then return (InLoop (L.get sNbLoop sys, fromJust $ fromSolveGoal m) , (cases, "InLoop "++ (show $ L.get sNbLoop sys)))
+                               else if (L.get sLoopFound sys) then return (InLoop (L.get sNbLoop sys,  fromJust $ fromSolveGoal m) , (cases, "InLoop "++ (show $ L.get sNbLoop sys)))
                                     else return (m, (cases, expl))
-      Nothing    -> [])
+      Nothing    -> []
   where
     contradiction c                    = (Contradiction (Just c), "")
 
@@ -753,7 +751,7 @@ internalTacticRanking tactic ctxt _sys ags0 =
       let logMsg = ">>>>>>>>>>>>>>>>>>>>>>>> START INPUT\n"
                    ++ inp
                    ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> ProofContext\n"
-                   ++ show ctxt
+                   ++ prettyOut
                    ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Tactic call\n"
       guard $ trace logMsg True
       return (res)
@@ -1228,8 +1226,7 @@ prettyProofMethod :: HighlightDocument d => ProofMethod -> d
 prettyProofMethod method = case method of
     Solved               -> keyword_ "SOLVED" <-> lineComment_ "trace found"
     Induction            -> keyword_ "induction"
-    InLoop (_, goal)-> keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")"
-    --InLoop (_, Nothing)  -> error "Not supposed to come here"
+    InLoop (_, goal)     -> keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")"
     BlackListed goal     -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just "blacklisted goal")]
     Sorry reason         ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
