@@ -123,6 +123,8 @@ import           Theory.Text.Pretty
 
 
 import           Theory.Constraint.Solver.Goals
+
+--import           Debug.Hugs.Observe
 ------------------------------------------------------------------------------
 -- Utility: Trees with uniquely labelled edges.
 ------------------------------------------------------------------------------
@@ -459,7 +461,7 @@ checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
         (Sorry reason, _         ) -> sorryNode reason cs
         (_           , Just cases) -> node method $ checkChildren cases
         (_           , Nothing   ) ->
-            sorryNode (Just "invalid proof step encountered")
+            sorryNode (Just $ "invalid proof step encountered "++show method++"\n"++(show $ L.get sGoals sys))
                       (M.singleton "" prf)
   where
     node m                 = LNode (ProofStep m (Just info, Just sys))
@@ -486,7 +488,7 @@ checkDiffProof ctxt prover d sys prf@(LNode (DiffProofStep method info) cs) =
         (DiffSorry reason, _         ) -> sorryNode reason cs
         (_               , Just cases) -> node method $ checkChildren cases
         (_               , Nothing   ) ->
-            sorryNode (Just "invalid proof step encountered")
+            sorryNode (Just $ "invalid proof step encountered  "++show method)
                       (M.singleton "" prf)
   where
     node m                 = LNode (DiffProofStep m (Just info, Just sys))
@@ -1034,89 +1036,64 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-    sndOf3 $ prove d0 sys0 --trace ("Genou mf "++ (show $ sndOf3 $ prove d0 sys0))  
+    prove d0 True sys0
   where
-
-    fstOf3 :: (a,b,c) -> a
-    fstOf3 (a,_,_) = a
-
-    sndOf3 :: (a,b,c) -> b
-    sndOf3 (_,b,_) = b
 
     thdOf3 :: (a,b,c) -> c
     thdOf3 (_,_,c) = c
 
-
-    prove !depth sys = case mimou of
-          []   -> node "prove solved" Solved M.empty (L.get sBlackList sys)
-          (InLoop (1,g) , (cases, _expl)):_   -> endNode (BlackListed g) (filtercases $ M.toList cases) --trace ("BeforeARPM: "++(show $ L.get sBlackList sys)++" "++(show $ filtercases $ M.toList cases)) 
-          (InLoop (idx,g) , (cases, _expl)):_ -> endNode (InLoop (idx-1,g)) (filtercases $ M.toList cases) --trace ("BeforeARPM: "++(show $ L.get sBlackList sys)++" "++(show $ filtercases $ M.toList cases)) 
-          (BlackListed g, (cases,_expl)):list -> parcoursSuite list (BlackListed g, (cases,_expl)) (filtercases $ M.toList cases)
-          --[(Sorry (Just o), (cases, _expl))] -> error "Black listed and nowhere else to go"
-          (method, (cases, _expl)):list       -> if fstOf3 $ node "prove parcoursSuite, test" method cases (filtercases $ M.toList cases) 
-                                                                    then parcoursSuite list (method, (cases, _expl)) (thdOf3 $ (node "Recupération de la bl pour pouvoir continuer" method cases (filtercases $ M.toList cases) )) 
-                                                                    else node "prove, found a goal in parcoursSuite" method cases $ filtercases $ (M.toList cases)
+    prove !depth keepGoing sys =
+        case rankedGoals of
+          []                                    -> fst $ node Solved M.empty keepGoing
+          (InLoop (idx,g) , (cases, _expl)):_   -> if keepGoing then fst $ node (InLoop (idx,g)) cases False else fst $ node (InLoop (idx,g)) M.empty keepGoing
+          (method, (cases, _expl)):list         -> fst $ chooseMethod ((method, (cases, _expl)):list) method cases keepGoing
       where
-        -- Renvoie des goals
-        mimou = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys --rankWithLoop $ 
 
-        filtercases [] = L.get sBlackList sys
-        filtercases cases = foldl (\l x -> if freeme x `elem` l then l else (freeme x):l) [] (concat $ map (L.get sBlackList) (map snd cases)) --trace ("BeforeFiltercase: " ++ (show $ concat $ map (L.get sBlackList) (map snd cases)))
+        rankedGoals = rankWithLoop $ rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys
+        --(nodeFinal, skip) = node (fst $ head rankedGoals) (fst . snd $ head rankedGoals)
 
-        areUWorthy (BlackListed _) = False
-        areUWorthy (InLoop (_,_))  = False
-        areUWorthy _ = True
+        chooseMethod [] method0 cases0 _ = node method0 cases0 True
+        chooseMethod ((BlackListed _ , (cases, _)):l) method0 cases0 keepGoing = chooseMethod l method0 cases0 keepGoing
+        chooseMethod ((method, (cases, _)):list) method0 cases0 keepGoing = if skip then chooseMethod list method0 cases0 keepGoing else (nodeFinal,skip)
+            where 
+                (nodeFinal, skip) = node method cases keepGoing
+
+        node methodOrigin cases keepGoing =
+          if (cases == M.empty) then ((LNode (ProofStep methodOrigin ()) M.empty),skip) else ((LNode (ProofStep method ()) successors_),skip)
+
+            where 
+                --successors_ = M.map (prove (succ depth)) cases
+                (method, successors_, skip) = propagatedMethod cases methodOrigin keepGoing --methodSkip methodOrigin $ M.toList successors_ --
+
+        extractGoal method = case method of
+            InLoop (idx, goal) -> Just goal             
+            BlackListed goal   -> Just goal
+            SolveGoal goal     -> Just goal
+            _ -> Nothing
+
+        {-methodSkip meth [] = (meth,False)
+        methodSkip methodOrigin list = case (snd $ head $ list) of 
+            LNode (ProofStep (BlackListed e) _ ) _  -> (methodOrigin, False) --True: if my fst son is a Sorry Node, I want to skip it traceStack ("1: blacklisted "++show e) 
+            LNode (ProofStep (InLoop (1,g)) _) _    -> (BlackListed g, True) --False traceStack ("1: inLoop 1 "++show g) 
+            LNode (ProofStep (InLoop (idx,g)) _) _  -> (InLoop (idx-1,g), False) --le nouveau noeud contiendra le même goal parce qu'on le construit avec g du noeud précédent traceStack ("1: inLoop "++show idx++" "++show g)
+            LNode (ProofStep _ _ ) _                -> (methodOrigin, False)-}
+
+        propagatedMethod cases methodOrigin keepGoing = if keepGoing then (methodOrigin, successors, False)
+            else case propagatingMethod cases of 
+            InLoop (1,g)     -> (BlackListed (fromJust $ extractGoal methodOrigin), successors, True)
+            InLoop (idx,g)   -> (InLoop (idx-1,(fromJust $ extractGoal methodOrigin)), successors, False)
+            BlackListed goal -> (methodOrigin, successors, False)
+            _                -> (methodOrigin, successors, False)
+
+          where
+                --Choose among the cases which method to propagate following the order _ < BlackListed < InLoop n (given InLopp is the most problematic)
+                propagatingMethod cases  = foldl (\method (LNode (ProofStep proofmethod _ ) _) -> if proofmethod > method then proofmethod else method) (Sorry Nothing) successors
+
+                successors = M.map (prove (succ depth) keepGoing) cases
 
 
-        -- Parcours la suite de Goals jusqu'à en trouver un qui ne sois pas Sorry
-        parcoursSuite [] (method0, (cases0, _expl0)) nbl = node "cas qui pue, plus rien" method0 cases0 (trace ("Warning: no other cases, going back to first choice: "++(show $ method0)) nbl) -- error "No successor to be explored"
-        parcoursSuite [(method, (cases, _expl))] (method0, (cases0, _expl0)) nbl = node "cas qui pue, plus qu'un" method cases (trace ("Warning: no other cases, going back to last choice: "++(show $ method)) nbl)
-        --parcoursSuite [(method, (cases, _expl))] (method0, (cases0, _expl0)) nbl = if fstOf3 $ node method cases nbl then trace ("Warning: all cases are detected as part of a loop, going back to first choice: "++(show $ method0)) node "cas pas bien" method0 cases0 nbl 
-        --                                                                                                             else node "cas bien" method cases nbl
-        parcoursSuite ((InLoop (_,_), (cases, _expl)):list) (method0, (cases0, _expl0)) nbl = parcoursSuite list (trace "Should be backtracking" method0, (cases0, _expl0)) nbl   
-        parcoursSuite ((BlackListed o, (cases, _expl)):list) (method0, (cases0, _expl0)) nbl = parcoursSuite list (trace "Should be backtracking too" method0, (cases0, _expl0)) nbl                                                                                       
-        parcoursSuite ((method, (cases, _expl)):list) (method0, (cases0, _expl0)) nbl = if fstOf3 $ node "parcours suite test" method cases nbl  then parcoursSuite list (method0, (cases0, _expl0)) nbl else node "Parcours suite abouti" method cases nbl
 
-        -- Crée un Node sans appeler proof sur ces fils
-        endNode method lastBL = (False, LNode (ProofStep method ()) M.empty,lastBL) --trace ("BeforeMethod: "++show method++" "++show lastBL)
-        --objectif scdaire, garder avoir un noeud qui construit juste le fils calculé déjà mais sans parir en récursion complète
 
-        node info methodOrigin cases newBL = --trace ("Nodo:Msg: "++show methodOrigin++" "++show successors++"\nBeforeLASTBL: "++show (newBL++lastBL))
-            -- Il n'y a plus de cas mais il peut y avoir des goals encore dans la liste
-            (if cases == M.empty then endNode (trace ("Nodo:Endnode: "++(show methodOrigin)) methodOrigin) (trace ("Nodo:BeforeLASTBL: "++show newBL) newBL) else (skip, LNode (ProofStep method ()) successors, lastBL))
-            --trace ("Nodo:Msg: "++info++" "++show successors) 
-            --trace ("Nodo:Node: "++ (show $ LNode (ProofStep method ()) successors))
-            --trace ("List: "++(show $ length $ M.toList cases)++" "++(show $ map fst $ M.toList cases))
-
-            where
-                -- Recursively compute the following child
-                --newCases = M.map (L.set sBlackList newBL) cases --trace ("BeforeNewBl"++(show newBL))
-                --afterProof = M.map (prove (succ depth)) newCases --trace ("Before"++(show $ map (L.get sBlackList) (map snd (M.toList newCases))))
-                afterProof = M.fromList $ exploreChild (M.toList cases) newBL
-                successors = M.map sndOf3 afterProof --trace ("After"++(show $ map (L.get sBlackList) (map snd (M.toList newCases)))) 
-                --fu = M.toList $ M.map thdOf3 afterProof
-                lastBL =  trace ("GI: "++(show $ map length (map thdOf3 ((map snd) (M.toList afterProof))))++" "++(show $ map thdOf3 ((map snd) (M.toList afterProof)))) thdOf3 $ snd $ last $ M.toList afterProof--(if fu == [] then [] else concat $ map snd $ fu)
-                --previousSBlackList =  L.get sBlackList $ snd $ head $ M.toList $ snd $ head $ M.toList $ M.map snd $ nextChild --snd $ head $ snd $ head $ M.toList $
-
-                (method, skip) = methodSkip methodOrigin $ M.toList successors 
-
-                -- Recursively looks for the Method in the first child to put the right on in the current node
-                -- If new node is just above a Sorry node, then skip the sorry node and go to the next child
-                -- methodSkip :: [(System, LTree System (ProofStep ()))] -> (ProofMethod, Bool)
-                --methodSkip (Contradiction prop) [] = (Contradiction prop, False)
-                methodSkip meth [] = (method,False) --  error $ "A goal with no cases is supposed to be Contradiction or Solved, not \"" ++ show meth ++ "\"" -- (method,False) -- 
-                methodSkip _ list = case (snd $ head $ list) of 
-                    LNode (ProofStep (BlackListed e) _ ) _ -> (methodOrigin, True) --True: if my fst son is a Sorry Node, I want to skip it 
-                    LNode (ProofStep (InLoop (1,g)) _) _  -> (Sorry $ Just $ "Just looping my way out of here, you know: "++show g, False) --False
-                    LNode (ProofStep (InLoop (idx,g)) _) _  -> (InLoop (idx-1,g), False)
-                    LNode (ProofStep _ _ ) _  -> (methodOrigin, False)
-
-                parcoursCases current_case updated_bl = prove (succ depth) newCases  --au moment de lancer ici l'info ne peut pas être perdue
-                    where newCases = L.set sBlackList updated_bl current_case --(foldl  (\li x -> if x `elem` li then li else x:li) (L.get sBlackList current_case) updated_bl)
-
-                exploreChild [] _ = []
-                exploreChild ((current_case,sys):t) bl = (current_case,explored_case):(exploreChild t $ thdOf3 explored_case)
-                    where explored_case = parcoursCases sys bl
 
 
 
