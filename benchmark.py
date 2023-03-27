@@ -11,22 +11,23 @@ def parseBigFile(file):
 
 	filename = os.path.splitext(file)[0]
 	inSum = False
+	incomplete=False
 
 	summary=f"{filename}_summary.spthy"
 
 	f = open(file,"r")
 	for line in f.readlines():
-		if inSum and (re.findall("incomplete", line) == []):
-			with open(summary,"w") as s:
-				s.write(line+"\n")
-			return True
+		if inSum and (re.findall("incomplete", line) != []):
+			with open(summary,"a") as s:
+				s.write(line)
+				incomplete = True
 		elif inSum:
-			with open(summary,"w") as s:
-				s.write(line+"\n")
-			return False
-		elif (re.findall("summary of summaries", line) == []):
+			with open(summary,"a") as s:
+				s.write(line)
+		elif (re.findall("summary of summaries", line) != []):
 			inSum = True
 	f.close()
+	return incomplete
 
 def parseAndRun(arg):
 
@@ -34,15 +35,11 @@ def parseAndRun(arg):
 	filename = filename.split(".")[0]
 
 	dirname = f"../../files_to_benchmark/{caseStudy}"
-	resultDir = f"../../files_to_benchmark/res_{caseStudy}_{benchmarkCase}"
 	proofFile = f"{resultDir}/{filename}_recap.spthy"
 	bigfile = f"{resultDir}/{filename}_total.spthy"
 	timefile= f"{resultDir}/{filename}_time.spthy"
 
 	diff=""
-
-	if (not os.path.isdir(resultDir)):
-		os.makedirs(resultDir)
 
 	if (benchmarkCase == "smartverif"):
 
@@ -60,7 +57,7 @@ def parseAndRun(arg):
 		end = perf_counter()
 
 		with open(f"{timefile}","a") as t:
-			t.write(str(end-start))
+			t.write(str(end-start)+"\n")
 
 
 		if (not exists(proofFile) or (os.stat(proofFile).st_size == 0)):
@@ -80,10 +77,7 @@ def parseAndRun(arg):
 				t = ""
 				with open(timefile) as tf :
 					lines = tf.readlines()
-					for line in lines:
-						if (re.findall("real",line) == []):
-							t = line.split("\t")[1]
-				result = f"{filename},{t}"
+				result = f"{filename},{lines[-2]}"
 			os.remove(bigfile)
 	return(result)
 
@@ -162,6 +156,10 @@ with open(file) as f:
 		params = re.split(r'\t',line)
 		#print(parseAndRun((params[1], params[0], params[2][:-1], benchmarkCase, recapFile)))
 		inputs.append((params[1], params[0], params[2][:-1], benchmarkCase))
+
+		resultDir = f"../../files_to_benchmark/res_{params[2][:-1]}_{benchmarkCase}"
+		if (not os.path.isdir(resultDir)):
+			os.makedirs(resultDir)
 
 pool = multiprocessing.Pool(processes=4)
 outputs = pool.map(parseAndRun, inputs)
