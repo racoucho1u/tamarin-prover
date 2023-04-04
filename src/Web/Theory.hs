@@ -101,7 +101,7 @@ applyMethodAtPath thy lemmaName proofPath prover i = do
         heuristic = selectHeuristic prover ctxt
         ranking = useHeuristic heuristic (length proofPath)
         tactic = selectTactic prover ctxt
-    methods <- (map fst . rankWithLoop . rankProofMethods ranking tactic ctxt) <$> sys 
+    methods <- (map fst . rankWithLoop . rankProofMethods ranking tactic ctxt) <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyProverAtPath thy lemmaName proofPath
       (oneStepProver method                        `mappend`
@@ -578,7 +578,7 @@ subProofSnippet renderUrl tidx ti lemma proofPath ctxt prf =
     heuristic               = selectHeuristic (tiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
     tactic                  = selectTactic (tiAutoProver ti) ctxt
-    proofMethods            = rankWithLoop . rankProofMethods ranking tactic ctxt
+    proofMethods            = rankWithLoop . rankProofMethods ranking tactic ctxt 
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
         [ withTag "h4" [] (text "Case" <-> text name)

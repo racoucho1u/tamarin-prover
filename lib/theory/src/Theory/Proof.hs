@@ -1036,34 +1036,41 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-    prove d0 True sys0
+    fstOf3 $ prove d0 True  sys0
   where
+
+    fstOf3 :: (a,b,c) -> a
+    fstOf3 (a,_,_) = a
+
+    sndOf3 :: (a,b,c) -> b
+    sndOf3 (_,b,_) = b
 
     thdOf3 :: (a,b,c) -> c
     thdOf3 (_,_,c) = c
 
     prove !depth keepGoing sys =
-        case rankedGoals of
-          []                                    -> fst $ node Solved M.empty keepGoing
-          (InLoop (idx,g) , (cases, _expl)):_   -> if keepGoing then fst $ node (InLoop (idx,g)) cases False else fst $ node (InLoop (idx,g)) M.empty keepGoing
-          (method, (cases, _expl)):list         -> fst $ chooseMethod ((method, (cases, _expl)):list) method cases keepGoing
+        (case rankedGoals of
+          []                                    -> node Solved M.empty keepGoing (L.get sBlackList sys)
+          (InLoop (idx,g) , (cases, _expl)):_   -> if keepGoing then node (InLoop (idx,g)) cases False (filtercases $ M.toList cases) else node (InLoop (idx,g)) M.empty keepGoing (filtercases $ M.toList cases)
+          (method, (cases, _expl)):list         -> chooseMethod ((method, (cases, _expl)):list) method cases keepGoing (filtercases $ M.toList cases)
+        )
       where
 
-        rankedGoals = rankWithLoop $ rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys
-        --(nodeFinal, skip) = node (fst $ head rankedGoals) (fst . snd $ head rankedGoals)
+        rankedGoals = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys
 
-        chooseMethod [] method0 cases0 _ = node method0 cases0 True
-        chooseMethod ((BlackListed _ , (cases, _)):l) method0 cases0 keepGoing = chooseMethod l method0 cases0 keepGoing
-        chooseMethod ((method, (cases, _)):list) method0 cases0 keepGoing = if skip then chooseMethod list method0 cases0 keepGoing else (nodeFinal,skip)
+        filtercases [] = L.get sBlackList sys
+        filtercases cases = foldl (\l x -> if freeme x `elem` l then l else (freeme x):l) [] (concat $ map (L.get sBlackList) (map snd cases))
+
+        chooseMethod [] method0 cases0 _ constructionBL                                         = node method0 cases0 True constructionBL
+        chooseMethod ((BlackListed _ , (cases, _)):l) method0 cases0 keepGoing constructionBL   = chooseMethod l method0 cases0 keepGoing constructionBL
+        chooseMethod ((method, (cases, _)):list) method0 cases0 keepGoing constructionBL        = if skip then chooseMethod list method0 cases0 keepGoing constructionBL else (nodeFinal,skip, modifiedBL)
             where 
-                (nodeFinal, skip) = node method cases keepGoing
+                (nodeFinal, skip, modifiedBL) = node method cases keepGoing constructionBL
 
-        node methodOrigin cases keepGoing =
-          if (cases == M.empty) then ((LNode (ProofStep methodOrigin ()) M.empty),skip) else ((LNode (ProofStep method ()) successors_),skip)
-
+        node methodOrigin cases keepGoing constructionBL =
+          if (cases == M.empty) then ((LNode (ProofStep methodOrigin ()) M.empty),skip, constructionBL) else ((LNode (ProofStep method ()) successors_),skip, modifiedBL) 
             where 
-                --successors_ = M.map (prove (succ depth)) cases
-                (method, successors_, skip) = propagatedMethod cases methodOrigin keepGoing --methodSkip methodOrigin $ M.toList successors_ --
+                (method, successors_, skip, modifiedBL) = propagatedMethod (M.toList cases) methodOrigin keepGoing constructionBL
 
         extractGoal method = case method of
             InLoop (idx, goal) -> Just goal             
@@ -1071,25 +1078,27 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
-        {-methodSkip meth [] = (meth,False)
-        methodSkip methodOrigin list = case (snd $ head $ list) of 
-            LNode (ProofStep (BlackListed e) _ ) _  -> (methodOrigin, False) --True: if my fst son is a Sorry Node, I want to skip it traceStack ("1: blacklisted "++show e) 
-            LNode (ProofStep (InLoop (1,g)) _) _    -> (BlackListed g, True) --False traceStack ("1: inLoop 1 "++show g) 
-            LNode (ProofStep (InLoop (idx,g)) _) _  -> (InLoop (idx-1,g), False) --le nouveau noeud contiendra le même goal parce qu'on le construit avec g du noeud précédent traceStack ("1: inLoop "++show idx++" "++show g)
-            LNode (ProofStep _ _ ) _                -> (methodOrigin, False)-}
-
-        propagatedMethod cases methodOrigin keepGoing = if keepGoing then (methodOrigin, successors, False)
+        propagatedMethod cases methodOrigin keepGoing constructionBL = if keepGoing then (methodOrigin, successors, False, modifiedBL)
             else case propagatingMethod cases of 
-            InLoop (1,g)     -> (BlackListed (fromJust $ extractGoal methodOrigin), successors, True)
-            InLoop (idx,g)   -> (InLoop (idx-1,(fromJust $ extractGoal methodOrigin)), successors, False)
-            BlackListed goal -> (methodOrigin, successors, False)
-            _                -> (methodOrigin, successors, False)
+                InLoop (1,g)     -> (BlackListed (fromJust $ extractGoal methodOrigin), successors, True, modifiedBL)
+                InLoop (idx,g)   -> (InLoop (idx-1,(fromJust $ extractGoal methodOrigin)), successors, False, modifiedBL)
+                BlackListed goal -> (methodOrigin, successors, False, modifiedBL)
+                _                -> (methodOrigin, successors, False, modifiedBL)
 
           where
                 --Choose among the cases which method to propagate following the order _ < BlackListed < InLoop n (given InLopp is the most problematic)
                 propagatingMethod cases  = foldl (\method (LNode (ProofStep proofmethod _ ) _) -> if proofmethod > method then proofmethod else method) (Sorry Nothing) successors
 
-                successors = M.map (prove (succ depth) keepGoing) cases
+                afterProof = M.fromList $ exploreChild cases constructionBL
+                successors = M.map fstOf3 afterProof
+                modifiedBL = thdOf3 $ snd $ last $ M.toList afterProof
+
+                exploreChild [] _ = []
+                exploreChild ((current_case,sys):t) bl = (current_case, explored_case):(exploreChild t $ thdOf3 explored_case)
+                    where explored_case = parcoursCases sys bl
+
+                parcoursCases current_case updated_bl = prove (succ depth) keepGoing newCases
+                    where newCases = L.set sBlackList updated_bl current_case
 
 
 
