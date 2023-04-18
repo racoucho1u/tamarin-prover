@@ -1036,21 +1036,17 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-    prove d0 True sys0
+    prove d0 False sys0
   where
-
-    thdOf3 :: (a,b,c) -> c
-    thdOf3 (_,_,c) = c
 
     prove !depth keepGoing sys =
         case rankedGoals of
           []                                    -> fst $ node Solved M.empty keepGoing
-          (InLoop (idx,g) , (cases, _expl)):_   -> if keepGoing then fst $ node (InLoop (idx,g)) cases False else fst $ node (InLoop (idx,g)) M.empty keepGoing
+          (InLoop (idx,g) , (cases, _expl)):_   -> if keepGoing then fst $ node (InLoop (idx,g)) cases False else fst $ node (InLoop (idx,g)) M.empty keepGoing --
           (method, (cases, _expl)):list         -> fst $ chooseMethod ((method, (cases, _expl)):list) method cases keepGoing
       where
 
-        rankedGoals = rankWithLoop $ rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys
-        --(nodeFinal, skip) = node (fst $ head rankedGoals) (fst . snd $ head rankedGoals)
+        rankedGoals = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys
 
         chooseMethod [] method0 cases0 _ = node method0 cases0 True
         chooseMethod ((BlackListed _ , (cases, _)):l) method0 cases0 keepGoing = chooseMethod l method0 cases0 keepGoing
@@ -1063,7 +1059,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
             where 
                 --successors_ = M.map (prove (succ depth)) cases
-                (method, successors_, skip) = propagatedMethod cases methodOrigin keepGoing --methodSkip methodOrigin $ M.toList successors_ --
+                (method, successors_, skip) = propagatedMethod cases methodOrigin keepGoing
 
         extractGoal method = case method of
             InLoop (idx, goal) -> Just goal             
@@ -1071,19 +1067,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
-        {-methodSkip meth [] = (meth,False)
-        methodSkip methodOrigin list = case (snd $ head $ list) of 
-            LNode (ProofStep (BlackListed e) _ ) _  -> (methodOrigin, False) --True: if my fst son is a Sorry Node, I want to skip it traceStack ("1: blacklisted "++show e) 
-            LNode (ProofStep (InLoop (1,g)) _) _    -> (BlackListed g, True) --False traceStack ("1: inLoop 1 "++show g) 
-            LNode (ProofStep (InLoop (idx,g)) _) _  -> (InLoop (idx-1,g), False) --le nouveau noeud contiendra le même goal parce qu'on le construit avec g du noeud précédent traceStack ("1: inLoop "++show idx++" "++show g)
-            LNode (ProofStep _ _ ) _                -> (methodOrigin, False)-}
-
         propagatedMethod cases methodOrigin keepGoing = if keepGoing then (methodOrigin, successors, False)
             else case propagatingMethod cases of 
-            InLoop (1,g)     -> (BlackListed (fromJust $ extractGoal methodOrigin), successors, True)
-            InLoop (idx,g)   -> (InLoop (idx-1,(fromJust $ extractGoal methodOrigin)), successors, False)
-            BlackListed goal -> (methodOrigin, successors, False)
-            _                -> (methodOrigin, successors, False)
+                InLoop (1,g)     -> (BlackListed (fromJust $ extractGoal methodOrigin), successors, True)
+                InLoop (idx,g)   -> (InLoop (idx-1,(fromJust $ extractGoal methodOrigin)), successors, False)
+                BlackListed goal -> (methodOrigin, successors, False)
+                _                -> (methodOrigin, successors, False)
 
           where
                 --Choose among the cases which method to propagate following the order _ < BlackListed < InLoop n (given InLopp is the most problematic)

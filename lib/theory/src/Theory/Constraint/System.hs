@@ -1103,7 +1103,7 @@ impliedFormulasAndSystems :: MaudeHandle -> System -> LNGuarded -> [(LNGuarded, 
 impliedFormulasAndSystems hnd sys gf = res
   where
     res = case (openGuarded gf `evalFresh` avoid (gf, sys)) of
-      Just (All, _vs, antecedent, succedent) -> error "milou" --map (\x -> apply x (succedent', sys)) subst --Apply system sert ici
+      Just (All, _vs, antecedent, succedent) -> map (\x -> apply x (succedent', sys)) subst --Apply system sert ici
         where
           (actionsEqs, otherAtoms) = first sortGAtoms . partitionEithers $ map prepare antecedent
           succedent'               = gall [] otherAtoms succedent
@@ -1112,7 +1112,7 @@ impliedFormulasAndSystems hnd sys gf = res
                then []
                else (`runReader` hnd) (unifyLNTerm y)) (equalities actionsEqs)
           subst  = map (\x -> freshToFreeAvoiding x ((gf, x), sys)) subst'
-      _ -> error "RAAAAh" --[]
+      _ -> []
 
     prepare (Action i fa) = Left  (GAction i fa)
     prepare (EqE s t)     = Left  (GEqE s t)
