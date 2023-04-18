@@ -1036,23 +1036,18 @@ proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContex
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 sys0
   where
-    {-{-checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> Bool
-        checkForLoop [] = node (InLoop 0) M.empty
-        checkForLoop ((method, (cases, _expl)):suite) = case method of 
-            InLoop index -> checkForLoop suite --trace (show index)
-            otherwise -> node method cases-}-}
+
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []   -> node Solved M.empty
-          -- (method, (cases, _expl)):list -> trace ((show $ M.map (L.get sLoopFound) cases) ++ (show $ map (M.map (L.get sLoopFound)) (map fst $ map snd list))) node method cases
           list -> checkForLoop list
       where
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
         checkForLoop [] = node (InLoop 0) M.empty
         checkForLoop ((method, (cases, _expl)):suite) = case method of 
-            InLoop index -> checkForLoop suite --trace (show index)
+            InLoop index -> checkForLoop suite 
             otherwise -> node method cases
 
-        node method cases = -- trace (show $ ((prove (succ depth)) (fst cases)))
+        node method cases = 
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
