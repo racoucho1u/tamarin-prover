@@ -302,7 +302,7 @@ execProofMethod ctxt method sys =
     foundAtP g (h:t) l = if g `elem` h then 1 else 1 + foundAtP g t l
 
     checkForLoop :: Goal -> System -> Bool -> Int -> Maybe (M.Map CaseName System)
-    checkForLoop goal sys foundLoop idx_bl = if index <= 0 then execSolveGoal goal False False index 0 else (L.get sPathGoals sys)))) execSolveGoal goal True False index 0
+    checkForLoop goal sys foundLoop idx_bl = if index <= 0 then execSolveGoal goal False False index 0 else execSolveGoal goal True False index 0
         where
             index = foundAtP (freeme goal) (map (map freeme) (L.get sPathGoals sys)) (length $ L.get sPathGoals sys)
 
