@@ -1194,7 +1194,7 @@ prettyProofMethod :: HighlightDocument d => ProofMethod -> d
 prettyProofMethod method = case method of
     Solved               -> keyword_ "SOLVED" <-> lineComment_ "trace found"
     Induction            -> keyword_ "induction"
-    InLoop _int          -> keyword_ "InLoop" <-> int _int
+    InLoop _int          -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "inLoop "++show i)]
     Sorry reason         ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
     SolveGoal goal       ->
