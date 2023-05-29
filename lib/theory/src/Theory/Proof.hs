@@ -1042,9 +1042,10 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
           list -> checkForLoop list
       where
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
-        checkForLoop [] = node (InLoop 0) M.empty
+        --checkForLoop [] = node (InLoop (0,method)) M.empty
+        checkForLoop [(method, (cases, _expl))] = node method cases
         checkForLoop ((method, (cases, _expl)):suite) = case method of 
-            InLoop index -> checkForLoop suite 
+            InLoop _ -> checkForLoop suite 
             otherwise -> node method cases
 
         node method cases = 

@@ -41,7 +41,7 @@ import           Data.Label                                hiding (get)
 import qualified Data.Label                                as L
 import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate,elem)
 import qualified Data.Map                                  as M
-import           Data.Maybe                                (catMaybes, fromMaybe)
+import           Data.Maybe                                (catMaybes, fromMaybe, fromJust)
 -- import           Data.Monoid
 import           Data.Ord                                  (comparing)
 import qualified Data.Set                                  as S
@@ -190,7 +190,7 @@ data ProofMethod =
     Sorry (Maybe String)                 -- ^ Proof was not completed
   | Solved                               -- ^ An attack was found.
   | Simplify                             -- ^ A simplification step.
-  | InLoop Int                           -- ^ A goal that has been detected as part as a loop
+  | InLoop (Int, Goal)                   -- ^ A goal that has been detected as part as a loop
   | SolveGoal Goal                       -- ^ A goal that was solved.
   | Contradiction (Maybe Contradiction)  -- ^ A contradiction could be
                                          -- derived, possibly with a reason.
@@ -488,7 +488,7 @@ rankProofMethods ranking tactics ctxt sys = do
       Just cases -> case M.toList cases of 
           []                       -> return (m, (cases, expl))
           -- [(case1,sys)]            -> if L.get sLoopFound sys then return (InLoop 0, (cases, expl)) else return (m, (cases, expl))
-          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop (L.get sNbLoop sys), (cases, expl)) else return (m, (cases, expl))
+          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop (L.get sNbLoop sys, fromJust $ fromSolveGoal m), (cases, expl)) else return (m, (cases, expl))
       Nothing    -> []
   where
     contradiction c                    = (Contradiction (Just c), "")
@@ -505,6 +505,10 @@ rankProofMethods ranking tactics ctxt sys = do
                                ProbablyConstructible -> " (probably constructible)"
                                CurrentlyDeducible    -> " (currently deducible)"
       )
+
+    fromSolveGoal :: ProofMethod -> Maybe Goal
+    fromSolveGoal (SolveGoal goal) = Just goal
+    fromSolveGoal _ = Nothing
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'DiffProofContext' and
@@ -1194,7 +1198,7 @@ prettyProofMethod :: HighlightDocument d => ProofMethod -> d
 prettyProofMethod method = case method of
     Solved               -> keyword_ "SOLVED" <-> lineComment_ "trace found"
     Induction            -> keyword_ "induction"
-    InLoop _int          -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "inLoop "++show i)]
+    InLoop (i, goal)     -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "inLoop "++show i)]
     Sorry reason         ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
     SolveGoal goal       ->
