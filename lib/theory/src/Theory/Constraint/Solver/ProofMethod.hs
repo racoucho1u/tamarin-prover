@@ -247,7 +247,9 @@ execProofMethod ctxt method sys =
         Solved
           | null (plainOpenGoals sys) -> return M.empty
           | otherwise                 -> Nothing
-        InLoop _                      -> return M.empty
+        InLoop (_, goal)
+          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
+          | otherwise                        -> Nothing
         SolveGoal goal
           | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing

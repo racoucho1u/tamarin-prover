@@ -630,7 +630,7 @@ tryProver =  (`orelse` mempty)
 oneStepProver :: ProofMethod -> Prover
 oneStepProver method = Prover $ \ctxt _ se _ -> do
     cases <- execProofMethod ctxt method se
-    return $ LNode (ProofStep method (Just se)) (M.map (unproven . Just) cases)
+    return $ trace ("Hello "++show cases) LNode (ProofStep method (Just se)) (M.map (unproven . Just) cases)
 
 -- | Try to execute one proof step using the given proof method.
 oneStepDiffProver :: DiffProofMethod -> DiffProver
@@ -1043,6 +1043,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
       where
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
         --checkForLoop [] = node (InLoop (0,method)) M.empty
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
         checkForLoop [(method, (cases, _expl))] = node method cases
         checkForLoop ((method, (cases, _expl)):suite) = case method of 
             InLoop _ -> checkForLoop suite 
