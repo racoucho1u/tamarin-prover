@@ -288,7 +288,7 @@ execProofMethod ctxt method sys =
 
     foundAt :: Goal -> [Goal] -> Int
     foundAt _ []    = -1
-    foundAt g (h:t) = if g == h then error "Loop found" else foundAt g t
+    foundAt g (h:t) = if g == h then 1 else foundAt g t
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
     checkForLoop goal sys = if index == -1 then execSolveGoal goal False index else execSolveGoal goal True index
