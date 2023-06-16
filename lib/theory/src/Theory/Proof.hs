@@ -1039,14 +1039,14 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []   -> node Solved M.empty
-          list -> checkForLoop list
+          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
-        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
+        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
         --checkForLoop [] = node (InLoop (0,method)) M.empty
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [(method, (cases, _expl))] = node method cases
-        checkForLoop ((method, (cases, _expl)):suite) = case method of 
-            InLoop _ -> checkForLoop suite 
+        checkForLoop [(method, (cases, _expl))] (method0, (cases0, _expl0)) = node method0 cases0
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
+            InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
             otherwise -> node method cases
 
         node method cases = 
