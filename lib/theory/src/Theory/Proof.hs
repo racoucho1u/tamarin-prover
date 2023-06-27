@@ -1044,7 +1044,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
         --checkForLoop [] = node (InLoop (0,method)) M.empty
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
+        checkForLoop [] (method0, (cases0, _expl0)) = error "No more option"
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
             InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
             otherwise -> node method cases
