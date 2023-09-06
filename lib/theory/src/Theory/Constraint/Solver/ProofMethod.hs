@@ -248,10 +248,10 @@ execProofMethod ctxt method sys =
           | null (plainOpenGoals sys) -> return M.empty
           | otherwise                 -> Nothing
         InLoop (_, goal)
-          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
+          | goal `M.member` L.get sGoals sys -> trace ("LISTE: "++(show $ length $ L.get sPathGoals sys)++" "++ show (L.get sPathGoals sys)) checkForLoop goal sys
           | otherwise                        -> Nothing
         SolveGoal goal
-          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
+          | goal `M.member` L.get sGoals sys -> trace ("LISTE: "++(show $ length $ L.get sPathGoals sys)++" "++ show (map (map freeme) (L.get sPathGoals sys))) checkForLoop goal sys
           | otherwise                        -> Nothing
         Simplify                 -> singleCase simplifySystem
         Induction                -> M.map cleanupSystem <$> execInduction
@@ -280,20 +280,21 @@ execProofMethod ctxt method sys =
       where check sys' = cleanupSystem sys /= sys'
 
     freeme :: Goal -> Goal
-    freeme (ActionG v f) = (ActionG (LVar (lvarName v) (lvarSort v) 0) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))) --encore des chose a enlever dans factTerms f
+    freeme (ActionG v f) = ActionG (setLVarIdx 0 v) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
+    --freeme (ActionG v (Fact t n l)) = ActionG (setLVarIdx 0 v) (Fact (t n (setLVarIdx 0 l)))
     freeme (ChainG (ni1, cidx) (ni2, pidx)) = (ChainG ((LVar (lvarName ni1) (lvarSort ni1) 0), cidx) ((LVar (lvarName ni2) (lvarSort ni2) 0), pidx))
-    freeme (PremiseG (ni, pidx) f) = (PremiseG ((LVar (lvarName ni) (lvarSort ni) 0), pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))) --encore des chose a enlever dans factTerms f
-    freeme (SplitG s) = (SplitG s)
+    freeme (PremiseG (ni, pidx) f) = PremiseG ((LVar (lvarName ni) (lvarSort ni) 0), pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
+    freeme (SplitG s) = SplitG s
     freeme (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g)))
 
-    foundAt :: Goal -> [Goal] -> Int
+    foundAt :: Goal -> [[Goal]] -> Int
     foundAt _ []    = -1
-    foundAt g (h:t) = if g == h then 1 else foundAt g t
+    foundAt g (h:t) = if g `elem` h then 1 else foundAt g t
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
     checkForLoop goal sys = if index == -1 then execSolveGoal goal False index else execSolveGoal goal True index
         where
-            index = (freeme goal) `foundAt` (L.get sPathGoals sys)
+            index = (freeme goal) `foundAt` (map (map freeme) (L.get sPathGoals sys))
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
@@ -303,7 +304,7 @@ execProofMethod ctxt method sys =
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys)) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (freeme goal:(L.get sPathGoals sys)) sys)) -- (succ (L.get sNbLoop sys))
+        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals ([freeme goal]:(L.get sPathGoals sys)) sys)) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals ([freeme goal]:(L.get sPathGoals sys)) sys)) -- (succ (L.get sNbLoop sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)

@@ -379,7 +379,7 @@ data System = System
     , _sSolvedFormulas :: S.Set LNGuarded
     , _sLemmas         :: S.Set LNGuarded
     , _sGoals          :: M.Map Goal GoalStatus
-    , _sPathGoals      :: [Goal]
+    , _sPathGoals      :: [[Goal]]
     , _sNbLoop         :: Int
     , _sLoopFound      :: Bool
     , _sNextGoalNr     :: Integer

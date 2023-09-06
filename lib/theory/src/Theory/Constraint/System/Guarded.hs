@@ -150,12 +150,10 @@ isAllGuarded _                    = False
 
 
 removeCpt :: LNGuarded -> LNGuarded
-removeCpt guarded = 
-        case guarded of
-            (GAto atom) -> GAto (changeBVarAtom atom)
-            (GDisj (Disj g)) -> (GDisj (Disj (map removeCpt g)))
-            (GConj (Conj g)) -> (GConj (Conj (map removeCpt g)))
-            (GGuarded qua vs as g) -> (GGuarded qua vs (map changeBVarAtom as) (removeCpt g))
+removeCpt (GAto atom) = GAto (changeBVarAtom atom)
+removeCpt (GDisj (Disj g)) = (GDisj (Disj (map removeCpt g)))
+removeCpt (GConj (Conj g)) = (GConj (Conj (map removeCpt g)))
+removeCpt (GGuarded qua vs as g) = (GGuarded qua vs (map changeBVarAtom as) (removeCpt g))
 
 -- | Check whether the guarded formula is closed and does not contain an
 -- existential quantifier. This under-approximates the question whether the

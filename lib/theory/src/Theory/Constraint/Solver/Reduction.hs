@@ -555,15 +555,15 @@ substSystem = do
     substSolvedFormulas
     substLemmas
     c2 <- substGoals
-    substPathGoals
-    substNbLoop
-    substLoopFound
+    --substPathGoals
+    --substNbLoop
+    --substLoopFound
     substNextGoalNr
     return (c1 <> c2)
 
 -- no invariants to maintain here
 substEdges, substLessAtoms, substLastAtom, substFormulas,
-  substSolvedFormulas, substLemmas, substPathGoals, substLoopFound, substNextGoalNr :: Reduction ()
+  substSolvedFormulas, substLemmas, substLoopFound, substNextGoalNr :: Reduction ()
 
 substEdges          = substPart sEdges
 substLessAtoms      = substPart sLessAtoms
@@ -571,10 +571,19 @@ substLastAtom       = substPart sLastAtom
 substFormulas       = substPart sFormulas
 substSolvedFormulas = substPart sSolvedFormulas
 substLemmas         = substPart sLemmas
-substPathGoals      = substPart sPathGoals
 substNbLoop         = substPart sNbLoop
 substLoopFound      = substPart sLoopFound
 substNextGoalNr     = return ()
+
+
+substPathGoals :: Reduction ()
+substPathGoals = do subst <- getM sSubst
+                    modM sPathGoals (unifyLists subst)
+    where
+        unifyLists :: LNSubst -> [[Goal]] -> [[Goal]]
+        unifyLists _ [] = []
+        --unifyLists subst [goal] = trace ("Merdum: "++show goal) [foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)]
+        unifyLists subst (goal:t) = [foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)] ++ unifyLists subst t 
 
 
 -- | Apply the current substitution of the equation store to a part of the

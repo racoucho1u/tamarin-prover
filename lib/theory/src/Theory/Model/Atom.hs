@@ -59,6 +59,7 @@ where
 
 -- import           Control.Basics
 import           Control.DeepSeq
+import qualified Data.DList as D
 
 import           GHC.Generics (Generic)
 import           Data.Binary
@@ -199,15 +200,19 @@ toAtom (Less t t')   = Less t t'
 toAtom (Last t)      = Last t
 
 insideJobi :: VTerm Name LVar -> VTerm Name LVar
-insideJobi (viewTerm -> Lit (Var v )) = termViewToTerm ( Lit (Var ( LVar (lvarName v) (lvarSort v) 0)) )
-insideJobi jobi = jobi
+insideJobi (FAPP sym ts) = (FAPP sym (map insideJobi ts))
+insideJobi (LIT (Var v)) = (LIT (Var ( LVar (lvarName v) (lvarSort v) 0)))
+insideJobi (LIT (Con c)) = (LIT (Con c))
 
 insideJob :: (VTerm Name (BVar LVar)) -> (VTerm Name (BVar LVar))
-insideJob (viewTerm -> Lit (Var v )) = case v of Free f -> termViewToTerm ( Lit (Var (Free ( LVar (lvarName f) (lvarSort f) 0)) )) ; _ -> termViewToTerm ( Lit (Var v ))
-insideJob bound = bound
+insideJob (FAPP sym ts) = (FAPP sym (map insideJob ts))
+insideJob (LIT (Var (Free f))) = (LIT (Var (Free (LVar (lvarName f) (lvarSort f) 0))))
+insideJob (LIT (Var (Bound b))) = (LIT (Var (Bound b)))
+insideJob (LIT (Con c)) = (LIT (Con c))
 
+ 
 changeBVarAtom :: Atom (VTerm Name (BVar LVar)) -> Atom (VTerm Name (BVar LVar))
-changeBVarAtom (Action v (Fact t1 t2 t3)) = Action (insideJob v) (Fact t1 t2 t3) -- remplace t3 par [] par def
+changeBVarAtom (Action v (Fact t1 t2 t3)) = Action (insideJob v) (Fact t1 t2 (map insideJob t3)) -- remplace t3 par [] par def
 changeBVarAtom (Less t1 t2) = Less (insideJob t1) (insideJob t2)
 changeBVarAtom (EqE  t1 t2) = EqE (insideJob t1) (insideJob t2)
 changeBVarAtom (Last t) = Last (insideJob t)
