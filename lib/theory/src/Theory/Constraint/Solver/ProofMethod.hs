@@ -248,10 +248,10 @@ execProofMethod ctxt method sys =
           | null (plainOpenGoals sys) -> return M.empty
           | otherwise                 -> Nothing
         InLoop (_, goal)
-          | goal `M.member` L.get sGoals sys -> trace ("LISTE: "++(show $ length $ L.get sPathGoals sys)++" "++ show (L.get sPathGoals sys)) checkForLoop goal sys
+          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
         SolveGoal goal
-          | goal `M.member` L.get sGoals sys -> trace ("LISTE: "++(show $ length $ L.get sPathGoals sys)++" "++ show (map (map freeme) (L.get sPathGoals sys))) checkForLoop goal sys
+          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
         Simplify                 -> singleCase simplifySystem
         Induction                -> M.map cleanupSystem <$> execInduction
