@@ -190,7 +190,7 @@ data ProofMethod =
     Sorry (Maybe String)                 -- ^ Proof was not completed
   | Solved                               -- ^ An attack was found.
   | Simplify                             -- ^ A simplification step.
-  | InLoop (Int, Goal)                   -- ^ A goal that has been detected as part as a loop
+  | InLoop (Int, Goal, Int)              -- ^ A goal that has been detected as part as a loop (depth of the loop, goal, nb of time through the loop)
   | SolveGoal Goal                       -- ^ A goal that was solved.
   | Contradiction (Maybe Contradiction)  -- ^ A contradiction could be
                                          -- derived, possibly with a reason.
@@ -247,7 +247,7 @@ execProofMethod ctxt method sys =
         Solved
           | null (plainOpenGoals sys) -> return M.empty
           | otherwise                 -> Nothing
-        InLoop (_, goal)
+        InLoop (_, goal,_)
           | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
         SolveGoal goal
@@ -281,20 +281,19 @@ execProofMethod ctxt method sys =
 
     freeme :: Goal -> Goal
     freeme (ActionG v f) = ActionG (setLVarIdx 0 v) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
-    --freeme (ActionG v (Fact t n l)) = ActionG (setLVarIdx 0 v) (Fact (t n (setLVarIdx 0 l)))
     freeme (ChainG (ni1, cidx) (ni2, pidx)) = (ChainG ((LVar (lvarName ni1) (lvarSort ni1) 0), cidx) ((LVar (lvarName ni2) (lvarSort ni2) 0), pidx))
     freeme (PremiseG (ni, pidx) f) = PremiseG ((LVar (lvarName ni) (lvarSort ni) 0), pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
     freeme (SplitG s) = SplitG s
     freeme (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g)))
 
-    foundAt :: Goal -> [[Goal]] -> Int
-    foundAt _ []    = -1
-    foundAt g (h:t) = if g `elem` h then 1 else foundAt g t
+    foundAt :: Goal -> [[Goal]] -> Int -> Int
+    foundAt g [] l   = 0 - l
+    foundAt g (h:t) l = if g `elem` h then 1 else 1 + foundAt g t l
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goal sys = if index == -1 then execSolveGoal goal False index else execSolveGoal goal True index
+    checkForLoop goal sys = if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index
         where
-            index = (freeme goal) `foundAt` (map (map freeme) (L.get sPathGoals sys))
+            index = foundAt (freeme goal) (map (map freeme) (map snd (L.get sPathGoals sys))) (length $ L.get sPathGoals sys)
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
@@ -304,7 +303,7 @@ execProofMethod ctxt method sys =
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals ([freeme goal]:(L.get sPathGoals sys)) sys)) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals ([freeme goal]:(L.get sPathGoals sys)) sys)) -- (succ (L.get sNbLoop sys))
+        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop sys) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals ((0,[freeme goal]):(L.get sPathGoals sys)) sys)) -- (succ (L.get sNbLoop sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
@@ -491,7 +490,7 @@ rankProofMethods ranking tactics ctxt sys = do
       Just cases -> case M.toList cases of 
           []                       -> return (m, (cases, expl))
           -- [(case1,sys)]            -> if L.get sLoopFound sys then return (InLoop 0, (cases, expl)) else return (m, (cases, expl))
-          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop (L.get sNbLoop sys, fromJust $ fromSolveGoal m), (cases, expl)) else return (m, (cases, expl))
+          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop (L.get sNbLoop sys, fromJust $ fromSolveGoal m, 0), (cases, expl)) else return (m, (cases, expl))
       Nothing    -> []
   where
     contradiction c                    = (Contradiction (Just c), "")
@@ -1201,7 +1200,7 @@ prettyProofMethod :: HighlightDocument d => ProofMethod -> d
 prettyProofMethod method = case method of
     Solved               -> keyword_ "SOLVED" <-> lineComment_ "trace found"
     Induction            -> keyword_ "induction"
-    InLoop (i, goal)     -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "inLoop "++show i)]
+    InLoop (d,goal,i)    -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "InLoop "++show d++" ("++show i++" iteration(s))")]
     Sorry reason         ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
     SolveGoal goal       ->

@@ -580,10 +580,9 @@ substPathGoals :: Reduction ()
 substPathGoals = do subst <- getM sSubst
                     modM sPathGoals (unifyLists subst)
     where
-        unifyLists :: LNSubst -> [[Goal]] -> [[Goal]]
+        unifyLists :: LNSubst -> [(Int,[Goal])] -> [(Int,[Goal])]
         unifyLists _ [] = []
-        --unifyLists subst [goal] = trace ("Merdum: "++show goal) [foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)]
-        unifyLists subst (goal:t) = [foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)] ++ unifyLists subst t 
+        unifyLists subst ((it,goal):t) = [(it,foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal))] ++ unifyLists subst t 
 
 
 -- | Apply the current substitution of the equation store to a part of the
