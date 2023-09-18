@@ -199,7 +199,7 @@ prettyLess (i, j) = prettyNAtom $ Less (varTerm i) (varTerm j)
 
 -- | Pretty print a goal.
 prettyGoal :: HighlightDocument d => Goal -> d
-prettyGoal (ActionG i fa) = prettyNAtom (Action (varTerm i) fa) -- trace ("MIMOU: "++(show $ factTerms fa)++" || "++(show $ getFactVariables fa)++" || "++(show $ map (setLVarIdx 0) (getFactVariables fa)))
+prettyGoal (ActionG i fa) = prettyNAtom (Action (varTerm i) fa)
 prettyGoal (ChainG c p)   =
     prettyNodeConc c <-> operator_ "~~>" <-> prettyNodePrem p
 prettyGoal (PremiseG (i, (PremIdx v)) fa) =

@@ -291,19 +291,20 @@ execProofMethod ctxt method sys =
     foundAt g (h:t) l = if g `elem` h then 1 else 1 + foundAt g t l
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goal sys = if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index
+    checkForLoop goal sys = execSolveGoal goal loop index iteration
         where
             index = foundAt (freeme goal) (map (map freeme) (map snd (L.get sPathGoals sys))) (length $ L.get sPathGoals sys)
+            (iteration, loop) = if index > 0 then ((map fst (L.get sPathGoals sys))!!index, True) else (0,False)
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
-    execSolveGoal :: Goal -> Bool -> Int -> Maybe (M.Map CaseName System)
-    execSolveGoal goal loop index = 
+    execSolveGoal :: Goal -> Bool -> Int -> Int -> Maybe (M.Map CaseName System)
+    execSolveGoal goal loop index iteration =
         return . makeCaseNames . removeRedundantCases ctxt [] snd
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop sys) else L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals ((0,[freeme goal]):(L.get sPathGoals sys)) sys)) -- (succ (L.get sNbLoop sys))
+        sys'   = if loop then L.set sNbLoop (index,iteration) (L.set sLoopFound loop sys) else L.set sNbLoop (index,iteration) (L.set sLoopFound loop (L.set sPathGoals ((0,[freeme goal]):(L.get sPathGoals sys)) sys))-- (succ (L.get sNbLoop sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
@@ -490,7 +491,7 @@ rankProofMethods ranking tactics ctxt sys = do
       Just cases -> case M.toList cases of 
           []                       -> return (m, (cases, expl))
           -- [(case1,sys)]            -> if L.get sLoopFound sys then return (InLoop 0, (cases, expl)) else return (m, (cases, expl))
-          ((case1,sys):_) -> if  (L.get sNbLoop sys) > 0 then return (InLoop (L.get sNbLoop sys, fromJust $ fromSolveGoal m, 0), (cases, expl)) else return (m, (cases, expl))
+          ((case1,sys):_) -> if  depth > 0 then return (InLoop (depth, fromJust $ fromSolveGoal m, iteration), (cases, expl)) else return (m, (cases, expl))
       Nothing    -> []
   where
     contradiction c                    = (Contradiction (Just c), "")
@@ -511,6 +512,8 @@ rankProofMethods ranking tactics ctxt sys = do
     fromSolveGoal :: ProofMethod -> Maybe Goal
     fromSolveGoal (SolveGoal goal) = Just goal
     fromSolveGoal _ = Nothing
+
+    (depth,iteration) = L.get sNbLoop sys
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'DiffProofContext' and

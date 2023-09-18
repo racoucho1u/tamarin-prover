@@ -380,7 +380,7 @@ data System = System
     , _sLemmas         :: S.Set LNGuarded
     , _sGoals          :: M.Map Goal GoalStatus
     , _sPathGoals      :: [(Int,[Goal])]
-    , _sNbLoop         :: Int
+    , _sNbLoop         :: (Int, Int)
     , _sLoopFound      :: Bool
     , _sNextGoalNr     :: Integer
     , _sSourceKind     :: SourceKind
@@ -780,7 +780,7 @@ emptySystem :: SourceKind -> Bool -> System
 emptySystem d isdiff = System
     M.empty S.empty S.empty Nothing emptyEqStore
     S.empty S.empty S.empty
-    M.empty [] 0 False 0 d isdiff
+    M.empty [] (0,0) False 0 d isdiff
 
 -- | The empty diff constraint system.
 emptyDiffSystem :: DiffSystem
