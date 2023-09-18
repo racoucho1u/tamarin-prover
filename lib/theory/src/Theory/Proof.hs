@@ -126,6 +126,7 @@ import           System.Random
 import           System.IO.Unsafe
 
 
+
 ------------------------------------------------------------------------------
 -- Utility: Trees with uniquely labelled edges.
 ------------------------------------------------------------------------------
@@ -227,7 +228,7 @@ instance HasFrees a => HasFrees (DiffProofStep a) where
     foldFreesOcc  _ _ = const mempty
     mapFrees f (DiffProofStep m i)  = DiffProofStep <$> mapFrees f m <*> mapFrees f i
 
-    
+
 ------------------------------------------------------------------------------
 -- Proof Trees
 ------------------------------------------------------------------------------
@@ -347,7 +348,7 @@ boundDiffProofDepth bound =
       | 0 < n     = LNode ps                     $ M.map (go (pred n)) cs
       | otherwise = diffSorry (Just $ "bound " ++ show bound ++ " hit") info
 
-      
+
 -- | Fold a proof.
 foldProof :: Monoid m => (ProofStep a -> m) -> Proof a -> m
 foldProof f =
@@ -395,15 +396,19 @@ data ProofStatus =
        | IncompleteProof    -- ^ There is a annotated sorry,
                             --   but no annotated solved step.
        | TraceFound         -- ^ There is an annotated solved step
-    deriving ( Show, Generic, NFData, Binary )
+       | UnfinishableProof  -- ^ The proof cannot be finished (due to reducible operators in subterms)
+                            --   i.e. all ends are either Completed or Unfinishable (if a trace is found, then the status is TraceFound)
+    deriving ( Show, Generic, NFData, Binary, Eq )
 
 instance Semigroup ProofStatus where
     TraceFound <> _                        = TraceFound
     _ <> TraceFound                        = TraceFound
     IncompleteProof <> _                   = IncompleteProof
     _ <> IncompleteProof                   = IncompleteProof
-    _ <> CompleteProof                     = CompleteProof
+    UnfinishableProof <> _                 = UnfinishableProof
+    _ <> UnfinishableProof                 = UnfinishableProof
     CompleteProof <> _                     = CompleteProof
+    _ <> CompleteProof                     = CompleteProof
     UndeterminedProof <> UndeterminedProof = UndeterminedProof
 
 
@@ -412,17 +417,20 @@ instance Monoid ProofStatus where
 
 -- | The status of a 'ProofStep'.
 proofStepStatus :: ProofStep (Maybe a) -> ProofStatus
-proofStepStatus (ProofStep _         Nothing ) = UndeterminedProof
-proofStepStatus (ProofStep Solved    (Just _)) = TraceFound
-proofStepStatus (ProofStep (Sorry _) (Just _)) = IncompleteProof
-proofStepStatus (ProofStep _         (Just _)) = CompleteProof
+proofStepStatus (ProofStep _            Nothing ) = UndeterminedProof
+proofStepStatus (ProofStep Solved       (Just _)) = TraceFound
+proofStepStatus (ProofStep Unfinishable (Just _)) = UnfinishableProof
+proofStepStatus (ProofStep (Sorry _)    (Just _)) = IncompleteProof
+proofStepStatus (ProofStep _            (Just _)) = CompleteProof
 
 -- | The status of a 'DiffProofStep'.
 diffProofStepStatus :: DiffProofStep (Maybe a) -> ProofStatus
-diffProofStepStatus (DiffProofStep _             Nothing ) = UndeterminedProof
-diffProofStepStatus (DiffProofStep DiffAttack    (Just _)) = TraceFound
-diffProofStepStatus (DiffProofStep (DiffSorry _) (Just _)) = IncompleteProof
-diffProofStepStatus (DiffProofStep _             (Just _)) = CompleteProof
+diffProofStepStatus (DiffProofStep _                Nothing ) = UndeterminedProof
+diffProofStepStatus (DiffProofStep DiffAttack       (Just _)) = TraceFound
+diffProofStepStatus (DiffProofStep (DiffSorry _)    (Just _)) = IncompleteProof
+diffProofStepStatus (DiffProofStep DiffUnfinishable (Just _)) = UnfinishableProof
+diffProofStepStatus (DiffProofStep _                (Just _)) = CompleteProof
+
 
 {- TODO: Test and probably improve
 
@@ -501,7 +509,7 @@ checkDiffProof ctxt prover d sys prf@(LNode (DiffProofStep method info) cs) =
       where
         unhandledCase = mapDiffProofInfo ((,) Nothing) . prover d
 
-        
+
 -- | Annotate a proof with the constraint systems of all intermediate steps
 -- under the assumption that all proof steps are valid. If some proof steps
 -- might be invalid, then you must use 'checkProof', which handles them
@@ -969,7 +977,7 @@ cutOnSolvedDFSDiff prf0 =
           LNode pstep (M.fromList [(label, extractSolved ps subprf)])
         Nothing     ->
           error "Theory.Constraint.cutOnSolvedDFSDiff: impossible, extractSolved failed, invalid path"
-          
+
 -- | Search for attacks in a BFS manner.
 cutOnSolvedBFS :: Proof (Maybe a) -> Proof (Maybe a)
 cutOnSolvedBFS =
@@ -981,6 +989,7 @@ cutOnSolvedBFS =
         case S.runState (checkLevel l prf) CompleteProof of
           (_, UndeterminedProof) -> error "cutOnSolvedBFS: impossible"
           (_, CompleteProof)     -> prf
+          (_, UnfinishableProof) -> prf
           (_, IncompleteProof)   -> go (l+1) prf
           (prf', TraceFound)     ->
               trace ("attack found at depth: " ++ show l) prf'
@@ -1010,6 +1019,7 @@ cutOnSolvedBFSDiff =
         case S.runState (checkLevel l prf) CompleteProof of
           (_, UndeterminedProof) -> error "cutOnSolvedBFS: impossible"
           (_, CompleteProof)     -> prf
+          (_, UnfinishableProof) -> prf
           (_, IncompleteProof)   -> go (l+1) prf
           (prf', TraceFound)     ->
               trace ("attack found at depth: " ++ show l) prf'
@@ -1158,6 +1168,7 @@ showProofStatus ExistsNoTrace   TraceFound        = "falsified - found trace"
 showProofStatus ExistsNoTrace   CompleteProof     = "verified"
 showProofStatus ExistsSomeTrace CompleteProof     = "falsified - no trace found"
 showProofStatus ExistsSomeTrace TraceFound        = "verified"
+showProofStatus _               UnfinishableProof = "analysis cannot be finished (reducible operators in subterms)"
 showProofStatus _               IncompleteProof   = "analysis incomplete"
 showProofStatus _               UndeterminedProof = "analysis undetermined"
 
@@ -1165,6 +1176,7 @@ showProofStatus _               UndeterminedProof = "analysis undetermined"
 showDiffProofStatus :: ProofStatus -> String
 showDiffProofStatus TraceFound        = "falsified - found trace"
 showDiffProofStatus CompleteProof     = "verified"
+showDiffProofStatus UnfinishableProof = "analysis cannot be finished (reducible operators in subterms)"
 showDiffProofStatus IncompleteProof   = "analysis incomplete"
 showDiffProofStatus UndeterminedProof = "analysis undetermined"
 

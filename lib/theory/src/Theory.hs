@@ -26,6 +26,8 @@ module Theory (
   , pBody
   , pVars
   , addFunctionTypingInfo
+  , addMacros
+  , addDiffMacros
   , clearFunctionTypingInfos
 
   -- * Options
@@ -39,6 +41,7 @@ module Theory (
   , forcedInjectiveFacts
   , setforcedInjectiveFacts
   , thyOptions
+  , thyIsSapic
   , setOption
   , Option
   -- * Predicates
@@ -98,6 +101,7 @@ module Theory (
   , DiffTheoryItem(..)
   , thyName
   , thySignature
+  , thyTactic
   , thyCache
   , thyItems
   , diffThyName
@@ -216,6 +220,8 @@ module Theory (
   , getDiffClassifiedRules
   , getInjectiveFactInsts
   , getDiffInjectiveFactInsts
+  , getLeftProtoRule
+  , getRightProtoRule
 
   , getSource
   , getDiffSource
@@ -245,6 +251,7 @@ module Theory (
   , prettyOpenTheory
   , prettyOpenTranslatedTheory
   , prettyOpenDiffTheory
+  , prettyMacros
 
   , prettyOpenProtoRule
   , prettyDiffRule
@@ -262,36 +269,37 @@ module Theory (
   , module Theory.Proof
   , module Pretty
 
+
   ) where
 
 -- import           Debug.Trace
 
 import           Prelude                             hiding (id, (.))
 
-import           GHC.Generics                        (Generic)
+--import           GHC.Generics                        (Generic)
 
 -- import           Data.Typeable
-import           Data.Binary
-import           Data.List
-import           Data.Maybe
-import           Data.Either
-import           Data.Monoid                         (Sum(..))
-import qualified Data.Set                            as S
+--import           Data.Binary
+--import           Data.List
+--import           Data.Maybe
+--import           Data.Either
+--import           Data.Monoid                         (Sum(..))
+--import qualified Data.Set                            as S
 
-import           Control.Basics
-import           Control.Category
-import           Control.DeepSeq
-import           Control.Monad.Reader
-import qualified Control.Monad.State                 as MS
-import           Control.Parallel.Strategies
+--import           Control.Basics
+--import           Control.Category
+--import           Control.DeepSeq
+--import           Control.Monad.Reader
+--import qualified Control.Monad.State                 as MS
+--import           Control.Parallel.Strategies
 
-import           Extension.Data.Label                hiding (get)
-import qualified Extension.Data.Label                as L
-import qualified Data.Label.Point
-import qualified Data.Label.Poly
+--import           Extension.Data.Label                hiding (get)
+--import qualified Extension.Data.Label                as L
+--import qualified Data.Label.Point
+--import qualified Data.Label.Poly
 -- import qualified Data.Label.Total
 
-import           Safe                                (headMay, atMay)
+{-import           Safe                                (headMay, atMay)
 
 import           Theory.Model
 import           Theory.Sapic
@@ -306,8 +314,7 @@ import           Theory.Tools.IntruderRules
 
 import           Term.Positions
 
-import           Utils.Misc
-import           Debug.Trace
+import           Utils.Misc-}
 
 import ClosedTheory
 import Items.ExportInfo
@@ -318,4 +325,6 @@ import Theory.Model
 import Theory.Proof
 import Theory.Syntactic.Predicate
 import TheoryObject
+import Prelude hiding (id, (.))
+
 

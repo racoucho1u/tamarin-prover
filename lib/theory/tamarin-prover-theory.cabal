@@ -2,7 +2,7 @@ name:               tamarin-prover-theory
 
 cabal-version:      >= 1.8
 build-type:         Simple
-version:            1.7.1
+version:            1.9.0
 license:            GPL
 license-file:       LICENSE
 category:           Theorem Provers
@@ -14,7 +14,8 @@ maintainer:         Simon Meier <simon.meier@inf.ethz.ch>,
                     Jannik Dreier <research@jannikdreier.net>,
                     Ralf Sasse <ralf.sasse@gmail.com>
                     Cas Cremers <cremers@cispa.de>
-copyright:          Benedikt Schmidt, Simon Meier, Jannik Dreier, Ralf Sasse, ETH Zurich, 2010-2018
+
+copyright:          Benedikt Schmidt, Simon Meier, Cas Cremers, Jannik Dreier, Ralf Sasse, 2010-2023
 
 synopsis:           Security protocol types and constraint solver library for the tamarin prover.
 
@@ -44,6 +45,7 @@ library
     build-depends:
         aeson
       , aeson-pretty
+      , array
       , attoparsec
       , base
       , binary
@@ -117,13 +119,16 @@ library
       Theory.Text.Parser.Token
       Theory.Text.Parser.Restriction
       Theory.Text.Parser.Signature
+      Theory.Text.Parser.Macro 
 
+      Theory.Tools.MessageDerivationChecks
       Theory.Tools.AbstractInterpretation
       Theory.Tools.EquationStore
       Theory.Tools.InjectiveFactInstances
       Theory.Tools.IntruderRules
       Theory.Tools.LoopBreakers
       Theory.Tools.RuleVariants
+      Theory.Tools.SubtermStore
       Theory.Tools.Wellformedness
       TheoryObject
       Lemma

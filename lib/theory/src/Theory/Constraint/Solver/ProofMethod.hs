@@ -27,6 +27,7 @@ module Theory.Constraint.Solver.ProofMethod (
 
   , roundRobinHeuristic
   , useHeuristic
+  , finishedSubterms
 
   -- ** Pretty Printing
   , prettyProofMethod
@@ -69,6 +70,7 @@ import           Theory.Model
 import           Theory.Text.Pretty
 
 import           Text.Regex.PCRE
+
 
 
 
@@ -189,6 +191,7 @@ type CaseName = String
 data ProofMethod =
     Sorry (Maybe String)                 -- ^ Proof was not completed
   | Solved                               -- ^ An attack was found.
+  | Unfinishable                         -- ^ The proof cannot be finished (due to reducible operators in subterms)
   | Simplify                             -- ^ A simplification step.
   | InLoop (Int, Goal, Int)              -- ^ A goal that has been detected as part as a loop (depth of the loop, goal, nb of time through the loop)
   | SolveGoal Goal                       -- ^ A goal that was solved.
@@ -204,6 +207,7 @@ data DiffProofMethod =
     DiffSorry (Maybe String)                 -- ^ Proof was not completed
   | DiffMirrored                             -- ^ No attack was found
   | DiffAttack                               -- ^ A potential attack was found
+  | DiffUnfinishable                         -- ^ The backward search is complete (but there are reducible operators in subterms)
   | DiffRuleEquivalence                      -- ^ Consider all rules
   | DiffBackwardSearch                       -- ^ Do the backward search starting from a rule
   | DiffBackwardSearchStep ProofMethod       -- ^ A step in the backward search starting from a rule
@@ -243,10 +247,15 @@ execProofMethod :: ProofContext
                 -> ProofMethod -> System -> Maybe (M.Map CaseName System)
 execProofMethod ctxt method sys =
       case method of
-        Sorry _                  -> return M.empty
+        Sorry _                                -> return M.empty
         Solved
-          | null (plainOpenGoals sys) -> return M.empty
-          | otherwise                 -> Nothing
+          | null (openGoals sys)
+            && finishedSubterms ctxt sys       -> return M.empty
+          | otherwise                          -> Nothing
+        Unfinishable
+          | null (openGoals sys)
+            && not (finishedSubterms ctxt sys) -> return M.empty
+          | otherwise                          -> Nothing
         InLoop (_, goal,_)
           | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
@@ -256,8 +265,8 @@ execProofMethod ctxt method sys =
         Simplify                 -> singleCase simplifySystem
         Induction                -> M.map cleanupSystem <$> execInduction
         Contradiction _
-          | null (contradictions ctxt sys) -> Nothing
-          | otherwise                      -> Just M.empty
+          | null (contradictions ctxt sys)     -> Nothing
+          | otherwise                          -> Just M.empty
   where
     -- at this point it is safe to remove the free substitution, as all
     -- systems have it fully applied (by the virtue of a call to
@@ -369,31 +378,49 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
           | otherwise                                         -> Nothing
         DiffMirrored
           | (L.get dsProofType sys) == (Just RuleEquivalence) -> case (L.get dsCurrentRule sys, L.get dsSide sys, L.get dsSystem sys) of
-                                                                      (Just _, Just s, Just sys') -> if ((isTrivial sys') && (fst (getMirrorDGandEvaluateRestrictions ctxt sys (isSolved s sys')) == TTrue))
-                                                                                                        then return M.empty 
+                                                                      (Just _, Just s, Just sys') -> if isTrivial sys' && allSubtermsFinished && (fst (evaluateRestrictions ctxt sys mirrorSyss (isSolved s sys')) == TTrue)
+                                                                                                        then return M.empty
                                                                                                         else Nothing
+                                                                                                    where
+                                                                                                        mirrorSyss = getMirrorDG ctxt s sys'
+                                                                                                        mirrorCtxt = eitherProofContext ctxt (opposite s)
+                                                                                                        allSubtermsFinished = finishedSubterms (eitherProofContext ctxt s) sys' && all (finishedSubterms mirrorCtxt) mirrorSyss
                                                                       (_ , _ , _)                 -> Nothing                                                       
           | otherwise                                         -> Nothing
         DiffAttack
           | (L.get dsProofType sys) == (Just RuleEquivalence) -> case (L.get dsCurrentRule sys, L.get dsSide sys, L.get dsSystem sys) of
-                                                                      (Just _, Just s, Just sys') -> if (isSolved s sys') && (fst (getMirrorDGandEvaluateRestrictions ctxt sys (isSolved s sys')) == TFalse)
-                                                                                                        then return M.empty
-                                                                                                        else if (not (contradictorySystem (eitherProofContext ctxt s) sys')) && (isTrivial sys') && (fst (getMirrorDGandEvaluateRestrictions ctxt sys (isSolved s sys')) == TFalse) then
-                                                                                                        -- here the system is trivial, has no mirror and restrictions do not get in the way.
+                                                                      (Just _, Just s, Just sys') -> if (isSolved s sys' || (isTrivial sys' && not (contradictorySystem (eitherProofContext ctxt s) sys'))) &&
+                                                                                                        (allSubtermsFinished && (fst (evaluateRestrictions ctxt sys mirrorSyss (isSolved s sys')) == TFalse))
+                                                                                                      then return M.empty
+                                                                                                        -- In the second case, the system is trivial, has no mirror and restrictions do not get in the way.
                                                                                                         -- If we solve arbitrarily the last remaining trivial goals,
-                                                                                                        -- then there will be an attack.
-                                                                                                        return M.empty
-                                                                                                        else Nothing
+                                                                                                        -- then there will be an attack.                                                                                                        then 
+                                                                                                      else Nothing
+                                                                                                        where
+                                                                                                          mirrorSyss = getMirrorDG ctxt s sys'
+                                                                                                          mirrorCtxt = eitherProofContext ctxt (opposite s)
+                                                                                                          allSubtermsFinished = finishedSubterms (eitherProofContext ctxt s) sys' && all (finishedSubterms mirrorCtxt) mirrorSyss
                                                                       (_ , _ , _)                 -> Nothing
           | otherwise                                         -> Nothing
         DiffRuleEquivalence
           | (L.get dsProofType sys) == Nothing                -> Just ruleEquivalence
           | otherwise                                         -> Nothing
+        DiffUnfinishable
+          | (L.get dsProofType sys) == (Just RuleEquivalence) -> case (L.get dsCurrentRule sys, L.get dsSide sys, L.get dsSystem sys) of
+                                                                      (Just _, Just s, Just sys') -> if isSolved s sys' && not allSubtermsFinished
+                                                                                                        then return M.empty
+                                                                                                        else Nothing
+                                                                                                      where
+                                                                                                        mirrorSyss = getMirrorDG ctxt s sys'
+                                                                                                        mirrorCtxt = eitherProofContext ctxt (opposite s)
+                                                                                                        allSubtermsFinished = finishedSubterms (eitherProofContext ctxt s) sys' && all (finishedSubterms mirrorCtxt) mirrorSyss
+                                                                      (_ , _ , _)                 -> Nothing
+          | otherwise                                         -> Nothing
           
   where
-    protoRules       = (L.get dpcProtoRules  ctxt)
-    destrRules       = (L.get dpcDestrRules  ctxt)
-    constrRules      = (L.get dpcConstrRules ctxt)
+    protoRules       = L.get dpcProtoRules  ctxt
+    destrRules       = L.get dpcDestrRules  ctxt
+    constrRules      = L.get dpcConstrRules ctxt
 
     protoRulesAC :: Side -> [RuleAC]
     protoRulesAC LHS = filter (\x -> getRuleNameDiff x /= "IntrRecv") $ L.get crProtocol $ L.get pcRules (L.get dpcPCLeft  ctxt)
@@ -439,6 +466,10 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
     isSolved :: Side -> System -> Bool
     isSolved s sys' = ((rankProofMethods GoalNrRanking [defaultTactic] (eitherProofContext ctxt s) sys') == []) && not (L.get sLoopFound sys') -- checks if the system is solved
 
+-- | returns True if there are no reducible operators on top of a right side of a subterm in the subterm store
+finishedSubterms :: ProofContext -> System -> Bool
+finishedSubterms pc sys = hasReducibleOperatorsOnTop (reducibleFunSyms $ mhMaudeSig $ L.get pcMaudeHandle pc) (L.get sSubtermStore sys)
+
 ------------------------------------------------------------------------------
 -- Heuristics
 ------------------------------------------------------------------------------
@@ -470,8 +501,8 @@ rankGoals ctxt ranking tacticsList = case ranking of
 
       checkName t1 t2 = (_name t1) == (_name t2)
 
-      chooseError [] t = error $ "No tactic has been written in the theory file"
-      chooseError l  t = error $ "The tactic specified ( "++(show $ _name t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
+      chooseError [] _ = error $ "No tactic has been written in the theory file"
+      chooseError _  t = error $ "The tactic specified ( "++(show $ _name t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'ProofContext' and
@@ -526,6 +557,7 @@ rankDiffProofMethods ranking tactics ctxt sys = do
             [(DiffRuleEquivalence, "Prove equivalence using rule equivalence")]
         <|> [(DiffMirrored, "Backward search completed")]
         <|> [(DiffAttack, "Found attack")]
+        <|> [(DiffUnfinishable, "Proof cannot be finished")]
         <|> [(DiffBackwardSearch, "Do backward search from rule")]
         <|> (case (L.get dsSide sys, L.get dsSystem sys) of
                   (Just s, Just sys') -> map (\x -> (DiffBackwardSearchStep (fst x), "Do backward search step"))
@@ -648,6 +680,8 @@ oracleSmartRanking oracle ctxt _sys ags0
     pgoal (g,(_nr,_usefulness)) = prettyGoal g
 
 
+-- | This function apply a tactic to a list of AnnotatedGoals to retrive an ordered list according
+-- | to its Prio/Deprio's functions
 itRanking :: Tactic ProofContext -> [AnnotatedGoal] -> ProofContext -> System -> [AnnotatedGoal]
 itRanking tactic ags ctxt _sys = result
     where
@@ -658,13 +692,14 @@ itRanking tactic ags ctxt _sys = result
       groupedPrio = groupBy (\(indice1,_) (indice2,_) -> indice1 == indice2) indexedPrio        -- grouping goals by prio
       preorderedPrio = if (Nothing `elem` indexPrio) then map (snd . unzip) (tail groupedPrio) else map (snd . unzip) groupedPrio -- recovering ranked goals only (no prio = Nothing = fst)
 
-      prioRankingFunctions = map rankingPrio (_prios tactic)
+      prioRankingFunctions = map rankingPrio (_prios tactic)                                              -- retrieve rankingFuntions for all Prio
       rankingFunToBeAppliedPrio = chooseRankingFunctionByPrio prioRankingFunctions (map head groupedPrio) -- only the functions for prios that are relevant
-      prioReorderedGoals = applyRankingFunctions rankingFunToBeAppliedPrio preorderedPrio
+      prioReorderedGoals = applyRankingFunctions rankingFunToBeAppliedPrio preorderedPrio                 -- apply the function 
 
-      rankedPrioGoals = concat prioReorderedGoals
+      rankedPrioGoals = concat prioReorderedGoals                                                         -- string the results in a single table
       
-      -- Getting the functions from depriorities
+      -- Getting the functions from depriorities (same as above but dor the depriorities)
+
       deprioToFunctions = map functionsDeprio (_deprios tactic)
       indexDeprio = map (findIndex (==True)) $ map (applyIsPrio deprioToFunctions ctxt _sys) ags
       indexedDeprio = sortOn fst $ zip indexDeprio ags 
@@ -672,7 +707,7 @@ itRanking tactic ags ctxt _sys = result
       preorderedDeprio = if (Nothing `elem` indexDeprio) then map (snd . unzip) (tail groupedDeprio) else map (snd . unzip) groupedDeprio -- recovering ranked goals only (no prio = Nothing = fst)
 
       deprioRankingFunctions = map rankingDeprio (_deprios tactic)
-      rankingFunToBeAppliedDeprio = chooseRankingFunctionByPrio prioRankingFunctions (map head groupedPrio)
+      rankingFunToBeAppliedDeprio = chooseRankingFunctionByPrio deprioRankingFunctions (map head groupedDeprio)
       deprioReorderedGoals = applyRankingFunctions rankingFunToBeAppliedDeprio preorderedDeprio
 
       rankedDeprioGoals = concat deprioReorderedGoals
@@ -683,65 +718,55 @@ itRanking tactic ags ctxt _sys = result
 
       -- Check whether a goal match a prio
       isPrio :: [(AnnotatedGoal, ProofContext, System) -> Bool] -> ProofContext -> System -> AnnotatedGoal -> Bool
-      isPrio list agoal ctxt sys = or $ (sequenceA list) (sys,agoal,ctxt)
+      isPrio list agoal ctxt_ sys = or $ (sequenceA list) (sys,agoal,ctxt_)
 
       -- Try to match all prio with all goals
       applyIsPrio :: [[(AnnotatedGoal, ProofContext, System) -> Bool]] -> ProofContext -> System -> AnnotatedGoal -> [Bool]
       applyIsPrio [] _ _ _ = []
-      applyIsPrio [xs] agoal ctxt sys = isPrio xs agoal ctxt sys:[]
-      applyIsPrio (h:t) agoal ctxt sys = isPrio h agoal ctxt sys:applyIsPrio t agoal ctxt sys
+      applyIsPrio [xs] agoal ctxt_ sys = isPrio xs agoal ctxt_ sys:[]
+      applyIsPrio (h:t) agoal ctxt_ sys = isPrio h agoal ctxt_ sys:applyIsPrio t agoal ctxt_ sys
 
+      -- If it exists, retrieve the right rankingFuntion for all Goals recognized by a Prio/Deprio
       chooseRankingFunctionByPrio :: [Maybe ([AnnotatedGoal] -> [AnnotatedGoal])] -> [(Maybe Int,AnnotatedGoal)] -> [Maybe ([AnnotatedGoal] -> [AnnotatedGoal])]
       chooseRankingFunctionByPrio [] _ = []
       chooseRankingFunctionByPrio _ [] = []
-      chooseRankingFunctionByPrio rf [(Nothing,_)] = []
+      chooseRankingFunctionByPrio _ [(Nothing,_)] = []
       chooseRankingFunctionByPrio rf [(Just n,_)] = [rf !! n]
       chooseRankingFunctionByPrio rf ((Nothing,_):t) = (chooseRankingFunctionByPrio rf t)
       chooseRankingFunctionByPrio rf ((Just n,_):t) = (rf !! n):(chooseRankingFunctionByPrio rf t)
 
+      -- If a given Prio/Deprio has a rankingFunction defined, apply it to the goals regognized by this Prio/Deprio
       applyRankingFunctions :: [Maybe ([AnnotatedGoal] -> [AnnotatedGoal])] -> [[AnnotatedGoal]] -> [[AnnotatedGoal]]
       applyRankingFunctions [] _ = []
       applyRankingFunctions _ [] = []
-      applyRankingFunctions (hf:tf) (hg:tg) = (apply hf hg):(applyRankingFunctions tf tg)
+      applyRankingFunctions (hf:tf) (hg:tg) = (apply_ hf hg):(applyRankingFunctions tf tg)
         where
-            apply :: Maybe ([AnnotatedGoal] -> [AnnotatedGoal]) -> [AnnotatedGoal] -> [AnnotatedGoal]
-            apply Nothing l = l
-            apply (Just f) l = f l
+            apply_ :: Maybe ([AnnotatedGoal] -> [AnnotatedGoal]) -> [AnnotatedGoal] -> [AnnotatedGoal]
+            apply_ Nothing l = l
+            apply_ (Just f) l = f l
 
 
-
-
+-- | A ranking function using a tactic to allow user-definable heuristics
+--   for each lemma separately, using the user chosen defaultMethod heuristic
+--   as the baseline.
 internalTacticRanking :: Tactic ProofContext -> ProofContext -> System -> [AnnotatedGoal] -> [AnnotatedGoal]
-internalTacticRanking tactic ctxt _sys ags0 = 
-  unsafePerformIO $ do
-      let defaultMethod =  _presort tactic
-      let ags = rankGoals ctxt defaultMethod [tactic] _sys ags0
-      let inp = unlines
-                  (map (\(i,ag) -> show i ++": "++ (concat . lines . render $ pgoal ag))
-                       (zip [(0::Int)..] ags))
-      let res = itRanking tactic ags ctxt _sys
-      let dict = M.fromList (zip ags [(0::Int)..])
-          outp = map (fromMaybe (-1)) (map (flip M.lookup dict) res)
-      let prettyOut = unlines (map show outp)
-      let logMsg = ">>>>>>>>>>>>>>>>>>>>>>>> START INPUT\n"
-                   ++ inp
-                   ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> START OUTPUT\n"
-                   ++ prettyOut
-                   -- ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> System\n"
-                   -- ++ show _sys
-                   ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Oracle call\n"
-      guard $ trace logMsg True
-      return (res)
-  where
-    pgoal (g,(_nr,_usefulness)) = prettyGoal g
-
-    orderList [] _ res        = res
-    orderList _ [] res        = res
-    orderList (h1:l) (h2:ref) res = if (snd h1 == snd h2) then orderList l ref (h1:res) else orderList (l++[h1]) (h2:ref) res
-
-    decomposeGoal :: AnnotatedGoal -> Maybe LNFact
-    decomposeGoal (ActionG _ lnfact,(_,_)) = Just lnfact
-    decomposeGoal _ = Nothing
+internalTacticRanking tactic ctxt _sys ags0 = trace logMsg res
+    where
+        defaultMethod =  _presort tactic                        -- retrieve baseline heuristic 
+        ags = rankGoals ctxt defaultMethod [tactic] _sys ags0   -- get goals accordingly
+        pgoal (g,(_nr,_usefulness)) = prettyGoal g
+        inp = unlines
+                    (map (\(i,ag) -> show i ++": "++ (concat . lines . render $ pgoal ag))
+                         (zip [(0::Int)..] ags))
+        res = itRanking tactic ags ctxt _sys                    -- apply the tactic ranking
+        dict = M.fromList (zip ags [(0::Int)..])
+        outp = map (fromMaybe (-1)) (map (flip M.lookup dict) res)
+        prettyOut = unlines (map show outp)
+        logMsg = ">>>>>>>>>>>>>>>>>>>>>>>> START INPUT\n"
+                     ++ inp
+                     ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> START OUTPUT\n"
+                     ++ prettyOut
+                     ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Oracle call\n"
 
 -- | Utilities for SAPiC translations specifically 
 
@@ -1082,7 +1107,7 @@ smartRanking :: ProofContext
              -> System
              -> [AnnotatedGoal] -> [AnnotatedGoal]
 smartRanking ctxt allowPremiseGLoopBreakers sys =
-    sortOnUsefulness . unmark . sortDecisionTree notSolveLast . sortDecisionTree solveFirst . goalNrRanking
+    moveNatToEnd . sortOnUsefulness . unmark . sortDecisionTree notSolveLast . sortDecisionTree solveFirst . goalNrRanking
   where
     oneCaseOnly = catMaybes . map getMsgOneCase . L.get pcSources $ ctxt
 
@@ -1092,6 +1117,10 @@ smartRanking ctxt allowPremiseGLoopBreakers sys =
       _                                            -> Nothing
 
     sortOnUsefulness = sortOn (tagUsefulness . snd . snd)
+
+    moveNatToEnd = sortOn isNatSubtermSplit
+    isNatSubtermSplit (SubtermG st, _) = isNatSubterm st
+    isNatSubtermSplit _                = False
 
     tagUsefulness Useful                = 0 :: Int
     tagUsefulness ProbablyConstructible = 1
@@ -1202,6 +1231,7 @@ smartDiffRanking ctxt sys =
 prettyProofMethod :: HighlightDocument d => ProofMethod -> d
 prettyProofMethod method = case method of
     Solved               -> keyword_ "SOLVED" <-> lineComment_ "trace found"
+    Unfinishable         -> keyword_ "UNFINISHABLE" <-> lineComment_ "reducible operator in subterm"
     Induction            -> keyword_ "induction"
     InLoop (d,goal,i)    -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "InLoop "++show d++" ("++show i++" iteration(s))")]
     Sorry reason         ->
@@ -1219,6 +1249,7 @@ prettyDiffProofMethod :: HighlightDocument d => DiffProofMethod -> d
 prettyDiffProofMethod method = case method of
     DiffMirrored             -> keyword_ "MIRRORED"
     DiffAttack               -> keyword_ "ATTACK" <-> lineComment_ "trace found"
+    DiffUnfinishable         -> keyword_ "UNFINISHABLEdiff" <-> lineComment_ "reducible operator in subterm"
     DiffSorry reason         ->
         fsep [keyword_ "sorry", maybe emptyDoc lineComment_ reason]
 -- MERGED with solved.
