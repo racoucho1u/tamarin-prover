@@ -91,6 +91,8 @@ import           Items.OptionItem                    (openChainsLimit,saturation
 import           Control.Monad.Except
 import           Control.Monad.Catch (MonadCatch)
 
+import           Debug.Trace
+
 
 import qualified Accountability as Acc
 import qualified Accountability.Generation as Acc
