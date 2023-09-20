@@ -1073,7 +1073,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                 it = int2Double iteration
                 d = int2Double depth
                 rand = int2Double(drawRand(depth)) / d
-                threshold = 1.0/(2.0**(it+1))
+                threshold = 1.0/2.0 --1.0/(2.0**(it+1))
 
         incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
         incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t) 
