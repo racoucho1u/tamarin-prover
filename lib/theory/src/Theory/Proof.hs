@@ -1072,8 +1072,8 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             where 
                 it = int2Double iteration
                 d = int2Double depth
-                rand = int2Double(drawRand(depth)) / d
-                threshold = 1.0/2.0 --1.0/(2.0**(it+1))
+                rand = int2Double(drawRand(depth)) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
+                threshold = 1.0/2.0 --1.0/(2.0**(it+1)) --1.0/(2.0**((it+1)/d))
 
         incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
         incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t) 
@@ -1083,7 +1083,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         applyIteration :: Int -> System -> System
         applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
 
-        node method cases = 
+        node method cases = --trace ("Mimou: "++(show $ map fst (M.toList cases)))
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
