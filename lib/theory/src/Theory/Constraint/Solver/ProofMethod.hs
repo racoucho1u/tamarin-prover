@@ -303,7 +303,7 @@ execProofMethod ctxt method sys =
     checkForLoop goal sys = execSolveGoal goal loop index iteration --trace ("Mimou: "++show goal++"\nMimou: "++(show $ freeme goal))
         where
             index = foundAt (freeme goal) (map (map freeme) (map snd (L.get sPathGoals sys))) (length $ L.get sPathGoals sys)
-            (iteration, loop) = if index > 0 then error "Loop found" else (0,False) --then ((map fst (L.get sPathGoals sys))!!index, True)
+            (iteration, loop) = if index > 0 then ((map fst (L.get sPathGoals sys))!!index, True) else (0,False) --then ((map fst (L.get sPathGoals sys))!!index, True)
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
