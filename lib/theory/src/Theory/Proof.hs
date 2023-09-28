@@ -1056,9 +1056,9 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
       where
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = error "No more option" --node method0 cases0
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
-            InLoop (depth,goal,iteration) -> checkForLoop suite (method0, (cases0, _expl0)) --if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
+            InLoop (depth,goal,iteration) -> if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
             otherwise -> node method cases
 
         drawRand :: Int -> Int
@@ -1068,12 +1068,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             return result
 
         chooseLoop :: Int -> Int -> Bool
-        chooseLoop depth iteration = rand <= threshold
+        chooseLoop depth iteration = trace ("ITERATION: "++show iteration) rand <= threshold
             where 
                 it = int2Double iteration
                 d = int2Double depth
-                rand = int2Double(drawRand(depth)) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
-                threshold = 1.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
+                rand = int2Double(drawRand(100+depth)) / (100.0+d) --int2Double(drawRand(depth)) / d --
+                threshold = 1.0/(2.0**it)
 
         incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
         incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t) 
