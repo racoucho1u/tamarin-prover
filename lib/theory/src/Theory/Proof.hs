@@ -1083,7 +1083,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         applyIteration :: Int -> System -> System
         applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
 
-        node method cases = --trace ("Mimou: "++(show $ map fst (M.toList cases)))
+        node method cases = 
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
