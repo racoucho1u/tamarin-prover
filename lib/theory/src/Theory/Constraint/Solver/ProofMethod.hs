@@ -193,13 +193,14 @@ data ProofMethod =
   | Solved                               -- ^ An attack was found.
   | Unfinishable                         -- ^ The proof cannot be finished (due to reducible operators in subterms)
   | Simplify                             -- ^ A simplification step.
-  | InLoop (Int, Goal, Int)              -- ^ A goal that has been detected as part as a loop (depth of the loop, goal, nb of time through the loop)
   | SolveGoal Goal                       -- ^ A goal that was solved.
   | Contradiction (Maybe Contradiction)  -- ^ A contradiction could be
                                          -- derived, possibly with a reason.
   | Induction                            -- ^ Use inductive strengthening on
                                          -- the single formula constraint in
                                          -- the system.
+  | BlackListed (Goal, Int)              -- ^ A goal that has been detected by the blacklist
+  | InLoop (Int, Goal, Int)              -- ^ A goal that has been detected as part as a loop (depth of the loop, goal, nb of time through the loop)
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
 -- | Sound transformations of diff sequents.
@@ -257,6 +258,9 @@ execProofMethod ctxt method sys =
             && not (finishedSubterms ctxt sys) -> return M.empty
           | otherwise                          -> Nothing
         InLoop (_, goal,_)
+          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
+          | otherwise                        -> Nothing
+        BlackListed (goal,_)
           | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
         SolveGoal goal

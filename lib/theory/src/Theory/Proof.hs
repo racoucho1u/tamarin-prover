@@ -1059,6 +1059,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
             InLoop (depth,goal,iteration) -> if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
+            BlackListed goal -> checkForLoop suite (method0, (cases0, _expl0)) -- to be better
             otherwise -> node method cases
 
         drawRand :: Int -> Int
@@ -1068,7 +1069,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             return result
 
         chooseLoop :: Int -> Int -> Bool
-        chooseLoop depth iteration = trace ("ITERATION: "++show iteration) rand <= threshold
+        chooseLoop depth iteration = rand <= threshold
             where 
                 it = int2Double iteration
                 d = int2Double depth
@@ -1083,8 +1084,39 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         applyIteration :: Int -> System -> System
         applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
 
-        node method cases = 
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+        node methodOrigin cases = 
+            if (cases == M.empty) then LNode (ProofStep methodOrigin ()) M.empty else LNode (ProofStep method ()) successors_
+
+                where 
+                    (method, successors_) = propagatedMethod cases methodOrigin
+
+        propagatedMethod :: (M.Map CaseName System) -> ProofMethod -> (ProofMethod, M.Map CaseName (LTree CaseName (ProofStep ())))
+        propagatedMethod cases methodOrigin = case propagatingMethod cases of 
+                InLoop (1,g,_)     -> (BlackListed (fromJust maybeGoal, it), successors)
+                InLoop (idx,g,_)   -> (InLoop (idx-1,(fromJust maybeGoal),it), successors) --to be fine tuned
+                BlackListed goal -> (methodOrigin, successors)
+                _                -> (methodOrigin, successors)
+
+          where
+                (maybeGoal, it) = extractGoal methodOrigin
+
+                extractGoal :: ProofMethod -> (Maybe Goal, Int)
+                extractGoal method = case method of
+                    InLoop (_, goal, it)    -> (Just goal, it)             
+                    BlackListed (goal,it)   -> (Just goal, it)
+                    SolveGoal goal          -> (Just goal, 0)
+                    _                       -> (Nothing, 0)
+
+                noMoreOption [] = (True, Nothing)
+                noMoreOption ((_,(LNode (ProofStep (InLoop _) _ ) _)):t)      = noMoreOption t
+                noMoreOption ((_,(LNode (ProofStep (BlackListed _) _ ) _)):t) = noMoreOption t
+                noMoreOption ((_,(LNode (ProofStep method _ ) _)):t)          = (False, Just method)
+
+                successors = M.map (prove (succ depth)) cases
+                (heir, heirMethod) = noMoreOption (M.toList $ successors)
+
+                propagatingMethod cases = if heir then foldl (\method (LNode (ProofStep proofmethod _ ) _) -> if proofmethod > method then proofmethod else method) (Sorry Nothing) successors
+                                          else fromJust heirMethod
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
