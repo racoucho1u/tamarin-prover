@@ -303,7 +303,7 @@ execProofMethod ctxt method sys =
     checkForLoop goal sys = execSolveGoal goal loop index iteration
         where
             index = foundAt (freeme goal) (map (map freeme) (map snd (L.get sPathGoals sys))) (length $ L.get sPathGoals sys)
-            (iteration, loop) = if index > 0 then ((map fst (L.get sPathGoals sys))!!index+1, True) else (0,False)
+            (iteration, loop) = if index > 0 then ((map fst (L.get sPathGoals sys)) `at` (index-1) +1, True) else (0,False)
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.

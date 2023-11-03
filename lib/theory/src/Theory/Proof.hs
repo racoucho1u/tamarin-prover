@@ -125,6 +125,8 @@ import           Theory.Text.Pretty
 import           System.Random
 import           System.IO.Unsafe
 
+import           Safe
+
 
 
 ------------------------------------------------------------------------------
@@ -1050,6 +1052,9 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 sys0
   where
 
+    -- Randomly choosing whether to go in a loop or not, 
+    -- loops are not deprioritized
+
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []   -> node Solved M.empty
           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
@@ -1085,6 +1090,222 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         node method cases = 
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+
+    --Randomly choosing the next goal based on its ranking by the heuristic (ponderated by the iteration)
+    
+    {-prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []   -> node Solved M.empty
+          list -> chooseNext list
+      where
+        chooseNext :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
+        chooseNext list = node method cases
+
+            where
+                idxScore = reverse [1..length list]--trace (show $ length list) foldl (\acc x -> (x+sum acc):acc) [1] [2..(length list)] --score based on the place in the list
+                finalScore = map itScore (zip list idxScore) 
+                distribution = reverse $ foldl (\acc x -> (x+head acc):acc) [head finalScore] (tail finalScore)
+                randInt = drawRand (last distribution)
+                chosenSuccIdx = if distribution /= [] then correspondingIdx randInt distribution else error "The empty case should have been filtered at the prove level"
+                (method, (cases, _expl)) = if length list /= length distribution then error (show list++" "++show chosenSuccIdx) else list `at` chosenSuccIdx
+
+        --Picking the index that correspond to the drawn random
+        correspondingIdx :: Int -> [Int] -> Int
+        correspondingIdx rand intList = foldl (\acc int -> if rand > int then 1+acc else acc) 0 intList
+
+        drawRand :: Int -> Int
+        drawRand sup = unsafePerformIO $ do
+            g <- newStdGen
+            let (result, _) = randomR (0, sup) g
+            return result
+
+        itScore :: ((ProofMethod, (M.Map CaseName System, String)),Int) -> Int 
+        itScore ((InLoop (_,_,it), _ ), score) = max (div score it) 1 --max (floor $ score/it) 1
+        itScore ((method, _ ), score) = score
+
+        node method cases = 
+          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+    -}
+
+    {-
+    
+    --Randomly choosing the next goal based on its ranking by the heuristic
+    
+    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []   -> node Solved M.empty
+          list -> chooseNext list
+      where
+        chooseNext :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
+        chooseNext list = node method cases
+
+            where
+                succDistribution = foldl (\acc x -> (x+head acc):acc) [1] [2..(length list)]
+                randInt = drawRand (last succDistribution)
+                chosenSuccIdx = if succDistribution /= [] then correspondingIdx randInt succDistribution else error "The empty case should have been filtered at the prove level"
+                (method, (cases, _expl)) = if length list /= length succDistribution then error (show list++" "++show chosenSuccIdx) else list `at` chosenSuccIdx
+
+        --Picking the index that correspond to the drawn random
+        correspondingIdx :: Int -> [Int] -> Int
+        correspondingIdx rand intList = foldl (\acc int -> if rand > int then 1+acc else acc) 0 intList
+
+        drawRand :: Int -> Int
+        drawRand sup = unsafePerformIO $ do
+            g <- newStdGen
+            let (result, _) = randomR (0, sup) g
+            return result
+
+        nbCases :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
+        nbCases list = reverse $ foldl (\acc (method, (cases, _expl)) -> if acc == [] then (casesLength cases):acc else (head acc+casesLength cases):acc) [] list 
+            where
+                casesLength cases = length $ M.toList cases --tried to use size directly on M.Map but it was not recognized
+
+        node method cases = 
+          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+
+    -}
+    
+    {-
+
+    --Avoid the loops and if no other choice, choose ranfdomly based on the number of cases
+
+    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []   -> node Solved M.empty
+          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) []
+      where
+        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop [] list = chooseNext list
+        checkForLoop ((method, (cases, _expl)):suite) [] = case method of 
+            InLoop (depth,goal,iteration) -> checkForLoop suite [(method, (cases, _expl))] --if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
+            otherwise -> node method cases
+        checkForLoop ((method, (cases, _expl)):suite) passed = case method of 
+            InLoop (depth,goal,iteration) -> checkForLoop suite (passed++[(method, (cases, _expl))]) --if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
+            otherwise -> node method cases
+
+        drawRand :: Int -> Int
+        drawRand sup = unsafePerformIO $ do
+            g <- newStdGen
+            let (result, _) = randomR (0, sup) g
+            return result
+
+        chooseLoop :: Int -> Int -> Bool
+        chooseLoop depth iteration = rand <= threshold
+            where 
+                it = int2Double iteration
+                d = int2Double depth
+                rand = int2Double(drawRand(depth)) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
+                threshold = 1.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
+
+        incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
+        incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t) 
+        incrementIteration _ [] removeint removelist = error (show removeint++" "++(show $ length removelist)++" "++show removelist)
+        incrementIteration depth (h:t) removeint removelist = (h:incrementIteration (depth-1) t removeint removelist)
+
+        applyIteration :: Int -> System -> System
+        applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
+
+        chooseNext :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
+        chooseNext list = node method cases
+
+            where
+                succDistribution = nbCases list
+                randInt = drawRand (last succDistribution)
+                chosenSuccIdx = if succDistribution /= [] then correspondingIdx randInt succDistribution else error "The empty case should have been filtered at the prove level"
+                (method, (cases, _expl)) = if length list /= length succDistribution then error (show list++" "++show chosenSuccIdx) else list `at` chosenSuccIdx
+
+        --Picking the index that correspond to the drawn random
+        correspondingIdx :: Int -> [Int] -> Int
+        correspondingIdx rand intList = foldl (\acc int -> if rand > int then 1+acc else acc) 0 intList
+
+
+        nbCases :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
+        nbCases list = reverse $ foldl (\acc (method, (cases, _expl)) -> if acc == [] then (casesLength cases):acc else (head acc+casesLength cases):acc) [] list 
+            where
+                casesLength cases = length $ M.toList cases --tried to use size directly on M.Map but it was not recognized
+
+        node method cases = 
+          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+    -}
+
+    {-
+
+    --Randomly choosing the next goal based on the number of their cases
+    
+    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []   -> node Solved M.empty
+          list -> chooseNext list
+      where
+        chooseNext :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
+        chooseNext list = node method cases
+
+            where
+                succDistribution = nbCases list
+                randInt = drawRand (last succDistribution)
+                chosenSuccIdx = if succDistribution /= [] then correspondingIdx randInt succDistribution else error "The empty case should have been filtered at the prove level"
+                (method, (cases, _expl)) = if length list /= length succDistribution then error (show list++" "++show chosenSuccIdx) else list `at` chosenSuccIdx
+
+        --Picking the index that correspond to the drawn random
+        correspondingIdx :: Int -> [Int] -> Int
+        correspondingIdx rand intList = foldl (\acc int -> if rand > int then 1+acc else acc) 0 intList
+
+        drawRand :: Int -> Int
+        drawRand sup = unsafePerformIO $ do
+            g <- newStdGen
+            let (result, _) = randomR (0, sup) g
+            return result
+
+        nbCases :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
+        nbCases list = reverse $ foldl (\acc (method, (cases, _expl)) -> if acc == [] then (casesLength cases):acc else (head acc+casesLength cases):acc) [] list 
+            where
+                casesLength cases = length $ M.toList cases --tried to use size directly on M.Map but it was not recognized
+
+        node method cases = 
+          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+
+
+    -}
+
+    {-
+
+    -- Randomly choosing whether to go in a loop or not, 
+    -- loops are not deprioritized
+
+    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []   -> node Solved M.empty
+          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+      where
+        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop [] (method0, (cases0, _expl0)) = error "No more option" --node method0 cases0
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
+            InLoop (depth,goal,iteration) -> checkForLoop suite (method0, (cases0, _expl0)) --if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
+            otherwise -> node method cases
+
+        drawRand :: Int -> Int
+        drawRand sup = unsafePerformIO $ do
+            g <- newStdGen
+            let (result, _) = randomR (0, sup) g
+            return result
+
+        chooseLoop :: Int -> Int -> Bool
+        chooseLoop depth iteration = rand <= threshold
+            where 
+                it = int2Double iteration
+                d = int2Double depth
+                rand = int2Double(drawRand(depth)) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
+                threshold = 1.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
+
+        incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
+        incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t) 
+        incrementIteration _ [] removeint removelist = error (show removeint++" "++(show $ length removelist)++" "++show removelist)
+        incrementIteration depth (h:t) removeint removelist = (h:incrementIteration (depth-1) t removeint removelist)
+
+        applyIteration :: Int -> System -> System
+        applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
+
+        node method cases = 
+          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+
+    -}
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
