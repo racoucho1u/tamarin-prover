@@ -1155,7 +1155,8 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
 
         node method cases = 
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)}
+          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+    -}
 
 
     {-- Escape new
