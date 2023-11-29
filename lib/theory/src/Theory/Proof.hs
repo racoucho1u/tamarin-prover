@@ -1051,46 +1051,27 @@ proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContex
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 sys0
   where
-    -- Randomly choosing whether to go in a loop or not, 
-    -- loops are not deprioritized
+    -- Escape new
+    --Try to find a goal that is not in loop, if none, take the first one
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []   -> node Solved M.empty
           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
+        --checkForLoop [] = node (InLoop (0,method)) M.empty
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = error "No more option" --node method0 cases0
+        checkForLoop [(method, (cases, _expl))] (method0, (cases0, _expl0)) = node method0 cases0
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
-            InLoop (depth,goal,iteration) -> checkForLoop suite (method0, (cases0, _expl0)) --if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
+            InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
             otherwise -> node method cases
-
-        drawRand :: Int -> Int
-        drawRand sup = unsafePerformIO $ do
-            g <- newStdGen
-            let (result, _) = randomR (0, sup) g
-            return result
-
-        chooseLoop :: Int -> Int -> Bool
-        chooseLoop depth iteration = rand <= threshold
-            where 
-                it = int2Double iteration
-                d = int2Double depth
-                rand = int2Double(drawRand(depth)) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
-                threshold = 1.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
-
-        incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
-        incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t) 
-        incrementIteration _ [] removeint removelist = error (show removeint++" "++(show $ length removelist)++" "++show removelist)
-        incrementIteration depth (h:t) removeint removelist = (h:incrementIteration (depth-1) t removeint removelist)
-
-        applyIteration :: Int -> System -> System
-        applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
-
         node method cases = 
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
-    {--Avoid the loops and if no other choice, choose randomly based on the number of cases (the less the better)
+    {-
+    --NoOptFewCases
+    --Avoid the loops and if no other choice, choose randomly based on the number of cases (the less the better)
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []   -> node Solved M.empty
@@ -1240,6 +1221,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
     -}
     {-
+    --distribItPond
     --Randomly choosing the next goal based on its ranking by the heuristic (ponderated by the iteration)
     
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
@@ -1313,7 +1295,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
     -}
     
     {-
-
+    --randomNoMoreOpt
     --Avoid the loops and if no other choice, choose randomly based on the number of cases (the more the better)
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
@@ -1333,7 +1315,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         drawRand :: Int -> Int
         drawRand sup = unsafePerformIO $ do
             g <- newStdGen
-            let (result, _) = randomR (0, sup) g
+            let (result, _) = randomR (0, sup) g#
             return result
 
         chooseLoop :: Int -> Int -> Bool
@@ -1376,7 +1358,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
     -}
 
     {-
-
+    --randomCases
     --Randomly choosing the next goal based on the number of their cases
     
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
@@ -1414,7 +1396,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
     -}
 
     {-
-
+    -- probabilistic
     -- Randomly choosing whether to go in a loop or not, 
     -- loops are not deprioritized
 
