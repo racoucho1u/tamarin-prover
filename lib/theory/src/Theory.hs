@@ -102,6 +102,7 @@ module Theory (
   , thyName
   , thySignature
   , thyTactic
+  , thyExportTactic
   , thyCache
   , thyItems
   , diffThyName

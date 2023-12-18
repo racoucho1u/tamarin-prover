@@ -1051,24 +1051,96 @@ proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContex
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 sys0
   where
-    -- Escape new
-    --Try to find a goal that is not in loop, if none, take the first one
+    --Scoring
+    --Attribute a score to each parameter and compute a probabilistic distribution based on it
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []   -> node Solved M.empty
-          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+          list -> chooseNext list
       where
-        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
-        --checkForLoop [] = node (InLoop (0,method)) M.empty
-        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [(method, (cases, _expl))] (method0, (cases0, _expl0)) = node method0 cases0
-        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
-            InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
-            otherwise -> node method cases
+        chooseNext :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
+        chooseNext list = node method cases
+
+            where
+                heuristicScoreList = map (*1) (heuristicScore list)
+                openCasesScoreMaxList = map (*0) (openCasesScoreMax list)
+                openCasesScoreMinList = map (*0) (openCasesScoreMin list)
+                iterationScoreList = map (*0) (iterationScore list)
+                depthScoreMaxList = map (*0) (depthScoreMax list)
+                depthScoreMinList = map (*1) (depthScoreMin list)
+
+                completeScore = zipWith (+) depthScoreMinList (zipWith (+) depthScoreMaxList (zipWith (+) iterationScoreList (zipWith (+) openCasesScoreMinList (zipWith (+) heuristicScoreList openCasesScoreMaxList))))
+                completeDistribution = reverse $ foldl (\acc x -> (x+ head acc):acc) [head completeScore] (tail completeScore)
+
+                (method, (cases, _expl)) = list !! (correspondingIdx (drawRand $ last completeDistribution) completeDistribution)
+
+        ------------- Random drawing  -------------
+        --Picking the index that correspond to the drawn random
+        correspondingIdx :: Int -> [Int] -> Int
+        correspondingIdx rand intList = foldl (\acc int -> if rand > int then 1+acc else acc) 0 intList
+
+        drawRand :: Int -> Int
+        drawRand sup = unsafePerformIO $ do
+            g <- newStdGen
+            let (result, _) = randomR (0, sup) g
+            return result
+
+        ------------- Node construction ------------- 
+
         node method cases = 
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
+        ------------- Scoring functions -------------
+
+        heuristicScore :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
+        heuristicScore list = reverse [1..(length list)]
+
+        openCasesScoreMax :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
+        openCasesScoreMax list = reverse $ foldl (\acc (method, (cases, _expl)) -> (length $ M.toList cases):acc) [] list
+
+        openCasesScoreMin :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
+        openCasesScoreMin list = reverse $ map (maxLength -) casesLength
+            where
+                casesLength = foldl (\acc (method, (cases, _expl)) -> (length $ M.toList cases):acc) [] list
+                maxLength   = maximum casesLength
+
+        iterationScore :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
+        iterationScore list = map computeIt itScoreList
+            where 
+                itScoreList = map retrieveIt list
+                maxIt = 2 * fromMaybe 0 (maximum itScoreList)
+
+                computeIt :: Maybe Int -> Int
+                computeIt (Just it) = it
+                computeIt Nothing = maxIt
+
+                retrieveIt (method, (cases, _expl)) = case method of 
+                    InLoop (_,_,iteration) -> Just iteration
+                    _ -> Nothing
+
+        depthScoreMax :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
+        depthScoreMax list = map computeDepth dScoreList
+            where
+                dScoreList = map retrieveDepth list
+                maxD = 2 * fromMaybe 0 (maximum dScoreList)
+
+                computeDepth :: Maybe Int -> Int
+                computeDepth (Just d) = d
+                computeDepth Nothing = maxD
+
+                retrieveDepth (method, (cases, _expl)) = case method of 
+                    InLoop (depth,_,_) -> Just depth
+                    _ -> Nothing
+
+        depthScoreMin :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
+        depthScoreMin list = map (maxDepth -) dList
+            where
+                dList = map dScore list
+                maxDepth = maximum dList
+
+                dScore (method, (cases, _expl)) = case method of 
+                    InLoop (depth,_,_) -> depth
+                    _ -> 0
     {-
     --NoOptFewCases
     --Avoid the loops and if no other choice, choose randomly based on the number of cases (the less the better)
@@ -1255,43 +1327,6 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         node method cases = 
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
-    -}
-
-    {-
-    
-    --Randomly choosing the next goal based on its ranking by the heuristic
-    
-    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []   -> node Solved M.empty
-          list -> chooseNext list
-      where
-        chooseNext :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
-        chooseNext list = node method cases
-
-            where
-                succDistribution = foldl (\acc x -> (x+head acc):acc) [1] [2..(length list)]
-                randInt = drawRand (last succDistribution)
-                chosenSuccIdx = if succDistribution /= [] then correspondingIdx randInt succDistribution else error "The empty case should have been filtered at the prove level"
-                (method, (cases, _expl)) = if length list /= length succDistribution then error (show list++" "++show chosenSuccIdx) else list `at` chosenSuccIdx
-
-        --Picking the index that correspond to the drawn random
-        correspondingIdx :: Int -> [Int] -> Int
-        correspondingIdx rand intList = foldl (\acc int -> if rand > int then 1+acc else acc) 0 intList
-
-        drawRand :: Int -> Int
-        drawRand sup = unsafePerformIO $ do
-            g <- newStdGen
-            let (result, _) = randomR (0, sup) g
-            return result
-
-        nbCases :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
-        nbCases list = reverse $ foldl (\acc (method, (cases, _expl)) -> if acc == [] then (casesLength cases):acc else (head acc+casesLength cases):acc) [] list 
-            where
-                casesLength cases = length $ M.toList cases --tried to use size directly on M.Map but it was not recognized
-
-        node method cases = 
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
-
     -}
     
     {-

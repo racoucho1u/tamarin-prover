@@ -103,6 +103,7 @@ getProofContext l thy = ProofContext
     inductionHint
     specifiedHeuristic
     specifiedTactic
+    ( L.get thyExportTactic thy)
     (toSystemTraceQuantifier $ L.get lTraceQuantifier l)
     (L.get lName l)
     ([ h | HideLemma h <- L.get lAttributes l])
@@ -148,6 +149,7 @@ getProofContextDiff s l thy = case s of
             inductionHint
             specifiedHeuristic
             specifiedTactic
+            (L.get diffThyExportTactic                             thy)
             (toSystemTraceQuantifier $ L.get lTraceQuantifier l)
             (L.get lName l)
             ([ h | HideLemma h <- L.get lAttributes l])
@@ -165,6 +167,7 @@ getProofContextDiff s l thy = case s of
             inductionHint
             specifiedHeuristic
             specifiedTactic
+            (L.get diffThyExportTactic  thy)
             (toSystemTraceQuantifier $ L.get lTraceQuantifier l)
             (L.get lName l)
             ([ h | HideLemma h <- L.get lAttributes l])
@@ -224,6 +227,7 @@ getDiffProofContext l thy = DiffProofContext (proofContext LHS) (proofContext RH
             AvoidInduction
             specifiedHeuristic
             specifiedTactic
+            (L.get diffThyExportTactic                          thy)
             ExistsNoTrace
             ( L.get lDiffName l )
             ([ h | HideLemma h <- L.get lDiffAttributes l])
@@ -241,6 +245,7 @@ getDiffProofContext l thy = DiffProofContext (proofContext LHS) (proofContext RH
             AvoidInduction
             specifiedHeuristic
             specifiedTactic
+            (L.get diffThyExportTactic       thy)
             ExistsNoTrace
             ( L.get lDiffName l )
             ([ h | HideLemma h <- L.get lDiffAttributes l])
