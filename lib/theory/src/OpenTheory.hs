@@ -38,7 +38,6 @@ removeTranslationItems thy =
   Theory {_thyName=(L.get thyName thy)
           ,_thyHeuristic=(L.get thyHeuristic thy)
           ,_thyTactic=(L.get thyTactic thy)
-          ,_thyExportTactic=(L.get thyExportTactic thy)
           ,_thySignature=(L.get thySignature thy)
           ,_thyCache=(L.get thyCache thy)
           ,_thyItems = newThyItems
@@ -61,7 +60,6 @@ openTranslatedTheory thy =
   Theory {_thyName=(L.get thyName thy)
           ,_thyHeuristic=(L.get thyHeuristic thy)
           ,_thyTactic=(L.get thyTactic thy)
-          ,_thyExportTactic=(L.get thyExportTactic thy)
           ,_thySignature=(L.get thySignature thy)
           ,_thyCache=(L.get thyCache thy)
           ,_thyItems = newThyItems
@@ -398,11 +396,11 @@ defaultOption = Option False False False False False False False False S.empty [
 
 -- | Default theory
 defaultOpenTheory :: Bool -> OpenTheory
-defaultOpenTheory flag = Theory "default" [] [] [] (emptySignaturePure flag) [] [] defaultOption False
+defaultOpenTheory flag = Theory "default" [] [] (emptySignaturePure flag) [] [] defaultOption False
 
 -- | Default diff theory
 defaultOpenDiffTheory :: Bool -> OpenDiffTheory
-defaultOpenDiffTheory flag = DiffTheory "default" [] [] [] (emptySignaturePure flag) [] [] [] [] [] defaultOption False
+defaultOpenDiffTheory flag = DiffTheory "default" [] [](emptySignaturePure flag) [] [] [] [] [] defaultOption False
 
 -- Add the default Diff lemma to an Open Diff Theory
 addDefaultDiffLemma:: OpenDiffTheory -> OpenDiffTheory

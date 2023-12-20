@@ -737,7 +737,6 @@ data ProofContext = ProofContext
        , _pcUseInduction       :: InductionHint
        , _pcHeuristic          :: Maybe (Heuristic ProofContext)
        , _pcTactic             :: Maybe [Tactic ProofContext]
-       , _exportTactic         :: [[Goal]]
        , _pcTraceQuantifier    :: SystemTraceQuantifier
        , _pcLemmaName          :: String
        , _pcHiddenLemmas       :: [String]

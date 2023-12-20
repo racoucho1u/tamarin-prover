@@ -102,7 +102,7 @@ module Theory.Proof (
 ) where
 
 import           GHC.Generics                     (Generic)
-import           GHC.Float
+--import           GHC.Float
 
 import           Data.Binary
 import           Data.List
@@ -124,8 +124,10 @@ import           Theory.Text.Pretty
 
 import           System.Random
 import           System.IO.Unsafe
+--import           System.Posix.Signals
+--import           System.Exit (die)
 
-import           Safe
+--import           Safe
 
 
 
@@ -1062,12 +1064,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         chooseNext list = node method cases
 
             where
-                heuristicScoreList = map (*1) (heuristicScore list)
+                heuristicScoreList = map (*5) (heuristicScore list)
                 openCasesScoreMaxList = map (*0) (openCasesScoreMax list)
                 openCasesScoreMinList = map (*0) (openCasesScoreMin list)
-                iterationScoreList = map (*0) (iterationScore list)
+                iterationScoreList = map (*5) (iterationScore list)
                 depthScoreMaxList = map (*0) (depthScoreMax list)
-                depthScoreMinList = map (*1) (depthScoreMin list)
+                depthScoreMinList = map (*0) (depthScoreMin list)
 
                 completeScore = zipWith (+) depthScoreMinList (zipWith (+) depthScoreMaxList (zipWith (+) iterationScoreList (zipWith (+) openCasesScoreMinList (zipWith (+) heuristicScoreList openCasesScoreMaxList))))
                 completeDistribution = reverse $ foldl (\acc x -> (x+ head acc):acc) [head completeScore] (tail completeScore)
@@ -1077,10 +1079,11 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         ------------- Random drawing  -------------
         --Picking the index that correspond to the drawn random
         correspondingIdx :: Int -> [Int] -> Int
-        correspondingIdx rand intList = foldl (\acc int -> if rand > int then 1+acc else acc) 0 intList
+        correspondingIdx rand intList = foldl (\acc i -> if rand > i then 1+acc else acc) 0 intList
 
         drawRand :: Int -> Int
         drawRand sup = unsafePerformIO $ do
+            -- _ <- installHandler sigINT (Catch (handler sys)) Nothing
             g <- newStdGen
             let (result, _) = randomR (0, sup) g
             return result
@@ -1096,12 +1099,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         heuristicScore list = reverse [1..(length list)]
 
         openCasesScoreMax :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
-        openCasesScoreMax list = reverse $ foldl (\acc (method, (cases, _expl)) -> (length $ M.toList cases):acc) [] list
+        openCasesScoreMax list = reverse $ foldl (\acc (_, (cases, _expl)) -> (length $ M.toList cases):acc) [] list
 
         openCasesScoreMin :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
         openCasesScoreMin list = reverse $ map (maxLength -) casesLength
             where
-                casesLength = foldl (\acc (method, (cases, _expl)) -> (length $ M.toList cases):acc) [] list
+                casesLength = foldl (\acc (_, (cases, _expl)) -> (length $ M.toList cases):acc) [] list
                 maxLength   = maximum casesLength
 
         iterationScore :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
@@ -1114,7 +1117,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                 computeIt (Just it) = it
                 computeIt Nothing = maxIt
 
-                retrieveIt (method, (cases, _expl)) = case method of 
+                retrieveIt (method, (_,_)) = case method of 
                     InLoop (_,_,iteration) -> Just iteration
                     _ -> Nothing
 
@@ -1128,8 +1131,8 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                 computeDepth (Just d) = d
                 computeDepth Nothing = maxD
 
-                retrieveDepth (method, (cases, _expl)) = case method of 
-                    InLoop (depth,_,_) -> Just depth
+                retrieveDepth (method, (_, _)) = case method of 
+                    InLoop (d,_,_) -> Just d
                     _ -> Nothing
 
         depthScoreMin :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int] 
@@ -1138,9 +1141,15 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                 dList = map dScore list
                 maxDepth = maximum dList
 
-                dScore (method, (cases, _expl)) = case method of 
-                    InLoop (depth,_,_) -> depth
+                dScore (method, (_, _)) = case method of 
+                    InLoop (d,_,_) -> d
                     _ -> 0
+
+        ------------- Scoring functions -------------
+        --handler :: System -> IO()
+        --handler n = die $ "I have caught a sig: "++show (L.get sPathGoals sys)++"!"
+
+
     {-
     --NoOptFewCases
     --Avoid the loops and if no other choice, choose randomly based on the number of cases (the less the better)

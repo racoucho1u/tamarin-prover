@@ -24,8 +24,6 @@ import           Data.List
 
 import           Theory
 import           Theory.Constraint.Solver.AnnotatedGoals
---import           Theory.Constraint.Solver.Heuristics
---import           Theory.Constraint.System.Guarded
 import           Theory.Text.Pretty         hiding (char,colon,symbol,opLAnd,opLOr, space)
 import           Theory.Text.Parser.Token
 --import           Theory.Text.Parser.Signature
@@ -33,6 +31,7 @@ import           Theory.Text.Parser.Token
 import           Text.Parsec                hiding ((<|>))
 import           Text.Regex.PCRE
 
+import Debug.Trace
 
 --Tactic
 tacticName :: Parser String
@@ -126,6 +125,7 @@ tacticFunctions = M.fromList
                       , ("defaultNoise", defaultNoise)
                       , ("reasonableNoncesNoise",reasonableNoncesNoise)
                       , ("nonAbsurdGoal", nonAbsurdGoal)
+                      , ("allGoal", allGoal)
                       ]
   where
     regex' :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
@@ -220,6 +220,12 @@ tacticFunctions = M.fromList
     isInFactTerms (s:_) ((ActionG _ (Fact { factTag = _ ,factAnnotations =  _ , factTerms = [test]}), _ ), _, _ ) = show test =~ s
     isInFactTerms _ (_, _, _) = False
 
+    allGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
+    allGoal (s:_) ((goal,(_,_)),_,_) = trace ("Extract "++ (show $ cleanGoal goal)) $ (if (filterChar s) =~ (filterChar $ show (cleanGoal goal)) then error "kill me" else False )
+        where
+            filterChar st = filter (\x -> x /='"') $ filter (\x -> x /=')') $ filter (\x -> x /='(') st
+    allGoal _ (_, _, _) = False
+
 nameToFunction :: (String,[String]) -> (AnnotatedGoal, ProofContext, System) -> Bool
 nameToFunction (s,param) = case M.lookup s tacticFunctions of
   Just f  -> f param
@@ -232,6 +238,7 @@ nameToFunction (s,param) = case M.lookup s tacticFunctions of
             "regex"                 -> "match between the pretty goal and the given regex"
             "isFactName"            -> "match against the fact name"
             "isInFactTerms"         -> "match against the fact terms"
+            "allGoal"               -> "match against the goal (tactic auto generated)"
             "nonAbsurdGoal"         -> "match non absurd goals (vacarme oracle)"
             "dhreNoise"             -> "match diffie-hellman (vacarme oracle)"
             "defaultNoise"          -> "match default facts (vacarme oracle)"

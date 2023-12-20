@@ -135,7 +135,7 @@ closeRuleCache parameters restrictions typAsms forcedInjFacts sig protoRules int
     ctxt0 = ProofContext
         sig classifiedRules injFactInstances RawSource [] AvoidInduction Nothing Nothing 
         (error "closeRuleCache: trace quantifier should not matter here")
-        (error "closeRuleCache: lemma name should not matter here") [] [] verbose isdiff
+        (error "closeRuleCache: lemma name should not matter here") [] verbose isdiff
         (all isSubtermRule {-- $ trace (show destr ++ " - " ++ show (map isSubtermRule destr))-} destr) (any isConstantRule destr)
         isSapic
 

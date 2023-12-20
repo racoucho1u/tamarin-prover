@@ -21,6 +21,8 @@ module Theory.Constraint.Solver.ProofMethod (
   , execProofMethod
   , execDiffProofMethod
 
+  , cleanGoal
+
   -- ** Heuristics
   , rankProofMethods
   , rankDiffProofMethods
@@ -40,7 +42,7 @@ import           Data.Binary
 import           Data.Function                             (on)
 import           Data.Label                                hiding (get)
 import qualified Data.Label                                as L
-import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate,elem)
+import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate) --elem
 import qualified Data.Map                                  as M
 import           Data.Maybe                                (catMaybes, fromMaybe, fromJust)
 -- import           Data.Monoid
@@ -57,6 +59,8 @@ import           Debug.Trace
 import           Safe
 import           System.IO.Unsafe
 import           System.Process
+import           System.Posix.Signals
+import           System.Exit (die)
 
 import           Theory.Constraint.Solver.Sources
 import           Theory.Constraint.Solver.Contradictions
@@ -69,7 +73,7 @@ import           Theory.Constraint.System
 import           Theory.Model
 import           Theory.Text.Pretty
 
-import           Text.Regex.PCRE
+--import           Text.Regex.PCRE
 
 
 
@@ -237,6 +241,13 @@ instance HasFrees DiffProofMethod where
 -- Proof method execution
 -------------------------
 
+cleanGoal :: Goal -> Goal
+cleanGoal (ActionG v f) = ActionG (setLVarIdx 0 v) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
+cleanGoal (ChainG (ni1, cidx) (ni2, pidx)) = (ChainG ((LVar (lvarName ni1) (lvarSort ni1) 0), cidx) ((LVar (lvarName ni2) (lvarSort ni2) 0), pidx))
+cleanGoal (PremiseG (ni, pidx) f) = PremiseG ((LVar (lvarName ni) (lvarSort ni) 0), pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
+cleanGoal (SplitG s) = SplitG s
+cleanGoal (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g)))
+
 -- @execMethod rules method se@ checks first if the @method@ is applicable to
 -- the sequent @se@. Then, it applies the @method@ to the sequent under the
 -- assumption that the @rules@ describe all rewriting rules in scope.
@@ -288,22 +299,15 @@ execProofMethod ctxt method sys =
                return $ M.fromList (zip (map show [(1::Int)..]) syss)
       where check sys' = cleanupSystem sys /= sys'
 
-    freeme :: Goal -> Goal
-    freeme (ActionG v f) = ActionG (setLVarIdx 0 v) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
-    freeme (ChainG (ni1, cidx) (ni2, pidx)) = (ChainG ((LVar (lvarName ni1) (lvarSort ni1) 0), cidx) ((LVar (lvarName ni2) (lvarSort ni2) 0), pidx))
-    freeme (PremiseG (ni, pidx) f) = PremiseG ((LVar (lvarName ni) (lvarSort ni) 0), pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
-    freeme (SplitG s) = SplitG s
-    freeme (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g)))
-
     foundAt :: Goal -> [[Goal]] -> Int -> Int
-    foundAt g [] l   = 0 - l
+    foundAt _ [] l   = 0 - l
     foundAt g (h:t) l = if g `elem` h then 1 else 1 + foundAt g t l
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goal sys = execSolveGoal goal loop index iteration
+    checkForLoop goal s = execSolveGoal goal l index iteration
         where
-            index = foundAt (freeme goal) (map (map freeme) (map snd (L.get sPathGoals sys))) (length $ L.get sPathGoals sys)
-            (iteration, loop) = if index > 0 then ((map fst (L.get sPathGoals sys)) `at` (index-1) +1, True) else (0,False)
+            index = foundAt (cleanGoal goal) (map (map cleanGoal) (map snd (L.get sPathGoals s))) (length $ L.get sPathGoals s)
+            (iteration, l) = if index > 0 then ((map fst (L.get sPathGoals s)) `at` (index-1) +1, True) else (0,False)
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
@@ -313,7 +317,8 @@ execProofMethod ctxt method sys =
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'  = if loop then L.set sNbLoop (index,iteration) (L.set sLoopFound loop (L.set sPathGoals ((iteration,[freeme goal]):(L.get sPathGoals sys)) sys)) else L.set sNbLoop (index,iteration) (L.set sLoopFound loop (L.set sPathGoals ((0,[freeme goal]):(L.get sPathGoals sys)) sys))
+        sys'  = updateSys sys index iteration goal
+        --if loop then L.set sNbLoop (index,iteration) (L.set sLoopFound loop (L.set sPathGoals ((iteration,[cleanGoal goal]):(L.get sPathGoals sys)) sys)) else L.set sNbLoop (index,iteration) (L.set sLoopFound loop (L.set sPathGoals ((0,[cleanGoal goal]):(L.get sPathGoals sys)) sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
@@ -321,6 +326,24 @@ execProofMethod ctxt method sys =
                                   (solveWithSource ctxt ths goal)
                     simplifySystem
                     return name
+
+        updateSys :: System -> Int -> Int-> Goal -> System
+        updateSys sys index it g = unsafePerformIO $ do
+          _ <- installHandler sigINT (Catch handler) Nothing
+          if loop 
+            then return $ L.set sNbLoop (index,it) (L.set sLoopFound loop (L.set sPathGoals ((it,[cleanGoal g]):(L.get sPathGoals sys)) sys)) 
+            else return $ L.set sNbLoop (index,it) (L.set sLoopFound loop (L.set sPathGoals ((0,[cleanGoal g]):(L.get sPathGoals sys)) sys)) 
+
+        handler :: IO()
+        handler = do
+          let goalList = L.get sPathGoals sys
+              pbGoals = sortOn fst $ filter (\(it,_) -> it>0) goalList
+              --pbGoalsName =  pbGoals
+          putStrLn $ "ProblematicGoals are: "++show pbGoals++"!"
+          putStrLn $ render $ prettyGeneratedTactic pbGoals
+          --interestingGoals <- getThem l
+          die $ "I am done here"
+
 
         makeCaseNames =
             M.fromListWith (error "case names not unique")
@@ -522,7 +545,7 @@ rankProofMethods ranking tactics ctxt sys = do
       Just cases -> case M.toList cases of 
           []                       -> return (m, (cases, expl))
           -- [(case1,sys)]            -> if L.get sLoopFound sys then return (InLoop 0, (cases, expl)) else return (m, (cases, expl))
-          ((case1,sys1):_) -> if  L.get sLoopFound sys1 then return (InLoop (fst $ L.get sNbLoop sys1, fromJust $ fromSolveGoal m, snd $ L.get sNbLoop sys1), (cases, expl)) else return (m, (cases, expl))
+          ((_,sys1):_) -> if  L.get sLoopFound sys1 then return (InLoop (fst $ L.get sNbLoop sys1, fromJust $ fromSolveGoal m, snd $ L.get sNbLoop sys1), (cases, expl)) else return (m, (cases, expl))
       Nothing    -> []
   where
     contradiction c                    = (Contradiction (Just c), "")
@@ -1256,3 +1279,32 @@ prettyDiffProofMethod method = case method of
     DiffBackwardSearch       -> keyword_ "backward-search"  
     DiffBackwardSearchStep s -> keyword_ "step(" <-> prettyProofMethod s <-> keyword_ ")"
 
+prettyGeneratedTactic :: HighlightDocument d => [(Int,[Goal])] -> d
+prettyGeneratedTactic goals = kwTactic <> colon <> space <> (text $ "gettingLemmeWouldBeNice_generated") 
+    $-$ sep
+        [ ppTabTab (map (map prettifyGoals) (splitPrios goals))
+        , char '\n'
+        ]
+   where 
+
+        -- pretty print for a prio block
+        ppTab xs = kwDeprio <> colon <> space $-$ (nest 2 $ vcat $ map prettify (map words xs))
+
+        ppTabTab [] = emptyDoc
+        ppTabTab listFunctions = vcat (map ppTab listFunctions)
+
+        prettifyGoals :: (Int,[Goal]) -> String
+        prettifyGoals (_,glist) = foldr (\goal acc -> acc ++(filter (\x -> x /='"') (show goal))++"\" | allGoal \"") "allGoal \"" glist
+
+        splitPrios :: [(Int,[Goal])] -> [[(Int,[Goal])]]
+        splitPrios [] = []
+        splitPrios [h] = [[h]]
+        splitPrios ((it,g):t) = [[(it,g)] ++ (fst $ span (\(a,_) -> a ==it) t)]++(splitPrios $ (snd $ span (\(a,_) -> a==it) t))
+
+        prettify :: HighlightDocument d => [String] -> d
+        prettify []    = emptyDoc
+        prettify ("|":"allGoal":"\"":[]) = emptyDoc
+        prettify ("|":t) = (operator_ " | ") <> prettify t-- if (s == "|") || (s == "&") || (s == "not") then (operator_ s) <> prettify t else text s <> prettify t
+        prettify ("&":t) = (operator_ " & ") <> prettify t
+        prettify ("not":t) = (operator_ "not ") <> prettify t
+        prettify (s:t) = text s <> space <> prettify t

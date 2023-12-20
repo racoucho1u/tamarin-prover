@@ -68,6 +68,7 @@ library
       , text
       , transformers
       , uniplate
+      , unix
       , exceptions
 
       , tamarin-prover-utils
