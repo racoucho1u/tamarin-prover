@@ -11,6 +11,7 @@
 
 module Theory.Text.Parser.Tactics (
     tactic
+    , elephant
     -- , aledTactic
 )
 where
@@ -221,9 +222,11 @@ tacticFunctions = M.fromList
     isInFactTerms _ (_, _, _) = False
 
     allGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
-    allGoal (s:_) ((goal,(_,_)),_,_) = trace ("Extract "++ (show $ cleanGoal goal)) $ (if (filterChar s) =~ (filterChar $ show (cleanGoal goal)) then error "kill me" else False )
+    allGoal (s:_) ((goal,(_,_)),_,_) = filteredParam == filteredGoal
         where
             filterChar st = filter (\x -> x /='"') $ filter (\x -> x /=')') $ filter (\x -> x /='(') st
+            filteredParam = filterChar s
+            filteredGoal = filterChar $ show (cleanGoal goal)
     allGoal _ (_, _, _) = False
 
 nameToFunction :: (String,[String]) -> (AnnotatedGoal, ProofContext, System) -> Bool
@@ -286,3 +289,6 @@ nameToRanking s = case M.lookup s rankingFunctions of
     listRankingFunction:: String
     listRankingFunction = M.foldMapWithKey
         (\k _ -> "'"++k++"': " ++ rankingFunctionName k ++ "\n") rankingFunctions
+
+elephant :: String
+elephant = "Elephant"

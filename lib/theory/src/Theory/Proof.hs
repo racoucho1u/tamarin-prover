@@ -124,7 +124,7 @@ import           Theory.Text.Pretty
 
 import           System.Random
 import           System.IO.Unsafe
---import           System.Posix.Signals
+import           System.Posix.Signals
 --import           System.Exit (die)
 
 --import           Safe
@@ -518,7 +518,7 @@ checkDiffProof ctxt prover d sys prf@(LNode (DiffProofStep method info) cs) =
 -- under the assumption that all proof steps are valid. If some proof steps
 -- might be invalid, then you must use 'checkProof', which handles them
 -- gracefully.
-annotateWithSystems :: ProofContext -> System -> Proof () -> Proof System
+annotateWithSystems :: ProofContext -> System -> Proof System -> Proof System
 annotateWithSystems ctxt =
     go
   where
@@ -1049,19 +1049,21 @@ cutOnSolvedBFSDiff =
 --
 -- Use 'annotateWithSystems' to annotate the proof tree with the constraint
 -- systems.
-proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
+proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof System
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 sys0
   where
     --Scoring
     --Attribute a score to each parameter and compute a probabilistic distribution based on it
 
-    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []   -> node Solved M.empty
-          list -> chooseNext list
+    prove !depth sys = unsafePerformIO $ do 
+        -- appendFile "exportTactic" "New branch new me\n"
+        case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []   -> return $ node Solved M.empty sys
+          list -> return $ chooseNext list sys
       where
-        chooseNext :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof ()
-        chooseNext list = node method cases
+        chooseNext :: [(ProofMethod, (M.Map CaseName System, String))] -> System -> Proof System
+        chooseNext list sys = node method cases sys
 
             where
                 heuristicScoreList = map (*5) (heuristicScore list)
@@ -1083,15 +1085,16 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         drawRand :: Int -> Int
         drawRand sup = unsafePerformIO $ do
-            -- _ <- installHandler sigINT (Catch (handler sys)) Nothing
+            _ <- installHandler sigINT  (Catch (handler (L.get pcLemmaName ctxt) sys)) Nothing
+            _ <- installHandler sigTERM (Catch (handler (L.get pcLemmaName ctxt) sys)) Nothing
             g <- newStdGen
             let (result, _) = randomR (0, sup) g
             return result
 
         ------------- Node construction ------------- 
 
-        node method cases = 
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+        node method cases sys = 
+          LNode (ProofStep method sys) (M.map (prove (succ depth)) cases)
 
         ------------- Scoring functions -------------
 
@@ -1145,9 +1148,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                     InLoop (d,_,_) -> d
                     _ -> 0
 
-        ------------- Scoring functions -------------
-        --handler :: System -> IO()
-        --handler n = die $ "I have caught a sig: "++show (L.get sPathGoals sys)++"!"
+        ------------- Handler for signal -------------
+        handler :: String -> System -> IO()
+        handler name _sys = do
+            --putStrLn $ "I have caught a sig: "++show (L.get sPathGoals sys)++"!"
+            putStrLn $ render $ prettyGeneratedTactic name $ L.get sPathGoals _sys
+            raiseSignal killProcess
 
 
     {-

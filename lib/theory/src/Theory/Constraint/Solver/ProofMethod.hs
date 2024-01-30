@@ -34,6 +34,7 @@ module Theory.Constraint.Solver.ProofMethod (
   -- ** Pretty Printing
   , prettyProofMethod
   , prettyDiffProofMethod
+  , prettyGeneratedTactic
 
 ) where
   
@@ -60,7 +61,7 @@ import           Safe
 import           System.IO.Unsafe
 import           System.Process
 import           System.Posix.Signals
-import           System.Exit (die)
+import           System.Exit (die, exitWith, exitFailure)
 
 import           Theory.Constraint.Solver.Sources
 import           Theory.Constraint.Solver.Contradictions
@@ -312,12 +313,12 @@ execProofMethod ctxt method sys =
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
     execSolveGoal :: Goal -> Bool -> Int -> Int -> Maybe (M.Map CaseName System)
-    execSolveGoal goal loop index iteration = 
+    execSolveGoal goal _loop _index iteration =
         return . makeCaseNames . removeRedundantCases ctxt [] snd
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'  = updateSys sys index iteration goal
+        sys'  = updateSys sys _index iteration goal
         --if loop then L.set sNbLoop (index,iteration) (L.set sLoopFound loop (L.set sPathGoals ((iteration,[cleanGoal goal]):(L.get sPathGoals sys)) sys)) else L.set sNbLoop (index,iteration) (L.set sLoopFound loop (L.set sPathGoals ((0,[cleanGoal goal]):(L.get sPathGoals sys)) sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
@@ -328,22 +329,12 @@ execProofMethod ctxt method sys =
                     return name
 
         updateSys :: System -> Int -> Int-> Goal -> System
-        updateSys sys index it g = unsafePerformIO $ do
-          _ <- installHandler sigINT (Catch handler) Nothing
-          if loop 
-            then return $ L.set sNbLoop (index,it) (L.set sLoopFound loop (L.set sPathGoals ((it,[cleanGoal g]):(L.get sPathGoals sys)) sys)) 
-            else return $ L.set sNbLoop (index,it) (L.set sLoopFound loop (L.set sPathGoals ((0,[cleanGoal g]):(L.get sPathGoals sys)) sys)) 
-
-        handler :: IO()
-        handler = do
-          let goalList = L.get sPathGoals sys
-              pbGoals = sortOn fst $ filter (\(it,_) -> it>0) goalList
-              --pbGoalsName =  pbGoals
-          putStrLn $ "ProblematicGoals are: "++show pbGoals++"!"
-          putStrLn $ render $ prettyGeneratedTactic pbGoals
-          --interestingGoals <- getThem l
-          die $ "I am done here"
-
+        updateSys _sys index it g = unsafePerformIO $ do
+            let currentPathGoals = L.get sPathGoals _sys
+                sys2 = if _loop 
+                  then L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,[cleanGoal g]):(take (index-1) currentPathGoals)++(drop index currentPathGoals)) _sys)) 
+                  else L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((0,[cleanGoal g]):currentPathGoals) _sys)) 
+            return sys2
 
         makeCaseNames =
             M.fromListWith (error "case names not unique")
@@ -1279,8 +1270,9 @@ prettyDiffProofMethod method = case method of
     DiffBackwardSearch       -> keyword_ "backward-search"  
     DiffBackwardSearchStep s -> keyword_ "step(" <-> prettyProofMethod s <-> keyword_ ")"
 
-prettyGeneratedTactic :: HighlightDocument d => [(Int,[Goal])] -> d
-prettyGeneratedTactic goals = kwTactic <> colon <> space <> (text $ "gettingLemmeWouldBeNice_generated") 
+prettyGeneratedTactic :: HighlightDocument d => String -> [(Int,[Goal])] -> d
+prettyGeneratedTactic _ []    = emptyDoc
+prettyGeneratedTactic s goals = kwTactic <> colon <> space <> (text $ s++"_generated") 
     $-$ sep
         [ ppTabTab (map (map prettifyGoals) (splitPrios goals))
         , char '\n'

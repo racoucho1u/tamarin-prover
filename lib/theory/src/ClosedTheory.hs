@@ -17,6 +17,7 @@ import TheoryObject
 import Prelude hiding (id, (.))
 import Text.PrettyPrint.Highlight
 import Term.Macro
+import qualified Data.Map                         as M
 
 
 import           Prelude                             hiding (id, (.))                 
@@ -24,14 +25,18 @@ import           Prelude                             hiding (id, (.))
 
 -- import           Data.Typeable
 import           Data.Monoid                         (Sum(..))
+import           Data.List                           (sortOn, nub)
+import           Data.Maybe                          (catMaybes)
 
 -- import qualified Data.Label.Total
 
 import           Theory.Tools.InjectiveFactInstances
 
+import Theory.Constraint.Solver.AnnotatedGoals
 import           Theory.Text.Pretty
 import OpenTheory
 import Pretty
+import Debug.Trace
 
 ------------------------------------------------------------------------------
 -- Closed theory querying / construction / modification
@@ -379,7 +384,7 @@ prettyClosedProtoRule cru =
 
 -- | Pretty print a closed theory.
 prettyClosedTheory :: HighlightDocument d => ClosedTheory -> d
-prettyClosedTheory thy = if containsManualRuleVariants mergedRules
+prettyClosedTheory thy = if containsManualRuleVariants mergedRules 
     then
       prettyTheory prettySignatureWithMaude
                        ppInjectiveFactInsts
@@ -395,19 +400,85 @@ prettyClosedTheory thy = if containsManualRuleVariants mergedRules
                prettyClosedProtoRule
                prettyIncrementalProof
                emptyString
-               thy
+               thy''
   where
     items = L.get thyItems thy
     mergedRules = mergeOpenProtoRules $ map (mapTheoryItem openProtoRule id) items
+
+    lemmaNames = extractName (L.get thyItems thy)
+    lemmasPathGoals = map (concat . retrievePathGoals . getThroughTree) $ extractProof (L.get thyItems thy)
+    pbGoals = fmap ((map snd) . (sortOn fst) . filter (\(it,_) -> it>0)) lemmasPathGoals 
+    uniquePbGoals = map nub pbGoals
+    uniqueGoalsOccurences = map countOcc $ zip uniquePbGoals pbGoals
+    prepareTactics = fmap (splitPrios . sortOn fst) $ (fmap zip uniqueGoalsOccurences) <*> uniquePbGoals
+ 
+    extractProof [] = []
+    extractProof (LemmaItem l:t) = ((L.get lProof l):extractProof t)
+    extractProof (_:t) = extractProof t
+
+    extractName [] = []
+    extractName (LemmaItem l:t) = ((L.get lName l):extractName t)
+    extractName (_:t) = extractName t
+
+    getThroughTree (LNode ps cs) = case (M.toList cs) of
+        [] -> [fmap (L.get sPathGoals) $ psInfo ps]
+        l  -> [fmap (L.get sPathGoals) $ psInfo ps]++(concat $ map getThroughTree (map snd l))
+
+    retrievePathGoals [] = []
+    retrievePathGoals (Nothing:t) = retrievePathGoals t
+    retrievePathGoals ((Just spg):t) = (spg):(retrievePathGoals t)
+
+    splitPrios :: [(Int,[Goal])] -> [[(Int,[Goal])]]
+    splitPrios [] = []
+    splitPrios [h] = [[h]]
+    splitPrios ((it,g):t) = [[(it,g)] ++ (fst $ span (\(a,_) -> a ==it) t)]++(splitPrios $ (snd $ span (\(a,_) -> a==it) t))
+
+
+    countOcc (ug,pbg) = map (\x -> (foldl (\acc y -> if x == y then acc+1 else acc) 0 pbg)) ug
+
+    generateTactic :: String -> [[(Int,[Goal])]] -> Tactic ProofContext
+    generateTactic name l = Tactic (name++"_generated")  (SmartRanking False) [] (map generateDeprio l)
+        where
+            allGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
+            allGoal (s:_) ((goal,(_,_)),_,_) = filteredParam == filteredGoal --trace ("Extract 1: "++filteredParam++"\nExtract 2: "++filteredGoal++"\nExtract 3: "++(show $ filteredParam == filteredGoal)) $ 
+                where
+                    filterChar st = filter (\x -> x /='"') $ filter (\x -> x /=')') $ filter (\x -> x /='(') st
+                    filteredParam = filterChar s
+                    filteredGoal = filterChar $ show (cleanGoal goal)
+            allGoal _ (_, _, _) = False
+
+            prettifyGoals :: (Int,[Goal]) -> String
+            prettifyGoals (_,glist) = foldr (\goal acc -> acc ++" allGoal \""++(filter (\x -> x /='"') (show goal))++"\" |") "" glist
+
+            generateDeprioFunctions :: [(Int,[Goal])] -> [(AnnotatedGoal, ProofContext, System) -> Bool]
+            generateDeprioFunctions lg = map allGoal (map paramGoals lg) 
+                where
+                    paramGoals :: (Int,[Goal]) -> [String]
+                    paramGoals (_,glist) = foldr (\goal acc -> acc ++[(filter (\x -> x /='"') (show goal))]) [] glist
+
+            generateDeprio :: [(Int,[Goal])] -> Deprio ProofContext
+            generateDeprio _lg = Deprio Nothing "id" (generateDeprioFunctions _lg) (map (init . prettifyGoals) _lg)
+
     thy' :: Theory SignatureWithMaude ClosedRuleCache OpenProtoRule IncrementalProof ()
     thy' = Theory {_thyName=(L.get thyName thy)
             ,_thyHeuristic=(L.get thyHeuristic thy)
-            ,_thyTactic=(L.get thyTactic thy)
+            ,_thyTactic=(L.get thyTactic thy++(fmap generateTactic lemmaNames <*> prepareTactics))
             ,_thySignature=(L.get thySignature thy)
             ,_thyCache=(L.get thyCache thy)
             ,_thyItems = mergedRules
             ,_thyOptions =(L.get thyOptions thy)
             ,_thyIsSapic = (L.get thyIsSapic thy)}
+
+    thy'' :: Theory SignatureWithMaude ClosedRuleCache ClosedProtoRule IncrementalProof ()
+    thy'' = Theory {_thyName=(L.get thyName thy)
+            ,_thyHeuristic=(L.get thyHeuristic thy)
+            ,_thyTactic=(L.get thyTactic thy++(fmap generateTactic lemmaNames <*> prepareTactics))
+            ,_thySignature=(L.get thySignature thy)
+            ,_thyCache=(L.get thyCache thy)
+            ,_thyItems =(L.get thyItems thy)
+            ,_thyOptions =(L.get thyOptions thy)
+            ,_thyIsSapic = (L.get thyIsSapic thy)}
+
     ppInjectiveFactInsts crc =
         case S.toList $ L.get crcInjectiveFactInsts crc of
             []   -> emptyDoc
@@ -417,7 +488,7 @@ prettyClosedTheory thy = if containsManualRuleVariants mergedRules
 
 -- | Pretty print a closed diff theory.
 prettyClosedDiffTheory :: HighlightDocument d => ClosedDiffTheory -> d
-prettyClosedDiffTheory thy = if containsManualRuleVariantsDiff mergedRules
+prettyClosedDiffTheory thy = trace (show $ prepareDiffTactics) (if containsManualRuleVariantsDiff mergedRules --trace (show $ prepareDiffTactics) 
     then
       prettyDiffTheory prettySignatureWithMaude
                  ppInjectiveFactInsts
@@ -433,15 +504,103 @@ prettyClosedDiffTheory thy = if containsManualRuleVariantsDiff mergedRules
                    (\_ -> emptyDoc) --prettyClosedEitherRule
                    prettyIncrementalDiffProof
                    prettyIncrementalProof
-                   thy
+                   thy'')
   where
     items = L.get diffThyItems thy
     mergedRules = mergeLeftRightRulesDiff $ mergeOpenProtoRulesDiff $
        map (mapDiffTheoryItem id (\(x, y) -> (x, (openProtoRule y))) id id) items
+
+    lemmasNames = extractName (L.get diffThyItems thy)
+    lemmasPathGoals = map (concat . retrievePathGoals . getThroughTree) $ extractProof (L.get diffThyItems thy)
+    pbGoals = fmap ((map snd) . (sortOn fst) . filter (\(it,_) -> it>0)) lemmasPathGoals 
+    uniquePbGoals = map nub pbGoals
+    uniqueGoalsOccurences = map countOcc $ zip uniquePbGoals pbGoals
+    prepareTactics = fmap (splitPrios . sortOn fst) $ (fmap zip uniqueGoalsOccurences) <*> uniquePbGoals
+    generatedTactics = catMaybes $ fmap generateTactic lemmasNames <*> prepareTactics
+
+    lemmasDiffNames = extractNameDiff (L.get diffThyItems thy)
+    lemmasDiffPathGoals = map (concat . retrievePathGoals . getThroughDiffTree) $ extractProofDiff (L.get diffThyItems thy) --map (concat . retrievePathGoals . getThroughTree) $ 
+    diffPbGoals = fmap ((map snd) . (sortOn fst) . filter (\(it,_) -> it>0)) lemmasDiffPathGoals 
+    uniqueDiffPbGoals = map nub diffPbGoals
+    uniqueDiffGoalsOccurences = map countOcc $ zip uniqueDiffPbGoals diffPbGoals
+    prepareDiffTactics = fmap (splitPrios . sortOn fst) $ (fmap zip uniqueDiffGoalsOccurences) <*> uniqueDiffPbGoals
+    generatedDiffTactics = catMaybes $ fmap generateTactic lemmasDiffNames <*> prepareDiffTactics
+
+
+    extractProof [] = []
+    extractProof (EitherLemmaItem (_,l):t) = ((L.get lProof l):extractProof t)
+    extractProof (_:t) = extractProof t
+
+    extractProofDiff [] = []
+    extractProofDiff (DiffLemmaItem l:t) = ((L.get lDiffProof l):extractProofDiff t)
+    extractProofDiff (_:t) = extractProofDiff t
+
+    extractName [] = []
+    extractName (EitherLemmaItem (s,l):t) = (((L.get lName l)++"_"++show s):extractName t)
+    extractName (_:t) = extractName t
+
+    extractNameDiff [] = []
+    extractNameDiff (DiffLemmaItem l:t) = ((L.get lDiffName l):extractNameDiff t)
+    extractNameDiff (_:t) = extractNameDiff t
+
+    getThroughTree (LNode ps cs) = case (M.toList cs) of
+        [] -> [fmap (L.get sPathGoals) $ psInfo ps]
+        l  -> [fmap (L.get sPathGoals) $ psInfo ps]++(concat $ map getThroughTree (map snd l))
+
+    extractPathDiffSys Nothing = []
+    extractPathDiffSys (Just sys) = [] --L.get sPathGoals sys
+
+    --getThroughDiffTree :: LTree a (DiffProofStep (f System)) -> [[Goal]]
+    getThroughDiffTree (LNode dps cs) = case (M.toList cs) of
+        [] -> [fmap (extractPathDiffSys . L.get dsSystem) $ dpsInfo dps] --fromMaybe []
+        l  -> [fmap (extractPathDiffSys . L.get dsSystem) $ dpsInfo dps]++(concat $ map getThroughDiffTree (map snd l))
+
+    --getThroughDiffTree :: LTree a (DiffProofStep (f System)) -> [[Goal]]
+    -- getThroughDiffTree (LNode dps cs) = case (M.toList cs) of
+    --     [] -> [fmap (L.get sPathGoals) $ dpsInfo dps]
+    --     l  -> trace ("non"++(show $ dpsInfo dps)) [] --trace (show l) [] --[dpsInfo dps]++(concat $ map getThroughTree (map snd l))
+
+    retrievePathGoals [] = []
+    retrievePathGoals (Nothing:t) = retrievePathGoals t
+    retrievePathGoals ((Just spg):t) = (spg):(retrievePathGoals t)
+
+    splitPrios :: [(Int,[Goal])] -> [[(Int,[Goal])]]
+    splitPrios [] = []
+    splitPrios [h] = [[h]]
+    splitPrios ((it,g):t) = [[(it,g)] ++ (fst $ span (\(a,_) -> a ==it) t)]++(splitPrios $ (snd $ span (\(a,_) -> a==it) t))
+
+
+    countOcc (ug,pbg) = map (\x -> (foldl (\acc y -> if x == y then acc+1 else acc) 0 pbg)) ug
+
+    generateTactic :: String -> [[(Int,[Goal])]] -> Maybe (Tactic ProofContext)
+    generateTactic name l = case l of
+        [] -> Nothing
+        _ -> Just (Tactic (name++"_generated")  (SmartRanking False) [] (map generateDeprio l))
+            where
+                allGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
+                allGoal (s:_) ((goal,(_,_)),_,_) = filteredParam == filteredGoal --trace ("Extract 1: "++filteredParam++"\nExtract 2: "++filteredGoal++"\nExtract 3: "++(show $ filteredParam == filteredGoal)) $ 
+                    where
+                        filterChar st = filter (\x -> x /='"') $ filter (\x -> x /=')') $ filter (\x -> x /='(') st
+                        filteredParam = filterChar s
+                        filteredGoal = filterChar $ show (cleanGoal goal)
+                allGoal _ (_, _, _) = False
+
+                prettifyGoals :: (Int,[Goal]) -> String
+                prettifyGoals (_,glist) = foldr (\goal acc -> acc ++" allGoal \""++(filter (\x -> x /='"') (show goal))++"\" |") "" glist
+
+                generateDeprioFunctions :: [(Int,[Goal])] -> [(AnnotatedGoal, ProofContext, System) -> Bool]
+                generateDeprioFunctions lg = map allGoal (map paramGoals lg) 
+                    where
+                        paramGoals :: (Int,[Goal]) -> [String]
+                        paramGoals (_,glist) = foldr (\goal acc -> acc ++[(filter (\x -> x /='"') (show goal))]) [] glist
+
+                generateDeprio :: [(Int,[Goal])] -> Deprio ProofContext
+                generateDeprio _lg = Deprio Nothing "id" (generateDeprioFunctions _lg) (map (init . prettifyGoals) _lg)
+
     thy' :: DiffTheory SignatureWithMaude ClosedRuleCache DiffProtoRule OpenProtoRule IncrementalDiffProof IncrementalProof
     thy' = DiffTheory {_diffThyName=(L.get diffThyName thy)
             ,_diffThyHeuristic=(L.get diffThyHeuristic thy)
-            ,_diffThyTactic=(L.get diffThyTactic thy)
+            ,_diffThyTactic=(L.get diffThyTactic thy++generatedTactics++generatedDiffTactics)
             ,_diffThySignature=(L.get diffThySignature thy)
             ,_diffThyCacheLeft=(L.get diffThyCacheLeft thy)
             ,_diffThyCacheRight=(L.get diffThyCacheRight thy)
@@ -450,6 +609,20 @@ prettyClosedDiffTheory thy = if containsManualRuleVariantsDiff mergedRules
             ,_diffThyItems = mergedRules
             ,_diffThyOptions =(L.get diffThyOptions thy)
             ,_diffThyIsSapic = (L.get diffThyIsSapic thy)}
+
+    thy'' :: DiffTheory SignatureWithMaude ClosedRuleCache DiffProtoRule ClosedProtoRule IncrementalDiffProof IncrementalProof
+    thy'' = DiffTheory {_diffThyName=(L.get diffThyName thy)
+            ,_diffThyHeuristic=(L.get diffThyHeuristic thy)
+            ,_diffThyTactic=(L.get diffThyTactic thy++generatedTactics++generatedDiffTactics)
+            ,_diffThySignature=(L.get diffThySignature thy)
+            ,_diffThyCacheLeft=(L.get diffThyCacheLeft thy)
+            ,_diffThyCacheRight=(L.get diffThyCacheRight thy)
+            ,_diffThyDiffCacheLeft=(L.get diffThyDiffCacheLeft thy)
+            ,_diffThyDiffCacheRight=(L.get diffThyDiffCacheRight thy)
+            ,_diffThyItems = (L.get diffThyItems thy)
+            ,_diffThyOptions =(L.get diffThyOptions thy)
+            ,_diffThyIsSapic = (L.get diffThyIsSapic thy)}
+
     ppInjectiveFactInsts crc =
         case S.toList $ L.get crcInjectiveFactInsts crc of
             []   -> emptyDoc

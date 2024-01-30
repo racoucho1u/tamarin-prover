@@ -174,7 +174,7 @@ run thisMode as
 
         (report, thy') <- closeTheory versionData thyLoadOptions sig' thy
         either (\t -> return (prettyClosedTheory t,     ppWf report Pretty.$--$ prettyClosedSummary t))
-               (\d -> return (prettyClosedDiffTheory d, ppWf report Pretty.$--$ prettyClosedDiffSummary d)) thy'
+               (\d -> return (prettyClosedDiffTheory d, ppWf report Pretty.$--$ prettyClosedDiffSummary d)) thy' --trace (show $ thy')
 
       where
         isParseOnlyMode = get oParseOnlyMode thyLoadOptions

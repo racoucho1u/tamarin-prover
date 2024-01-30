@@ -408,6 +408,7 @@ closeTheory version thyOpts sign srcThy = do
                            (\t -> return $ closeDiffTheoryWithMaude sign t autoSources) diffLemThy
   partialThy <- bitraverse (return . (maybe id (\s -> applyPartialEvaluation     s autoSources) partialStyle))
                            (return . (maybe id (\s -> applyPartialEvaluationDiff s autoSources) partialStyle)) closedThy
+  -- _          <- liftIO $ installHandler sigINT (Catch (handler partialThy)) Nothing
   provedThy  <- bitraverse (\t -> return $ proveTheory     (lemmaSelectorByModule thyOpts &&& lemmaSelector thyOpts) prover t)
                            (\t -> return $ proveDiffTheory (lemmaSelectorByModule thyOpts &&& lemmaSelector thyOpts) prover diffProver t) partialThy
   provedThyWithVersion <- bitraverse (return . addComment (Pretty.text version))
@@ -434,6 +435,9 @@ closeTheory version thyOpts sign srcThy = do
       NoEq (name, (int, _, constr)) -> NoEq (name,(int, Public, constr))
       x -> x
       )
+
+    --handler :: Either ClosedTheory ClosedDiffTheory -> IO()
+    --handler _ = die "I have caught a sig!"
 
     prover | L.get oProveMode thyOpts = replaceSorryProver $ runAutoProver $ constructAutoProver thyOpts
            | otherwise                = mempty

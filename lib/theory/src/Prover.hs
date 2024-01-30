@@ -34,6 +34,9 @@ import           OpenTheory
 import           Theory.Constraint.Solver.Sources     as Sources (IntegerParameters(..))
 
 
+import          Debug.Trace
+
+
 
 -- | Close a theory by closing its associated rule set and checking the proof
 -- skeletons and caching AC variants as well as precomputed case distinctions.
@@ -261,12 +264,12 @@ proveTheory :: (Lemma IncrementalProof -> Bool)   -- ^ Lemma selector.
             -> ClosedTheory
             -> ClosedTheory
 proveTheory selector prover thy =
-    modify thyItems ((`MS.evalState` []) . mapM prove) thy
+   modify thyItems ((`MS.evalState` []) . mapM prove) thy -- modify thyTactic (\l -> l++l) (
   where
     prove item = case item of
       LemmaItem l0 -> do l <- MS.gets (LemmaItem . proveLemma l0)
                          MS.modify (l :)
-                         return l
+                         return l --trace (show l) 
       _            -> do return item
 
     proveLemma lem preItems
