@@ -539,7 +539,7 @@ annotateWithSystems ctxt =
 -- under the assumption that all proof steps are valid. If some proof steps
 -- might be invalid, then you must use 'checkProof', which handles them
 -- gracefully.
-annotateWithDiffSystems :: DiffProofContext -> DiffSystem -> DiffProof () -> DiffProof DiffSystem
+annotateWithDiffSystems :: DiffProofContext -> DiffSystem -> DiffProof DiffSystem -> DiffProof DiffSystem
 annotateWithDiffSystems ctxt =
     go
   where
@@ -1050,7 +1050,7 @@ cutOnSolvedBFSDiff =
 -- Use 'annotateWithSystems' to annotate the proof tree with the constraint
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof System
-proveSystemDFS heuristic tactics ctxt d0 sys0 =
+proveSystemDFS heuristic tactics ctxt d0 sys0 = 
     prove d0 sys0
   where
     --Scoring
@@ -1069,8 +1069,8 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                 heuristicScoreList = map (*5) (heuristicScore list)
                 openCasesScoreMaxList = map (*0) (openCasesScoreMax list)
                 openCasesScoreMinList = map (*0) (openCasesScoreMin list)
-                iterationScoreList = map (*5) (iterationScore list)
-                depthScoreMaxList = map (*0) (depthScoreMax list)
+                iterationScoreList = map (*0) (iterationScore list)
+                depthScoreMaxList = map (*1) (depthScoreMax list)
                 depthScoreMinList = map (*0) (depthScoreMin list)
 
                 completeScore = zipWith (+) depthScoreMinList (zipWith (+) depthScoreMaxList (zipWith (+) iterationScoreList (zipWith (+) openCasesScoreMinList (zipWith (+) heuristicScoreList openCasesScoreMaxList))))
@@ -1495,17 +1495,120 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 --
 -- Use 'annotateWithSystems' to annotate the proof tree with the constraint
 -- systems.
-proveDiffSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> DiffProofContext -> Int -> DiffSystem -> DiffProof ()
+proveDiffSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> DiffProofContext -> Int -> DiffSystem -> DiffProof DiffSystem
 proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 sys0
   where
-    prove !depth sys =
+    -- prove !depth sys =
+    --     case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+    --       []                         -> node (DiffSorry (Just "Cannot prove")) M.empty
+    --       (method, (cases, _expl)):_ -> node method cases
+    --   where
+    --     node method cases =
+    --       LNode (DiffProofStep method ()) (M.map (prove (succ depth)) cases)
+
+    --Scoring
+    --Attribute a score to each parameter and compute a probabilistic distribution based on it
+
+    prove !depth sys = 
         case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []                         -> node (DiffSorry (Just "Cannot prove")) M.empty
-          (method, (cases, _expl)):_ -> node method cases
+          []   -> node (DiffSorry (Just "Cannot prove")) M.empty sys
+          list -> chooseNext list sys
       where
-        node method cases =
-          LNode (DiffProofStep method ()) (M.map (prove (succ depth)) cases)
+        chooseNext :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> DiffSystem -> DiffProof DiffSystem
+        chooseNext list sys = node method cases sys
+
+            where
+                heuristicScoreList = map (*5) (heuristicScore list)
+                openCasesScoreMaxList = map (*0) (openCasesScoreMax list)
+                openCasesScoreMinList = map (*0) (openCasesScoreMin list)
+                iterationScoreList = map (*0) (iterationScore list)
+                depthScoreMaxList = map (*1) (depthScoreMax list)
+                depthScoreMinList = map (*0) (depthScoreMin list)
+
+                completeScore = zipWith (+) depthScoreMinList (zipWith (+) depthScoreMaxList (zipWith (+) iterationScoreList (zipWith (+) openCasesScoreMinList (zipWith (+) heuristicScoreList openCasesScoreMaxList))))
+                completeDistribution = reverse $ foldl (\acc x -> (x+ head acc):acc) [head completeScore] (tail completeScore)
+
+                (method, (cases, _expl)) = list !! (correspondingIdx (drawRand $ last completeDistribution) completeDistribution)
+
+        ------------- Random drawing  -------------
+        --Picking the index that correspond to the drawn random
+        correspondingIdx :: Int -> [Int] -> Int
+        correspondingIdx rand intList = foldl (\acc i -> if rand > i then 1+acc else acc) 0 intList
+
+        drawRand :: Int -> Int
+        drawRand sup = unsafePerformIO $ do
+            let name = "Observational_equivalence" --(L.get pcLemmaName ctxt)
+            _ <- installHandler sigINT  (Catch (handler name sys)) Nothing
+            _ <- installHandler sigTERM (Catch (handler name sys)) Nothing
+            g <- newStdGen
+            let (result, _) = randomR (0, sup) g
+            return result
+
+        ------------- Node construction ------------- 
+
+        node method cases sys = 
+          LNode (DiffProofStep method sys) (M.map (prove (succ depth)) cases)
+
+        ------------- Scoring functions -------------
+
+        heuristicScore :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int] 
+        heuristicScore list = reverse [1..(length list)]
+
+        openCasesScoreMax :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int] 
+        openCasesScoreMax list = reverse $ foldl (\acc (_, (cases, _expl)) -> (length $ M.toList cases):acc) [] list
+
+        openCasesScoreMin :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int] 
+        openCasesScoreMin list = reverse $ map (maxLength -) casesLength
+            where
+                casesLength = foldl (\acc (_, (cases, _expl)) -> (length $ M.toList cases):acc) [] list
+                maxLength   = maximum casesLength
+
+        iterationScore :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int] 
+        iterationScore list = map computeIt itScoreList
+            where 
+                itScoreList = map retrieveIt list
+                maxIt = 2 * fromMaybe 0 (maximum itScoreList)
+
+                computeIt :: Maybe Int -> Int
+                computeIt (Just it) = it
+                computeIt Nothing = maxIt
+
+                retrieveIt (method, (_,_)) = case method of 
+                    DiffBackwardSearchStep (InLoop (_,_,iteration)) -> Just iteration
+                    _ -> Nothing
+
+        depthScoreMax :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int] 
+        depthScoreMax list = map computeDepth dScoreList
+            where
+                dScoreList = map retrieveDepth list
+                maxD = 2 * fromMaybe 0 (maximum dScoreList)
+
+                computeDepth :: Maybe Int -> Int
+                computeDepth (Just d) = d
+                computeDepth Nothing = maxD
+
+                retrieveDepth (method, (_, _)) = case method of 
+                    DiffBackwardSearchStep (InLoop (d,_,_)) -> Just d
+                    _ -> Nothing
+
+        depthScoreMin :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int] 
+        depthScoreMin list = map (maxDepth -) dList
+            where
+                dList = map dScore list
+                maxDepth = maximum dList
+
+                dScore (method, (_, _)) = case method of 
+                    DiffBackwardSearchStep (InLoop (d,_,_)) -> d
+                    _ -> 0
+
+        ------------- Handler for signal -------------
+        handler :: String -> DiffSystem -> IO()
+        handler name _sys = do
+            let goalList = fromMaybe [] $ fmap (L.get sPathGoals) $ L.get dsSystem _sys
+            putStrLn $ render $ prettyGeneratedTactic name goalList
+            raiseSignal killProcess
+
 
 ------------------------------------------------------------------------------
 -- Pretty printing

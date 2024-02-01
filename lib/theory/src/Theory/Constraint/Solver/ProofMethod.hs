@@ -1272,7 +1272,7 @@ prettyDiffProofMethod method = case method of
 
 prettyGeneratedTactic :: HighlightDocument d => String -> [(Int,[Goal])] -> d
 prettyGeneratedTactic _ []    = emptyDoc
-prettyGeneratedTactic s goals = kwTactic <> colon <> space <> (text $ s++"_generated") 
+prettyGeneratedTactic s goals = trace (show s) kwTactic <> colon <> space <> (text $ s++"_generated") 
     $-$ sep
         [ ppTabTab (map (map prettifyGoals) (splitPrios goals))
         , char '\n'
