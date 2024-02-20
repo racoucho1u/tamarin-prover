@@ -291,7 +291,7 @@ import           Theory.Tools.InjectiveFactInstances
 
 import           System.FilePath
 import           Text.Show.Functions()
-import           Utils.Misc 
+import           Utils.Misc
 
 import           System.FilePath
 import           Text.Show.Functions()
@@ -466,7 +466,7 @@ instance NFData (Prio a) where
 
 instance Binary (Prio a) where
     put p = put $ show p
-    get = return (Prio Nothing "" [] []) 
+    get = return (Prio Nothing "" [] [])
 
 -- | Derio keeps a list of function that aim at recognizing some goals based on the state of the 
 -- | System, the ProofContext and the Annotated Goal considered. If one of the function returns 
@@ -647,7 +647,7 @@ stringToGoalRankingDiff :: Bool -> String -> GoalRanking ProofContext
 stringToGoalRankingDiff noOracle s = fromMaybe
     (error $ render $ sep $ map text $ lines $ "Unknown goal ranking '" ++ s
         ++ "'. Use one of the following:\n" ++ listGoalRankingsDiff noOracle)
-    $ stringToGoalRankingDiffMay noOracle s  
+    $ stringToGoalRankingDiffMay noOracle s
 
 listGoalRankings :: Bool -> String
 listGoalRankings noOracle = M.foldMapWithKey
@@ -666,8 +666,8 @@ listGoalRankingsDiff noOracle = M.foldMapWithKey
 filterHeuristic :: Bool -> String -> [GoalRanking ProofContext]
 filterHeuristic diff  ('{':t) = if '}' `elem` t then InternalTacticRanking (Tactic (takeWhile (/= '}') t) (SmartRanking False) [] []):(filterHeuristic diff $ tail $ dropWhile (/= '}') t) else error "A call to a tactic is supposed to end by '}' "
 filterHeuristic False (c:t)   = (stringToGoalRanking False [c]):(filterHeuristic False t)
-filterHeuristic True  (c:t)   = (stringToGoalRankingDiff False [c]):(filterHeuristic True t)
-filterHeuristic   _   ("")    = []
+filterHeuristic True  (c:t)   = stringToGoalRankingDiff False [c]:filterHeuristic True t
+filterHeuristic   _   ""      = []
 
 -- | The name/explanation of a 'GoalRanking'.
 goalRankingName :: GoalRanking ProofContext -> String
@@ -1200,7 +1200,7 @@ data Trivalent = TTrue | TFalse | TUnknown deriving (Show, Eq)
 -- | Computes the mirror dependency graph and evaluates whether the restrictions hold.
 -- Returns Just True and a list of mirrors if all hold, Just False and a list of attacks (if found) if at least one does not hold and Nothing otherwise.
 getMirrorDGandEvaluateRestrictions :: DiffProofContext -> DiffSystem -> Bool -> (Trivalent, [System])
-getMirrorDGandEvaluateRestrictions dctxt dsys isSolved = 
+getMirrorDGandEvaluateRestrictions dctxt dsys isSolved =
     case (L.get dsSide dsys, L.get dsSystem dsys) of
           (Nothing,   _       ) -> (TFalse, [])
           (Just _ , Nothing   ) -> (TFalse, [])
@@ -1609,7 +1609,7 @@ getLessRel :: [Less] -> [(NodeId, NodeId)]
 getLessRel = map (\(x,y,_)->(x,y))
 
 getLessAtoms :: System -> S.Set (NodeId, NodeId)
-getLessAtoms sys = S.fromList $ map (\(x,y,_) -> (x,y)) 
+getLessAtoms sys = S.fromList $ map (\(x,y,_) -> (x,y))
                   ( S.toList $ L.get sLessAtoms sys)
 -- | Gets the reason of a less
 getLessReason :: Less -> Reason

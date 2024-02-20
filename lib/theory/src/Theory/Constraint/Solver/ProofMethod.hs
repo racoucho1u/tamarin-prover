@@ -37,7 +37,7 @@ module Theory.Constraint.Solver.ProofMethod (
   , prettyGeneratedTactic
 
 ) where
-  
+
 import           GHC.Generics                              (Generic)
 import           Data.Binary
 import           Data.Function                             (on)
@@ -60,8 +60,8 @@ import           Debug.Trace
 import           Safe
 import           System.IO.Unsafe
 import           System.Process
-import           System.Posix.Signals
-import           System.Exit (die, exitWith, exitFailure)
+--import           System.Posix.Signals
+--import           System.Exit (die, exitWith, exitFailure)
 
 import           Theory.Constraint.Solver.Sources
 import           Theory.Constraint.Solver.Contradictions
@@ -130,7 +130,7 @@ isProgressFact (factTag -> ProtoFact Linear name 1) = isPrefixOf "ProgressTo_" n
 isProgressFact _ = False
 
 isProgressDisj :: Goal -> Bool
-isProgressDisj (DisjG (Disj disj )) = all (\f ->  (case f of 
+isProgressDisj (DisjG (Disj disj )) = all (\f ->  (case f of
         GGuarded Ex [(_,LSortNode)] [Action _ f' ] _ -> isProgressFact f'
         _                                            -> False
         )) disj
@@ -218,7 +218,7 @@ data DiffProofMethod =
   | DiffBackwardSearchStep ProofMethod       -- ^ A step in the backward search starting from a rule
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
-  
+
 instance HasFrees ProofMethod where
     foldFrees f (SolveGoal g)     = foldFrees f g
     foldFrees f (Contradiction c) = foldFrees f c
@@ -244,10 +244,10 @@ instance HasFrees DiffProofMethod where
 
 cleanGoal :: Goal -> Goal
 cleanGoal (ActionG v f) = ActionG (setLVarIdx 0 v) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
-cleanGoal (ChainG (ni1, cidx) (ni2, pidx)) = (ChainG ((LVar (lvarName ni1) (lvarSort ni1) 0), cidx) ((LVar (lvarName ni2) (lvarSort ni2) 0), pidx))
-cleanGoal (PremiseG (ni, pidx) f) = PremiseG ((LVar (lvarName ni) (lvarSort ni) 0), pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
+cleanGoal (ChainG (ni1, cidx) (ni2, pidx)) = ChainG (LVar (lvarName ni1) (lvarSort ni1) 0, cidx) (LVar (lvarName ni2) (lvarSort ni2) 0, pidx)
+cleanGoal (PremiseG (ni, pidx) f) = PremiseG (LVar (lvarName ni) (lvarSort ni) 0, pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
 cleanGoal (SplitG s) = SplitG s
-cleanGoal (DisjG (Disj g)) = (DisjG (Disj (map removeCpt g)))
+cleanGoal (DisjG (Disj g)) = DisjG (Disj (map removeCpt g))
 
 -- @execMethod rules method se@ checks first if the @method@ is applicable to
 -- the sequent @se@. Then, it applies the @method@ to the sequent under the
@@ -307,8 +307,8 @@ execProofMethod ctxt method sys =
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
     checkForLoop goal s = execSolveGoal goal l index iteration
         where
-            index = foundAt (cleanGoal goal) (map (map cleanGoal) (map snd (L.get sPathGoals s))) (length $ L.get sPathGoals s)
-            (iteration, l) = if index > 0 then ((map fst (L.get sPathGoals s)) `at` (index-1) +1, True) else (0,False)
+            index = foundAt (cleanGoal goal) (map (map cleanGoal . snd) (L.get sPathGoals s)) (length $ L.get sPathGoals s)
+            (iteration, l) = if index > 0 then (map fst (L.get sPathGoals s) `at` (index-1) +1, True) else (0,False)
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
@@ -331,9 +331,9 @@ execProofMethod ctxt method sys =
         updateSys :: System -> Int -> Int-> Goal -> System
         updateSys _sys index it g = unsafePerformIO $ do
             let currentPathGoals = L.get sPathGoals _sys
-                sys2 = if _loop 
-                  then L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,[cleanGoal g]):(take (index-1) currentPathGoals)++(drop index currentPathGoals)) _sys)) 
-                  else L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((0,[cleanGoal g]):currentPathGoals) _sys)) 
+                sys2 = if _loop
+                  then L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,[cleanGoal g]):take (index-1) currentPathGoals++drop index currentPathGoals) _sys))
+                  else L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((0,[cleanGoal g]):currentPathGoals) _sys))
             return sys2
 
         makeCaseNames =
@@ -399,7 +399,7 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
                                                                                                         mirrorSyss = getMirrorDG ctxt s sys'
                                                                                                         mirrorCtxt = eitherProofContext ctxt (opposite s)
                                                                                                         allSubtermsFinished = finishedSubterms (eitherProofContext ctxt s) sys' && all (finishedSubterms mirrorCtxt) mirrorSyss
-                                                                      (_ , _ , _)                 -> Nothing                                                       
+                                                                      (_ , _ , _)                 -> Nothing
           | otherwise                                         -> Nothing
         DiffAttack
           | (L.get dsProofType sys) == (Just RuleEquivalence) -> case (L.get dsCurrentRule sys, L.get dsSide sys, L.get dsSystem sys) of
@@ -430,7 +430,7 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
                                                                                                         allSubtermsFinished = finishedSubterms (eitherProofContext ctxt s) sys' && all (finishedSubterms mirrorCtxt) mirrorSyss
                                                                       (_ , _ , _)                 -> Nothing
           | otherwise                                         -> Nothing
-          
+
   where
     protoRules       = L.get dpcProtoRules  ctxt
     destrRules       = L.get dpcDestrRules  ctxt
@@ -439,29 +439,29 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
     protoRulesAC :: Side -> [RuleAC]
     protoRulesAC LHS = filter (\x -> getRuleNameDiff x /= "IntrRecv") $ L.get crProtocol $ L.get pcRules (L.get dpcPCLeft  ctxt)
     protoRulesAC RHS = filter (\x -> getRuleNameDiff x /= "IntrRecv") $ L.get crProtocol $ L.get pcRules (L.get dpcPCRight ctxt)
-    
+
     ruleEquivalenceSystem :: String -> DiffSystem
-    ruleEquivalenceSystem rule = L.set dsCurrentRule (Just rule) 
-      $ L.set dsConstrRules (S.fromList constrRules) 
-      $ L.set dsDestrRules (S.fromList destrRules) 
-      $ L.set dsProtoRules (S.fromList protoRules) 
+    ruleEquivalenceSystem rule = L.set dsCurrentRule (Just rule)
+      $ L.set dsConstrRules (S.fromList constrRules)
+      $ L.set dsDestrRules (S.fromList destrRules)
+      $ L.set dsProtoRules (S.fromList protoRules)
       $ L.set dsProofType (Just RuleEquivalence) sys
-      
+
     formula :: String -> LNFormula
     formula rulename = Qua Ex ("i", LSortNode) (Ato (Action (LIT (Var (Bound 0))) (Fact (ProtoFact Linear ("Diff" ++ rulename) 0) S.empty [])))
-    
+
     ruleEquivalenceCase :: M.Map CaseName DiffSystem -> RuleAC -> M.Map CaseName DiffSystem
     ruleEquivalenceCase m rule = M.insert ("Rule_" ++ (getRuleName rule) ++ "") (ruleEquivalenceSystem (getRuleNameDiff rule)) m
-    
+
     -- Not checking construction rules is sound, as they are 'trivial' !
     -- Note that we use the protoRulesAC, as we also want to include the ISEND rule as it is labelled with an action that might show up in restrictions.
     -- LHS or RHS is not important in this case as we only need the names of the rules.
     ruleEquivalence :: M.Map CaseName DiffSystem
     ruleEquivalence = foldl ruleEquivalenceCase (foldl ruleEquivalenceCase {-(foldl ruleEquivalenceCase-} M.empty {-constrRules)-} destrRules) (protoRulesAC LHS)
-    
+
     isTrivial :: System -> Bool
     isTrivial sys' = (dgIsNotEmpty sys') && (allOpenGoalsAreSimpleFacts ctxt sys') && (allOpenFactGoalsAreIndependent sys')
-    
+
     backwardSearchSystem :: Side -> DiffSystem -> String -> DiffSystem
     backwardSearchSystem s sys' rulename = L.set dsSide (Just s)
       $ L.set dsSystem (Just ruleSys) sys'
@@ -471,7 +471,7 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
 
     startBackwardSearch :: String -> M.Map CaseName DiffSystem
     startBackwardSearch rulename = M.insert ("LHS") (backwardSearchSystem LHS sys rulename) $ M.insert ("RHS") (backwardSearchSystem RHS sys rulename) $ M.empty
-    
+
     applyStep :: ProofMethod -> Side -> System -> Maybe (M.Map CaseName DiffSystem)
     applyStep m s sys' = case (execProofMethod (eitherProofContext ctxt s) m sys') of
                            Nothing    -> Nothing
@@ -504,12 +504,12 @@ rankGoals ctxt ranking tacticsList = case ranking of
     InjRanking useLoopBreakers -> injRanking ctxt useLoopBreakers
     InternalTacticRanking tactic-> internalTacticRanking (chosenTactic tacticsList tactic) ctxt
 
-    where 
+    where
       chosenTactic :: [Tactic ProofContext] -> Tactic ProofContext-> Tactic ProofContext
       chosenTactic   []  t = chooseError tacticsList t
-      chosenTactic (h:q) t = case (checkName h t) of 
+      chosenTactic (h:q) t = case (checkName h t) of
         True  -> h
-        False -> chosenTactic q t 
+        False -> chosenTactic q t
 
       definedHeuristic = intercalate [','] (foldl (\acc x -> (_name x):acc ) [] tacticsList)
 
@@ -533,7 +533,7 @@ rankProofMethods ranking tactics ctxt sys = do
             )
         <|> (solveGoalMethod <$> (rankGoals ctxt ranking tactics sys $ openGoals sys))
     case execProofMethod ctxt m sys of
-      Just cases -> case M.toList cases of 
+      Just cases -> case M.toList cases of
           []                       -> return (m, (cases, expl))
           -- [(case1,sys)]            -> if L.get sLoopFound sys then return (InLoop 0, (cases, expl)) else return (m, (cases, expl))
           ((_,sys1):_) -> if  L.get sLoopFound sys1 then return (InLoop (fst $ L.get sNbLoop sys1, fromJust $ fromSolveGoal m, snd $ L.get sNbLoop sys1), (cases, expl)) else return (m, (cases, expl))
@@ -545,7 +545,7 @@ rankProofMethods ranking tactics ctxt sys = do
         Just ru -> " (from rule " ++ getRuleName ru ++ ")"
         Nothing -> ""
 
-    solveGoalMethod (goal, (nr, usefulness)) = 
+    solveGoalMethod (goal, (nr, usefulness)) =
       ( SolveGoal goal
       , "nr. " ++ show nr ++ sourceRule goal ++ case usefulness of
                                Useful                -> ""
@@ -642,7 +642,7 @@ oracleRanking oracle ctxt _sys ags0
                   (map (\(i,ag) -> show i ++": "++ (concat . lines . render $ pgoal ag))
                        (zip [(0::Int)..] ags))
       outp <- readProcess (oraclePath oracle) [ L.get pcLemmaName ctxt ] inp
-      
+
       let indices = catMaybes . map readMay . lines $ outp
           ranked = catMaybes . map (atMay ags) $ indices
           remaining = filter (`notElem` ranked) ags
@@ -709,12 +709,12 @@ itRanking tactic ags ctxt _sys = result
       prioReorderedGoals = applyRankingFunctions rankingFunToBeAppliedPrio preorderedPrio                 -- apply the function 
 
       rankedPrioGoals = concat prioReorderedGoals                                                         -- string the results in a single table
-      
+
       -- Getting the functions from depriorities (same as above but dor the depriorities)
 
       deprioToFunctions = map functionsDeprio (_deprios tactic)
       indexDeprio = map (findIndex (==True)) $ map (applyIsPrio deprioToFunctions ctxt _sys) ags
-      indexedDeprio = sortOn fst $ zip indexDeprio ags 
+      indexedDeprio = sortOn fst $ zip indexDeprio ags
       groupedDeprio = groupBy (\(indice1,_) (indice2,_) -> indice1 == indice2) indexedDeprio
       preorderedDeprio = if (Nothing `elem` indexDeprio) then map (snd . unzip) (tail groupedDeprio) else map (snd . unzip) groupedDeprio -- recovering ranked goals only (no prio = Nothing = fst)
 
@@ -772,7 +772,7 @@ internalTacticRanking tactic ctxt _sys ags0 = trace logMsg res
                          (zip [(0::Int)..] ags))
         res = itRanking tactic ags ctxt _sys                    -- apply the tactic ranking
         dict = M.fromList (zip ags [(0::Int)..])
-        outp = map (fromMaybe (-1)) (map (flip M.lookup dict) res)
+        outp = map (fromMaybe (-1) . (`M.lookup` dict)) res
         prettyOut = unlines (map show outp)
         logMsg = ">>>>>>>>>>>>>>>>>>>>>>>> START INPUT\n"
                      ++ inp
@@ -807,14 +807,14 @@ isMID_Sender (PremiseG _ (Fact (ProtoFact _ "MID_Sender" _) _ _)) = True
 isMID_Sender  _                                 = False
 
 isFirstInsertAction :: Goal -> Bool
-isFirstInsertAction (ActionG _ (Fact (ProtoFact _ "Insert" _) _ (t:_)) ) = 
+isFirstInsertAction (ActionG _ (Fact (ProtoFact _ "Insert" _) _ (t:_)) ) =
     case t of
     (viewTerm2 -> FPair (viewTerm2 -> Lit2( Con (Name PubName a)))  _) -> isPrefixOf "F_" (show a)
     _ -> False
 isFirstInsertAction _ = False
 
 isLastInsertAction :: Goal -> Bool
-isLastInsertAction (ActionG _ (Fact (ProtoFact _ "Insert" _) _ (t:_)) ) = 
+isLastInsertAction (ActionG _ (Fact (ProtoFact _ "Insert" _) _ (t:_)) ) =
         case t of
             (viewTerm2 -> FPair (viewTerm2 -> Lit2( Con (Name PubName a)))  _) ->  isPrefixOf "L_" (show a)
             _ -> False
@@ -829,11 +829,11 @@ isNotReceiveAction (ActionG _ (Fact (ProtoFact _ "Receive" _) _ _)) = False
 isNotReceiveAction  _                                 = True
 
 isStandardActionGoalButNotInsertOrReceive :: Goal -> Bool
-isStandardActionGoalButNotInsertOrReceive g = 
+isStandardActionGoalButNotInsertOrReceive g =
    (isStandardActionGoal g) && (isNotInsertAction g) && (isNotReceiveAction g)
 
 isStandardActionGoalButNotInsert :: Goal -> Bool
-isStandardActionGoalButNotInsert g = 
+isStandardActionGoalButNotInsert g =
        (isStandardActionGoal g) &&  (isNotInsertAction g) && (not $ isEventAction g)
 
 -- | A ranking function tuned for the automatic verification of
@@ -863,8 +863,8 @@ sapicRanking ctxt sys =
     tagUsefulness LoopBreaker           = 0
     tagUsefulness CurrentlyDeducible    = 2
 
-    solveLast = 
-        [ 
+    solveLast =
+        [
         isLastInsertAction . fst, -- move insert actions for positions that start with L_ to the end
         isLastProtoFact . fst, -- move Last proto facts (L_) to the end.
         isKnowsLastNameGoal . fst, -- move last names (L_key) to the end
@@ -890,7 +890,7 @@ sapicRanking ctxt sys =
         , isSplitGoalSmall . fst
         , isMsgOneCaseGoal . fst
         , isDoubleExpGoal . fst
-        , isNoLargeSplitGoal . fst 
+        , isNoLargeSplitGoal . fst
         ]
         -- move the rest (mostly more expensive KU-goals) before expensive
         -- equation splits
@@ -939,8 +939,8 @@ sapicPKCS11Ranking ctxt sys =
     tagUsefulness LoopBreaker           = 0
     tagUsefulness CurrentlyDeducible    = 2
 
-    solveLast = 
-        [ 
+    solveLast =
+        [
         -- isNotInsertAction . fst 
         -- ,        
         isKnowsHandleGoal . fst,
@@ -964,7 +964,7 @@ sapicPKCS11Ranking ctxt sys =
         , isSplitGoalSmall . fst
         , isMsgOneCaseGoal . fst
         , isDoubleExpGoal . fst
-        , isNoLargeSplitGoal . fst 
+        , isNoLargeSplitGoal . fst
         ]
         -- move the rest (mostly more expensive KU-goals) before expensive
         -- equation splits
@@ -975,7 +975,7 @@ sapicPKCS11Ranking ctxt sys =
     -- sure that a split does not get too old.
     smallSplitGoalSize = 3
 
-    isInsertTemplateAction (ActionG _ (Fact (ProtoFact _ "Insert" _) _ (t:_)) ) = 
+    isInsertTemplateAction (ActionG _ (Fact (ProtoFact _ "Insert" _) _ (t:_)) ) =
         case t of
             (viewTerm2 -> FPair (viewTerm2 -> Lit2( Con (Name PubName a)))  _) -> isPrefixOf "template" (show a)
             _ -> False
@@ -1217,7 +1217,7 @@ smartDiffRanking ctxt sys =
     delayTrivial agl = fst parts ++ snd parts
       where
         parts = partition (not . trivialKUGoal) agl
-    
+
     trivialKUGoal ((ActionG _ fa), _) = isKUFact fa && (isTrivialMsgFact fa /= Nothing)
     trivialKUGoal _                   = False
 
@@ -1231,7 +1231,7 @@ smartDiffRanking ctxt sys =
         combine Nothing    _        = Nothing
         combine (Just _ )  Nothing  = Nothing
         combine (Just l1) (Just l2) = if noDuplicates l1 l2 then (Just (l1++l2)) else Nothing
-      
+
         noDuplicates l1 l2 = S.null (S.intersection (S.fromList l1) (S.fromList l2))
 
 
@@ -1267,36 +1267,36 @@ prettyDiffProofMethod method = case method of
 -- MERGED with solved.
 --    DiffTrivial              -> keyword_ "trivial"
     DiffRuleEquivalence      -> keyword_ "rule-equivalence"
-    DiffBackwardSearch       -> keyword_ "backward-search"  
+    DiffBackwardSearch       -> keyword_ "backward-search"
     DiffBackwardSearchStep s -> keyword_ "step(" <-> prettyProofMethod s <-> keyword_ ")"
 
 prettyGeneratedTactic :: HighlightDocument d => String -> [(Int,[Goal])] -> d
-prettyGeneratedTactic _ []    = emptyDoc
-prettyGeneratedTactic s goals = trace (show s) kwTactic <> colon <> space <> (text $ s++"_generated") 
+prettyGeneratedTactic _ []    = trace "nobody tell me nothing" emptyDoc
+prettyGeneratedTactic s goals = trace (show goals) kwTactic <> colon <> space <> text (s++"_generated")
     $-$ sep
         [ ppTabTab (map (map prettifyGoals) (splitPrios goals))
         , char '\n'
         ]
-   where 
+   where
 
         -- pretty print for a prio block
-        ppTab xs = kwDeprio <> colon <> space $-$ (nest 2 $ vcat $ map prettify (map words xs))
+        ppTab xs = kwDeprio <> colon <> space $-$ nest 2 (vcat $ map (prettify . words) xs)
 
         ppTabTab [] = emptyDoc
         ppTabTab listFunctions = vcat (map ppTab listFunctions)
 
         prettifyGoals :: (Int,[Goal]) -> String
-        prettifyGoals (_,glist) = foldr (\goal acc -> acc ++(filter (\x -> x /='"') (show goal))++"\" | allGoal \"") "allGoal \"" glist
+        prettifyGoals (_,glist) = foldr (\goal acc -> acc ++filter (/='"') (show goal)++"\" | allGoal \"") "allGoal \"" (map cleanGoal glist)
 
         splitPrios :: [(Int,[Goal])] -> [[(Int,[Goal])]]
         splitPrios [] = []
         splitPrios [h] = [[h]]
-        splitPrios ((it,g):t) = [[(it,g)] ++ (fst $ span (\(a,_) -> a ==it) t)]++(splitPrios $ (snd $ span (\(a,_) -> a==it) t))
+        splitPrios ((it,g):t) = ([(it,g)] ++ (fst $ span (\(a,_) -> a ==it) t)) : (splitPrios $ (snd $ span (\(a,_) -> a==it) t))
 
         prettify :: HighlightDocument d => [String] -> d
         prettify []    = emptyDoc
-        prettify ("|":"allGoal":"\"":[]) = emptyDoc
-        prettify ("|":t) = (operator_ " | ") <> prettify t-- if (s == "|") || (s == "&") || (s == "not") then (operator_ s) <> prettify t else text s <> prettify t
-        prettify ("&":t) = (operator_ " & ") <> prettify t
-        prettify ("not":t) = (operator_ "not ") <> prettify t
+        prettify ["|", "allGoal", "\""] = emptyDoc
+        prettify ("|":t) = operator_ " | " <> prettify t-- if (s == "|") || (s == "&") || (s == "not") then (operator_ s) <> prettify t else text s <> prettify t
+        prettify ("&":t) = operator_ " & " <> prettify t
+        prettify ("not":t) = operator_ "not " <> prettify t
         prettify (s:t) = text s <> space <> prettify t

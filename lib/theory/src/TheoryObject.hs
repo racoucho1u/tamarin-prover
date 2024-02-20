@@ -170,6 +170,8 @@ import qualified Data.Set as S
 import Theory.Syntactic.Predicate
 import Data.ByteString.Char8 (unpack)
 
+import Debug.Trace
+
 -- | A theory contains a single set of rewriting rules modeling a protocol
 -- and the lemmas that
 data Theory sig c r p s = Theory {
@@ -725,13 +727,13 @@ prettyVarList :: Document d => [LVar] -> d
 prettyVarList = fsep . punctuate comma . map prettyLVar
 
 -- | Pretty print all macros
-prettyMacros :: HighlightDocument d => [Macro] -> d 
+prettyMacros :: HighlightDocument d => [Macro] -> d
 prettyMacros m = if m == [] then text empty else vcat (keyword_ "macros:" : map prettyMacro m)
 
 -- | Pretty print a macro.
 prettyMacro :: HighlightDocument d => Macro -> d
-prettyMacro (op, args, out) = vcat [ppNonEmptyList (\ds -> sep (map (nest 4) ds)) 
-                              text ([BC.unpack op ++ "("]) <-> prettyVarList args <-> text (") = " ++ show(out))]
+prettyMacro (op, args, out) = vcat [ppNonEmptyList (\ds -> sep (map (nest 4) ds))
+                              text ([BC.unpack op ++ "("]) <-> prettyVarList args <-> text (") = " ++ show (out))]
     where
         ppNonEmptyList _   _  [] = emptyDoc
         ppNonEmptyList hdr pp xs = hdr $ punctuate comma $ map pp xs
@@ -756,25 +758,25 @@ prettyEitherRestriction (s, rstr) =
     safety = isSafetyFormula $ formulaToGuarded_ $ L.get rstrFormula rstr
 
 prettyTactic :: HighlightDocument d => Tactic ProofContext -> d
-prettyTactic tactic = kwTactic <> colon <> space <> (text $ _name tactic) 
-    $-$ kwPresort <> colon <> space <> (char $ goalRankingToChar $ _presort tactic) $-$ sep
+prettyTactic tactic = if null (_prios tactic) && null (_deprios tactic) then emptyDoc else kwTactic <> colon <> space <> text (_name tactic)
+    $-$ kwPresort <> colon <> space <> char (goalRankingToChar $ _presort tactic) $-$ sep
         [ ppTabTab  "prio"  (map stringRankingPrio $ _prios tactic) (map stringsPrio $ _prios tactic)
         , ppTabTab "deprio" (map stringRankingDeprio $ _deprios tactic) (map stringsDeprio $ _deprios tactic)
         , char '\n'
         ]
-   where 
+   where
 
         -- pretty print for a prio block
-        ppTab "prio" (rankingName,xs) = kwPrio <> colon <> space <> braces (text rankingName) $-$ (nest 2 $ vcat $ map prettify (map words xs))
-        ppTab "deprio" (rankingName,xs) = kwDeprio <> colon <> space <> braces (text rankingName) $-$ (nest 2 $ vcat $ map prettify (map words xs))
+        ppTab "prio" (rankingName,xs) = kwPrio <> colon <> space <> braces (text rankingName) $-$ nest 2 (vcat $ map (prettify . words) xs)
+        ppTab "deprio" (rankingName,xs) = kwDeprio <> colon <> space <> braces (text rankingName) $-$ nest 2 (vcat $ map (prettify . words) xs)
         ppTab _ _ = emptyDoc
 
         ppTabTab _ _ [] = emptyDoc
-        ppTabTab param rankingName listFunctions = vcat (map (ppTab param) (zip rankingName listFunctions))
+        ppTabTab param rankingName listFunctions = vcat (zipWith (curry (ppTab param)) rankingName listFunctions)
 
         prettify :: HighlightDocument d => [String] -> d
         prettify []    = emptyDoc
         prettify ("|":t) = (operator_ " | ") <> prettify t-- if (s == "|") || (s == "&") || (s == "not") then (operator_ s) <> prettify t else text s <> prettify t
         prettify ("&":t) = (operator_ " & ") <> prettify t
         prettify ("not":t) = (operator_ "not ") <> prettify t
-        prettify (s:t) = text s <> prettify t
+        prettify (s:t) = text s <> space <> prettify t

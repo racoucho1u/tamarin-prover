@@ -39,8 +39,7 @@ tacticName :: Parser String
 tacticName = do
     _ <- symbol "tactic"
     _ <- colon
-    tName <- identifier
-    return tName
+    identifier
 
 goalRankingPresort :: Bool -> Parser (GoalRanking ProofContext)
 goalRankingPresort diff = regularRanking <?> "goal ranking"
@@ -54,8 +53,7 @@ selectedPreSort :: Bool -> Parser (GoalRanking ProofContext)
 selectedPreSort diff = do
     _ <- symbol "presort"
     _ <- colon
-    presort <- goalRankingPresort diff <* lexeme spaces 
-    return $ presort
+    goalRankingPresort diff <* lexeme spaces
 
 
 --Function value
@@ -68,17 +66,17 @@ function :: Parser ((AnnotatedGoal, ProofContext, System) -> Bool, String)
 function = do
     f <- identifier
     param <- many1 $ doubleQuoted functionValue
-    return $ (nameToFunction (f,param), f++" \""++intercalate "\" \"" param++"\"")
+    return (nameToFunction (f,param), f++" \""++intercalate "\" \"" param++"\"")
 
 
 functionNot :: ((AnnotatedGoal, ProofContext, System) -> Bool, String) -> ((AnnotatedGoal, ProofContext, System) -> Bool, String)
 functionNot (f,s) = (not . f, "not "++s)
 
 functionAnd :: ((AnnotatedGoal, ProofContext, System) -> Bool, String) -> ((AnnotatedGoal, ProofContext, System) -> Bool, String) -> ((AnnotatedGoal, ProofContext, System) -> Bool, String)
-functionAnd (f,s1) (g,s2) = ((\x -> and [f x, g x]),s1++" & "++s2)
+functionAnd (f,s1) (g,s2) = (\x -> f x && g x,s1++" & "++s2)
 
 functionOr :: ((AnnotatedGoal, ProofContext, System) -> Bool, String) -> ((AnnotatedGoal, ProofContext, System) -> Bool, String) -> ((AnnotatedGoal, ProofContext, System) -> Bool, String)
-functionOr (f,s1) (g,s2) = ((\x -> or [f x, g x]),s1++" | "++s2)
+functionOr (f,s1) (g,s2) = (\x -> f x || g x,s1++" | "++s2)
 
 -- | Parse a negation.
 negation :: Parser ((AnnotatedGoal, ProofContext, System) -> Bool, String)
@@ -90,7 +88,7 @@ conjuncts = chainl1 negation (functionAnd <$ opLAnd)
 
 -- | Parse a left-associative sequence of disjunctions.
 disjuncts :: Parser ((AnnotatedGoal, ProofContext, System) -> Bool, String)
-disjuncts = try $ (chainl1 conjuncts (functionOr <$ opLOr))
+disjuncts = try (chainl1 conjuncts (functionOr <$ opLOr))
 
 --Parsing prio
 prio :: Parser (Prio ProofContext)
@@ -98,7 +96,7 @@ prio = do
     ranking <- symbol "prio" *> colon *> option "id" (braced identifier) -- if none use default ranking
     -- _ <- newline
     fs <- many1 disjuncts --
-    return $ Prio (nameToRanking ranking) ranking (map fst fs) (map snd fs) 
+    return $ Prio (nameToRanking ranking) ranking (map fst fs) (map snd fs)
 
 
 --Parsing deprio
@@ -130,7 +128,7 @@ tacticFunctions = M.fromList
                       ]
   where
     regex' :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
-    regex' l (agoal,_,_) = case l of 
+    regex' l (agoal,_,_) = case l of
         (regex:_) -> pg =~ regex
         _     -> False
         where
@@ -145,12 +143,12 @@ tacticFunctions = M.fromList
 
             functionsDetection = "[^A-Za-z0-9][A-Za-z0-9]+\\("
             functions = retrieveFun pg
-            isSubset = and $ map ((flip elem) ["Ku","inv"]) functions
+            isSubset = all ((flip elem) ["Ku","inv"]) functions
 
             retrieveFun :: String -> [String]
-            retrieveFun pgoal_ = map init $ map tail $ getAllTextMatches $ pgoal_ =~ functionsDetection
+            retrieveFun pgoal_ = map (init . tail) (getAllTextMatches $ pgoal_ =~ functionsDetection)
 
-            safenoncePattern = "(~n|" ++ intercalate "|" (map show $ concat (map (checkFormula $ head param) (S.toList $ L.get sFormulas sys)))++")(?![.0-9a-zA-Z])"
+            safenoncePattern = "(~n|" ++ intercalate "|" (map show $ concatMap (checkFormula $ head param) (S.toList $ L.get sFormulas sys))++")(?![.0-9a-zA-Z])"
             hasSafeNonces = not (pg =~ safenoncePattern)
 
     dhreNoise :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
@@ -177,7 +175,7 @@ tacticFunctions = M.fromList
             sysPattern = map show $ concat (map (checkFormula oracleType) (S.toList $ L.get sFormulas sys))
 
     reasonableNoncesNoise :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
-    reasonableNoncesNoise param (goal,_,sys) = or $ map ((flip elem) sysPattern) nonces
+    reasonableNoncesNoise param (goal,_,sys) = any (`elem` sysPattern) nonces
         where
             oracleType = head param
             nonces = map show (getFactTerms_ goal)
@@ -188,7 +186,7 @@ tacticFunctions = M.fromList
             getFactTerms_ (ActionG _ (Fact { factTag = _ ,factAnnotations =  _ , factTerms = ft }), _ ) = ft
             getFactTerms_ _ = []
 
-            sysPattern = "~n":(map show $ concat (map (checkFormula oracleType) (S.toList $ L.get sFormulas sys)))
+            sysPattern = "~n":map show (concat (map (checkFormula oracleType) (S.toList $ L.get sFormulas sys)))
 
     checkFormula :: String -> LNGuarded -> [LVar]
     checkFormula oracleType f = if rev && expG then concat $ getFormulaTermsCore f else []
@@ -197,7 +195,7 @@ tacticFunctions = M.fromList
           getCore (Free v) = v
           getCore _ = error "It should really not happend"
 
-          rev = or $ map matchReveal (map factTagName $ guardFactTags f)
+          rev = any matchReveal (map factTagName $ guardFactTags f)
           expG = if oracleType == "curve" then show (getFormulaTerms f) =~ "grpid,exp\\('g'" else show (getFormulaTerms f) =~ "exp\\('g'"
 
           matchReveal :: String -> Bool
@@ -208,11 +206,11 @@ tacticFunctions = M.fromList
           getFormulaTerms _ = []
 
           getFormulaTermsCore :: LNGuarded -> [[LVar]]
-          getFormulaTermsCore (GGuarded _ _ [Action _ fa] _ ) = map (map getCore) (map varsVTerm (getFactTerms fa))
+          getFormulaTermsCore (GGuarded _ _ [Action _ fa] _ ) = map (map getCore . varsVTerm) (getFactTerms fa)
           getFormulaTermsCore _ = []
 
     isFactName :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
-    isFactName (s:_) (((PremiseG _ Fact {factTag = ProtoFact Linear test _, factAnnotations = _ , factTerms = _ }), (_,_)), _, _ ) = test == s
+    isFactName (s:_) ((PremiseG _ Fact {factTag = ProtoFact Linear test _, factAnnotations = _ , factTerms = _ }, (_,_)), _, _ ) = test == s
     -- Not necessarily usefull line
     isFactName (s:_) ((ActionG _ (Fact { factTag = test ,factAnnotations =  _ , factTerms = _ }), _ ), _, _ ) = show test == s
     isFactName _ (_,_,_) = False
@@ -224,7 +222,7 @@ tacticFunctions = M.fromList
     allGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
     allGoal (s:_) ((goal,(_,_)),_,_) = filteredParam == filteredGoal
         where
-            filterChar st = filter (\x -> x /='"') $ filter (\x -> x /=')') $ filter (\x -> x /='(') st
+            filterChar st = filter (/= '"') $ filter (/= ')') $ filter (/= '(') st
             filteredParam = filterChar s
             filteredGoal = filterChar $ show (cleanGoal goal)
     allGoal _ (_, _, _) = False
@@ -272,7 +270,7 @@ rankingFunctions = M.fromList
 
             tplList = map (\(x,y) -> (length x,(x,y))) dblList
             sortedTps = sortOn fst tplList
-            res = snd $ unzip (snd $ unzip sortedTps)
+            res = map snd (snd $ unzip sortedTps)
 
 nameToRanking :: String -> Maybe ([AnnotatedGoal] -> [AnnotatedGoal])
 nameToRanking s = case M.lookup s rankingFunctions of
