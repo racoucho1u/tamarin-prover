@@ -648,7 +648,27 @@ checkDiffProof ctxt prover d sys prf@(LNode (DiffProofStep method info) cs) =
 
         -- New version: closer to probabilistic
         heuristicScore :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
-        heuristicScore list = reverse [1..(length list)]
+        heuristicScore l = case scoreProba of
+          [] -> 1 : replicate (ll -1) 0
+          sp -> gui sp
+
+          where
+            probaList = map (fromMaybe 1 . computeIndivProba) l
+            inLoopProbaList = takeWhile (<1) probaList
+            inverseProba = map (1 -) inLoopProbaList
+            productInverseProba = foldl (\acc x -> acc ++ [last acc * x]) [1] inverseProba
+            usableProbaList = zipWith (*) productInverseProba inLoopProbaList
+            totalProba = product usableProbaList
+            scoreProba = map (double2Int . (* totalProba)) usableProbaList
+            lsp = length scoreProba
+
+            ll = length l
+
+            computeIndivProba (method, (_,_)) = case method of
+                    DiffBackwardSearchStep (InLoop (_,_,iteration)) -> Just $ 1 / (2**(int2Double iteration+1))
+                    _ -> Nothing
+
+            gui sp = if lsp == ll then sp else sp++[last sp -1]++replicate (ll-lsp-1) 0
 
         openCasesScoreMax :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
         openCasesScoreMax list = reverse $ foldl (\acc (_, (cases, _expl)) -> length (M.toList cases):acc) [] list
@@ -1272,21 +1292,21 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
 
                 info = zip6 heuristicScoreList openCasesScoreMaxList openCasesScoreMinList iterationScoreList depthScoreMaxList depthScoreMinList
                 infoTotal = zipWith6 (\a b c d e f -> a + b+ c+ d+e+f) heuristicScoreList openCasesScoreMaxList openCasesScoreMinList iterationScoreList depthScoreMaxList depthScoreMinList
-                --idx = correspondingIdx (drawRand $ last completeDistribution) completeDistribution
-                idx = correspondingIdx
+                idx = correspondingIdx (drawRand $ last completeDistribution) completeDistribution
+                --idx = correspondingIdx
 
                 (method, (cases, _expl)) = list !! idx --trace (show idx ++ "\n"++ show info ++ "\n"++ show infoTotal)
 
         ------------- Random drawing  -------------
         --Picking the index that correspond to the drawn random
-        --correspondingIdx :: Int -> [Int] -> Int
-        --correspondingIdx rand = foldl (\acc i -> if rand > i then 1+acc else acc) 0
+        correspondingIdx :: Int -> [Int] -> Int
+        correspondingIdx rand = foldl (\acc i -> if rand > i then 1+acc else acc) 0
 
         --correspondingIdx :: Int
-        correspondingIdx = unsafePerformIO $ do
+        {-correspondingIdx = unsafePerformIO $ do
             _ <- installHandler sigINT  (Catch (handler (L.get pcLemmaName ctxt) sys)) Nothing
             _ <- installHandler sigTERM (Catch (handler (L.get pcLemmaName ctxt) sys)) Nothing
-            return 0
+            return 0-}
 
 
         drawRand :: Int -> Int
@@ -1314,7 +1334,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
         heuristicScore :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
         heuristicScore l = case scoreProba of
           [] -> 1 : replicate (ll -1) 0
-          sp -> trace ("=========================" ++ show l ++ "\n" ++ (show $ gui sp)) gui sp
+          sp -> gui sp
 
           where
             probaList = map computeIndivProba l
@@ -1784,8 +1804,29 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
 
         ------------- Scoring functions -------------
 
+        -- New version: closer to probabilistic
         heuristicScore :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
-        heuristicScore list = reverse [1..(length list)]
+        heuristicScore l = case scoreProba of
+          [] -> 1 : replicate (ll -1) 0
+          sp -> gui sp
+
+          where
+            probaList = map (fromMaybe 1 . computeIndivProba) l
+            inLoopProbaList = takeWhile (<1) probaList
+            inverseProba = map (1 -) inLoopProbaList
+            productInverseProba = foldl (\acc x -> acc ++ [last acc * x]) [1] inverseProba
+            usableProbaList = zipWith (*) productInverseProba inLoopProbaList
+            totalProba = product usableProbaList
+            scoreProba = map (double2Int . (* totalProba)) usableProbaList
+            lsp = length scoreProba
+
+            ll = length l
+
+            computeIndivProba (method, (_,_)) = case method of
+                    DiffBackwardSearchStep (InLoop (_,_,iteration)) -> Just $ 1 / (2**(int2Double iteration+1))
+                    _ -> Nothing
+
+            gui sp = if lsp == ll then sp else sp++[last sp -1]++replicate (ll-lsp-1) 0
 
         openCasesScoreMax :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
         openCasesScoreMax list = reverse $ foldl (\acc (_, (cases, _expl)) -> length (M.toList cases):acc) [] list
