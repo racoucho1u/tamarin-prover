@@ -1771,12 +1771,12 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
         chooseNext list sys = node method cases sys
 
             where
-                heuristicScoreList = map (*5) (heuristicScore list)
-                openCasesScoreMaxList = map (*5) (openCasesScoreMax list)
-                openCasesScoreMinList = map (*5) (openCasesScoreMin list)
-                iterationScoreList = map (*5) (iterationScore list)
-                depthScoreMaxList = map (*5) (depthScoreMax list)
-                depthScoreMinList = map (*1) (depthScoreMin list)
+                heuristicScoreList = map (*1) (heuristicScore list)
+                openCasesScoreMaxList = map (*0) (openCasesScoreMax list)
+                openCasesScoreMinList = map (*0) (openCasesScoreMin list)
+                iterationScoreList = map (*0) (iterationScore list)
+                depthScoreMaxList = map (*0) (depthScoreMax list)
+                depthScoreMinList = map (*0) (depthScoreMin list)
 
                 completeScore = zipWith (+) depthScoreMinList (zipWith (+) depthScoreMaxList (zipWith (+) iterationScoreList (zipWith (+) openCasesScoreMinList (zipWith (+) heuristicScoreList openCasesScoreMaxList))))
                 completeDistribution = reverse $ foldl (\acc x -> (x+ head acc):acc) [head completeScore] (tail completeScore)
