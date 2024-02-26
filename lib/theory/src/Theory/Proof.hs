@@ -127,7 +127,7 @@ import           System.IO.Unsafe
 import           System.Posix.Signals
 import Data.Array.Base (memcpy_thaw)
 import GHC.Exts (the)
-import GHC.Float (int2Double)
+import GHC.Float (int2Double, float2Int, int2Float, double2Int)
 --import           System.Exit (die)
 
 --import           Safe
@@ -482,7 +482,7 @@ checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
 --                      (M.singleton "" prf)
   where
 
-    chooseNext list = trace ("\nAbricot:" ++ show idx ++ "\nAbricot:"++ show _info ++ "\nAbricot:"++ show infoTotal) $ case thechosenone of
+    chooseNext list = case thechosenone of
       --trace ("\nAbricot:" ++ show idx ++ "\nAbricot:"++ show _info ++ "\nAbricot:"++ show infoTotal)
       -- trace ("\nAbricot:"++show idx ++"\nAbricot:" ++ show thecho ++"\nAbricot:" ++ show (map printElem list) )
         (Sorry reason, _         ) -> sorryNode reason cs
@@ -514,8 +514,27 @@ checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
             printElem (m,_) = m
             --cleanElem2 (m,(sys,_)) = (m, Nothing)
 
+            -- Old version
+            -- heuristicScore :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
+            --heuristicScore l = reverse [1..(length l)]
+
+            -- New version: closer to probabilistic
             heuristicScore :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
-            heuristicScore l = reverse [1..(length l)]
+            heuristicScore l = case scoreProba of
+              [] -> 1 : replicate (ll -1) 0
+              sp -> if lsp == ll then sp else sp++[last sp -1]++replicate (ll-lsp-1) 0
+
+              where
+                probaList = map computeProba l
+                usableProbaList = takeWhile (<1) probaList
+                totalProba = product usableProbaList
+                scoreProba = map (double2Int . (* totalProba)) usableProbaList
+                lsp = length scoreProba
+
+                ll = length l
+
+                computeProba (InLoop (_, _, it),_) = 1 / (2**(int2Double it+1))
+                computeProba _ = 1.0
 
             openCasesScoreMax :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
             openCasesScoreMax l = reverse $ foldl (\acc (_, (cases, _expl)) -> length (M.toList cases):acc) [] l
@@ -587,10 +606,12 @@ checkDiffProof :: DiffProofContext
            -> DiffProof (Maybe a, Maybe DiffSystem)
 checkDiffProof ctxt prover d sys prf@(LNode (DiffProofStep method info) cs) =
     chooseNext $ rankDiffProofMethods (useHeuristic heuristic d) [] ctxt sys
-  
+
   where
     heuristic = Heuristic [SmartRanking True]
-    chooseNext list = trace ("\nAbricot:" ++ show idx ++ "\nAbricot:"++ show thechosenone ++ "\nAbricot:"++ show list) $ case thechosenone of --trace ("\nAbricot:" ++ show idx ++ "\nAbricot:"++ show _info ++ "\nAbricot:"++ show infoTotal)
+    chooseNext list = case thechosenone of 
+      --trace ("\nAbricot:" ++ show idx ++ "\nAbricot:"++ show thechosenone ++ "\nAbricot:"++ show list)
+      --trace ("\nAbricot:" ++ show idx ++ "\nAbricot:"++ show _info ++ "\nAbricot:"++ show infoTotal)
         (DiffSorry reason, _         ) -> sorryNode reason cs
         (_               , Just cases) -> node method $ checkChildren cases
         (_               , Nothing   ) ->
@@ -621,6 +642,11 @@ checkDiffProof ctxt prover d sys prf@(LNode (DiffProofStep method info) cs) =
 
         ------------- Scoring functions -------------
 
+        -- Old version
+        --heuristicScore :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
+        --heuristicScore list = reverse [1..(length list)]
+
+        -- New version: closer to probabilistic
         heuristicScore :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
         heuristicScore list = reverse [1..(length list)]
 
@@ -1221,44 +1247,7 @@ proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContex
 proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
   where
 
-    --probabilistic
-    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []   -> node Solved M.empty sys
-          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
-      where
-        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
-        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
-            InLoop (depth,goal,iteration) -> checkForLoop suite (method0, (cases0, _expl0)) --if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
-            otherwise -> node method cases sys
-
-        drawRand :: Int -> Int
-        drawRand sup = unsafePerformIO $ do
-            g <- newStdGen
-            let (result, _) = randomR (0, sup) g
-            return result
-
-        chooseLoop :: Int -> Int -> Bool
-        chooseLoop depth iteration = rand <= threshold
-            where 
-                it = int2Double iteration
-                d = int2Double depth
-                rand = int2Double(drawRand(depth)) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
-                threshold = 1.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
-
-        incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
-        incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t) 
-        incrementIteration _ [] removeint removelist = error (show removeint++" "++(show $ length removelist)++" "++show removelist)
-        incrementIteration depth (h:t) removeint removelist = (h:incrementIteration (depth-1) t removeint removelist)
-
-        applyIteration :: Int -> System -> System
-        applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
-
-        node method cases _sys = 
-          LNode (ProofStep method _sys) (M.map (prove (succ depth)) cases)
-
-    {--Scoring
+    --Scoring
     --Attribute a score to each parameter and compute a probabilistic distribution based on it
 
     prove !depth sys =
@@ -1318,8 +1307,31 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
 
         ------------- Scoring functions -------------
 
+        --heuristicScore :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
+        --heuristicScore list = reverse [1..(length list)]
+
+        -- New version: closer to probabilistic
         heuristicScore :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
-        heuristicScore list = reverse [1..(length list)]
+        heuristicScore l = case scoreProba of
+          [] -> 1 : replicate (ll -1) 0
+          sp -> trace ("=========================" ++ show l ++ "\n" ++ (show $ gui sp)) gui sp
+
+          where
+            probaList = map computeIndivProba l
+            inLoopProbaList = takeWhile (<1) probaList
+            inverseProba = map (1 -) inLoopProbaList
+            productInverseProba = foldl (\acc x -> acc ++ [last acc * x]) [1] inverseProba
+            usableProbaList = zipWith (*) productInverseProba inLoopProbaList
+            totalProba = product usableProbaList
+            scoreProba = map (double2Int . (* totalProba)) usableProbaList
+            lsp = length scoreProba
+
+            ll = length l
+
+            computeIndivProba (InLoop (_, _, it),_) = 1 / (2**(int2Double it+1))
+            computeIndivProba _ = 1.0
+
+            gui sp = if lsp == ll then sp else sp++[last sp -1]++replicate (ll-lsp-1) 0
 
         openCasesScoreMax :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
         openCasesScoreMax list = reverse $ foldl (\acc (_, (cases, _expl)) -> (length $ M.toList cases):acc) [] list
@@ -1375,7 +1387,6 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
             trace (render $ prettyGeneratedTactic name $ filter (\(it,_) -> it>0) (L.get sPathGoals _sys)) raiseSignal killProcess
             --putStrLn $ render $ prettyGeneratedTactic name $ L.get sPathGoals _sys
             --raiseSignal killProcess
-  -}
 
     {-
     --NoOptFewCases
@@ -1672,15 +1683,15 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
     -- loops are not deprioritized
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []   -> node Solved M.empty
+          []   -> node Solved M.empty sys
           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
-        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
+        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = error "No more option" --node method0 cases0
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
             InLoop (depth,goal,iteration) -> checkForLoop suite (method0, (cases0, _expl0)) --if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
-            otherwise -> node method cases
+            otherwise -> node method cases sys
 
         drawRand :: Int -> Int
         drawRand sup = unsafePerformIO $ do
@@ -1690,22 +1701,22 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
 
         chooseLoop :: Int -> Int -> Bool
         chooseLoop depth iteration = rand <= threshold
-            where 
+            where
                 it = int2Double iteration
                 d = int2Double depth
-                rand = int2Double(drawRand(depth)) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
+                rand = int2Double (drawRand (depth)) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
                 threshold = 1.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
 
         incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
-        incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t) 
+        incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t)
         incrementIteration _ [] removeint removelist = error (show removeint++" "++(show $ length removelist)++" "++show removelist)
         incrementIteration depth (h:t) removeint removelist = (h:incrementIteration (depth-1) t removeint removelist)
 
         applyIteration :: Int -> System -> System
         applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
 
-        node method cases = 
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+        node method cases _sys =
+          LNode (ProofStep method _sys) (M.map (prove (succ depth)) cases)
 
     -}
 
