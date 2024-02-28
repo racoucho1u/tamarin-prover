@@ -768,8 +768,7 @@ internalTacticRanking tactic ctxt _sys ags0 = trace logMsg res
         ags = rankGoals ctxt defaultMethod [tactic] _sys ags0   -- get goals accordingly
         pgoal (g,(_nr,_usefulness)) = prettyGoal g
         inp = unlines
-                    (map (\(i,ag) -> show i ++": "++ (concat . lines . render $ pgoal ag))
-                         (zip [(0::Int)..] ags))
+                    (zipWith (\ i ag -> show i ++ ": " ++ (concat . lines . render $ pgoal ag)) [(0::Int)..] ags)
         res = itRanking tactic ags ctxt _sys                    -- apply the tactic ranking
         dict = M.fromList (zip ags [(0::Int)..])
         outp = map (fromMaybe (-1) . (`M.lookup` dict)) res
@@ -778,7 +777,7 @@ internalTacticRanking tactic ctxt _sys ags0 = trace logMsg res
                      ++ inp
                      ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> START OUTPUT\n"
                      ++ prettyOut
-                     ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Oracle call\n"
+                     ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Tactic call\n"
 
 -- | Utilities for SAPiC translations specifically 
 
