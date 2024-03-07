@@ -443,7 +443,7 @@ prettyClosedTheory thy = if containsManualRuleVariants mergedRules
     countOcc (ug,pbg) = map (\x -> (foldl (\acc y -> if x == y then acc+1 else acc) 0 pbg)) ug
 
     generateTactic :: String -> [[(Int,[Goal])]] -> Tactic ProofContext
-    generateTactic name l = trace name $ Tactic (name++"_generated")  (SmartRanking False) [] (map generateDeprio l)
+    generateTactic name l = Tactic (name++"_generated")  (SmartRanking False) [] (map generateDeprio l)
         where
             allGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
             allGoal (s:_) ((goal,(_,_)),_,_) = filteredParam == filteredGoal --trace ("Extract 1: "++filteredParam++"\nExtract 2: "++filteredGoal++"\nExtract 3: "++(show $ filteredParam == filteredGoal)) $ 

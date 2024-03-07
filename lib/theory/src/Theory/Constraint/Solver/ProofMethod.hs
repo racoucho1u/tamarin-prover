@@ -248,6 +248,7 @@ cleanGoal (ChainG (ni1, cidx) (ni2, pidx)) = ChainG (LVar (lvarName ni1) (lvarSo
 cleanGoal (PremiseG (ni, pidx) f) = PremiseG (LVar (lvarName ni) (lvarSort ni) 0, pidx) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
 cleanGoal (SplitG s) = SplitG s
 cleanGoal (DisjG (Disj g)) = DisjG (Disj (map removeCpt g))
+cleanGoal (SubtermG a) = SubtermG a --MOUAI
 
 -- @execMethod rules method se@ checks first if the @method@ is applicable to
 -- the sequent @se@. Then, it applies the @method@ to the sequent under the
@@ -332,7 +333,7 @@ execProofMethod ctxt method sys =
         updateSys _sys index it g = unsafePerformIO $ do
             let currentPathGoals = L.get sPathGoals _sys
                 sys2 = if _loop
-                  then L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,[cleanGoal g]):take (index-1) currentPathGoals++drop index currentPathGoals) _sys))
+                  then trace ("2: "++ show (cleanGoal g)) L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,[cleanGoal g]):take (index-1) currentPathGoals++drop index currentPathGoals) _sys))
                   else L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((0,[cleanGoal g]):currentPathGoals) _sys))
             return sys2
 
@@ -1270,8 +1271,8 @@ prettyDiffProofMethod method = case method of
     DiffBackwardSearchStep s -> keyword_ "step(" <-> prettyProofMethod s <-> keyword_ ")"
 
 prettyGeneratedTactic :: HighlightDocument d => String -> [(Int,[Goal])] -> d
-prettyGeneratedTactic _ []    = trace "nobody tell me nothing" emptyDoc
-prettyGeneratedTactic s goals = trace (show goals) kwTactic <> colon <> space <> text (s++"_generated")
+prettyGeneratedTactic _ []    = emptyDoc
+prettyGeneratedTactic s goals = kwTactic <> colon <> space <> text (s++"_generated")
     $-$ sep
         [ ppTabTab (map (map prettifyGoals) (splitPrios goals))
         , char '\n'

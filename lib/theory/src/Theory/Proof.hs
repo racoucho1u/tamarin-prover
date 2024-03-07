@@ -1272,7 +1272,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
     -- loops are not deprioritized
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []   -> node Solved M.empty sys
+          []   -> trace ("1: End of branch\n1: " ++ show (L.get sPathGoals sys)++ "\n2: End of branch") node Solved M.empty sys
           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
@@ -1291,12 +1291,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
             return result
 
         chooseLoop :: Int -> Int -> Bool
-        chooseLoop depth iteration = rand <= threshold
+        chooseLoop depth iteration = trace ("X: "++show (rand <= threshold)) rand <= threshold
             where
                 it = int2Double iteration
                 d = int2Double depth
                 rand = int2Double (drawRand depth) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
-                threshold = 1.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
+                threshold = 2.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
 
         incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
         incrementIteration 0 ((it,g):t) removeint removelist = (it+1,g):t
