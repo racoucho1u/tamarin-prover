@@ -17,11 +17,13 @@ module Theory.Text.Parser.Tactics (
 where
 
 import           Prelude                    hiding (id)
+import           Safe
 import           Control.Applicative        hiding (empty, many, optional)
 import qualified Data.Map                   as M
 import qualified Extension.Data.Label       as L
 import qualified Data.Set                   as S
 import           Data.List
+import           Data.Char
 
 import           Theory
 import           Theory.Constraint.Solver.AnnotatedGoals
@@ -125,6 +127,7 @@ tacticFunctions = M.fromList
                       , ("reasonableNoncesNoise",reasonableNoncesNoise)
                       , ("nonAbsurdGoal", nonAbsurdGoal)
                       , ("allGoal", allGoal)
+                      , ("ignoreN", ignoreN)
                       ]
   where
     regex' :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
@@ -134,6 +137,15 @@ tacticFunctions = M.fromList
         where
             pgoal (g,(_nr,_usefulness)) = prettyGoal g
             pg = concat . lines . render $ pgoal agoal
+
+    ignoreN :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
+    ignoreN n ((goal,_),_,sys) = case n of 
+            [i] -> trace ("I: "++show iteration++" "++show goal) iteration >= (read i :: Int)
+            _   -> error "ignoreN takes a int as parameter"
+        where
+            index = foundAt (cleanGoal goal) (map (map cleanGoal . snd) (L.get sPathGoals sys)) (length $ L.get sPathGoals sys)
+            iteration = if index > 0 then map fst (L.get sPathGoals sys) `at` (index-1) +1 else 0
+
 
     nonAbsurdGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
     nonAbsurdGoal param (goal,_,sys) = hasSafeNonces && isSubset
@@ -153,7 +165,7 @@ tacticFunctions = M.fromList
 
     dhreNoise :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
     dhreNoise param (goal,_,sys) = pg =~ goalPattern
-        where 
+        where
             pgoal (g,(_nr,_usefulness)) = prettyGoal g
             pg = concat . lines . render $ pgoal goal
 
@@ -164,7 +176,7 @@ tacticFunctions = M.fromList
 
     defaultNoise :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
     defaultNoise param (goal,_,sys) = or $ map ((flip elem) sysPattern) goalMatches
-        where 
+        where
             paramGoal = head param
             oracleType = head $ tail param
 
@@ -244,6 +256,7 @@ nameToFunction (s,param) = case M.lookup s tacticFunctions of
             "dhreNoise"             -> "match diffie-hellman (vacarme oracle)"
             "defaultNoise"          -> "match default facts (vacarme oracle)"
             "reasonableNoncesNoise" -> "match reasonable noncesNoise (vacarme oracle)"
+            "ignoreN"               -> "specify how many time"
             _                       -> ""
 
     listTacticFunction:: String

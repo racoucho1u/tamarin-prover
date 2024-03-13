@@ -151,7 +151,7 @@ instance (Traversable s) => Traversable (ProtoAtom s) where
     traverse f (Last i)        = Last <$> f i
     traverse f (Syntactic s)   = Syntactic <$> traverse f s
 
-instance (IsConst c, IsVar v) 
+instance (IsConst c, IsVar v)
         => Apply (Subst c v) (SyntacticSugar (VTerm c v))
     where
     apply subst (Pred fa) = Pred $ apply subst fa
@@ -211,19 +211,19 @@ toAtom (Less t t')    = Less t t'
 toAtom (Last t)       = Last t
 
 insideJobi :: VTerm Name LVar -> VTerm Name LVar
-insideJobi (FAPP (AC Union) ts) = (FAPP (AC Union) (map insideJobi $ nub $ sort ts))
-insideJobi (FAPP sym ts) = (FAPP sym (map insideJobi ts))
-insideJobi (LIT (Var v)) = (LIT (Var ( LVar (lvarName v) (lvarSort v) 0)))
-insideJobi (LIT (Con c)) = (LIT (Con c))
+insideJobi (FAPP (AC Union) ts) = FAPP (AC Union) (map insideJobi $ nub $ sort ts)
+insideJobi (FAPP sym ts) = FAPP sym (map insideJobi ts) --trace ("B: "++ show (map isPublicFunction ts)++ " "++show ts) 
+insideJobi (LIT (Var v)) = LIT (Var ( LVar (lvarName v) (lvarSort v) 0))
+insideJobi (LIT (Con c)) = LIT (Con c)
 
-insideJob :: (VTerm Name (BVar LVar)) -> (VTerm Name (BVar LVar))
-insideJob (FAPP (AC Union) ts) = (FAPP (AC Union) (map insideJob $ nub $ sort ts))
-insideJob (FAPP sym ts) = (FAPP sym (map insideJob ts))
-insideJob (LIT (Var (Free f))) = (LIT (Var (Free (LVar (lvarName f) (lvarSort f) 0))))
-insideJob (LIT (Var (Bound b))) = (LIT (Var (Bound b)))
-insideJob (LIT (Con c)) = (LIT (Con c))
+insideJob :: VTerm Name (BVar LVar) -> VTerm Name (BVar LVar)
+insideJob (FAPP (AC Union) ts) = FAPP (AC Union) (map insideJob $ nub $ sort ts)
+insideJob (FAPP sym ts) = FAPP sym (map insideJob ts)
+insideJob (LIT (Var (Free f))) = LIT (Var (Free (LVar (lvarName f) (lvarSort f) 0)))
+insideJob (LIT (Var (Bound b))) = LIT (Var (Bound b))
+insideJob (LIT (Con c)) = LIT (Con c)
 
- 
+
 changeBVarAtom :: Atom (VTerm Name (BVar LVar)) -> Atom (VTerm Name (BVar LVar))
 --manque un sous cas?
 changeBVarAtom (Action v (Fact t1 t2 t3)) = Action (insideJob v) (Fact t1 t2 (map insideJob t3)) -- remplace t3 par [] par def
@@ -231,12 +231,13 @@ changeBVarAtom (Less t1 t2) = Less (insideJob t1) (insideJob t2)
 changeBVarAtom (EqE  t1 t2) = EqE (insideJob t1) (insideJob t2)
 changeBVarAtom (Last t) = Last (insideJob t)
 changeBVarAtom (Syntactic fa) = Syntactic fa
+changeBVarAtom (Subterm s sub) = Subterm s sub
 
 ------------------------------------------------------------------------------
 -- Pretty-Printing
 ------------------------------------------------------------------------------
 
-prettyProtoAtom :: (Show v, HighlightDocument d) => 
+prettyProtoAtom :: (Show v, HighlightDocument d) =>
                  (s v -> d)  --  Function for pretty printing syntactic sugar
               -> (v -> d)  --  Function for pretty printing terms / variables
               -> ProtoAtom s v -> d
@@ -250,7 +251,7 @@ prettyProtoAtom _ ppT (Subterm l r) = sep [ppT l <-> opSubterm, ppT r]
 prettyProtoAtom _ _ (Less u v) = text (show u) <-> opLess <-> text (show v)
 prettyProtoAtom _ _ (Last i)   = operator_ "last" <> parens (text (show i))
 
-prettyAtom :: (Show v, HighlightDocument d) => 
+prettyAtom :: (Show v, HighlightDocument d) =>
               (v -> d)  --  Function for pretty printing terms / variables
               -> Atom v -> d
 prettyAtom = prettyProtoAtom (const emptyDoc)

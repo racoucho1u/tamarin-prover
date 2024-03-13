@@ -22,6 +22,7 @@ module Theory.Constraint.Solver.ProofMethod (
   , execDiffProofMethod
 
   , cleanGoal
+  , foundAt
 
   -- ** Heuristics
   , rankProofMethods
@@ -241,6 +242,9 @@ instance HasFrees DiffProofMethod where
 
 -- Proof method execution
 -------------------------
+foundAt :: Goal -> [[Goal]] -> Int -> Int
+foundAt _ [] l   = 0 - l
+foundAt g (h:t) l = if g `elem` h then 1 else 1 + foundAt g t l
 
 cleanGoal :: Goal -> Goal
 cleanGoal (ActionG v f) = ActionG (setLVarIdx 0 v) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
@@ -301,15 +305,11 @@ execProofMethod ctxt method sys =
                return $ M.fromList (zip (map show [(1::Int)..]) syss)
       where check sys' = cleanupSystem sys /= sys'
 
-    foundAt :: Goal -> [[Goal]] -> Int -> Int
-    foundAt _ [] l   = 0 - l
-    foundAt g (h:t) l = if g `elem` h then 1 else 1 + foundAt g t l
-
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
     checkForLoop goal s = execSolveGoal goal l index iteration
         where
             index = foundAt (cleanGoal goal) (map (map cleanGoal . snd) (L.get sPathGoals s)) (length $ L.get sPathGoals s)
-            (iteration, l) = if index > 0 then (map fst (L.get sPathGoals s) `at` (index-1) +1, True) else (0,False)
+            (iteration, l) = if index > 0 then (map fst (L.get sPathGoals s) `at` (index-1) +1, True) else (0,False) --
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
@@ -333,7 +333,8 @@ execProofMethod ctxt method sys =
         updateSys _sys index it g = unsafePerformIO $ do
             let currentPathGoals = L.get sPathGoals _sys
                 sys2 = if _loop
-                  then trace ("2: "++ show (cleanGoal g)) L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,[cleanGoal g]):take (index-1) currentPathGoals++drop index currentPathGoals) _sys))
+                  --then trace ("2: "++ show (cleanGoal g))
+                  then L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,[cleanGoal g]):take (index-1) currentPathGoals++drop index currentPathGoals) _sys))
                   else L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((0,[cleanGoal g]):currentPathGoals) _sys))
             return sys2
 
@@ -762,7 +763,7 @@ itRanking tactic ags ctxt _sys = result
 -- | A ranking function using a tactic to allow user-definable heuristics
 --   for each lemma separately, using the user chosen defaultMethod heuristic
 --   as the baseline.
-internalTacticRanking :: Tactic ProofContext -> ProofContext -> System -> [AnnotatedGoal] -> [AnnotatedGoal]
+internalTacticRanking :: Tactic ProofContext -> ProofContext -> System ->  [AnnotatedGoal] -> [AnnotatedGoal]
 internalTacticRanking tactic ctxt _sys ags0 = trace logMsg res
     where
         defaultMethod =  _presort tactic                        -- retrieve baseline heuristic 
