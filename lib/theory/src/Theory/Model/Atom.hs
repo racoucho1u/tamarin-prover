@@ -53,7 +53,11 @@ module Theory.Model.Atom(
   , prettySyntacticNAtom
 
   , changeBVarAtom
+  , goalVars
+  , goalConsts
   , insideJobi
+  , functionSymbol
+  , firstFunctionSymbol
 
   )
 where
@@ -67,6 +71,7 @@ import           Data.Binary
 -- import           Data.Foldable      (Foldable, foldMap)
 import           Data.Data
 import           Data.List
+import qualified Data.MultiSet as M
 -- import           Data.Monoid        (mappend, mempty)
 -- import           Data.Traversable
 
@@ -76,6 +81,7 @@ import           Theory.Model.Fact
 import           Theory.Text.Pretty
 
 import Debug.Trace
+import qualified System.Posix as M
 ------------------------------------------------------------------------------
 -- Atoms
 ------------------------------------------------------------------------------
@@ -210,16 +216,33 @@ toAtom (Subterm t t') = Subterm t t'
 toAtom (Less t t')    = Less t t'
 toAtom (Last t)       = Last t
 
+functionSymbol :: VTerm Name LVar -> M.MultiSet FunSym
+--functionSymbol (FAPP sym [ts]) = M.insert sym $ M.insert ts $ M.empty
+functionSymbol (FAPP sym ts)= M.insert sym $ M.unions (map functionSymbol ts)
+functionSymbol _ = M.empty
+
+firstFunctionSymbol ::  VTerm Name LVar -> Maybe FunSym
+firstFunctionSymbol (FAPP sym _)= Just sym
+firstFunctionSymbol _ = Nothing
+
+goalVars :: VTerm Name LVar -> M.MultiSet LVar
+goalVars (FAPP _ (ts:t)) =  M.union (M.unions $ map M.singleton $ varsVTerm $ insideJobi ts) $ M.unions (map goalVars t)
+goalVars _ = M.empty
+
+goalConsts :: VTerm Name LVar -> M.MultiSet Name
+goalConsts (FAPP _ (ts:t)) =  M.union (M.unions $ map M.singleton $ constsVTerm $ insideJobi ts) $ M.unions (map goalConsts t)
+goalConsts _ = M.empty
+
 insideJobi :: VTerm Name LVar -> VTerm Name LVar
 insideJobi (FAPP (AC Union) ts) = FAPP (AC Union) (map insideJobi $ nub $ sort ts)
-insideJobi (FAPP sym ts) = FAPP sym (map insideJobi ts) --trace ("B: "++ show (map isPublicFunction ts)++ " "++show ts) 
-insideJobi (LIT (Var v)) = LIT (Var ( LVar (lvarName v) (lvarSort v) 0))
+insideJobi (FAPP sym ts) = FAPP sym (map insideJobi ts)
+insideJobi (LIT (Var v)) = LIT (Var ( LVar (lvarName v) LSortPub 0))
 insideJobi (LIT (Con c)) = LIT (Con c)
 
 insideJob :: VTerm Name (BVar LVar) -> VTerm Name (BVar LVar)
 insideJob (FAPP (AC Union) ts) = FAPP (AC Union) (map insideJob $ nub $ sort ts)
 insideJob (FAPP sym ts) = FAPP sym (map insideJob ts)
-insideJob (LIT (Var (Free f))) = LIT (Var (Free (LVar (lvarName f) (lvarSort f) 0)))
+insideJob (LIT (Var (Free f))) = LIT (Var (Free (LVar (lvarName f) LSortPub 0)))
 insideJob (LIT (Var (Bound b))) = LIT (Var (Bound b))
 insideJob (LIT (Con c)) = LIT (Con c)
 

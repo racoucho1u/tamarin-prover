@@ -39,6 +39,7 @@ import           Theory.Text.Pretty
 import OpenTheory
 import Pretty
 import Debug.Trace
+import Utils.Misc (fst3, thd3, snd4, fth4)
 
 ------------------------------------------------------------------------------
 -- Closed theory querying / construction / modification
@@ -409,12 +410,12 @@ prettyClosedTheory thy = if containsManualRuleVariants mergedRules
 
     lemmaNames = extractName (L.get thyItems thy)
     lemmasPathGoals = map (concat . retrievePathGoals . getThroughTree) $ extractProof (L.get thyItems thy)
-    pbGoals = fmap (map (map cleanGoal . snd) . sortOn fst . filter (\(it,_) -> it>0)) lemmasPathGoals
+    pbGoals = fmap (map (map cleanGoal . fth4) . sortOn snd4 . filter (\(_,it,_,_) -> it>0)) lemmasPathGoals
     uniquePbGoals = map nub pbGoals
     uniqueGoalsOccurences = zipWith (curry countOcc) uniquePbGoals pbGoals
     prepareTactics = fmap (splitPrios . sortOn fst) $ fmap zip uniqueGoalsOccurences <*> uniquePbGoals
 
-    goodGoals = fmap (map (map cleanGoal . snd) . sortOn fst . filter (\(it,_) -> it == 0)) lemmasPathGoals
+    goodGoals = fmap (map (map cleanGoal . fth4) . sortOn snd4 . filter (\(_,it,_,_) -> it == 0)) lemmasPathGoals
     uniqueGoodGoals = map nub goodGoals
     uniqueGoodGoalsOccurences = zipWith (curry countOcc) uniqueGoodGoals pbGoals
 
@@ -518,7 +519,7 @@ prettyClosedDiffTheory thy = if containsManualRuleVariantsDiff mergedRules --tra
 
     lemmasNames = extractName (L.get diffThyItems thy)
     lemmasPathGoals = map (concat . retrievePathGoals . getThroughTree) $ extractProof (L.get diffThyItems thy)
-    pbGoals = fmap (map (map cleanGoal . snd) . sortOn fst . filter (\(it,_) -> it>0)) lemmasPathGoals
+    pbGoals = fmap (map (map cleanGoal . fth4) . sortOn snd4 . filter (\(_,it,_,_) -> it>0)) lemmasPathGoals
     uniquePbGoals = map nub pbGoals
     uniqueGoalsOccurences = zipWith (curry countOcc) uniquePbGoals pbGoals
     prepareTactics = fmap (splitPrios . sortOn fst) $ (fmap zip uniqueGoalsOccurences) <*> uniquePbGoals
@@ -526,7 +527,7 @@ prettyClosedDiffTheory thy = if containsManualRuleVariantsDiff mergedRules --tra
 
     lemmasDiffNames = extractNameDiff (L.get diffThyItems thy)
     lemmasDiffPathGoals = map (concat . retrievePathGoals . getThroughDiffTree) $ extractProofDiff (L.get diffThyItems thy) --map (concat . retrievePathGoals . getThroughTree) $ 
-    diffPbGoals = fmap (map (map cleanGoal . snd) . (sortOn fst) . filter (\(it,_) -> it>0)) lemmasDiffPathGoals
+    diffPbGoals = fmap (map (map cleanGoal . fth4) . (sortOn snd4) . filter (\(_,it,_,_) -> it>0)) lemmasDiffPathGoals
     uniqueDiffPbGoals = map nub diffPbGoals
     uniqueDiffGoalsOccurences = zipWith (curry countOcc) uniqueDiffPbGoals diffPbGoals
     prepareDiffTactics = fmap (splitPrios . sortOn fst) $ (fmap zip uniqueDiffGoalsOccurences) <*> uniqueDiffPbGoals
@@ -554,17 +555,12 @@ prettyClosedDiffTheory thy = if containsManualRuleVariantsDiff mergedRules --tra
         l  -> fmap (L.get sPathGoals) (psInfo ps) : concatMap (getThroughTree . snd) l
 
     extractPathDiffSys Nothing = []
-    extractPathDiffSys (Just sys) = [] --L.get sPathGoals sys
+    extractPathDiffSys (Just sys) = L.get sPathGoals sys
 
     --getThroughDiffTree :: LTree a (DiffProofStep (f System)) -> [[Goal]]
     getThroughDiffTree (LNode dps cs) = case (M.toList cs) of
         [] -> [(extractPathDiffSys . L.get dsSystem) <$> dpsInfo dps] --fromMaybe []
         l  -> fmap (extractPathDiffSys . L.get dsSystem) (dpsInfo dps) : concatMap (getThroughDiffTree . snd) l
-
-    --getThroughDiffTree :: LTree a (DiffProofStep (f System)) -> [[Goal]]
-    -- getThroughDiffTree (LNode dps cs) = case (M.toList cs) of
-    --     [] -> [fmap (L.get sPathGoals) $ dpsInfo dps]
-    --     l  -> trace ("non"++(show $ dpsInfo dps)) [] --trace (show l) [] --[dpsInfo dps]++(concat $ map getThroughTree (map snd l))
 
     retrievePathGoals [] = []
     retrievePathGoals (Nothing:t) = retrievePathGoals t

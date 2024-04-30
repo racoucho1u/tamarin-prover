@@ -295,7 +295,6 @@ import           Utils.Misc
 
 import           System.FilePath
 import           Text.Show.Functions()
-import           Debug.Trace
 
 
 
@@ -395,8 +394,8 @@ data System = System
     , _sSolvedFormulas :: S.Set LNGuarded
     , _sLemmas         :: S.Set LNGuarded
     , _sGoals          :: M.Map Goal GoalStatus
-    , _sPathGoals      :: [(Int,[Goal])]
-    , _sNbLoop         :: (Int, Int)
+    , _sPathGoals      :: [(Int,Int,Int,[Goal])]                --(gravityScore,iteration,depth,rewritting of the goal)
+    , _sNbLoop         :: (Int, Int, Int)
     , _sLoopFound      :: Bool
     , _sNextGoalNr     :: Integer
     , _sSourceKind     :: SourceKind
@@ -526,7 +525,7 @@ data GoalRanking a =
   deriving (Eq, Ord, Show, Generic, NFData, Binary  )
 
 newtype Heuristic a = Heuristic [GoalRanking a]
-    deriving (Eq, Ord, Show, Generic, NFData, Binary  )
+    deriving (Eq, Ord, Show, Generic, NFData, Binary )
 
 -- Default rankings for normal and diff mode.
 defaultRankings :: Bool -> [GoalRanking ProofContext]
@@ -810,7 +809,7 @@ emptySystem :: SourceKind -> Bool -> System
 emptySystem d isdiff = System
     M.empty S.empty S.empty Nothing emptySubtermStore emptyEqStore
     S.empty S.empty S.empty
-    M.empty [] (0,0) False 0 d isdiff
+    M.empty [] (0,0,0) False 0 d isdiff
 
 -- | The empty diff constraint system.
 emptyDiffSystem :: DiffSystem

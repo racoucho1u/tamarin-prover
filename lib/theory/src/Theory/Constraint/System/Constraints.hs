@@ -59,7 +59,6 @@ import           Theory.Model
 import           Theory.Text.Pretty
 import           Theory.Tools.EquationStore
 
-import          Debug.Trace
 
 ------------------------------------------------------------------------------
 -- Graph part of a sequent                                                  --

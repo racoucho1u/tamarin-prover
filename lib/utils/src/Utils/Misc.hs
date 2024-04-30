@@ -37,6 +37,12 @@ module Utils.Misc (
   , snd3
   , thd3
 
+  -- * quadruples
+  , fst4
+  , snd4
+  , thd4
+  , fth4
+
   -- * uncurry
   , uncurry3
 
@@ -72,6 +78,22 @@ snd3 (_, x, _) = x
 -- | @thd3 (x, y, z)@ returns the third element @z@ of the triple
 thd3 :: (a, b, c) -> c
 thd3 (_, _, x) = x
+
+-- | @fst4 (w, x, y, z)@ returns the first element @w@ of the quadruple
+fst4 :: (a, b, c, d) -> a
+fst4 (x, _, _, _) = x
+
+-- | @snd4 (w, x, y, z)@ returns the second element @x@ of the triple
+snd4 :: (a, b, c, d) -> b
+snd4 (_, x, _, _) = x
+
+-- | @thd4 (w, x, y, z)@ returns the third element @y@ of the triple
+thd4 :: (a, b, c, d) -> c
+thd4 (_, _, x, _) = x
+
+-- | @fth4 (w, x, y, z)@ returns the third element @y@ of the triple
+fth4 :: (a, b, c, d) -> d
+fth4 (_, _, _, x) = x
 
 -- | @uncurry3 f (a,b,c)@ uncurry a function which has three param
 uncurry3 :: (a -> b -> c -> d) -> (a, b, c) -> d

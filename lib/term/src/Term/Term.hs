@@ -39,6 +39,7 @@ module Term.Term (
     , isUnion
     , isEMap
     , isNullaryPublicFunction
+    , isPublicFunction
     , isPrivateFunction
     , isAC
     , getLeftTerm
@@ -196,6 +197,11 @@ isUnion _                       = False
 isNullaryPublicFunction :: Term a -> Bool
 isNullaryPublicFunction (viewTerm -> FApp (NoEq (_, (0, Public,_))) _) = True
 isNullaryPublicFunction _                                            = False
+
+-- | 'True' iff the term is a nullary, public function.
+isPublicFunction :: Term a -> Bool
+isPublicFunction (viewTerm -> FApp (NoEq (_, (_, Public,_))) _) = True
+isPublicFunction _                                            = False
 
 isPrivateFunction :: Term a -> Bool
 isPrivateFunction (viewTerm -> FApp (NoEq (_, (_,Private,_))) _) = True

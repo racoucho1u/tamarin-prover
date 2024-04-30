@@ -507,7 +507,7 @@ checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
             idx = fromMaybe (-1) $ elemIndex thechosenone $ map cleanElem list
             --idx2 = fromMaybe (-1) $ elemIndex thechosenone $ map cleanElem2 list
 
-            cleanElem (InLoop (_d, m, i),(_sys,_)) = (SolveGoal m, Just _sys)
+            cleanElem (InLoop (s, _d, m, i),(_sys,_)) = (SolveGoal m, Just _sys)
             cleanElem (Contradiction (Just _),(_sys,_)) = (Contradiction Nothing, Just _sys)
             cleanElem (m,(_sys,_)) = (m, Just _sys)
 
@@ -533,7 +533,7 @@ checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
 
                 ll = length l
 
-                computeProba (InLoop (_, _, it),_) = 1 / (2**(int2Double it+1))
+                computeProba (InLoop (_, _, _, it),_) = 1 / (2**(int2Double it+1))
                 computeProba _ = 1.0
 
             openCasesScoreMax :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
@@ -555,8 +555,8 @@ checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
                     computeIt (Just it) = it
                     computeIt Nothing = maxIt
 
-                    retrieveIt (method, (_,_)) = case method of
-                        InLoop (_,_,iteration) -> Just iteration
+                    retrieveIt (meth, (_,_)) = case meth of
+                        InLoop (_,_,_,iteration) -> Just iteration
                         _ -> Nothing
 
             depthScoreMax :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
@@ -566,11 +566,11 @@ checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
                     maxD = 2 * fromMaybe 0 (maximum dScoreList)
 
                     computeDepth :: Maybe Int -> Int
-                    computeDepth (Just d) = d
+                    computeDepth (Just dpth) = dpth
                     computeDepth Nothing = maxD
 
-                    retrieveDepth (method, (_, _)) = case method of
-                        InLoop (d,_,_) -> Just d
+                    retrieveDepth (meth, (_, _)) = case meth of
+                        InLoop (_,dpth,_,_) -> Just dpth
                         _ -> Nothing
 
             depthScoreMin :: [(ProofMethod, (M.Map CaseName System, String))] -> [Int]
@@ -579,8 +579,8 @@ checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
                     dList = map dScore l
                     maxDepth = maximum dList
 
-                    dScore (method, (_, _)) = case method of
-                        InLoop (d,_,_) -> d
+                    dScore (meth, (_, _)) = case meth of
+                        InLoop (_,dpth,_,_) -> dpth
                         _ -> 0
 
     node m                 = LNode (ProofStep m (Just info, Just sys))
@@ -664,57 +664,57 @@ checkDiffProof ctxt prover d sys prf@(LNode (DiffProofStep method info) cs) =
 
             ll = length l
 
-            computeIndivProba (method, (_,_)) = case method of
-                    DiffBackwardSearchStep (InLoop (_,_,iteration)) -> Just $ 1 / (2**(int2Double iteration+1))
+            computeIndivProba (meth, (_,_)) = case meth of
+                    DiffBackwardSearchStep (InLoop (_,_,_,iteration)) -> Just $ 1 / (2**(int2Double iteration+1))
                     _ -> Nothing
 
             gui sp = if lsp == ll then sp else sp++[last sp -1]++replicate (ll-lsp-1) 0
 
         openCasesScoreMax :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
-        openCasesScoreMax list = reverse $ foldl (\acc (_, (cases, _expl)) -> length (M.toList cases):acc) [] list
+        openCasesScoreMax _list = reverse $ foldl (\acc (_, (cases, _expl)) -> length (M.toList cases):acc) [] _list
 
         openCasesScoreMin :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
-        openCasesScoreMin list = reverse $ map (maxLength -) casesLength
+        openCasesScoreMin _list = reverse $ map (maxLength -) casesLength
             where
-                casesLength = foldl (\acc (_, (cases, _expl)) -> length (M.toList cases):acc) [] list
+                casesLength = foldl (\acc (_, (cases, _expl)) -> length (M.toList cases):acc) [] _list
                 maxLength   = maximum casesLength
 
         iterationScore :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
-        iterationScore list = map computeIt itScoreList
+        iterationScore _list = map computeIt itScoreList
             where
-                itScoreList = map retrieveIt list
+                itScoreList = map retrieveIt _list
                 maxIt = 2 + fromMaybe 0 (maximum itScoreList)
 
                 computeIt :: Maybe Int -> Int
                 computeIt (Just it) = it
                 computeIt Nothing = maxIt
 
-                retrieveIt (method, (_,_)) = case method of
-                    DiffBackwardSearchStep (InLoop (_,_,iteration)) -> Just iteration
+                retrieveIt (meth, (_,_)) = case meth of
+                    DiffBackwardSearchStep (InLoop (_,_,_,iteration)) -> Just iteration
                     _ -> Nothing
 
         depthScoreMax :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
-        depthScoreMax list = map computeDepth dScoreList
+        depthScoreMax _list = map computeDepth dScoreList
             where
-                dScoreList = map retrieveDepth list
+                dScoreList = map retrieveDepth _list
                 maxD = 2 + fromMaybe 0 (maximum dScoreList)
 
                 computeDepth :: Maybe Int -> Int
-                computeDepth (Just d) = d
+                computeDepth (Just dpth) = dpth
                 computeDepth Nothing = maxD
 
-                retrieveDepth (method, (_, _)) = case method of
-                    DiffBackwardSearchStep (InLoop (d,_,_)) -> Just d
+                retrieveDepth (meth, (_, _)) = case meth of
+                    DiffBackwardSearchStep (InLoop (_,dpth,_,_)) -> Just dpth
                     _ -> Nothing
 
         depthScoreMin :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> [Int]
-        depthScoreMin list = map (maxDepth -) dList
+        depthScoreMin _list = map (maxDepth -) dList
             where
-                dList = map dScore list
+                dList = map dScore _list
                 maxDepth = maximum dList
 
-                dScore (method, (_, _)) = case method of
-                    DiffBackwardSearchStep (InLoop (d,_,_)) -> d
+                dScore (meth, (_, _)) = case meth of
+                    DiffBackwardSearchStep (InLoop (_,dpth,_,_)) -> dpth
                     _ -> 0
 
 
@@ -996,7 +996,7 @@ selectDiffTactic prover ctx = fromMaybe [defaultTactic]
 
 runAutoProver :: AutoProver -> Prover
 runAutoProver aut@(AutoProver _ _  bound cut) =
-    mapProverProof cutSolved $ maybe id boundProver bound autoProver
+    mapProverProof cutSolved $ maybe id boundProver bound autoProver -- (Just 15)
   where
     cutSolved = case cut of
       CutDFS             -> cutOnSolvedDFS
@@ -1010,7 +1010,7 @@ runAutoProver aut@(AutoProver _ _  bound cut) =
     autoProver = Prover $ \ctxt depth sys _ ->
         return $ fmap (fmap Just)
                $ annotateWithSystems ctxt sys
-               $ proveSystemDFS (selectHeuristic aut ctxt) (selectTactic aut ctxt) ctxt depth sys
+               $ proveSystemDFS (selectHeuristic aut ctxt) (selectTactic aut ctxt) ctxt depth sys 
 
     -- | Bound the depth of proofs generated by the given prover.
     boundProver :: Int -> Prover -> Prover
@@ -1272,20 +1272,28 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
     -- loops are not deprioritized
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []   -> trace ("1: End of branch\n" ++exportTactic (L.get sPathGoals sys)++ "\n2: End of branch") node Solved M.empty sys
-          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+          []   -> node Solved M.empty sys
+          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl)) -- if depth < 15 then  else avoidLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
         exportTactic :: [(Int,[Goal])] -> String
         exportTactic [] = ""
         exportTactic ((_,lg):t) = cg ++ exportTactic t
           where
-            cg = concatMap (("\n1: "++) . show . cleanGoal) lg
+            cg = concatMap (("\n1: "++) . show . cleanGoal) lg --if i > 0 then concatMap (("\n1: "++) . show . cleanGoal) lg else ""
 
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            InLoop (d,goal,iteration) -> trace ("2: "++ show (cleanGoal goal)) $ if chooseLoop depth iteration then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration d) cases) sys else checkForLoop suite (method0, (cases0, _expl0))
+            InLoop (s,d,goal,iteration) -> if chooseLoop s d iteration (length $ L.get sPathGoals sys) then node (InLoop (s,d,goal,iteration)) (M.map (applyIteration d) cases) sys else checkForLoop suite (method0, (cases0, _expl0))
+            --InLoop (d,goal,iteration) -> if chooseLoop d iteration then node (InLoop (d,goal,iteration+1)) cases sys else checkForLoop suite (method0, (cases0, _expl0))
+            _ -> node method cases sys
+
+        avoidLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        avoidLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
+        avoidLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
+            InLoop (s,d,goal,iteration) -> checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases sys
 
         drawRand :: Int -> Int
@@ -1296,38 +1304,43 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
             let (result, _) = randomR (0, sup) g
             return result
 
-        chooseLoop :: Int -> Int -> Bool
-        chooseLoop depth iteration = trace ("X: "++show (rand <= threshold)) rand <= threshold
+        chooseLoop :: Int -> Int -> Int -> Int -> Bool
+        chooseLoop score _depth iteration maxd = rand <= threshold
             where
+                coeff = int2Double score / 10
                 it = int2Double iteration
-                d = int2Double depth
-                rand = int2Double (drawRand depth) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
-                threshold = 2.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
+                d = int2Double _depth
+                md = int2Double maxd
+                rand = int2Double (drawRand _depth) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
+                threshold = coeff/(2**(it+(md - d))) --1.0/(2.0**((it+1)/d))
 
-        incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
-        incrementIteration 0 ((it,g):t) _ _ = (it+1,g):t
-        incrementIteration _ [] removeint removelist = error (show removeint++" "++show (length removelist)++" "++show removelist)
-        incrementIteration depth (h:t) removeint removelist = h:incrementIteration (depth-1) t removeint removelist
+        incrementIteration :: Int -> [(Int,Int,Int,[Goal])] -> Int -> [(Int,Int,Int,[Goal])] -> [(Int,Int,Int,[Goal])]
+        incrementIteration 0 ((s,it,d,g):t) _ _ = (s,it+1,d,g):t
+        incrementIteration _ [] removeint removelist = error (show removeint++" "++show (length removelist)++"\n"++show removelist)
+        incrementIteration _depth (h:t) removeint removelist = h:incrementIteration (_depth-1) t removeint removelist
 
         applyIteration :: Int -> System -> System
-        applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
+        applyIteration idx _sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals _sys) idx (L.get sPathGoals _sys)) _sys
 
         handler :: String -> System -> IO()
         handler name _sys = do
             --putStrLn $ "I have caught a sig: "++show (L.get sPathGoals sys)++"!"
-            trace (render $ prettyGeneratedTactic name $ filter (\(it,_) -> it>0) (L.get sPathGoals _sys)) raiseSignal killProcess
+            trace (render $ prettyGeneratedTactic name $ filter (\(_,it,_,_) -> it>0) (L.get sPathGoals _sys)) raiseSignal killProcess
             --putStrLn $ render $ prettyGeneratedTactic name $ L.get sPathGoals _sys
             --raiseSignal killProcess
 
-        node method cases _sys =
-          LNode (ProofStep method _sys) (M.map (prove (succ depth)) cases)
+        node method cases _sys = LNode (ProofStep method _sys) (M.map (prove (succ depth)) cases)
+        --trace ("Node: "++show method++"\nPproofmethod: "++render (prettyProofMethod method))
+        --trace ("Node: "++show (length $ L.get sPathGoals _sys)++": "++show method++"\nPproofmethod: "++render (prettyProofMethod method)++"\n9: "++show depth++" "++show (length cases))
+
+        
 
     {--Scoring
     --Attribute a score to each parameter and compute a probabilistic distribution based on it
 
     prove !depth sys =
         -- appendFile "exportTactic" "New branch new me\n"
-        case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+        case  s (useHeuristic heuristic depth) tactics ctxt sys of
           []   -> trace ("end of branch\n" ++ (render $ prettyGeneratedTactic (L.get pcLemmaName ctxt) $ filter (\(it,_) -> it>0) (L.get sPathGoals sys))) node Solved M.empty sys
           list -> chooseNext list sys
       where
@@ -1822,8 +1835,8 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            DiffBackwardSearchStep (InLoop (depth,goal,iteration)) -> if chooseLoop depth iteration then node (DiffBackwardSearchStep (InLoop (depth,goal,iteration))) (M.map (applyIteration depth) cases) sys else checkForLoop suite (method0, (cases0, _expl0))
-            otherwise -> node method cases sys
+            DiffBackwardSearchStep (InLoop (score,_dpth,goal,iteration)) -> if chooseLoop _dpth iteration then node (DiffBackwardSearchStep (InLoop (score,_dpth,goal,iteration))) (M.map (applyIteration _dpth) cases) sys else checkForLoop suite (method0, (cases0, _expl0))
+            _ -> node method cases sys
 
         drawRand :: Int -> Int
         drawRand sup = unsafePerformIO $ do
@@ -1835,17 +1848,18 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
             return result
 
         chooseLoop :: Int -> Int -> Bool
-        chooseLoop depth iteration = rand <= threshold
+        chooseLoop _depth iteration = rand <= threshold
             where
                 it = int2Double iteration
-                d = int2Double depth
-                rand = int2Double (drawRand depth) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
+                d = int2Double _depth
+                rand = int2Double (drawRand _depth) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
                 threshold = 1.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
 
-        incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
-        incrementIteration 0 ((it,g):t) removeint removelist = (it+1,g):t
+        incrementIteration :: Int -> [(Int,Int,Int,[Goal])] -> Int -> [(Int,Int,Int,[Goal])] -> [(Int,Int,Int,[Goal])]
+        incrementIteration 0 ((s,it,d,g):t) _ _ = (s,it+1,d,g):t
         incrementIteration _ [] removeint removelist = error (show removeint++" "++show (length removelist)++" "++show removelist)
-        incrementIteration depth (h:t) removeint removelist = h:incrementIteration (depth-1) t removeint removelist
+        incrementIteration d (h:t) removeint removelist = h:incrementIteration (d-1) t removeint removelist
+        
 
         applyIteration :: Int -> DiffSystem -> DiffSystem
         applyIteration idx dsys = L.set dsSystem ssys dsys
@@ -1857,12 +1871,12 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
         handler name _sys = do
             --putStrLn $ "I have caught a sig: "++show (L.get sPathGoals sys)++"!"
             let goalList = maybe [] (L.get sPathGoals) (L.get dsSystem _sys)
-            trace (render $ prettyGeneratedTactic name $ filter (\(it,_) -> it>0) goalList) raiseSignal killProcess
+            trace (render $ prettyGeneratedTactic name $ filter (\(_,it,_,_) -> it>0) goalList) raiseSignal killProcess
             --putStrLn $ render $ prettyGeneratedTactic name $ L.get sPathGoals _sys
             --raiseSignal killProcess
 
-        node method cases sys =
-          LNode (DiffProofStep method sys) (M.map (prove (succ depth)) cases)
+        node method cases _sys =
+          LNode (DiffProofStep method _sys) (M.map (prove (succ depth)) cases)
 
     {--Scoring
     --Attribute a score to each parameter and compute a probabilistic distribution based on it

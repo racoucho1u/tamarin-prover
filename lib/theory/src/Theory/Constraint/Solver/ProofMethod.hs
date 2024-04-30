@@ -23,6 +23,9 @@ module Theory.Constraint.Solver.ProofMethod (
 
   , cleanGoal
   , foundAt
+  , functionSymGoal
+  , foundAtMultiSet
+  , customComparison
 
   -- ** Heuristics
   , rankProofMethods
@@ -46,6 +49,7 @@ import           Data.Label                                hiding (get)
 import qualified Data.Label                                as L
 import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate) --elem
 import qualified Data.Map                                  as M
+import qualified Data.MultiSet                             as MS
 import           Data.Maybe                                (catMaybes, fromMaybe, fromJust)
 -- import           Data.Monoid
 import           Data.Ord                                  (comparing)
@@ -53,7 +57,8 @@ import qualified Data.Set                                  as S
 import           Extension.Prelude                         (sortOn)
 import qualified Data.ByteString.Char8 as BC
 
-import           Control.Basics
+import Control.Basics
+    ( guard, Arrow(second), Alternative((<|>)), MonadPlus(mzero) )
 import           Control.DeepSeq
 import qualified Control.Monad.Trans.PreciseFresh          as Precise
 
@@ -74,6 +79,11 @@ import           Theory.Constraint.Solver.Simplify
 import           Theory.Constraint.System
 import           Theory.Model
 import           Theory.Text.Pretty
+import GHC.ExecutionStack (Location(functionName))
+import qualified Control.Applicative as MU
+import Utils.Misc (snd3, fst3, thd3, snd4, fth4)
+import Data.Aeson (Value(Bool))
+import qualified Data.Bifunctor
 
 --import           Text.Regex.PCRE
 
@@ -199,7 +209,7 @@ data ProofMethod =
   | Solved                               -- ^ An attack was found.
   | Unfinishable                         -- ^ The proof cannot be finished (due to reducible operators in subterms)
   | Simplify                             -- ^ A simplification step.
-  | InLoop (Int, Goal, Int)              -- ^ A goal that has been detected as part as a loop (depth of the loop, goal, nb of time through the loop)
+  | InLoop (Int, Int, Goal, Int)              -- ^ A goal that has been detected as part as a loop (depth of the loop, goal, nb of time through the loop)
   | SolveGoal Goal                       -- ^ A goal that was solved.
   | Contradiction (Maybe Contradiction)  -- ^ A contradiction could be
                                          -- derived, possibly with a reason.
@@ -242,9 +252,9 @@ instance HasFrees DiffProofMethod where
 
 -- Proof method execution
 -------------------------
-foundAt :: Goal -> [[Goal]] -> Int -> Int
-foundAt _ [] l   = 0 - l
-foundAt g (h:t) l = if g `elem` h then 1 else 1 + foundAt g t l
+foundAt :: Goal -> [[Goal]] -> Maybe Int
+foundAt _ []    = Nothing
+foundAt g (h:t) = if g `elem` h then Just 1 else (1 +) <$> foundAt g t
 
 cleanGoal :: Goal -> Goal
 cleanGoal (ActionG v f) = ActionG (setLVarIdx 0 v) (Fact (factTag f) (factAnnotations f) (map insideJobi $ factTerms f))
@@ -253,6 +263,79 @@ cleanGoal (PremiseG (ni, pidx) f) = PremiseG (LVar (lvarName ni) (lvarSort ni) 0
 cleanGoal (SplitG s) = SplitG s
 cleanGoal (DisjG (Disj g)) = DisjG (Disj (map removeCpt g))
 cleanGoal (SubtermG a) = SubtermG a --MOUAI
+
+functionSymGoal :: Goal -> MS.MultiSet FunSym
+functionSymGoal (ActionG _ f) = MS.unions $ map functionSymbol (getFactTerms f)
+functionSymGoal (PremiseG _ f) =  MS.unions $ map functionSymbol (getFactTerms f)
+functionSymGoal _ = MS.empty
+
+varGoal :: Goal -> MS.MultiSet LVar
+varGoal (ActionG _ f) = MS.unions $ map goalVars (getFactTerms f)
+varGoal (PremiseG _ f) =  MS.unions $ map goalVars (getFactTerms f)
+varGoal _ = MS.empty
+
+constGoal :: Goal -> MS.MultiSet Name
+constGoal (ActionG _ f) = MS.unions $ map goalConsts (getFactTerms f)
+constGoal (PremiseG _ f) =  MS.unions $ map goalConsts (getFactTerms f)
+constGoal _ = MS.empty
+
+goalTerms :: Goal -> [LNTerm]
+goalTerms (ActionG _ f) = getFactTerms f
+goalTerms (PremiseG _ f) = getFactTerms f
+goalTerms _ = []
+
+foundAtMultiSet :: Goal -> [[Goal]] -> Maybe (Int, Int)
+foundAtMultiSet _  []       = Nothing
+foundAtMultiSet goal ([]:t) = foundAtMultiSet goal t
+foundAtMultiSet goal (h:t)
+      | sameFirstTerm goal (head h) && sameName goal (head h) = if any (customSubset mst) msL && any (customSubset varG) varH
+                then Just (2, 1)
+                else second (1 +) <$> foundAtMultiSet goal t -- trace ("Ptitcailloux: "++show goal++" : "++show (functionSymGoal goal)++"\nMoyencailloux: "++show h++"\nCailloux:" ++ show (firstTerm goal)) $
+      | sameName goal (head h) = if any (customSubset mst) msL && any (customSubset varG) varH
+                then Just (3,1)
+                else second (1 +) <$> foundAtMultiSet goal t
+      | otherwise = second (1 +) <$> foundAtMultiSet goal t --trace ("Not matched: "++show goal++" : "++show (functionSymGoal goal)++"\nMoyencailloux: "++show h++"\nCailloux:" ++ show (firstTerm goal))
+  where
+    mst = functionSymGoal goal
+    msL = map functionSymGoal h
+
+    varG = varGoal goal
+    varH = map varGoal h
+
+    --constG = constGoal goal
+    --constH = map constGoal h
+    -- && any (customSubset constG) constH 
+    -- block detection for h(h(x)), or need a default case at True
+
+    customSubset refMST refMS = refMS `MS.isSubsetOf` refMST
+        -- | null refMS = False
+        -- | otherwise  = trace ("Comp: "++show goal++" | "++show h++"\n"++show refMST++" | "++show refMS++" | "++show (refMS `MS.isSubsetOf` refMST)) refMS `MS.isSubsetOf` refMST -- || (mst `MS.isSubsetOf` refMS)
+
+    sameName :: Goal -> Goal -> Bool
+    sameName (ActionG _ f1) (ActionG _ f2) =  factTag f1 == factTag f2 --trace ("Name: "++show (factTag f1))
+    sameName (PremiseG _ f1) (PremiseG _ f2) = factTag f1 == factTag f2
+    sameName _ _ = False
+
+    firstTerm :: Goal -> Maybe FunSym --Maybe LNTerm
+    firstTerm (ActionG _ f)  = head $ map firstFunctionSymbol $ factTerms f --trace ("Fst term: "++show (head $ map firstFunctionSymbol $ factTerms f))
+    firstTerm (PremiseG _ f) = head $ map firstFunctionSymbol $ factTerms f
+    --firstTerm (PremiseG _ f) = trace ("FT: "++show f) insideJobi <$> headMay (factTerms f)
+    firstTerm _ = Nothing
+
+    sameFirstTerm :: Goal -> Goal -> Bool
+    sameFirstTerm g b = case (firstTerm g, firstTerm b) of
+      (Nothing, _) -> False
+      (_, Nothing) -> False
+      (fstG, fstB) -> fstG == fstB
+
+
+--Meilleure généralisation: chaque Maybe Int comes with its own gravity score, we sort on the smallest not Nothing one and take its depth
+--Ask if we sould rather go this way or by depth loop
+customComparison :: Maybe Int -> Maybe (Int,Int) -> (Int, Int)
+customComparison Nothing Nothing   = (0,0)
+customComparison Nothing (Just (s,n))  = (s,n)
+customComparison (Just n) _  = (1,n)
+
 
 -- @execMethod rules method se@ checks first if the @method@ is applicable to
 -- the sequent @se@. Then, it applies the @method@ to the sequent under the
@@ -273,11 +356,11 @@ execProofMethod ctxt method sys =
           | null (openGoals sys)
             && not (finishedSubterms ctxt sys) -> return M.empty
           | otherwise                          -> Nothing
-        InLoop (_, goal,_)
+        InLoop (_,_, goal,_)
           | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
         SolveGoal goal
-          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
+          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys --trace ("5: "++show goal) 
           | otherwise                        -> Nothing
         Simplify                 -> singleCase simplifySystem
         Induction                -> M.map cleanupSystem <$> execInduction
@@ -306,20 +389,29 @@ execProofMethod ctxt method sys =
       where check sys' = cleanupSystem sys /= sys'
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goal s = execSolveGoal goal l index iteration
+    checkForLoop goal s = executedProofMethod -- filterProvedMethod executedProofMethod --trace ("Coucou genou:"++show index++": "++show (cleanGoal goal))
         where
-            index = foundAt (cleanGoal goal) (map (map cleanGoal . snd) (L.get sPathGoals s)) (length $ L.get sPathGoals s)
-            (iteration, l) = if index > 0 then (map fst (L.get sPathGoals s) `at` (index-1) +1, True) else (0,False) --
+            indexId = foundAt (cleanGoal goal) (map (map cleanGoal . fth4 ) (L.get sPathGoals s))
+            resMult = foundAtMultiSet goal (map fth4 (L.get sPathGoals s))
+            (score, index) = customComparison indexId resMult
+            fatherGoal = L.get sPathGoals s `at` (index-1)
+            (iteration, depth, l) = if index > 0 then (snd4 fatherGoal+1, index, True) else (0,0,False) --snd3 fatherGoal+index
+
+            executedProofMethod = execSolveGoal goal l score depth iteration
+
+            filterProvedMethod epm = case epm of
+              Just mlist -> if length (M.toList mlist) > 6 then execSolveGoal goal True 1 0 1 else epm
+              Nothing  -> epm
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
-    execSolveGoal :: Goal -> Bool -> Int -> Int -> Maybe (M.Map CaseName System)
-    execSolveGoal goal _loop _index iteration =
+    execSolveGoal :: Goal -> Bool -> Int -> Int -> Int -> Maybe (M.Map CaseName System)
+    execSolveGoal goal _loop score _index iteration =
         return . makeCaseNames . removeRedundantCases ctxt [] snd
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'  = updateSys sys _index iteration goal
+        sys'  = updateSys sys score _index iteration goal
         --if loop then L.set sNbLoop (index,iteration) (L.set sLoopFound loop (L.set sPathGoals ((iteration,[cleanGoal goal]):(L.get sPathGoals sys)) sys)) else L.set sNbLoop (index,iteration) (L.set sLoopFound loop (L.set sPathGoals ((0,[cleanGoal goal]):(L.get sPathGoals sys)) sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
@@ -329,13 +421,14 @@ execProofMethod ctxt method sys =
                     simplifySystem
                     return name
 
-        updateSys :: System -> Int -> Int-> Goal -> System
-        updateSys _sys index it g = unsafePerformIO $ do
+        updateSys :: System -> Int -> Int -> Int-> Goal -> System
+        updateSys _sys score index it g = unsafePerformIO $ do
             let currentPathGoals = L.get sPathGoals _sys
                 sys2 = if _loop
-                  --then trace ("2: "++ show (cleanGoal g))
-                  then L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,[cleanGoal g]):take (index-1) currentPathGoals++drop index currentPathGoals) _sys))
-                  else L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((0,[cleanGoal g]):currentPathGoals) _sys))
+                  --why did I want to remove goal at index?
+                  --then L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,index,[cleanGoal g]):take (index-1) currentPathGoals++drop index currentPathGoals) _sys))
+                  then L.set sNbLoop (score,index,it) (L.set sLoopFound _loop (L.set sPathGoals ((score,it,index,[cleanGoal g]):currentPathGoals) _sys)) --trace ("SYSLOOPTRUE: "++show index++" "++show it++" "++show _loop++show (cleanGoal g))
+                  else L.set sNbLoop (score,index,it) (L.set sLoopFound _loop (L.set sPathGoals ((0,0,0,[cleanGoal g]):currentPathGoals) _sys)) --trace ("SYSLOOPFALS: "++show index++" "++show it++" "++show _loop++show (cleanGoal g))
             return sys2
 
         makeCaseNames =
@@ -509,16 +602,14 @@ rankGoals ctxt ranking tacticsList = case ranking of
     where
       chosenTactic :: [Tactic ProofContext] -> Tactic ProofContext-> Tactic ProofContext
       chosenTactic   []  t = chooseError tacticsList t
-      chosenTactic (h:q) t = case (checkName h t) of
-        True  -> h
-        False -> chosenTactic q t
+      chosenTactic (h:q) t = if checkName h t then h else chosenTactic q t
 
       definedHeuristic = intercalate [','] (foldl (\acc x -> (_name x):acc ) [] tacticsList)
 
-      checkName t1 t2 = (_name t1) == (_name t2)
+      checkName t1 t2 = _name t1 == _name t2
 
-      chooseError [] _ = error $ "No tactic has been written in the theory file"
-      chooseError _  t = error $ "The tactic specified ( "++(show $ _name t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
+      chooseError [] _ = error "No tactic has been written in the theory file"
+      chooseError _  t = error $ "The tactic specified ( "++show (_name t)++" ) is not written in the theory file, please chose among the following: "++show definedHeuristic
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'ProofContext' and
@@ -526,21 +617,24 @@ rankGoals ctxt ranking tacticsList = case ranking of
 -- system is solved.
 rankProofMethods :: GoalRanking ProofContext -> [Tactic ProofContext] -> ProofContext -> System
                  -> [(ProofMethod, (M.Map CaseName System, String))]
-rankProofMethods ranking tactics ctxt sys = do
+rankProofMethods ranking tactics ctxt sys = do -- trace ("NbOpenGoals: "++show (length openG)) $ 
     (m, expl) <-
             (contradiction <$> contradictions ctxt sys)
         <|> (case L.get pcUseInduction ctxt of
                AvoidInduction -> [(Simplify, ""), (Induction, "")]
                UseInduction   -> [(Induction, ""), (Simplify, "")]
             )
-        <|> (solveGoalMethod <$> (rankGoals ctxt ranking tactics sys $ openGoals sys))
+        <|> (solveGoalMethod <$> (rankGoals ctxt ranking tactics sys $ openG))
     case execProofMethod ctxt m sys of
       Just cases -> case M.toList cases of
-          []                       -> return (m, (cases, expl))
-          -- [(case1,sys)]            -> if L.get sLoopFound sys then return (InLoop 0, (cases, expl)) else return (m, (cases, expl))
-          ((_,sys1):_) -> if  L.get sLoopFound sys1 then return (InLoop (fst $ L.get sNbLoop sys1, fromJust $ fromSolveGoal m, snd $ L.get sNbLoop sys1), (cases, expl)) else return (m, (cases, expl))
+          []           -> return (m, (cases, expl))
+          ((_,sys1):_)
+            | L.get sLoopFound sys1 -> return (fromSolveGoal m sys1 cases expl)
+            | otherwise -> return (m, (cases, expl))
       Nothing    -> []
   where
+    openG = openGoals sys
+
     contradiction c                    = (Contradiction (Just c), "")
 
     sourceRule goal = case goalRule sys goal of
@@ -556,9 +650,9 @@ rankProofMethods ranking tactics ctxt sys = do
                                CurrentlyDeducible    -> " (currently deducible)"
       )
 
-    fromSolveGoal :: ProofMethod -> Maybe Goal
-    fromSolveGoal (SolveGoal goal) = Just goal
-    fromSolveGoal _ = Nothing
+    fromSolveGoal :: ProofMethod -> System -> a0 -> b0 -> (ProofMethod, (a0, b0))
+    fromSolveGoal (SolveGoal goal) sys1 cases expl = (InLoop (fst3 $ L.get sNbLoop sys1,snd3 $ L.get sNbLoop sys1, goal, thd3 $ L.get sNbLoop sys1), (cases, expl))
+    fromSolveGoal m sys1 cases expl = trace ("FromJust: "++show m++"\n"++show (L.get sNbLoop sys1)++" "++show (L.get sPathGoals sys1)) (m, (cases, expl))
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'DiffProofContext' and
@@ -1246,7 +1340,7 @@ prettyProofMethod method = case method of
     Solved               -> keyword_ "SOLVED" <-> lineComment_ "trace found"
     Unfinishable         -> keyword_ "UNFINISHABLE" <-> lineComment_ "reducible operator in subterm"
     Induction            -> keyword_ "induction"
-    InLoop (d,goal,i)    -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "InLoop "++show d++" (iteration: "++show i++")")]
+    InLoop (_,d,goal,i)    -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "InLoop "++show d++" (iteration: "++show i++")")]
     Sorry reason         ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
     SolveGoal goal       ->
@@ -1271,7 +1365,7 @@ prettyDiffProofMethod method = case method of
     DiffBackwardSearch       -> keyword_ "backward-search"
     DiffBackwardSearchStep s -> keyword_ "step(" <-> prettyProofMethod s <-> keyword_ ")"
 
-prettyGeneratedTactic :: HighlightDocument d => String -> [(Int,[Goal])] -> d
+prettyGeneratedTactic :: HighlightDocument d => String -> [(Int,Int,Int,[Goal])] -> d
 prettyGeneratedTactic _ []    = emptyDoc
 prettyGeneratedTactic s goals = kwTactic <> colon <> space <> text (s++"_generated")
     $-$ sep
@@ -1286,13 +1380,13 @@ prettyGeneratedTactic s goals = kwTactic <> colon <> space <> text (s++"_generat
         ppTabTab [] = emptyDoc
         ppTabTab listFunctions = vcat (map ppTab listFunctions)
 
-        prettifyGoals :: (Int,[Goal]) -> String
-        prettifyGoals (_,glist) = foldr (\goal acc -> acc ++filter (/='"') (show goal)++"\" | allGoal \"") "allGoal \"" (map cleanGoal glist)
+        prettifyGoals :: (Int,Int,Int,[Goal]) -> String
+        prettifyGoals (_,_,_,glist) = foldr ((\goal acc -> acc ++filter (/='"') (show goal)++"\" | allGoal \"") . cleanGoal) "allGoal \"" glist
 
-        splitPrios :: [(Int,[Goal])] -> [[(Int,[Goal])]]
+        splitPrios :: [(Int,Int,Int,[Goal])] -> [[(Int,Int,Int,[Goal])]]
         splitPrios [] = []
         splitPrios [h] = [[h]]
-        splitPrios ((it,g):t) = ([(it,g)] ++ (fst $ span (\(a,_) -> a ==it) t)) : (splitPrios $ (snd $ span (\(a,_) -> a==it) t))
+        splitPrios ((score,it,d,g):t) = ((score,it,d,g) : takeWhile (\(_,a,_,_) -> a ==it) t) : splitPrios (dropWhile (\(_,a,_,_) -> a==it) t)
 
         prettify :: HighlightDocument d => [String] -> d
         prettify []    = emptyDoc
@@ -1300,4 +1394,4 @@ prettyGeneratedTactic s goals = kwTactic <> colon <> space <> text (s++"_generat
         prettify ("|":t) = operator_ " | " <> prettify t-- if (s == "|") || (s == "&") || (s == "not") then (operator_ s) <> prettify t else text s <> prettify t
         prettify ("&":t) = operator_ " & " <> prettify t
         prettify ("not":t) = operator_ "not " <> prettify t
-        prettify (s:t) = text s <> space <> prettify t
+        prettify (_s:t) = text _s <> space <> prettify t

@@ -23,7 +23,6 @@ import qualified Data.Map                   as M
 import qualified Extension.Data.Label       as L
 import qualified Data.Set                   as S
 import           Data.List
-import           Data.Char
 
 import           Theory
 import           Theory.Constraint.Solver.AnnotatedGoals
@@ -35,6 +34,7 @@ import           Text.Parsec                hiding ((<|>))
 import           Text.Regex.PCRE
 
 import Debug.Trace
+import Utils.Misc (fst3, thd3, snd4, fth4)
 
 --Tactic
 tacticName :: Parser String
@@ -139,12 +139,14 @@ tacticFunctions = M.fromList
             pg = concat . lines . render $ pgoal agoal
 
     ignoreN :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
-    ignoreN n ((goal,_),_,sys) = case n of 
+    ignoreN n ((goal,_),_,sys) = case n of
             [i] -> trace ("I: "++show iteration++" "++show goal) iteration >= (read i :: Int)
             _   -> error "ignoreN takes a int as parameter"
         where
-            index = foundAt (cleanGoal goal) (map (map cleanGoal . snd) (L.get sPathGoals sys)) (length $ L.get sPathGoals sys)
-            iteration = if index > 0 then map fst (L.get sPathGoals sys) `at` (index-1) +1 else 0
+            indexId = foundAt (cleanGoal goal) (map (map cleanGoal . fth4) (L.get sPathGoals sys))
+            indexMult = foundAtMultiSet goal $ map fth4 (L.get sPathGoals sys)
+            (_,index) = customComparison indexId indexMult
+            iteration = if index > 0 then map snd4 (L.get sPathGoals sys) `at` (index-1) +1 else 0
 
 
     nonAbsurdGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
@@ -155,7 +157,7 @@ tacticFunctions = M.fromList
 
             functionsDetection = "[^A-Za-z0-9][A-Za-z0-9]+\\("
             functions = retrieveFun pg
-            isSubset = all ((flip elem) ["Ku","inv"]) functions
+            isSubset = all (`elem` ["Ku","inv"]) functions
 
             retrieveFun :: String -> [String]
             retrieveFun pgoal_ = map (init . tail) (getAllTextMatches $ pgoal_ =~ functionsDetection)
@@ -198,7 +200,7 @@ tacticFunctions = M.fromList
             getFactTerms_ (ActionG _ (Fact { factTag = _ ,factAnnotations =  _ , factTerms = ft }), _ ) = ft
             getFactTerms_ _ = []
 
-            sysPattern = "~n":map show (concat (map (checkFormula oracleType) (S.toList $ L.get sFormulas sys)))
+            sysPattern = "~n":map show (concatMap (checkFormula oracleType) (S.toList $ L.get sFormulas sys))
 
     checkFormula :: String -> LNGuarded -> [LVar]
     checkFormula oracleType f = if rev && expG then concat $ getFormulaTermsCore f else []

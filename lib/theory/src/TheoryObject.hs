@@ -170,7 +170,6 @@ import qualified Data.Set as S
 import Theory.Syntactic.Predicate
 import Data.ByteString.Char8 (unpack)
 
-import Debug.Trace
 
 -- | A theory contains a single set of rewriting rules modeling a protocol
 -- and the lemmas that
@@ -654,7 +653,7 @@ prettyTheory ppSig ppCache ppRule ppPrf ppSap thy = vsep $
     [ kwTheoryHeader $ text $ L.get thyName thy
     , lineComment_ "Function signature and definition of the equational theory E"
     , ppSig $ L.get thySignature thy
-    , if thyT == [] then text "" else vcat $ map prettyTactic thyT
+    , if null thyT then text "" else vcat $ map prettyTactic thyT
     , if null thyH then text "" else text "heuristic: " <> text (prettyGoalRankings thyH)
     , ppCache $ L.get thyCache thy
     ] ++
@@ -776,7 +775,7 @@ prettyTactic tactic = if null (_prios tactic) && null (_deprios tactic) then emp
 
         prettify :: HighlightDocument d => [String] -> d
         prettify []    = emptyDoc
-        prettify ("|":t) = (operator_ " | ") <> prettify t-- if (s == "|") || (s == "&") || (s == "not") then (operator_ s) <> prettify t else text s <> prettify t
-        prettify ("&":t) = (operator_ " & ") <> prettify t
-        prettify ("not":t) = (operator_ "not ") <> prettify t
+        prettify ("|":t) = operator_ " | " <> prettify t-- if (s == "|") || (s == "&") || (s == "not") then (operator_ s) <> prettify t else text s <> prettify t
+        prettify ("&":t) = operator_ " & " <> prettify t
+        prettify ("not":t) = operator_ "not " <> prettify t
         prettify (s:t) = text s <> space <> prettify t
