@@ -1065,9 +1065,16 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
   where
     prove !depth sys =
         case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []                         -> node (DiffSorry (Just "Cannot prove")) M.empty
-          (method, (cases, _expl)):_ -> node method cases
+          []                             -> node (DiffSorry (Just "Cannot prove")) M.empty
+          (method, (cases, _expl)):suite ->  checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
+        checkForLoop :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> (DiffProofMethod, (M.Map CaseName DiffSystem, String)) -> DiffProof ()
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
+            DiffBackwardSearchStep (InLoop _) -> checkForLoop suite (method0, (cases0, _expl0))
+            _ -> node method cases
+
         node method cases =
           LNode (DiffProofStep method ()) (M.map (prove (succ depth)) cases)
 
