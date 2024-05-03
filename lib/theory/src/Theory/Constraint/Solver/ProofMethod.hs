@@ -50,7 +50,7 @@ import qualified Data.Label                                as L
 import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate) --elem
 import qualified Data.Map                                  as M
 import qualified Data.MultiSet                             as MS
-import           Data.Maybe                                (catMaybes, fromMaybe, fromJust)
+import           Data.Maybe                                (catMaybes, fromMaybe, listToMaybe)
 -- import           Data.Monoid
 import           Data.Ord                                  (comparing)
 import qualified Data.Set                                  as S
@@ -274,15 +274,16 @@ varGoal (ActionG _ f) = MS.unions $ map goalVars (getFactTerms f)
 varGoal (PremiseG _ f) =  MS.unions $ map goalVars (getFactTerms f)
 varGoal _ = MS.empty
 
-constGoal :: Goal -> MS.MultiSet Name
+{-constGoal :: Goal -> MS.MultiSet Name
 constGoal (ActionG _ f) = MS.unions $ map goalConsts (getFactTerms f)
 constGoal (PremiseG _ f) =  MS.unions $ map goalConsts (getFactTerms f)
 constGoal _ = MS.empty
+-}
 
-goalTerms :: Goal -> [LNTerm]
+{-goalTerms :: Goal -> [LNTerm]
 goalTerms (ActionG _ f) = getFactTerms f
 goalTerms (PremiseG _ f) = getFactTerms f
-goalTerms _ = []
+goalTerms _ = []-}
 
 foundAtMultiSet :: Goal -> [[Goal]] -> Maybe (Int, Int)
 foundAtMultiSet _  []       = Nothing
@@ -317,8 +318,8 @@ foundAtMultiSet goal (h:t)
     sameName _ _ = False
 
     firstTerm :: Goal -> Maybe FunSym --Maybe LNTerm
-    firstTerm (ActionG _ f)  = head $ map firstFunctionSymbol $ factTerms f --trace ("Fst term: "++show (head $ map firstFunctionSymbol $ factTerms f))
-    firstTerm (PremiseG _ f) = head $ map firstFunctionSymbol $ factTerms f
+    firstTerm (ActionG _ f)  = fromMaybe Nothing $ listToMaybe $ map firstFunctionSymbol $ factTerms f --trace ("Fst term: "++show (head $ map firstFunctionSymbol $ factTerms f))
+    firstTerm (PremiseG _ f) = fromMaybe Nothing $ listToMaybe $ map firstFunctionSymbol $ factTerms f
     --firstTerm (PremiseG _ f) = trace ("FT: "++show f) insideJobi <$> headMay (factTerms f)
     firstTerm _ = Nothing
 

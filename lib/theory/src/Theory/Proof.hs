@@ -628,17 +628,17 @@ checkDiffProof ctxt prover d sys prf@(LNode (DiffProofStep method info) cs) =
         depthScoreMaxList = map (*5) (depthScoreMax list)
         depthScoreMinList = map (*1) (depthScoreMin list)
 
-        completeScore = zipWith (+) depthScoreMinList (zipWith (+) depthScoreMaxList (zipWith (+) iterationScoreList (zipWith (+) openCasesScoreMinList (zipWith (+) heuristicScoreList openCasesScoreMaxList))))
-        completeDistribution = reverse $ foldl (\acc x -> (x+ head acc):acc) [head completeScore] (tail completeScore)
+        --completeScore = zipWith (+) depthScoreMinList (zipWith (+) depthScoreMaxList (zipWith (+) iterationScoreList (zipWith (+) openCasesScoreMinList (zipWith (+) heuristicScoreList openCasesScoreMaxList))))
+        --completeDistribution = reverse $ foldl (\acc x -> (x+ head acc):acc) [head completeScore] (tail completeScore)
 
         _info = zip6 heuristicScoreList openCasesScoreMaxList openCasesScoreMinList iterationScoreList depthScoreMaxList depthScoreMinList
-        infoTotal = zipWith6 (\a b c d e f -> a + b+ c+ d+e+f) heuristicScoreList openCasesScoreMaxList openCasesScoreMinList iterationScoreList depthScoreMaxList depthScoreMinList
+        -- infoTotal = zipWith6 (\a b c d e f -> a + b+ c+ d+e+f) heuristicScoreList openCasesScoreMaxList openCasesScoreMinList iterationScoreList depthScoreMaxList depthScoreMinList
 
-        idx = fromMaybe (-1) $ elemIndex thechosenone $ map cleanElem list
+        --idx = fromMaybe (-1) $ elemIndex thechosenone $ map cleanElem list
 
         --cleanElem (InLoop (_d, m, i),(_sys,_)) = (SolveGoal m, Just _sys)
         --cleanElem (Contradiction (Just _),(_sys,_)) = (Contradiction Nothing, Just _sys)
-        cleanElem (m,(_sys,_)) = (m, Just _sys)
+        --cleanElem (m,(_sys,_)) = (m, Just _sys)
 
         ------------- Scoring functions -------------
 
@@ -1275,11 +1275,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
           []   -> node Solved M.empty sys
           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl)) -- if depth < 15 then  else avoidLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
-        exportTactic :: [(Int,[Goal])] -> String
+        {-exportTactic :: [(Int,[Goal])] -> String
         exportTactic [] = ""
         exportTactic ((_,lg):t) = cg ++ exportTactic t
           where
             cg = concatMap (("\n1: "++) . show . cleanGoal) lg --if i > 0 then concatMap (("\n1: "++) . show . cleanGoal) lg else ""
+        -}
 
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
@@ -1289,12 +1290,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
             --InLoop (d,goal,iteration) -> if chooseLoop d iteration then node (InLoop (d,goal,iteration+1)) cases sys else checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases sys
 
-        avoidLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
+        --avoidLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        avoidLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
-        avoidLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            InLoop (s,d,goal,iteration) -> checkForLoop suite (method0, (cases0, _expl0))
-            _ -> node method cases sys
+        --avoidLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
+        --avoidLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
+        --    InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
+        --    _ -> node method cases sys
 
         drawRand :: Int -> Int
         drawRand sup = unsafePerformIO $ do
@@ -1307,7 +1308,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
         chooseLoop :: Int -> Int -> Int -> Int -> Bool
         chooseLoop score _depth iteration maxd = rand <= threshold
             where
-                coeff = int2Double score / 10
+                coeff = int2Double score -- / 10
                 it = int2Double iteration
                 d = int2Double _depth
                 md = int2Double maxd
@@ -1835,7 +1836,7 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            DiffBackwardSearchStep (InLoop (score,_dpth,goal,iteration)) -> if chooseLoop _dpth iteration then node (DiffBackwardSearchStep (InLoop (score,_dpth,goal,iteration))) (M.map (applyIteration _dpth) cases) sys else checkForLoop suite (method0, (cases0, _expl0))
+            DiffBackwardSearchStep (InLoop (score,_dpth,goal,iteration)) -> if chooseLoop score _dpth iteration (length $ L.get sPathGoals <$> L.get dsSystem sys) then node (DiffBackwardSearchStep (InLoop (score,_dpth,goal,iteration))) (M.map (applyIteration _dpth) cases) sys else checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases sys
 
         drawRand :: Int -> Int
@@ -1847,13 +1848,15 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
             let (result, _) = randomR (0, sup) g
             return result
 
-        chooseLoop :: Int -> Int -> Bool
-        chooseLoop _depth iteration = rand <= threshold
+        chooseLoop :: Int -> Int -> Int -> Int -> Bool
+        chooseLoop score _depth iteration maxd = rand <= threshold
             where
+                coeff = int2Double score -- / 10
                 it = int2Double iteration
                 d = int2Double _depth
+                md = int2Double maxd
                 rand = int2Double (drawRand _depth) / d --int2Double(drawRand(100+depth)) / (100.0+d) 
-                threshold = 1.0/(2**(it+1)) --1.0/(2.0**((it+1)/d))
+                threshold = coeff/(2**(it+(md - d))) --1.0/(2.0**((it+1)/d))
 
         incrementIteration :: Int -> [(Int,Int,Int,[Goal])] -> Int -> [(Int,Int,Int,[Goal])] -> [(Int,Int,Int,[Goal])]
         incrementIteration 0 ((s,it,d,g):t) _ _ = (s,it+1,d,g):t

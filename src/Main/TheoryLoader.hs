@@ -252,7 +252,7 @@ mkTheoryLoadOptions as = TheoryLoadOptions
       Just unknown  -> throwError $ ArgumentError ("unknown stop-on-trace method: " ++ unknown)
 
     proofBound = case maybe (Right Nothing) readEither (findArg "bound" as) of
-      Left _ -> throwError $ ArgumentError "bound: invalid bound given"
+      Left _ -> throwError $ ArgumentError "bound: invalid bound given "
       Right b -> liftEither $ Right b
 
     heuristic = case findArg "heuristic" as of
@@ -460,7 +460,7 @@ closeTheory version thyOpts sign srcThy = do
 -- | Construct an 'AutoProver' from the given arguments (--bound,
 -- --stop-on-trace).
 constructAutoProver :: TheoryLoadOptions -> AutoProver
-constructAutoProver thyOpts = trace (show $ L.get oProofBound thyOpts)
+constructAutoProver thyOpts =
     AutoProver (L.get oHeuristic thyOpts)
                Nothing
                (L.get oProofBound thyOpts)
