@@ -1824,7 +1824,30 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 sys0
   where
 
-    --probabilistic
+    prove !depth sys = case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []   -> node (DiffSorry (Just "Cannot prove")) M.empty sys
+          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+      where
+        checkForLoop :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> (DiffProofMethod, (M.Map CaseName DiffSystem, String)) -> DiffProof DiffSystem
+        --checkForLoop [] = node (InLoop (0,method)) M.empty
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop [(method, (cases, _expl))] (method0, (cases0, _expl0)) = node method0 cases0 sys
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
+            DiffBackwardSearchStep (InLoop (score,_dpth,goal,iteration)) -> checkForLoop suite (method0, (cases0, _expl0))
+            otherwise -> node method cases sys
+
+        node method cases _sys =
+            LNode (DiffProofStep method _sys) (M.map (prove (succ depth)) cases)
+
+
+    --       []                         -> node (DiffSorry (Just "Cannot prove")) M.empty
+    --       (method, (cases, _expl)):_ -> node method cases
+    --   where
+    --     node method cases =
+    --       LNode (DiffProofStep method ()) (M.map (prove (succ depth)) cases)
+
+    {--probabilistic
     prove !depth sys =
         case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []   -> node (DiffSorry (Just "Cannot prove")) M.empty sys
@@ -1879,6 +1902,7 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
 
         node method cases _sys =
           LNode (DiffProofStep method _sys) (M.map (prove (succ depth)) cases)
+    -}
 
     {--Scoring
     --Attribute a score to each parameter and compute a probabilistic distribution based on it
