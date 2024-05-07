@@ -1267,7 +1267,26 @@ proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContex
 proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
   where
 
-    -- probabilistic
+    -- Escape new
+    --Try to find a goal that is not in loop, if none, take the first one
+
+    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []   -> node Solved M.empty sys
+          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+      where
+        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
+        --checkForLoop [] = node (InLoop (0,method)) M.empty
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop [(method, (cases, _expl))] (method0, (cases0, _expl0)) = node method0 cases0 sys
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
+            InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
+            otherwise -> node method cases sys
+
+        node method cases _sys = 
+          LNode (ProofStep method _sys) (M.map (prove (succ depth)) cases)
+
+    {-- probabilistic
     -- Randomly choosing whether to go in a loop or not, 
     -- loops are not deprioritized
 
@@ -1334,7 +1353,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
         --trace ("Node: "++show method++"\nPproofmethod: "++render (prettyProofMethod method))
         --trace ("Node: "++show (length $ L.get sPathGoals _sys)++": "++show method++"\nPproofmethod: "++render (prettyProofMethod method)++"\n9: "++show depth++" "++show (length cases))
 
-        
+    -}
 
     {--Scoring
     --Attribute a score to each parameter and compute a probabilistic distribution based on it
@@ -1547,26 +1566,6 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
                 weightCases = fst $ unzip $ sortOn snd largeToSmallIdx
 
 
-        node method cases = 
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
-    -}
-
-
-    {-- Escape new
-    --Try to find a goal that is not in loop, if none, take the first one
-
-    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []   -> node Solved M.empty
-          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
-      where
-        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
-        --checkForLoop [] = node (InLoop (0,method)) M.empty
-        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [(method, (cases, _expl))] (method0, (cases0, _expl0)) = node method0 cases0
-        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
-            InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
-            otherwise -> node method cases
         node method cases = 
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
     -}
