@@ -1057,7 +1057,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
             InLoop (depth,goal,iteration) -> if (chooseLoop depth iteration) then node (InLoop (depth,goal,iteration+1)) (M.map (applyIteration depth) cases) else checkForLoop suite (method0, (cases0, _expl0))
             otherwise -> node method cases
 
@@ -1069,21 +1069,21 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         chooseLoop :: Int -> Int -> Bool
         chooseLoop depth iteration = rand <= threshold
-            where 
+            where
                 it = int2Double iteration
                 d = int2Double depth
-                rand = int2Double(drawRand(depth)) / d
+                rand = int2Double (drawRand (depth)) / d
                 threshold = 1.0/(2.0**(it+1))
 
         incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
-        incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t) 
+        incrementIteration 0 ((it,g):t) removeint removelist = ((it+1,g):t)
         incrementIteration _ [] removeint removelist = error (show removeint++" "++(show $ length removelist)++" "++show removelist)
         incrementIteration depth (h:t) removeint removelist = (h:incrementIteration (depth-1) t removeint removelist)
 
         applyIteration :: Int -> System -> System
         applyIteration idx sys = L.set sPathGoals (incrementIteration idx (L.get sPathGoals sys) idx (L.get sPathGoals sys)) sys
 
-        node method cases = 
+        node method cases =
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
@@ -1100,8 +1100,41 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
     prove !depth sys =
         case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []                         -> node (DiffSorry (Just "Cannot prove")) M.empty
-          (method, (cases, _expl)):_ -> node method cases
+          (method, (cases, _expl)):suite -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl)) --node method cases
       where
+
+        checkForLoop :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> (DiffProofMethod, (M.Map CaseName DiffSystem, String)) -> DiffProof ()
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
+            DiffBackwardSearchStep (InLoop (dpth,goal,iteration)) -> if chooseLoop dpth iteration then node (DiffBackwardSearchStep (InLoop (dpth, goal,iteration))) (M.map (applyIteration dpth) cases) else checkForLoop suite (method0, (cases0, _expl0))
+            _ -> node method cases
+
+        drawRand :: Int -> Int
+        drawRand sup = unsafePerformIO $ do
+            g <- newStdGen
+            let (result, _) = randomR (0, sup) g
+            return result
+
+        chooseLoop :: Int -> Int -> Bool
+        chooseLoop dpth iteration = rand <= threshold
+            where
+                it = int2Double iteration
+                d = int2Double depth
+                rand = int2Double (drawRand dpth) / d
+                threshold = 1.0/(2.0**(it+1))
+
+        incrementIteration :: Int -> [(Int,[Goal])] -> Int -> [(Int,[Goal])] -> [(Int,[Goal])]
+        incrementIteration 0 ((it,g):t) _ _ = (it+1,g):t
+        incrementIteration _ [] removeint removelist = error (show removeint++" "++show (length removelist)++" "++show removelist)
+        incrementIteration dpth (h:t) removeint removelist = h:incrementIteration (dpth-1) t removeint removelist
+
+        applyIteration :: Int -> DiffSystem -> DiffSystem
+        applyIteration idx dsys = L.set dsSystem ssys dsys
+          where
+            ssys = L.set sPathGoals (incrementIteration idx goalList idx goalList) <$> L.get dsSystem dsys
+            goalList = maybe [] (L.get sPathGoals) (L.get dsSystem dsys)
+
         node method cases =
           LNode (DiffProofStep method ()) (M.map (prove (succ depth)) cases)
 
