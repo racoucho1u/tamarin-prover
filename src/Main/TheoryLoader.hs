@@ -1,14 +1,9 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeApplications #-}
 
 -- |
 -- Copyright   : (c) 2010, 2011 Benedikt Schmidt & Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : GHC only
 --
 -- Theory loading infrastructure.
@@ -20,8 +15,10 @@ module Main.TheoryLoader (
   , TheoryLoadOptions(..)
   , oProveMode
   , oDiffMode
+  , oHeuristic
   , oOutputModule
   , oMaudePath
+  , oVerboseMode
   , oParseOnlyMode
   , defaultTheoryLoadOptions
   , ArgumentError(..)
@@ -29,6 +26,8 @@ module Main.TheoryLoader (
 
   , TheoryLoadError(..)
   , loadTheory
+  , translateAndCheckTheory
+  , prettyOpenTheoryByModule
   , closeTheory
 
   -- ** Constructing automatic prover
@@ -41,54 +40,67 @@ module Main.TheoryLoader (
 
   ) where
 
--- import           Debug.Trace
-
 import           Prelude                             hiding (id, (.))
 
 import           Data.Char                           (toLower)
 import           Data.Label
-import           Data.List                           (isPrefixOf,intersperse, intercalate, find)
-
+import           Data.List                           (isPrefixOf, intercalate, find)
+import qualified Data.Set
+import           Data.Maybe                          (fromMaybe, isNothing)
 import           Data.Map                            (keys)
 import           Data.FileEmbed                      (embedFile)
+import qualified Data.Label as L
+import           Data.Bifunctor (Bifunctor(bimap))
+import           Data.Bitraversable (Bitraversable(bitraverse))
 
 import           Control.Category
+import           Control.DeepSeq (force)
+import           Control.Exception (evaluate)
+import           Control.Monad
+import           Control.Monad.IO.Class (MonadIO(liftIO))
 
 import           System.Console.CmdArgs.Explicit
+import           System.Timeout (timeout)
 
 import           Theory hiding (transReport, closeTheory)
 import           Theory.Text.Parser                  (parseIntruderRules, theory, diffTheory)
+import           Theory.Text.Parser.Token
+import qualified Theory.Text.Pretty as Pretty
 import           Theory.Tools.AbstractInterpretation (EvaluationStyle(..))
 import           Theory.Tools.IntruderRules          (specialIntruderRules, subtermIntruderRules
                                                      , multisetIntruderRules, xorIntruderRules)
 import           Theory.Tools.Wellformedness
-import qualified Sapic as Sapic
-import           Main.Console                        (argExists, findArg, addEmptyArg, updateArg, Arguments)
+import           Theory.Tools.MessageDerivationChecks
+import           Theory.Module
 
-import           Main.Environment
+import           TheoryObject                        (diffThyOptions, diffTheoryConfigBlock, theoryConfigBlock)
 
+import qualified Sapic
+import qualified Export
+import           Main.Console
+
+import           Text.Read (readEither)
 import           Text.Parsec                hiding ((<|>),try,parse)
+
 import           Safe
 
 import           Debug.Trace
 
 import qualified Theory.Text.Pretty as Pretty
 import           Items.LemmaItem (HasLemmaName, HasLemmaAttributes)
+import           Items.OptionItem                    (openChainsLimit,saturationLimit,lemmasToProve,verboseOption)
+
 import           Control.Monad.Except
-import           Text.Read (readEither, readMaybe)
-import           Theory.Module (ModuleType (ModuleSpthy, ModuleMsr))
-import           qualified Data.Label as L
-import           Theory.Text.Parser.Token (parseString)
-import           Data.Bifunctor (Bifunctor(bimap))
-import           Data.Bitraversable (Bitraversable(bitraverse))
-import           Control.Monad.Catch (MonadCatch, onException, handle)
+import           Control.Monad.Catch (MonadCatch)
+
+
 import qualified Accountability as Acc
 import qualified Accountability.Generation as Acc
-import GHC.Records (HasField(getField))
 
-import           TheoryObject                        (diffThyOptions)
-import           Items.OptionItem                    (openChainsLimit,saturationLimit,lemmasToProve)
-import Data.Maybe (fromMaybe)
+import           GHC.Records (HasField(getField))
+import           GHC.Num (integerFromInt)
+
+import           Debug.Trace
 
 
 ------------------------------------------------------------------------------
@@ -114,8 +126,9 @@ theoryLoadFlags =
   , flagOpt "5" ["bound", "b"] (updateArg "bound") "INT"
       "Bound the depth of the proofs"
 
-  , flagOpt "s" ["heuristic"] (updateArg "heuristic") ("(" ++ (intercalate "|" $ keys goalRankingIdentifiers) ++ ")+")
-      "Sequence of goal rankings to use (default 's')"
+  ,  flagOpt (prettyGoalRanking $ head $ defaultRankings False)
+      ["heuristic"] (updateArg "heuristic") ("(" ++ (intercalate "|" $ keys goalRankingIdentifiers) ++ ")+")
+      ("Sequence of goal rankings to use (default '" ++ prettyGoalRanking (head $ defaultRankings False) ++ "')")
 
   , flagOpt "summary" ["partial-evaluation"] (updateArg "partial-evaluation")
       "SUMMARY|VERBOSE"
@@ -130,17 +143,26 @@ theoryLoadFlags =
   , flagNone ["quit-on-warning"] (addEmptyArg "quit-on-warning")
       "Strict mode that quits on any warning that is emitted."
 
-  , flagOpt "./oracle" ["oraclename"] (updateArg "oraclename") "FILE"
-      "Path to the oracle heuristic (default './oracle')."
+--  , flagOpt "./oracle" ["oraclename"] (updateArg "oraclename") "FILE"
+--      "Path to the oracle heuristic (default './oracle')."
+
+  , flagOpt "" ["oraclename"] (updateArg "oraclename") "FILE"
+      ("Path to the oracle heuristic (default '" ++ "./theory_filename.oracle" ++ "', fallback '" ++ "./oracle" ++ "')")
 
   , flagNone ["quiet"] (addEmptyArg "quiet")
       "Do not display computation steps of oracle or tactic."
+
+  , flagNone ["verbose", "v"] (addEmptyArg "verbose")
+      "Display full information when calculating proof."
 
   , flagOpt "10" ["open-chains","c"] (updateArg "OpenChainsLimit" ) "PositiveInteger"
       "Limits the number of open chains to be resoled during precomputations (default 10)"
 
   , flagOpt "5" ["saturation","s"] (updateArg "SaturationLimit" ) "PositiveInteger"
       "Limits the number of saturations during precomputations (default 5)"
+
+  , flagOpt "5" ["derivcheck-timeout","d"] (updateArg "derivcheck-timeout" ) "INT"
+      "Set timeout for message derivation checks in sec (default 5). 0 deactivates check."
 
 
 --  , flagOpt "" ["diff"] (updateArg "diff") "OFF|ON"
@@ -154,7 +176,7 @@ theoryLoadFlags =
 data TheoryLoadOptions = TheoryLoadOptions {
     _oProveMode         :: Bool
   , _oLemmaNames        :: [String]
-  , _oStopOnTrace       :: SolutionExtractor
+  , _oStopOnTrace       :: Maybe SolutionExtractor
   , _oProofBound        :: Maybe Int
   , _oHeuristic         :: Maybe (Heuristic ProofContext)
   , _oPartialEvaluation :: Maybe EvaluationStyle
@@ -162,11 +184,13 @@ data TheoryLoadOptions = TheoryLoadOptions {
   , _oDiffMode          :: Bool
   , _oQuitOnWarning     :: Bool
   , _oAutoSources       :: Bool
-  , _oOutputModule      :: Maybe ModuleType -- Note: This flag is only used for batch mode.
+  , _oVerboseMode       :: Bool
+  , _oOutputModule      :: ModuleType -- Note: This flag is only used for batch mode.
   , _oMaudePath         :: FilePath -- FIXME: Other functions defined in Environment.hs
   , _oParseOnlyMode     :: Bool
   , _oOpenChain         :: Integer
   , _oSaturation        :: Integer
+  , _oDerivationChecks  :: Int
 } deriving Show
 $(mkLabels [''TheoryLoadOptions])
 
@@ -174,7 +198,7 @@ defaultTheoryLoadOptions :: TheoryLoadOptions
 defaultTheoryLoadOptions = TheoryLoadOptions {
     _oProveMode         = False
   , _oLemmaNames        = []
-  , _oStopOnTrace       = CutDFS
+  , _oStopOnTrace       = Nothing
   , _oProofBound        = Nothing
   , _oHeuristic         = Nothing
   , _oPartialEvaluation = Nothing
@@ -182,11 +206,13 @@ defaultTheoryLoadOptions = TheoryLoadOptions {
   , _oDiffMode          = False
   , _oQuitOnWarning     = False
   , _oAutoSources       = False
-  , _oOutputModule      = Nothing
+  , _oVerboseMode       = False
+  , _oOutputModule      = ModuleMsr
   , _oMaudePath         = "maude"
   , _oParseOnlyMode     = False
   , _oOpenChain         = 10
   , _oSaturation        = 5
+  , _oDerivationChecks  = 5
 }
 
 toParserFlags :: TheoryLoadOptions -> [String]
@@ -201,7 +227,7 @@ mkTheoryLoadOptions :: MonadError ArgumentError m => Arguments -> m TheoryLoadOp
 mkTheoryLoadOptions as = TheoryLoadOptions
                          <$> proveMode
                          <*> lemmaNames
-                         <*> stopOnTrace
+                         <*> (stopOnTrace as)
                          <*> proofBound
                          <*> heuristic
                          <*> partialEvaluation
@@ -209,84 +235,88 @@ mkTheoryLoadOptions as = TheoryLoadOptions
                          <*> diffMode
                          <*> quitOnWarning
                          <*> autoSources
+                         <*> verboseMode
                          <*> outputModule
                          <*> (return $ maudePath as)
                          <*> parseOnlyMode
                          <*> openchain
                          <*> saturation
+                         <*> deriv
   where
     proveMode  = return $ argExists "prove" as
     lemmaNames = return $ findArg "prove" as ++ findArg "lemma" as
 
-    stopOnTrace = case map toLower <$> findArg "stop-on-trace" as of
-      Nothing       -> return CutDFS
-      Just "dfs"    -> return CutDFS
-      Just "none"   -> return CutNothing
-      Just "bfs"    -> return CutBFS
-      Just "seqdfs" -> return CutSingleThreadDFS
-      Just unknown  -> throwError $ ArgumentError ("unknown stop-on-trace method: " ++ unknown)
+    parseIntArg args defaultValue conv errMsg = case args of
+      []    -> return defaultValue
+      (x:_) -> case (readEither x :: Either String Int) of
+        Left  _ -> throwError $ ArgumentError errMsg
+        Right i -> return $ conv i
+      -- FIXME : provide option to handle potential error without crash (ie, take default value and raise error but continue)
 
-    proofBound = case maybe (Right Nothing) readEither (findArg "bound" as) of
-      Left _ -> throwError $ ArgumentError "bound: invalid bound given"
-      Right b -> liftEither $ Right b
+    proofBound = parseIntArg (findArg "bound" as) Nothing Just "bound: invalid bound given"
 
     heuristic = case findArg "heuristic" as of
         Just rawRankings@(_:_) -> return $ Just $ roundRobinHeuristic
-                                         $ map (mapOracleRanking (maybeSetOracleRelPath (findArg "oraclename" as))) (filterHeuristic rawRankings)
+                                         $ map (mapOracleRanking (maybeSetOracleRelPath oraclename)) (filterHeuristic (argExists "diff" as) rawRankings)
         Just []                -> throwError $ ArgumentError "heuristic: at least one ranking must be given"
         _                      -> return Nothing
-
-    toGoalRanking | argExists "diff" as = stringToGoalRankingDiff
-                  | otherwise           = stringToGoalRanking
+    oraclename = case findArg "oraclename" as of
+      Just "" -> Nothing
+      name    -> name
+    --toGoalRanking | argExists "diff" as = stringToGoalRankingDiff
+    --              | otherwise           = stringToGoalRanking
 
     partialEvaluation = case map toLower <$> findArg "partial-evaluation" as of
       Just "summary" -> return $ Just Summary
       Just "verbose" -> return $ Just Tracing
       Just _         -> throwError $ ArgumentError "partial-evaluation: unknown option"
-      Nothing        -> return $ Nothing
+      Nothing        -> return   Nothing
 
     defines       = return $ findArg "defines" as
     diffMode      = return $ argExists "diff" as
+    verboseMode   = return $ argExists "verbose" as
     quitOnWarning = return $ argExists "quit-on-warning" as
     autoSources   = return $ argExists "auto-sources" as
 
-    outputModule
-     | Nothing  <- findArg "outModule" as , [] /= findArg "prove" as = return $ Just ModuleMsr
-     -- ^ when proving, we act like we chose the Msr Output module.
-     | Nothing  <- findArg "outModule" as = return $ Just ModuleSpthy -- default
-     | Just str <- findArg "outModule" as
-     , Just modCon <- find (\x -> show x  == str) (enumFrom minBound) = return $ Just modCon
-     | otherwise   = throwError $ ArgumentError "output mode not supported."
+    outputModule = case findArg "outModule" as of
+      Just str -> case find ((str ==) . show) [minBound..] of
+        Just m -> return m
+        _       -> throwError $ ArgumentError "output mode not supported."
+      Nothing   -> return $ L.get oOutputModule defaultTheoryLoadOptions
 
-    -- NOTE: Output mode implicitly activates parse-only mode
-    parseOnlyMode = return $ argExists "parseOnly" as || argExists "outputMode" as
+    parseOnlyMode = return $ argExists "parseOnly" as
 
     chain = findArg "OpenChainsLimit" as
     chainDefault = L.get oOpenChain defaultTheoryLoadOptions
-    openchain = if not (null chain) 
-                  then return (fromMaybe chainDefault (readMaybe (head chain) ::Maybe Integer))
-                  else return chainDefault
-    -- FIXME : use "read" and handle potential error without crash (with default version and raising error)
+    openchain = parseIntArg chain chainDefault integerFromInt "OpenChainsLimit: invalid bound given"
 
     sat = findArg "SaturationLimit" as
     satDefault = L.get oSaturation defaultTheoryLoadOptions
-    saturation = if not (null sat)
-                   then return (fromMaybe satDefault (readMaybe (head sat) ::Maybe Integer))
-                   else return satDefault
-    -- FIXME : use "read" and handle potential error without crash (with default version and raising error)
+    saturation = parseIntArg sat satDefault integerFromInt "SaturationLimit: invalid bound given"
+
+    derivchecks = findArg "derivcheck-timeout" as
+    derivDefault = L.get oDerivationChecks defaultTheoryLoadOptions
+    deriv = parseIntArg derivchecks derivDefault id "derivcheck-timeout: invalid bound given"
+
+stopOnTrace :: MonadError ArgumentError m => Arguments -> m (Maybe SolutionExtractor)
+stopOnTrace as = case map toLower <$> findArg "stop-on-trace" as of
+  Just "dfs"    -> return $ Just CutDFS
+  Just "none"   -> return $ Just CutNothing
+  Just "bfs"    -> return $ Just CutBFS
+  Just "seqdfs" -> return $ Just CutSingleThreadDFS
+  Just unknown  -> throwError $ ArgumentError ("unknown stop-on-trace method: " ++ unknown)
+  Nothing       -> return Nothing
 
 lemmaSelectorByModule :: HasLemmaAttributes l => TheoryLoadOptions -> l -> Bool
 lemmaSelectorByModule thyOpt lem = case lemmaModules of
     [] -> True -- default to true if no modules (or only empty ones) are set
-    _  -> case (L.get oOutputModule thyOpt) of
-      Just outMod -> outMod `elem` lemmaModules
-      Nothing     -> ModuleSpthy `elem` lemmaModules
+    _  -> (L.get oOutputModule thyOpt) `elem` lemmaModules
     where
         lemmaModules = concat [ m | LemmaModule m <- getField @"lAttributes" lem]
 
 -- | quiet flag in the argument
-quiet :: Arguments -> [String]
-quiet as = if (argExists "quiet" as) then ["quiet"] else []
+--quiet :: Arguments -> [String]
+--quiet as = if (argExists "quiet" as) then ["quiet"] else []
 
 -- | Select lemmas for proving
 lemmaSelector :: HasLemmaName l => TheoryLoadOptions -> l -> Bool
@@ -313,67 +343,136 @@ instance Show TheoryLoadError
     show (ParserError e) = show e
     show (WarningError e) = Pretty.render (prettyWfErrorReport e)
 
--- FIXME: How can we avoid the MonadCatch here?
-loadTheory :: MonadCatch m => TheoryLoadOptions -> String -> FilePath -> ExceptT TheoryLoadError m (Either OpenTheory OpenDiffTheory)
+-- | Load an open theory from a string with the given options.
+loadTheory :: Monad m => TheoryLoadOptions -> String -> FilePath -> ExceptT TheoryLoadError m (Either OpenTheory OpenDiffTheory)
 loadTheory thyOpts input inFile = do
     thy <- withExceptT ParserError $ liftEither $ unwrapError $ bimap parse parse thyParser
-    let thy' = addParamsOptions thyOpts thy
-    withTheory translate thy'
+    traceM ("[Theory " ++ theoryName thy ++ "] Theory loaded")
+    return $ addParamsOptions thyOpts thy
   where
     thyParser | isDiffMode = Right $ diffTheory $ Just inFile
               | otherwise  = Left  $ theory     $ Just inFile
 
     parse p = parseString (toParserFlags thyOpts) inFile p input
 
-    translate | isParseOnlyMode = return
-              | otherwise       = Sapic.typeTheory
-                              >=> Sapic.translate
-                              >=> Acc.translate
-
-    isDiffMode      = L.get oDiffMode thyOpts
-    isParseOnlyMode = L.get oParseOnlyMode thyOpts
+    isDiffMode   = L.get oDiffMode thyOpts
 
     unwrapError (Left (Left e)) = Left e
     unwrapError (Left (Right v)) = Right $ Left v
     unwrapError (Right (Left e)) = Left e
     unwrapError (Right (Right v)) = Right $ Right v
+    theoryName = either (L.get thyName) (L.get diffThyName)
 
-    withTheory     f t = bitraverse f return t
-
-closeTheory :: MonadError TheoryLoadError m => String -> TheoryLoadOptions -> SignatureWithMaude -> Either OpenTheory OpenDiffTheory -> m ((WfErrorReport, Either ClosedTheory ClosedDiffTheory))
-closeTheory version thyOpts sig srcThy = do
-  let preReport = either (\t -> (Sapic.checkWellformedness t ++ Acc.checkWellformedness t))
-                         (const []) srcThy
-
-  transThy   <- withTheory (return . removeTranslationItems) srcThy
-
-  let transReport = either (\t -> checkWellformedness t sig)
-                           (\t -> checkWellformednessDiff t sig) transThy
-
-  let report = preReport ++ transReport
-  checkedThy <- bitraverse (\t -> return $ addComment     (reportToDoc report) t)
-                           (\t -> return $ addDiffComment (reportToDoc report) t) transThy
-
-  when (quitOnWarning && (not $ null report)) (throwError $ WarningError report)
-
-  deducThy   <- bitraverse (return . addMessageDeductionRuleVariants)
-                           (return . addMessageDeductionRuleVariantsDiff) checkedThy
-  diffLemThy <- withDiffTheory (return . addDefaultDiffLemma) deducThy
-  closedThy  <- bitraverse (\t -> return $ closeTheoryWithMaude     sig t autoSources)
-                           (\t -> return $ closeDiffTheoryWithMaude sig t autoSources) diffLemThy
-  partialThy <- bitraverse (return . (maybe id (\s -> applyPartialEvaluation     s autoSources) partialStyle))
-                           (return . (maybe id (\s -> applyPartialEvaluationDiff s autoSources) partialStyle)) closedThy
-  provedThy  <- bitraverse (\t -> return $ proveTheory     (lemmaSelectorByModule thyOpts &&& lemmaSelector thyOpts) prover t)
-                           (\t -> return $ proveDiffTheory (lemmaSelectorByModule thyOpts &&& lemmaSelector thyOpts) prover diffProver t) partialThy
-  provedThyWithVersion <- bitraverse (return . addComment (Pretty.text version))
-                           (return . addDiffComment (Pretty.text version) )  provedThy
-
-  return (report, provedThyWithVersion)
-
+-- | Process an open theory based on the specified output module.
+processOpenTheory :: MonadCatch m => TheoryLoadOptions -> OpenTheory -> m OpenTheory
+processOpenTheory thyOpts = case modType of
+  ModuleSpthy               -> return
+  ModuleSpthyTyped          -> Sapic.typeTheory
+  ModuleMsr                 -> Sapic.typeTheory >=> Sapic.translate >=> Acc.translate >=> (return . filterLemma lemmas)
+  ModuleProVerifEquivalence -> Sapic.typeTheory -- Type theory here to catch errors.
+  ModuleProVerif            -> Sapic.typeTheory -- Type theory here to catch errors.
+  ModuleDeepSec             -> Sapic.typeTheory
   where
-    autoSources   = L.get oAutoSources thyOpts
-    partialStyle  = L.get oPartialEvaluation thyOpts
+    modType = L.get oOutputModule thyOpts
+    lemmas = lemmaSelector thyOpts
+
+-- | Translate an open theory.
+translateTheory :: MonadCatch m => MonadError TheoryLoadError m => TheoryLoadOptions -> Either OpenTheory OpenDiffTheory -> m (WfErrorReport, Either OpenTheory OpenDiffTheory)
+translateTheory thyOpts thy = do
+    traceM ("[Theory " ++ theoryName thy ++ "] Theory translated")
+    let report = either (\t -> Sapic.checkWellformedness t ++ Acc.checkWellformedness t) (const []) thy
+    transThy <- withTheory (processOpenTheory thyOpts) thy
+    return (report, transThy)
+  where
+    withTheory f = bitraverse f return
+    theoryName = either (L.get thyName) (L.get diffThyName)
+
+-- | Perform wellformedness and deducability checks on a theory.
+checkTranslatedTheory :: MonadIO m => MonadError TheoryLoadError m => TheoryLoadOptions -> SignatureWithMaude -> Either OpenTranslatedTheory OpenDiffTheory -> m ((WfErrorReport, Either OpenTranslatedTheory OpenDiffTheory))
+checkTranslatedTheory thyOpts sign thy = do
+  let transReport = either (`checkWellformedness` sign)
+                           (`checkWellformednessDiff` sign) thy
+
+  deducThy <- bitraverse (return . addMessageDeductionRuleVariants)
+                         (return . addMessageDeductionRuleVariantsDiff) thy
+
+
+  variableReport <- case compare derivChecks 0 of
+    EQ -> pure $ Just []
+    _ -> do
+      traceM ("[Theory " ++ theoryName thy ++ "] Derivation checks started")
+      derivCheckSignature <- liftIO $ toSignatureWithMaude (get oMaudePath thyOpts) $ maudePublicSig (toSignaturePure sign)
+      rep <- liftIO $ timeout (1000000 * derivChecks) $ evaluate . force $ either (\t -> checkVariableDeducability t derivCheckSignature autoSources defaultProver)
+             (\t-> diffCheckVariableDeducability t derivCheckSignature autoSources defaultProver defaultDiffProver) deducThy
+      traceM ("[Theory " ++ theoryName thy ++ "] Derivation checks ended")
+      return rep
+
+  let report = transReport ++ fromMaybe derivTimeoutMsg  variableReport
+
+  return (report, deducThy)
+  where
+    autoSources = L.get oAutoSources thyOpts
+    derivChecks = L.get oDerivationChecks thyOpts
+    derivTimeoutMsg = [(underlineTopic "Derivation Checks"
+                      , Pretty.vcat [
+                          Pretty.text "Derivation checks timed out."
+                        , Pretty.text "Use --derivcheck-timeout=INT to configure timeout."
+                        , Pretty.text "Set to 0 to deactivate for no timeout." ])]
+
+    defaultProver = replaceSorryProver $ runAutoProver $ constructAutoProver defaultTheoryLoadOptions
+    defaultDiffProver = replaceDiffSorryProver $ runAutoDiffProver $ constructAutoProver defaultTheoryLoadOptions
+    maudePublicSig s = Signature $ (getSignature s)
+      {stFunSyms = makepublic (stFunSyms (getSignature s))
+      , funSyms = makepublicsym (funSyms (getSignature s))
+      , irreducibleFunSyms = makepublicsym (irreducibleFunSyms (getSignature s))
+      , reducibleFunSyms = makepublicsym (reducibleFunSyms (getSignature s))}
+    getSignature =  Data.Label.get sigpMaudeSig
+    makepublic = Data.Set.map (\(name, (int, _, construct)) -> (name,(int, Public, construct)))
+    makepublicsym  = Data.Set.map (\el -> case el of
+      NoEq (name, (int, _, constr)) -> NoEq (name,(int, Public, constr))
+      x -> x
+      )
+
+    theoryName = either (L.get thyName) (L.get diffThyName)
+
+-- | Add report and version information to a theory.
+withVersionAndReport :: MonadError TheoryLoadError m => String -> TheoryLoadOptions -> WfErrorReport -> Either (Theory sig1 c1 r1 p1 s) (DiffTheory sig2 c2 r2 r3 p2 p3) -> m (Either (Theory sig1 c1 r1 p1 s) (DiffTheory sig2 c2 r2 r3 p2 p3))
+withVersionAndReport version thyOpts report thy = do
+    reportThy <- bitraverse (return . addComment     (reportToDoc report))
+                            (return . addDiffComment (reportToDoc report)) thy
+
+    versionThy <- bitraverse (return . addComment (Pretty.text version))
+                             (return . addDiffComment (Pretty.text version) ) reportThy
+
+    when (quitOnWarning && not (null report)) (throwError $ WarningError report)
+
+    return versionThy
+  where
     quitOnWarning = L.get oQuitOnWarning thyOpts
+
+    reportToDoc rep
+      | null rep = Pretty.text "All wellformedness checks were successful."
+      | otherwise   = Pretty.vsep
+                        [ Pretty.text "WARNING: the following wellformedness checks failed!"
+                        , prettyWfErrorReport rep ]
+
+-- | Close a translated theory.
+closeTranslatedTheory :: MonadError TheoryLoadError m => TheoryLoadOptions -> SignatureWithMaude -> Either OpenTranslatedTheory OpenDiffTheory -> m (Either ClosedTheory ClosedDiffTheory)
+closeTranslatedTheory thyOpts sign srcThy = do
+  diffLemThy <- withDiffTheory (return . addDefaultDiffLemma) srcThy
+  closedThy  <- bitraverse (\t -> return $ closeTheoryWithMaude     sign t autoSources True)
+                           (\t -> return $ closeDiffTheoryWithMaude sign t autoSources) diffLemThy
+  partialThy <- bitraverse (return . maybe id (`applyPartialEvaluation` autoSources) partialStyle)
+                           (return . maybe id (`applyPartialEvaluationDiff` autoSources) partialStyle) closedThy
+  provedThy  <- bitraverse (return . proveTheory     (lemmaSelectorByModule thyOpts &&& lemmaSelector thyOpts) prover)
+                           (return . proveDiffTheory (lemmaSelectorByModule thyOpts &&& lemmaSelector thyOpts) prover diffProver) partialThy
+
+  traceM ("[Theory " ++ theoryName srcThy ++ "] Theory closed")
+
+  return provedThy
+  where
+    autoSources = L.get oAutoSources thyOpts
+    partialStyle = L.get oPartialEvaluation thyOpts
 
     prover | L.get oProveMode thyOpts = replaceSorryProver $ runAutoProver $ constructAutoProver thyOpts
            | otherwise                = mempty
@@ -381,14 +480,78 @@ closeTheory version thyOpts sig srcThy = do
     diffProver | L.get oProveMode thyOpts = replaceDiffSorryProver $ runAutoDiffProver $ constructAutoProver thyOpts
                | otherwise                = mempty
 
-    reportToDoc report
-      | null report = Pretty.text "All wellformedness checks were successful."
-      | otherwise   = Pretty.vsep
-                        [ Pretty.text "WARNING: the following wellformedness checks failed!"
-                        , prettyWfErrorReport report ]
+    withDiffTheory = bitraverse return
 
-    withTheory     f t = bitraverse f return t
-    withDiffTheory f t = bitraverse return f t
+    theoryName = either (L.get thyName) (L.get diffThyName)
+
+-- | Translate an open theory, perform checks on the translated theory and finally close it.
+closeTheory :: MonadCatch m => MonadIO m => MonadError TheoryLoadError m => String -> TheoryLoadOptions -> SignatureWithMaude -> Either OpenTheory OpenDiffTheory -> m ((WfErrorReport, Either ClosedTheory ClosedDiffTheory))
+closeTheory version loadedThyOpts sign srcThy = do
+  (preReport, transThy)    <- translateTheory thyOpts srcThy
+  removedThy               <- withTheory (return . removeTranslationItems) transThy
+  (postReport, checkedThy) <- checkTranslatedTheory thyOpts sign removedThy
+  closedThy                <- closeTranslatedTheory thyOpts sign checkedThy
+  finalThy                 <- withVersionAndReport version thyOpts (preReport ++ postReport) closedThy
+
+  return (preReport ++ postReport, finalThy)
+  where
+    withTheory f = bitraverse f return
+
+    loadedAutoSources = L.get oAutoSources loadedThyOpts
+    loadedStopOnTrace = L.get oStopOnTrace loadedThyOpts
+    loadedHeuristic   = L.get oHeuristic loadedThyOpts
+
+    srcThyInFileName = either (L.get thyInFile) (L.get diffThyInFile) srcThy
+
+    -- Update command line arguments with arguments taken from the configuration block.
+    -- Set the default oraclename if needed.
+    thyOpts = (thyHeurDefOracle . configStopOnTrace . configAutoSources) loadedThyOpts
+
+    -- Set the oraclename to theory_filename.oracle (if none was supplied).
+    thyHeurDefOracle =
+      set oHeuristic $ (\(Heuristic grl) -> Just $ Heuristic $ defaultOracleNames srcThyInFileName grl) =<< loadedHeuristic
+
+    -- Read and process the arguments from the theory's config block.
+    srcThyConfigBlockArgs = argsConfigString $ either theoryConfigBlock diffTheoryConfigBlock srcThy
+
+    argsConfigString =
+      processValue (mode "configuration block arguments" [] "" (flagArg (updateArg "") "") theoryConfFlags) <$> splitArgs
+
+    theoryConfFlags =
+      [flagOpt "dfs" ["stop-on-trace"] (updateArg "stop-on-trace") "" ""
+     , flagNone ["auto-sources"] (addEmptyArg "auto-sources") ""]
+
+    configStopOnTrace =
+      if isNothing loadedStopOnTrace
+        then L.set oStopOnTrace (either (\(ArgumentError e) -> error e) id $ stopOnTrace srcThyConfigBlockArgs)
+        else id
+
+    configAutoSources = L.set oAutoSources (argExists "auto-sources" srcThyConfigBlockArgs || loadedAutoSources)
+
+-- | Translate an open theory and perform checks on the translated theory.
+translateAndCheckTheory :: MonadCatch m => MonadIO m => MonadError TheoryLoadError m => String -> TheoryLoadOptions -> SignatureWithMaude -> Either OpenTheory OpenDiffTheory -> m ((WfErrorReport, Either OpenTheory OpenDiffTheory))
+translateAndCheckTheory version thyOpts sign srcThy = do
+  (preReport, transThy) <- translateTheory thyOpts srcThy
+  removedThy            <- withTheory (return . removeTranslationItems) transThy
+  (postReport, _)       <- checkTranslatedTheory thyOpts sign removedThy
+  finalThy              <- withVersionAndReport version thyOpts (preReport ++ postReport) transThy
+
+  return (preReport ++ postReport, finalThy)
+  where
+    withTheory f = bitraverse f return
+
+-- | Pretty print an open theory based on the specified output module.
+prettyOpenTheoryByModule :: TheoryLoadOptions -> OpenTheory -> IO Pretty.Doc
+prettyOpenTheoryByModule thyOpts = case modType of
+  ModuleSpthy               -> return . prettyOpenTheory
+  ModuleSpthyTyped          -> return . prettyOpenTheory
+  ModuleMsr                 -> return . prettyOpenTranslatedTheory . removeTranslationItems
+  ModuleProVerifEquivalence -> Export.prettyProVerifEquivTheory   <=< Sapic.typeTheoryEnv
+  ModuleProVerif            -> Export.prettyProVerifTheory lemmas <=< Sapic.typeTheoryEnv
+  ModuleDeepSec             -> Export.prettyDeepSecTheory
+  where
+    modType = L.get oOutputModule thyOpts
+    lemmas = lemmaSelector thyOpts
 
 (&&&) :: (t -> Bool) -> (t -> Bool) -> t -> Bool
 (&&&) f g x = f x && g x
@@ -400,7 +563,7 @@ constructAutoProver thyOpts = trace (show $ L.get oProofBound thyOpts)
     AutoProver (L.get oHeuristic thyOpts)
                Nothing
                (L.get oProofBound thyOpts)
-               (L.get oStopOnTrace thyOpts)
+               (fromMaybe CutDFS $ L.get oStopOnTrace thyOpts)
 
 -----------------------------------------------
 -- Add Options parameters in an OpenTheory
@@ -408,21 +571,25 @@ constructAutoProver thyOpts = trace (show $ L.get oProofBound thyOpts)
 
 -- | Add parameters in the OpenTheory, here openchain and saturation in the options
 addParamsOptions :: TheoryLoadOptions -> Either OpenTheory OpenDiffTheory -> Either OpenTheory OpenDiffTheory
-addParamsOptions opt = addSatArg . addChainsArg . addLemmaToProve
+addParamsOptions opt = addVerboseOptions . addSatArg . addChainsArg . addLemmaToProve
 
     where
       -- Add Open Chain Limit parameters in the Options
       chain = L.get oOpenChain opt
-      addChainsArg (Left thy) = Left $ set (openChainsLimit.thyOptions) chain thy
-      addChainsArg (Right diffThy) = Right $ set (openChainsLimit.diffThyOptions) chain diffThy
+      addChainsArg (Left thy) = Left $ set (openChainsLimit . thyOptions) chain thy
+      addChainsArg (Right diffThy) = Right $ set (openChainsLimit . diffThyOptions) chain diffThy
       -- Add Saturation Limit parameters in the Options
       sat = L.get oSaturation opt
-      addSatArg (Left thy) = Left $ set (saturationLimit.thyOptions) sat thy
-      addSatArg (Right diffThy) = Right $ set (saturationLimit.diffThyOptions) sat diffThy
+      addSatArg (Left thy) = Left $ set (saturationLimit . thyOptions) sat thy
+      addSatArg (Right diffThy) = Right $ set (saturationLimit . diffThyOptions) sat diffThy
       -- Add lemmas to Prove in the Options
       lem = L.get oLemmaNames opt
-      addLemmaToProve (Left thy) = Left $ set (lemmasToProve.thyOptions) lem thy
-      addLemmaToProve (Right diffThy) = Right $ set (lemmasToProve.diffThyOptions) lem diffThy
+      addLemmaToProve (Left thy) = Left $ set (lemmasToProve . thyOptions) lem thy
+      addLemmaToProve (Right diffThy) = Right $ set (lemmasToProve . diffThyOptions) lem diffThy
+      -- Add Verbose parameter in the Options
+      verb = L.get oVerboseMode opt
+      addVerboseOptions (Left thy) = Left $ set (verboseOption . thyOptions) verb thy
+      addVerboseOptions (Right diffThy) = Right $ set (verboseOption . diffThyOptions) verb diffThy
 
 
 ------------------------------------------------------------------------------

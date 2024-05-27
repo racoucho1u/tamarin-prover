@@ -3,7 +3,6 @@
 --               contributing in 2019: Robert Künnemann, Johannes Wocker
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- Parsing Tactics
@@ -71,7 +70,7 @@ function :: Parser ((AnnotatedGoal, ProofContext, System) -> Bool, String)
 function = do
     f <- identifier
     param <- many1 $ doubleQuoted functionValue
-    return $ (nameToFunction (f,param),f++" \""++intercalate "\" \"" param++"\"")
+    return $ (nameToFunction (f,param), f++" \""++intercalate "\" \"" param++"\"")
 
 functionNot :: ((AnnotatedGoal, ProofContext, System) -> Bool, String) -> ((AnnotatedGoal, ProofContext, System) -> Bool, String)
 functionNot (f,s) = (not . f, "not "++s)
@@ -100,7 +99,7 @@ prio = do
     ranking <- symbol "prio" *> colon *> option "id" (braced identifier) -- if none use default ranking
     -- _ <- newline
     fs <- many1 disjuncts --
-    return $ Prio (nameToRanking ranking) ranking (map fst fs) (map snd fs)
+    return $ Prio (nameToRanking ranking) ranking (map fst fs) (map snd fs) 
 
 --Parsing deprio
 deprio :: Parser (Deprio ProofContext)
@@ -130,7 +129,9 @@ tacticFunctions = M.fromList
                       ]
   where
     regex' :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
-    regex' (regex:_) (agoal,_,_) = pg =~ regex
+    regex' l (agoal,_,_) = case l of 
+        (regex:_) -> pg =~ regex
+        _     -> False
         where
             pgoal (g,(_nr,_usefulness)) = prettyGoal g
             pg = concat . lines . render $ pgoal agoal
@@ -146,7 +147,7 @@ tacticFunctions = M.fromList
             isSubset = and $ map ((flip elem) ["Ku","inv"]) functions
 
             retrieveFun :: String -> [String]
-            retrieveFun pgoal = map init $ map tail $ getAllTextMatches $ pgoal=~ functionsDetection
+            retrieveFun pgoal_ = map init $ map tail $ getAllTextMatches $ pgoal_ =~ functionsDetection
 
             safenoncePattern = "(~n|" ++ intercalate "|" (map show $ concat (map (checkFormula $ head param) (S.toList $ L.get sFormulas sys)))++")(?![.0-9a-zA-Z])"
             hasSafeNonces = not (pg =~ safenoncePattern)
@@ -179,20 +180,23 @@ tacticFunctions = M.fromList
         where
             oracleType = head param
 
-            nonces = map show (getFactTerms goal)
+            nonces = map show (getFactTerms_ goal)
 
             -- reasonableNonces is designed to mimic reasonable_nonces from oracle.py of Vacarme,
             -- therefore it is meant to be used with regex "!KU\( *~.*\)", limiting the type of possible goals
-            getFactTerms :: AnnotatedGoal -> [LNTerm]
-            getFactTerms (ActionG _ (Fact { factTag = _ ,factAnnotations =  _ , factTerms = ft }), _ ) = ft
-            getFactTerms _ = []
+            getFactTerms_ :: AnnotatedGoal -> [LNTerm]
+            getFactTerms_ (ActionG _ (Fact { factTag = _ ,factAnnotations =  _ , factTerms = ft }), _ ) = ft
+            getFactTerms_ _ = []
 
             sysPattern = "~n":(map show $ concat (map (checkFormula oracleType) (S.toList $ L.get sFormulas sys)))
 
     checkFormula :: String -> LNGuarded -> [LVar]
-    checkFormula oracleType f = if rev && expG then trace (show $ concat $ getFormulaTermsCore f ) concat $ getFormulaTermsCore f else []
+    checkFormula oracleType f = if rev && expG then concat $ getFormulaTermsCore f else []
 
         where
+          getCore (Free v) = v
+          getCore _ = error "It should really not happend"
+
           rev = or $ map matchReveal (map factTagName $ guardFactTags f)
           expG = if oracleType == "curve" then show (getFormulaTerms f) =~ "grpid,exp\\('g'" else show (getFormulaTerms f) =~ "exp\\('g'"
 
@@ -200,14 +204,13 @@ tacticFunctions = M.fromList
           matchReveal s = s =~ "Reveal"
 
           getFormulaTerms :: LNGuarded -> [VTerm Name (BVar LVar)]
-          getFormulaTerms (GGuarded _ _ [Action t fa] _ ) = getFactTerms fa
+          getFormulaTerms (GGuarded _ _ [Action _ fa] _ ) = getFactTerms fa
           getFormulaTerms _ = []
 
           getFormulaTermsCore :: LNGuarded -> [[LVar]]
-          getFormulaTermsCore (GGuarded _ _ [Action t fa] _ ) = map (map getCore) (map varsVTerm (getFactTerms fa))
+          getFormulaTermsCore (GGuarded _ _ [Action _ fa] _ ) = map (map getCore) (map varsVTerm (getFactTerms fa))
+          getFormulaTermsCore _ = []
 
-              where 
-                getCore (Free v) = v
 
     isFactName :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
     isFactName (s:_) (((PremiseG _ Fact {factTag = ProtoFact Linear test _, factAnnotations = _ , factTerms = _ }), (_,_)), _, _ ) = test == s

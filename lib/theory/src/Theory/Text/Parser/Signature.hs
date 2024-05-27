@@ -3,7 +3,6 @@
 --               contributing in 2019: Robert Künnemann, Johannes Wocker
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- Parsing Signatures
@@ -25,7 +24,6 @@ where
 
 import           Prelude                    hiding (id)
 import qualified Data.ByteString.Char8      as BC
-import           Data.Foldable              (asum)
 import           Data.Either
 -- import           Data.Monoid                hiding (Last)
 import qualified Data.Set                   as S
@@ -51,20 +49,25 @@ import Theory.Sapic
 import qualified Data.Functor
 
 
+
  -- Describes the mapping between Maude Signatures and the builtin Name
 builtinsDiffNames :: [(String,
                        MaudeSig)]
 builtinsDiffNames = [
   ("diffie-hellman", dhMaudeSig),
   ("bilinear-pairing", bpMaudeSig),
-
   ("multiset", msetMaudeSig),
   ("xor", xorMaudeSig),
   ("symmetric-encryption", symEncMaudeSig),
   ("asymmetric-encryption", asymEncMaudeSig),
   ("signing", signatureMaudeSig),
+  ("dest-pairing", pairDestMaudeSig),  
+  ("dest-symmetric-encryption", symEncDestMaudeSig),
+  ("dest-asymmetric-encryption", asymEncDestMaudeSig),
+  ("dest-signing", signatureDestMaudeSig),  
   ("revealing-signing", revealSignatureMaudeSig),
-  ("hashing", hashMaudeSig)
+  ("hashing", hashMaudeSig),
+  ("natural-numbers", natMaudeSig)
               ]
 
 -- | Describes the mapping between a builtin name, its potential Maude Signatures
@@ -179,11 +182,12 @@ options thy0 =do
     setOption' thy Nothing  = thy
     setOption' thy (Just l) = setOption l thy
     builtinTheory = asum
-      [  try (symbol "translation-progress") Data.Functor.$> Just transProgress
+      [  try 
+         (symbol "translation-progress") Data.Functor.$> Just transProgress
         , symbol "translation-allow-pattern-lookups" Data.Functor.$> Just transAllowPatternMatchinginLookup
-        , symbol "enableStateOpt" Data.Functor.$> Just stateChannelOpt
-        , symbol "asynchronous-channels" Data.Functor.$> Just asynchronousChannels
-        , symbol "compress-events" Data.Functor.$> Just compressEvents
+        , symbol "translation-state-optimisation" Data.Functor.$> Just stateChannelOpt
+        , symbol "translation-asynchronous-channels" Data.Functor.$> Just asynchronousChannels
+        , symbol "translation-compress-events" Data.Functor.$> Just compressEvents
       ]
 
 predicate :: Parser Predicate
@@ -209,7 +213,7 @@ export thy = do
                     _          <- colon
                     text       <- doubleQuoted $ many bodyChar -- TODO Gotta use some kind of text.
                     let ei = ExportInfo tag text
-                    liftMaybeToEx (DuplicateItem (TranslationItem (ExportInfoItem ei))) (addExportInfo ei thy)
+                    return (addExportInfo ei thy)
                     <?> "export block"
               where
                 bodyChar = try $ do
@@ -221,25 +225,25 @@ export thy = do
 
 
 heuristic :: Bool -> Maybe FilePath -> Parser [GoalRanking ProofContext]
-heuristic diff workDir = symbol "heuristic" *> char ':' *> skipMany (char ' ') *> many1 (goalRanking diff workDir) <* lexeme spaces
+heuristic diff workDir = symbol "heuristic" *> char ':' *> skipMany (char ' ') *> (concat <$> many1 (goalRanking diff workDir)) <* lexeme spaces
 
-goalRanking :: Bool -> Maybe FilePath -> Parser (GoalRanking ProofContext)
+goalRanking :: Bool -> Maybe FilePath -> Parser [GoalRanking ProofContext]
 goalRanking diff workDir = try oracleRanking <|> internalTacticRanking <|> regularRanking <?> "goal ranking"
    where
-       regularRanking = toGoalRanking <$> many1 letter <* skipMany (char ' ')
+       regularRanking = filterHeuristic diff <$> many1 letter <* skipMany (char ' ')
 
        internalTacticRanking = do
             _ <- string "{" <* skipMany (char ' ')
             goal <- toGoalRanking <$> pure ("{.}")
             tacticName <- optionMaybe (many1 (noneOf "\"\n\r{}") <* char '}' <* skipMany (char ' '))
 
-            return $ mapInternalTacticRanking (maybeSetInternalTacticName tacticName) goal
+            return $ [mapInternalTacticRanking (maybeSetInternalTacticName tacticName) goal]
 
        oracleRanking = do
            goal <- toGoalRanking <$> (string "o" <|> string "O") <* skipMany (char ' ')
            relPath <- optionMaybe (char '"' *> many1 (noneOf "\"\n\r") <* char '"' <* skipMany (char ' '))
 
-           return $ mapOracleRanking (maybeSetOracleRelPath relPath . maybeSetOracleWorkDir workDir) goal
+           return $ [mapOracleRanking (maybeSetOracleRelPath relPath . maybeSetOracleWorkDir workDir) goal]
 
        toGoalRanking = if diff then stringToGoalRankingDiff False else stringToGoalRanking False
 

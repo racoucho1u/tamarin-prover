@@ -74,7 +74,40 @@ var server = {
         if(data.redirect) {
             // Server wants redirect
             loadingScreen.show(data.redirect);
-            window.location.href = data.redirect;
+            // Add the image query parameters so that the server response directly contains an image url with the correct parameters.
+            // Get image settings from cookie
+            var params = []
+            // If level == 0, do not compact and compress
+            if (parseInt($.cookie("simplification")) == 0) {
+                params = params.concat(
+                    { name: "uncompact", value: "" }
+                );
+                params = params.concat(
+                    { name: "uncompress", value: "" }
+                );
+            }
+            if ($.cookie("abbreviate") == null) {
+                params = params.concat(
+                    { name: "unabbreviate", value: "" }
+                );
+            }
+            params = params.concat(
+                { name: "simplification", value: $.cookie("simplification") }
+            );
+
+            if($.cookie("auto-sources")== null){
+                params = params.concat(
+                  { name: "no-auto-sources", value: ""}  
+                );
+            }
+
+            var redirectUrl = data.redirect;
+            // Rewrite image paths (if necessary)
+            if(params.length > 0) {
+                var query_string = $.param(params);
+                redirectUrl = redirectUrl + "?" + query_string;
+            }
+            window.location.href = redirectUrl;
         } else if(data.alert) {
             // Server requested alert box
             ui.showDialog(data.alert);
@@ -146,6 +179,12 @@ var ui = {
         // Load display settings
         this.loadSettings();
 
+        // initialize the cookie for not-init
+        if ($.cookie("not-init")) {
+            $.cookie("not-init",null,{path: "/"});
+        }
+
+        // $.cookie("simplification", 2, { path: '/' });
         // Navigation drop-down menus
         $("ul#navigation").superfish();
 
@@ -232,11 +271,11 @@ var ui = {
 		    var obj = $(olink);
 	            if (i == j) {
     		        obj.removeClass('inactive-option');
-		        obj.addClass('active-option');
-		    } else {
-		        obj.removeClass('active-option');
-		        obj.addClass('inactive-option');
-		    }
+		            obj.addClass('active-option');
+		        } else {
+		            obj.removeClass('active-option');
+		            obj.addClass('inactive-option');
+		        }
 	        }
                 $("a.active-link").click();
             });
@@ -258,6 +297,24 @@ var ui = {
             $("a.active-link").click();
             mainDisplay.toggleOption(abbrv_toggle);
         });
+
+        // Click handler for auto-sources' toggle
+        var auto_toggle = $('a#auto-toggle');
+        auto_toggle.click(function(ev) {
+            ev.preventDefault();
+            var pathname = window.location.href;
+            if ($.cookie("auto-sources")) {      
+                $.cookie("auto-sources", null, { path: '/' });  
+            } else {
+                $.cookie("auto-sources", true, { path: '/' });
+              
+            }
+            mainDisplay.toggleOption(auto_toggle);  
+            // to tell that this is a call from the toggle
+            $.cookie("not-init",true,{path: "/"});
+            $("a.active-link").click();
+        });
+
 
 
         // Install event handlers
@@ -328,10 +385,10 @@ var ui = {
 
 	/* If no simplification level specified yet, default to 1 */
 	if ($.cookie("simplification") == null) {
-	    $.cookie("simplification", 10, { path: '/' });
+	    $.cookie("simplification", 2, { path: '/' });
 	}
 	/* Add buttons for each of the simplification levels */
-	for (var i=0;i<10;i++) {
+	for (var i=0;i<4;i++) {
 	    var linkname = "a#lvl"+i+"-toggle";
 	    if (parseInt($.cookie("simplification")) == i) {
                 $(linkname).addClass("active-option");
@@ -345,6 +402,14 @@ var ui = {
         } else {
             $("a#abbrv-toggle").addClass("disabled-option");
         }
+
+        if($.cookie("auto-sources")){
+            $("a#auto-toggle").addClass("active-option");
+        }
+        else{
+            $("a#auto-toggle").addClass("disabled-option");
+        }
+        
     },
 
     /**
@@ -457,6 +522,23 @@ var events = {
               elementPath[4] = section;
               path = elementPath.join("/");
             }
+            // if is a call not from the toggle (the first time to enter in the lemma)
+            if ($.cookie("not-init")== null) {
+                // show annotation auto-sources for lemma AUTO_typing
+                if (path.indexOf("AUTO_typing")>0) {
+                    if ($.cookie("auto-sources")== null) {
+                        $.cookie("auto-sources",true,{path:'/'});
+                        mainDisplay.toggleOption($('a#auto-toggle'));
+                    }
+                // else, don't show annotations for other lemmas    
+                }else{
+                    if ($.cookie("auto-sources")) {
+                        $.cookie("auto-sources",null,{path:'/'});
+                        mainDisplay.toggleOption($('a#auto-toggle'));
+                    }
+                }
+            }
+            
 
             mainDisplay.loadTarget(
                 path,
@@ -706,6 +788,12 @@ var mainDisplay = {
         params = params.concat(
             { name: "simplification", value: $.cookie("simplification") }
         );
+
+        if($.cookie("auto-sources")== null){
+            params = params.concat(
+              { name: "no-auto-sources", value: ""}  
+            );
+        }
 
         // Rewrite image paths (if necessary)
         if(params.length > 0) {

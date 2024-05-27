@@ -5,7 +5,6 @@
 -- Copyright   : (c) 2011,2012 Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : GHC only
 --
 -- Big-step proofs computing possible sources of a fact.
@@ -29,13 +28,13 @@ module Theory.Constraint.Solver.Sources (
   , IntegerParameters(..)
   , paramOpenChainsLimit
   , paramSaturationLimit
+  , showSaturationSteps
 
   ) where
 
 import           Prelude                                 hiding (id, (.))
 import           Safe
 
-import           Data.Foldable                           (asum)
 import qualified Data.Map                                as M
 import qualified Data.Set                                as S
 
@@ -72,10 +71,11 @@ import qualified Data.Binary  as B
 
 
 -- | Parameters
-data IntegerParameters = IntegerParameters 
+data IntegerParameters = IntegerParameters
     {
       _paramOpenChainsLimit :: Integer
     , _paramSaturationLimit :: Integer
+    , _showSaturationSteps  :: Bool
     } deriving( Eq, Ord, Show, G.Generic, NFData, B.Binary )
 $(mkLabels [''IntegerParameters])
 
@@ -162,6 +162,7 @@ solveAllSafeGoals ths' openChainsLimit =
         -- Uncomment to get more extensive case splitting
         SplitG _      -> doSplit --extensiveSplitting &&
         -- SplitG _      -> False
+        SubtermG _    -> doSplit
 
     usefulGoal (_, (_, Useful)) = True
     usefulGoal _                = False
@@ -360,20 +361,33 @@ applySource ctxt th0 goal = case matchToGoal ctxt th0 goal of
 saturateSources
     :: IntegerParameters -> ProofContext -> [Source] -> [Source]
 saturateSources parameters ctxt thsInit  =
-    (go thsInit 1)
+    go thsInit 1
   where
     go :: [Source] -> Integer -> [Source]
-    go ths n =
-        if (any or (changes `using` parList rdeepseq)) && (n <= get paramSaturationLimit parameters)
-          then trace("[Saturating Sources] Step " ++ show n ++ "/" ++ show (get paramSaturationLimit parameters)) $ go ths' (n + 1)
-          else if (n > get paramSaturationLimit parameters)
-            then trace ("[Saturating Sources] Saturation aborted, more than " ++ (show (get paramSaturationLimit parameters)) ++ " iterations. (Limit can be change with -s=)") ths'
-            else trace("[Saturating Sources] Step " ++ show n ++ "/" ++ show (get paramSaturationLimit parameters)) ths'
+    go ths n
+      | any or (changes `using` parList rdeepseq) && (n <= get paramSaturationLimit parameters) =
+          if get showSaturationSteps parameters then
+            trace ("[Saturating Sources] Step " ++ show n ++ " (Max " ++ show (get paramSaturationLimit parameters) ++ ")")
+             $ go ths' (n + 1)
+          else 
+             go ths' (n + 1)
+      | n > get paramSaturationLimit parameters =
+          if get showSaturationSteps parameters then
+            trace ("[Saturating Sources] Saturation aborted, more than " ++ show (get paramSaturationLimit parameters) ++
+                 " iterations. (Limit can be change with -s=)") ths'
+          else
+            ths'
+      | otherwise =
+          if get showSaturationSteps parameters then
+            trace "[Saturating Sources] Done" ths'
+          else ths'
       where
-        (changes, ths') = unzip $ map (refineSource ctxt solver) ths
-        goodTh th  = length (getDisj (get cdCases th)) <= 1
-        solver     = do names <- solveAllSafeGoals (filter goodTh ths) (get paramOpenChainsLimit parameters) 
-                        return (not $ null names, names)
+          (changes, ths') = unzip $ map (refineSource ctxt solver) ths
+          goodTh th = length (getDisj (get cdCases th)) <= 1
+          solver
+            = do names <- solveAllSafeGoals
+                            (filter goodTh ths) (get paramOpenChainsLimit parameters)
+                 return (not $ null names, names)
 
 -- | Precompute a saturated set of case distinctions.
 precomputeSources
@@ -425,7 +439,13 @@ precomputeSources parameters ctxt restrictions =
     absMsgFacts :: [LNTerm]
     absMsgFacts = asum $ sortednub $
       [ return $ varTerm (LVar "t" LSortFresh 1)
+      -- Bilinear pairing
       , if enableBP msig then return $ fAppC EMap $ nMsgVars (2::Int) else []
+      -- Natural numbers
+      , if enableNat msig then
+          [ fAppNoEq natOneSym []
+          , fAppAC NatPlus [varTerm (LVar "t" LSortNat 1), varTerm (LVar "t" LSortNat 2)] ]
+          else []
       , [ fAppNoEq o $ nMsgVars k
         | o@(_,(k,priv,_)) <- S.toList . noEqFunSyms  $ msig
         , NoEq o `S.notMember` implicitFunSig, k > 0 || priv==Private]

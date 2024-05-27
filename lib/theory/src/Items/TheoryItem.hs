@@ -16,6 +16,8 @@ import Data.Binary (Binary)
 import Theory.Model.Restriction
 import Theory.Constraint.Solver
 
+import Term.Macro
+
 import Items.ProcessItem
 import Theory.Syntactic.Predicate
 import Items.CaseTestItem
@@ -33,6 +35,9 @@ import Items.ExportInfo
 -- | A formal comment is a header together with the body of the comment.
 
 type FormalComment = (String, String)
+
+-- | A configuration block.
+type ConfigBlock = String
 
 -- | TranslationItems can be processes, accountability lemmas, and case tests
 data TranslationElement =
@@ -53,7 +58,9 @@ data TheoryItem r p s =
      | LemmaItem (Lemma p)
      | RestrictionItem Restriction
      | TextItem FormalComment
+     | ConfigBlockItem ConfigBlock
      | PredicateItem Predicate
+     | MacroItem [Macro]
      | TranslationItem s
      deriving( Show, Eq, Ord, Functor, Generic, NFData, Binary )
 
@@ -62,6 +69,7 @@ data TheoryItem r p s =
 --   - Diff Rules, which are then decomposed in either rules for both sides
 --   - the Diff Lemmas, stating observational equivalence
 --   - the either lemmas and restrictions, stating properties about either side
+--   - the Diff Macros 
 --   - and comments
 data DiffTheoryItem r r2 p p2 =
        DiffRuleItem r
@@ -69,7 +77,9 @@ data DiffTheoryItem r r2 p p2 =
      | DiffLemmaItem (DiffLemma p)
      | EitherLemmaItem (Side, Lemma p2)
      | EitherRestrictionItem (Side, Restriction)
+     | DiffMacroItem [Macro]
      | DiffTextItem FormalComment
+     | DiffConfigBlockItem ConfigBlock
      deriving( Show, Eq, Ord, Functor, Generic, NFData, Binary )
 
 

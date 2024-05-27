@@ -9,7 +9,6 @@
 -- Copyright   : (c) 2010-2012 Benedikt Schmidt & Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : GHC only
 --
 -- Types representing constraints.
@@ -21,12 +20,14 @@ module Theory.Constraint.System.Constraints (
   , NodePrem
   , NodeConc
   , Edge(..)
+  , Reason(..)
   , Less
 
   -- * Goal constraints
   , Goal(..)
   , isActionGoal
   , isStandardActionGoal
+  , isSubtermGoal
   , isPremiseGoal
   , isChainGoal
   , isSplitGoal
@@ -76,12 +77,31 @@ data Edge = Edge {
     }
   deriving (Show, Ord, Eq, Data, Typeable, Generic, NFData, Binary)
 
+-- | A reason to explain the less
+-- | Order is from the most important to the least important 
+data Reason = Formula | InjectiveFacts | Fresh | Adversary | NormalForm
+      deriving (Ord, Eq, Data, Typeable, Generic, NFData, Binary)
+
 -- | A *⋖* constraint between 'NodeId's.
-type Less = (NodeId, NodeId)
+type Less = (NodeId, NodeId, Reason)
 
 -- Instances
 ------------
+instance Show Reason where
+    show Fresh              = "fresh value"
+    show Formula            = "formula"
+    show InjectiveFacts     = "injective facts"
+    show NormalForm         = "normal form condition"
+    show Adversary          = "adversary"
 
+instance Apply LNSubst Reason where
+    apply = const id
+
+instance HasFrees Reason where
+    foldFrees = const mempty
+    foldFreesOcc  _ _ = const mempty
+    mapFrees  = const pure
+    
 instance Apply LNSubst Edge where
     apply subst (Edge from to) = Edge (apply subst from) (apply subst to)
 
@@ -102,13 +122,15 @@ data Goal =
        ActionG LVar LNFact
        -- ^ An action that must exist in the trace.
      | ChainG NodeConc NodePrem
-       -- A destruction chain.
+       -- ^ A destruction chain.
      | PremiseG NodePrem LNFact
        -- ^ A premise that must have an incoming direct edge.
      | SplitG SplitId
        -- ^ A case split over equalities.
      | DisjG (Disj LNGuarded)
        -- ^ A case split over a disjunction.
+     | SubtermG (LNTerm, LNTerm)
+       -- ^ A split of a Subterm which is in SubtermStore -> _subterms
      deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
 -- Indicators
@@ -138,6 +160,10 @@ isDisjGoal :: Goal -> Bool
 isDisjGoal (DisjG _) = True
 isDisjGoal _         = False
 
+isSubtermGoal :: Goal -> Bool
+isSubtermGoal (DisjG _) = True
+isSubtermGoal _         = False
+
 
 
 -- Instances
@@ -150,6 +176,7 @@ instance HasFrees Goal where
         ChainG c p    -> foldFrees f c <> foldFrees f p
         SplitG i      -> foldFrees f i
         DisjG x       -> foldFrees f x
+        SubtermG p    -> foldFrees f p
 
     foldFreesOcc  f c goal = case goal of
         ActionG i fa -> foldFreesOcc f ("ActionG":c) (i, fa)
@@ -162,6 +189,7 @@ instance HasFrees Goal where
         ChainG c p    -> ChainG   <$> mapFrees f c <*> mapFrees f p
         SplitG i      -> SplitG   <$> mapFrees f i
         DisjG x       -> DisjG    <$> mapFrees f x
+        SubtermG p    -> SubtermG <$> mapFrees f p
 
 instance Apply LNSubst Goal where
     apply subst goal = case goal of
@@ -170,12 +198,16 @@ instance Apply LNSubst Goal where
         ChainG c p    -> ChainG   (apply subst c) (apply subst p)
         SplitG i      -> SplitG   (apply subst i)
         DisjG x       -> DisjG    (apply subst x)
+        SubtermG p    -> SubtermG (apply subst p)
 
 
 ------------------------------------------------------------------------------
 -- Pretty printing                                                          --
 ------------------------------------------------------------------------------
-
+-- | Pretty print a reason
+prettyReason :: HighlightDocument d => Reason -> d
+prettyReason r = text $ "induced by " ++ show r
+    
 -- | Pretty print a node.
 prettyNode :: HighlightDocument d => (NodeId, RuleACInst) -> d
 prettyNode (v,ru) = prettyNodeId v <> colon <-> prettyRuleACInst ru
@@ -195,7 +227,7 @@ prettyEdge (Edge c p) =
 
 -- | Pretty print a less-atom as @src < tgt@.
 prettyLess :: HighlightDocument d => Less -> d
-prettyLess (i, j) = prettyNAtom $ Less (varTerm i) (varTerm j)
+prettyLess (i, j, r) = (prettyNAtom $ Less (varTerm i) (varTerm j)) <> colon <-> prettyReason r
 
 -- | Pretty print a goal.
 prettyGoal :: HighlightDocument d => Goal -> d
@@ -212,4 +244,6 @@ prettyGoal (DisjG (Disj gfs)) = fsep $
     -- punctuate (operator_ " |") (map (nest 1 . parens . prettyGuarded) gfs)
 prettyGoal (SplitG x) =
     text "splitEqs" <> parens (text $ show (unSplitId x))
+prettyGoal (SubtermG (l,r)) =
+    prettyLNTerm l <-> operator_ "⊏" <-> prettyLNTerm r
 
