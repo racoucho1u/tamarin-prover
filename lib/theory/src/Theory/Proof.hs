@@ -1056,7 +1056,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
             InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
-            otherwise -> node method cases
+            _ -> node method cases
 
         node method cases = 
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)

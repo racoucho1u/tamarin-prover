@@ -398,8 +398,8 @@ data System = System
     , _sSolvedFormulas :: S.Set LNGuarded
     , _sLemmas         :: S.Set LNGuarded
     , _sGoals          :: M.Map Goal GoalStatus
-    , _sPathGoals      :: [[Goal]]
-    , _sNbLoop         :: Int
+    , _sPathGoals      :: [(Int, Int, [Goal])]         -- (depth, iteration, rewritting of the goal)
+    , _sNbLoop         :: (Int, Int)                   -- (depth, iteration)
     , _sLoopFound      :: Bool
     , _sNextGoalNr     :: Integer
     , _sSourceKind     :: SourceKind
@@ -830,7 +830,7 @@ emptySystem :: SourceKind -> Bool -> System
 emptySystem d isdiff = System
     M.empty S.empty S.empty Nothing emptySubtermStore emptyEqStore
     S.empty S.empty S.empty
-    M.empty [] 0 False 0 d isdiff
+    M.empty [] (0,0) False 0 d isdiff
 
 -- | The empty diff constraint system.
 emptyDiffSystem :: DiffSystem
