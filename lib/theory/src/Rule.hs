@@ -136,8 +136,8 @@ closeRuleCache parameters restrictions typAsms forcedInjFacts sig protoRules int
         sig classifiedRules injFactInstances RawSource [] AvoidInduction Nothing Nothing 
         (error "closeRuleCache: trace quantifier should not matter here")
         (error "closeRuleCache: lemma name should not matter here") [] verbose isdiff
-        (all isSubtermRule {-- $ trace (show destr ++ " - " ++ show (map isSubtermRule destr))-} destr) (any isConstantRule destr)
-        isSapic
+        (all isSubtermRule destr) (any isConstantRule destr)
+        isSapic False
 
     -- Maude handle
     hnd = L.get sigmMaudeHandle sig

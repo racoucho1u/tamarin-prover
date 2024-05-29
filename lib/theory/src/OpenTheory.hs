@@ -402,11 +402,11 @@ defaultOption = Option False False False False False False False False S.empty [
 
 -- | Default theory
 defaultOpenTheory :: Bool -> OpenTheory
-defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False
+defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False False
 
 -- | Default diff theory
 defaultOpenDiffTheory :: Bool -> OpenDiffTheory
-defaultOpenDiffTheory flag = DiffTheory "default" "default" [] [] (emptySignaturePure flag) [] [] [] [] [] defaultOption False
+defaultOpenDiffTheory flag = DiffTheory "default" "default" [] [] (emptySignaturePure flag) [] [] [] [] [] defaultOption False False
 
 -- Add the default Diff lemma to an Open Diff Theory
 addDefaultDiffLemma:: OpenDiffTheory -> OpenDiffTheory

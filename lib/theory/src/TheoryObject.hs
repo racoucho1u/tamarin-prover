@@ -36,6 +36,8 @@ module TheoryObject (
   , diffThyHeuristic
   , thyTactic
   , diffThyTactic
+  , thyGenerateTactic
+  , diffThyGenerateTactic
   , DiffLemma(..)
   , ProcessDef(..)
   , Predicate(..)
@@ -180,15 +182,16 @@ import Data.ByteString.Char8 (unpack)
 -- | A theory contains a single set of rewriting rules modeling a protocol
 -- and the lemmas that
 data Theory sig c r p s = Theory {
-         _thyName      :: String
-       , _thyInFile    :: String
-       , _thyHeuristic :: [GoalRanking ProofContext]
-       , _thyTactic    :: [Tactic ProofContext]
-       , _thySignature :: sig
-       , _thyCache     :: c
-       , _thyItems     :: [TheoryItem r p s]
-       , _thyOptions   :: Option
-       , _thyIsSapic   :: Bool
+         _thyName           :: String
+       , _thyInFile         :: String
+       , _thyHeuristic      :: [GoalRanking ProofContext]
+       , _thyTactic         :: [Tactic ProofContext]
+       , _thySignature      :: sig
+       , _thyCache          :: c
+       , _thyItems          :: [TheoryItem r p s]
+       , _thyOptions        :: Option
+       , _thyIsSapic        :: Bool
+       , _thyGenerateTactic :: Bool
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
@@ -209,6 +212,7 @@ data DiffTheory sig c r r2 p p2 = DiffTheory {
        , _diffThyItems          :: [DiffTheoryItem r r2 p p2]
        , _diffThyOptions        :: Option
        , _diffThyIsSapic        :: Bool
+       , _diffThyGenerateTactic :: Bool
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 $(mkLabels [''DiffTheory])
@@ -541,21 +545,21 @@ addDiffLemma l thy = do
 
 -- | Add a new default heuristic. Fails if a heuristic is already defined.
 addHeuristic :: [GoalRanking ProofContext] -> Theory sig c r p s -> Maybe (Theory sig c r p s)
-addHeuristic h (Theory n f [] t sig c i o sapic) = Just (Theory n f h t sig c i o sapic)
+addHeuristic h (Theory n f [] t sig c i o sapic gt) = Just (Theory n f h t sig c i o sapic gt)
 addHeuristic _ _ = Nothing
 
 addDiffHeuristic :: [GoalRanking ProofContext] -> DiffTheory sig c r r2 p p2 -> Maybe (DiffTheory sig c r r2 p p2)
-addDiffHeuristic h (DiffTheory n f [] t sig cl cr dcl dcr i opt sapic) = Just (DiffTheory n f h t sig cl cr dcl dcr i opt sapic)
+addDiffHeuristic h (DiffTheory n f [] t sig cl cr dcl dcr i opt sapic gt) = Just (DiffTheory n f h t sig cl cr dcl dcr i opt sapic gt)
 addDiffHeuristic _ _ = Nothing
 
 addTactic :: Tactic ProofContext -> Theory sig c r p s -> Maybe (Theory sig c r p s)
-addTactic t (Theory n f h [] sig c i o sapic) = Just (Theory n f h [t] sig c i o sapic)
-addTactic t (Theory n f h l sig c i o sapic) = Just (Theory n f h (l++[t]) sig c i o sapic)
+addTactic t (Theory n f h [] sig c i o sapic gt) = Just (Theory n f h [t] sig c i o sapic gt)
+addTactic t (Theory n f h l sig c i o sapic gt) = Just (Theory n f h (l++[t]) sig c i o sapic gt)
 -- addTactic _ _ = Nothing
 
 addDiffTactic :: Tactic ProofContext -> DiffTheory sig c r r2 p p2 -> Maybe (DiffTheory sig c r r2 p p2)
-addDiffTactic t (DiffTheory n f h [] sig cl cr dcl dcr i o sapic) = Just (DiffTheory n f h [t] sig cl cr dcl dcr i o sapic)
-addDiffTactic t (DiffTheory n f h l sig cl cr dcl dcr i o sapic) = Just (DiffTheory n f h (l++[t]) sig cl cr dcl dcr i o sapic)
+addDiffTactic t (DiffTheory n f h [] sig cl cr dcl dcr i o sapic gt) = Just (DiffTheory n f h [t] sig cl cr dcl dcr i o sapic gt)
+addDiffTactic t (DiffTheory n f h l sig cl cr dcl dcr i o sapic gt) = Just (DiffTheory n f h (l++[t]) sig cl cr dcl dcr i o sapic gt)
 
 -- | Remove a lemma by name. Fails, if the lemma does not exist.
 removeLemma :: String -> Theory sig c r p s -> Maybe (Theory sig c r p s)

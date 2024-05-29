@@ -164,6 +164,9 @@ theoryLoadFlags =
   , flagOpt "5" ["derivcheck-timeout","d"] (updateArg "derivcheck-timeout" ) "INT"
       "Set timeout for message derivation checks in sec (default 5). 0 deactivates check."
 
+  , flagNone ["generate-tactic", "t"] (addEmptyArg "generateTactic")
+      "Export tactic from the proof execution"
+
 
 --  , flagOpt "" ["diff"] (updateArg "diff") "OFF|ON"
 --      "Turn on observational equivalence (default OFF)."
@@ -191,6 +194,7 @@ data TheoryLoadOptions = TheoryLoadOptions {
   , _oOpenChain         :: Integer
   , _oSaturation        :: Integer
   , _oDerivationChecks  :: Int
+  , _oTacticGeneration  :: Bool
 } deriving Show
 $(mkLabels [''TheoryLoadOptions])
 
@@ -213,6 +217,7 @@ defaultTheoryLoadOptions = TheoryLoadOptions {
   , _oOpenChain         = 10
   , _oSaturation        = 5
   , _oDerivationChecks  = 5
+  , _oTacticGeneration  = False
 }
 
 toParserFlags :: TheoryLoadOptions -> [String]
@@ -242,6 +247,7 @@ mkTheoryLoadOptions as = TheoryLoadOptions
                          <*> openchain
                          <*> saturation
                          <*> deriv
+                         <*> tacticG
   where
     proveMode  = return $ argExists "prove" as
     lemmaNames = return $ findArg "prove" as ++ findArg "lemma" as
@@ -297,6 +303,8 @@ mkTheoryLoadOptions as = TheoryLoadOptions
     derivchecks = findArg "derivcheck-timeout" as
     derivDefault = L.get oDerivationChecks defaultTheoryLoadOptions
     deriv = parseIntArg derivchecks derivDefault id "derivcheck-timeout: invalid bound given"
+
+    tacticG = return $ argExists "generateTactic" as
 
 stopOnTrace :: MonadError ArgumentError m => Arguments -> m (Maybe SolutionExtractor)
 stopOnTrace as = case map toLower <$> findArg "stop-on-trace" as of

@@ -756,7 +756,7 @@ data ProofContext = ProofContext
        , _pcSources            :: [Source]
        , _pcUseInduction       :: InductionHint
        , _pcHeuristic          :: Maybe (Heuristic ProofContext)
-       , _pcTactic            :: Maybe [Tactic ProofContext]
+       , _pcTactic             :: Maybe [Tactic ProofContext]
        , _pcTraceQuantifier    :: SystemTraceQuantifier
        , _pcLemmaName          :: String
        , _pcHiddenLemmas       :: [String]
@@ -765,6 +765,7 @@ data ProofContext = ProofContext
        , _pcTrueSubterm        :: Bool -- true if in all rules the RHS is a subterm of the LHS
        , _pcConstantRHS        :: Bool -- true if there are rules with a constant RHS
        , _pcIsSapic            :: Bool -- true if the model was originally a sapic process
+       , _pcTacticExport       :: Bool -- true if we want to export a tactic for each lemma
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
