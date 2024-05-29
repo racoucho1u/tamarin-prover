@@ -120,6 +120,9 @@ import           Theory.Constraint.Solver
 import           Theory.Model
 import           Theory.Text.Pretty
 import GHC.IO (unsafePerformIO)
+
+
+
 -- import Text.XHtml (meta)
 
 
@@ -1051,23 +1054,56 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           [] | finishedSubterms ctxt sys -> node Solved M.empty
           []                             -> node Unfinishable M.empty
-          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+          ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || isNothing (extractGoal method)
+                                                then checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+                                                else node (Incorrect (depth, fromJust $ extractGoal method)) M.empty --we are going to backtrack so this node will disappear
       where
+        incorrectnessScore :: ProofMethod -> Int
+        incorrectnessScore (Incorrect (s,_)) = s
+        incorrectnessScore _ = 0
+
+        countLoop :: [(Int,Int,[Goal])] -> Int
+        countLoop []          = 0
+        countLoop ((_,0,_):t) = countLoop t
+        countLoop ((_,_,_):t) = 1 + countLoop t
+
+        checkBacktracking :: Int -> System -> Bool
+        -- alpha = 20 and delta = 3 lifted from SmartVerif paper
+        checkBacktracking _depth _system = _depth > 20 && countLoop (L.get sPathGoals sys) > 3
+
         exportTactic :: String -> ProofMethod -> M.Map CaseName System -> Proof ()
         exportTactic tacticFile method cases = unsafePerformIO $ do
           writeFile tacticFile (show method)
           return (node method cases)
 
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
-        --checkForLoop [] = node (InLoop (0,method)) M.empty
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = trace "Hey you" exportTactic generatedTactic method0 cases0
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
-            InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
+        checkForLoop [] (method0, (cases0, _expl0)) = exportTactic generatedTactic method0 cases0
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
+            InLoop _    -> checkForLoop suite (method0, (cases0, _expl0))
+            Incorrect _ -> checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
 
-        node method cases = 
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+        extractGoal :: ProofMethod -> Maybe Goal
+        extractGoal method = case method of
+            InLoop (_, _, goal) -> Just goal
+            Incorrect (_,goal)  -> Just goal
+            SolveGoal goal      -> Just goal
+            _ -> Nothing
+
+        propagatedMethod cases methodOrigin = case propagatingMethod cases of
+                Incorrect (1, _)   -> (methodOrigin, successors)                               -- When badness scores reaches 1, we should be at the root and therefore shoulg go again
+                Incorrect (scr, _) -> (Incorrect (scr-1, fromJust $ extractGoal methodOrigin), successors)
+                _                  -> (methodOrigin, successors)
+           where
+                propagatingMethod cases  = foldl (\method (LNode (ProofStep proofmethod _ ) _) -> if proofmethod > method then proofmethod else method) (Sorry Nothing) successors
+                successors = M.map (prove (succ depth)) cases
+
+        node methodOrigin cases =
+          if cases == M.empty then LNode (ProofStep methodOrigin ()) M.empty else LNode (ProofStep method ()) successors_
+            where
+                --successors_ = M.map (prove (succ depth)) cases
+                (method, successors_) = propagatedMethod cases methodOrigin
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the

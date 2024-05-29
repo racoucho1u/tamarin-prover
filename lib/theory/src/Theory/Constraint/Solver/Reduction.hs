@@ -594,7 +594,7 @@ substLastAtom       = substPart sLastAtom
 substFormulas       = substPart sFormulas
 substSolvedFormulas = substPart sSolvedFormulas
 substLemmas         = substPart sLemmas
-substNbLoop         = substPart sNbLoop
+--substNbLoop         = substPart sNbLoop
 substLoopFound      = substPart sLoopFound
 substNextGoalNr     = return ()
 

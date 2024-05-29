@@ -237,7 +237,7 @@ module Theory.Constraint.System (
 
   -- ** Goals for loopdetection
   , sPathGoals
-  , sNbLoop
+  , sCurrentLoop
   , sLoopFound
 
   -- * Formula simplification
@@ -399,7 +399,7 @@ data System = System
     , _sLemmas         :: S.Set LNGuarded
     , _sGoals          :: M.Map Goal GoalStatus
     , _sPathGoals      :: [(Int, Int, [Goal])]         -- (depth, iteration, rewritting of the goal)
-    , _sNbLoop         :: (Int, Int)                   -- (depth, iteration)
+    , _sCurrentLoop    :: (Int, Int)                   -- (depth, iteration)
     , _sLoopFound      :: Bool
     , _sNextGoalNr     :: Integer
     , _sSourceKind     :: SourceKind

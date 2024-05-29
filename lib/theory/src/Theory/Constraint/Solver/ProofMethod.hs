@@ -199,6 +199,7 @@ data ProofMethod =
   | Simplify                             -- ^ A simplification step.
   | InLoop (Int, Int, Goal)              -- ^ A goal that has been detected as part as a loop (depth, iteration, goal)
   | SolveGoal Goal                       -- ^ A goal that was solved.
+  | Incorrect (Int, Goal)                -- ^ A goal that is on a branch that have been backtracked (badness score,goal)
   | Contradiction (Maybe Contradiction)  -- ^ A contradiction could be
                                          -- derived, possibly with a reason.
   | Induction                            -- ^ Use inductive strengthening on
@@ -325,7 +326,7 @@ execProofMethod ctxt method sys =
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
       where
-        sys'   = L.set sNbLoop (depth,iteration) (L.set sLoopFound loop (L.set sPathGoals ((depth,iteration,[cleanGoal goal]):(L.get sPathGoals sys)) sys))
+        sys'   = L.set sCurrentLoop (depth,iteration) (L.set sLoopFound loop (L.set sPathGoals ((depth,iteration,[cleanGoal goal]):(L.get sPathGoals sys)) sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
@@ -535,7 +536,9 @@ rankProofMethods ranking tactics ctxt sys = do
       Just cases -> case M.toList cases of
           []                       -> return (m, (cases, expl))
           -- [(case1,sys)]            -> if L.get sLoopFound sys then return (InLoop 0, (cases, expl)) else return (m, (cases, expl))
-          ((case1,sys):_) -> if  fst (L.get sNbLoop sys) > 0 then return (InLoop (fst $ L.get sNbLoop sys, snd $ L.get sNbLoop sys, fromJust $ fromSolveGoal m), (cases, expl)) else return (m, (cases, expl))
+          ((case1,sys):_) -> if  fst (L.get sCurrentLoop sys) > 0 
+            then return (InLoop (fst $ L.get sCurrentLoop sys, snd $ L.get sCurrentLoop sys, fromJust $ fromSolveGoal m), (cases, expl)) 
+            else return (m, (cases, expl))
       Nothing    -> []
   where
     contradiction c                    = (Contradiction (Just c), "")
