@@ -101,6 +101,7 @@ module Theory.Proof (
 ) where
 
 import           GHC.Generics                     (Generic)
+import           GHC.Float                        (int2Float)
 
 import           Data.Binary
 import           Data.List
@@ -119,7 +120,8 @@ import           Control.Parallel.Strategies
 import           Theory.Constraint.Solver
 import           Theory.Model
 import           Theory.Text.Pretty
-import GHC.IO (unsafePerformIO)
+import           System.Random
+import           System.IO.Unsafe
 
 
 
@@ -1052,11 +1054,11 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
     generatedTactic = L.get pcLemmaName ctxt ++ ".tactic"
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          [] | finishedSubterms ctxt sys -> node Solved M.empty
-          []                             -> node Unfinishable M.empty
-          ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || isNothing (extractGoal method)
-                                                then checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
-                                                else node (Incorrect (depth, fromJust $ extractGoal method)) M.empty --we are going to backtrack so this node will disappear
+          [] | finishedSubterms ctxt sys -> node Solved M.empty depth
+          []                             -> node Unfinishable M.empty depth
+          ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || trace ("Should backtrack but does not: "++show method) isNothing (extractGoal method)
+                                                then pickGoal ((method, (cases, _expl)):suite) depth
+                                                else node (Incorrect (incorrectnessScore method+1, fromJust $ extractGoal method)) M.empty depth --we are going to backtrack so this node will disappear
       where
         incorrectnessScore :: ProofMethod -> Int
         incorrectnessScore (Incorrect (s,_)) = s
@@ -1071,18 +1073,43 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         -- alpha = 20 and delta = 3 lifted from SmartVerif paper
         checkBacktracking _depth _system = _depth > 20 && countLoop (L.get sPathGoals sys) > 3
 
-        exportTactic :: String -> ProofMethod -> M.Map CaseName System -> Proof ()
-        exportTactic tacticFile method cases = unsafePerformIO $ do
+        {-exportTactic :: Int -> String -> ProofMethod -> M.Map CaseName System -> Proof ()
+        exportTactic dpth tacticFile method cases = unsafePerformIO $ do
           writeFile tacticFile (show method)
-          return (node method cases)
+          return (node method cases dpth)
 
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
         checkForLoop [] (method0, (cases0, _expl0)) = exportTactic generatedTactic method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            InLoop _    -> checkForLoop suite (method0, (cases0, _expl0))
+            --InLoop _    -> checkForLoop suite (method0, (cases0, _expl0))
             Incorrect _ -> checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
+        -}
+
+        pickGoal :: [(ProofMethod, (M.Map CaseName System, String))] -> Int -> Proof()
+        pickGoal list dpth = node method cases dpth
+          where
+            scoreList = scoreGoals list
+            distribution = reverse $ foldl (\acc x -> (x+ head acc):acc) [head scoreList] (tail scoreList)
+            idx = correspondingIdx (drawRand $ last distribution) distribution
+            (method, (cases, _expl)) = list !! idx
+
+            ------------- Random drawing  -------------
+            --Picking the index that correspond to the drawn random
+            correspondingIdx :: Float -> [Float] -> Int
+            correspondingIdx rand = foldl (\acc i -> if rand > i then 1+acc else acc) 0
+
+            drawRand :: Float -> Float
+            drawRand sup = unsafePerformIO $ do
+                g <- newStdGen
+                let (result, _) = randomR (0, sup) g
+                return result
+
+            scoreGoals :: [(ProofMethod, (M.Map CaseName System, String))] -> [Float]
+            scoreGoals [] = []
+            scoreGoals ((Incorrect (i,_),_):t) = 1/int2Float i:scoreGoals t
+            scoreGoals (_:t) = 1.0:scoreGoals t
 
         extractGoal :: ProofMethod -> Maybe Goal
         extractGoal method = case method of
@@ -1091,7 +1118,9 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             SolveGoal goal      -> Just goal
             _ -> Nothing
 
-        propagatedMethod cases methodOrigin = case propagatingMethod cases of
+        propagatedMethod cases methodOrigin dpth = if depth == 0
+          then (methodOrigin, successors)
+          else case propagatingMethod cases of
                 Incorrect (1, _)   -> (methodOrigin, successors)                               -- When badness scores reaches 1, we should be at the root and therefore shoulg go again
                 Incorrect (scr, _) -> (Incorrect (scr-1, fromJust $ extractGoal methodOrigin), successors)
                 _                  -> (methodOrigin, successors)
@@ -1099,11 +1128,11 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                 propagatingMethod cases  = foldl (\method (LNode (ProofStep proofmethod _ ) _) -> if proofmethod > method then proofmethod else method) (Sorry Nothing) successors
                 successors = M.map (prove (succ depth)) cases
 
-        node methodOrigin cases =
+        node methodOrigin cases dpth =
           if cases == M.empty then LNode (ProofStep methodOrigin ()) M.empty else LNode (ProofStep method ()) successors_
             where
                 --successors_ = M.map (prove (succ depth)) cases
-                (method, successors_) = propagatedMethod cases methodOrigin
+                (method, successors_) = propagatedMethod cases methodOrigin dpth
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
