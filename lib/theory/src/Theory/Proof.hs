@@ -1128,14 +1128,20 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             SolveGoal goal        -> Just goal
             _ -> Nothing
 
-        propagatedMethod cases methodOrigin = case propagatingMethod of
+        propagatedMethod cases methodOrigin = case propagatingMethod skip (Sorry Nothing,"") (M.toList cases) of
                 (Incorrect (_, 1, g),cs)   -> (methodOrigin, cleanSuccessors (successors $ skip++[Just $ cleanGoal g]) cases cs)                         -- When depth reaches 1, we should be at the root and therefore shoulg go again
                 (Incorrect (scr, d, g),_) -> (Incorrect (scr, d-1, fromJust $ extractGoal methodOrigin),successors $ skip++[Just $ cleanGoal g])
                 (_,_)                  -> (methodOrigin, successors skip)
            where
-                propagatingMethod = M.foldlWithKey (\(method,s) k (LNode (ProofStep proofmethod _ ) _) -> 
-                      if proofmethod > method then (proofmethod,k) else (method,s)) (Sorry Nothing,"") (successors skip)
-                successors updateSkipList = M.mapWithKey (prove (succ depth) updateSkipList) cases
+                propagatingMethod :: [Maybe Goal] -> (ProofMethod,CaseName) -> [(CaseName,System)] -> (ProofMethod,CaseName)
+                propagatingMethod _ (method,caseName) [] = (method,caseName)
+                propagatingMethod updateSkipList (method,caseName) ((cn,_sys):t) = case prove (succ depth) updateSkipList cn _sys of
+                  (LNode (ProofStep (Incorrect (s,d,g)) _ ) _) -> (Incorrect (s,d,g),cn)
+                  _ -> propagatingMethod updateSkipList (method,caseName) t
+
+                --propagatingMethodB = M.foldlWithKey (\(method,s) k (LNode (ProofStep proofmethod _ ) _) -> 
+                --      if proofmethod > method then (proofmethod,k) else (method,s)) (Sorry Nothing,"") (successors skip)
+                successors updateSkipList = trace ("Succ: "++show updateSkipList) M.mapWithKey (prove (succ depth) updateSkipList) cases
 
                 pbSucc cs cn = prove (succ depth) (trace ("Backtracking: "++cn) skip) cn (cs M.! cn) --prove (succ depth)
                 cleanSuccessors s cs cn = M.insert cn (pbSucc cs cn) $ M.delete cn s --M.insert (pbSucc pbCase) 
