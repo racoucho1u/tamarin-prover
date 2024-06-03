@@ -118,6 +118,7 @@ import qualified Control.Monad.State              as S
 import           Control.Parallel.Strategies
 
 import           Theory.Constraint.Solver
+--import           Theory.Constraint.Solver.ProofMethod
 import           Theory.Model
 import           Theory.Text.Pretty
 import           System.Random
@@ -1049,19 +1050,19 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-    prove d0 sys0
+    prove d0 [] "beginning" sys0
   where
     generatedTactic = L.get pcLemmaName ctxt ++ ".tactic"
 
-    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          [] | finishedSubterms ctxt sys -> node Solved M.empty depth
-          []                             -> node Unfinishable M.empty depth
-          ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || trace ("Should backtrack but does not: "++show method) isNothing (extractGoal method)
-                                                then pickGoal ((method, (cases, _expl)):suite) depth
-                                                else node (Incorrect (incorrectnessScore method+1, fromJust $ extractGoal method)) M.empty depth --we are going to backtrack so this node will disappear
+    prove !depth skip c sys = trace ("Prove case "++show c) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          [] | finishedSubterms ctxt sys -> node Solved M.empty
+          []                             -> node Unfinishable M.empty
+          ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || isNothing (extractGoal method)
+                                                then checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+                                                else trace "Ending branch here" node (Incorrect (incorrectnessScore method+1,depth, fromJust $ extractGoal method)) M.empty --we are going to backtrack so this node will disappear
       where
         incorrectnessScore :: ProofMethod -> Int
-        incorrectnessScore (Incorrect (s,_)) = s
+        incorrectnessScore (Incorrect (s,_,_)) = s
         incorrectnessScore _ = 0
 
         countLoop :: [(Int,Int,[Goal])] -> Int
@@ -1073,22 +1074,31 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         -- alpha = 20 and delta = 3 lifted from SmartVerif paper
         checkBacktracking _depth _system = _depth > 20 && countLoop (L.get sPathGoals sys) > 3
 
-        {-exportTactic :: Int -> String -> ProofMethod -> M.Map CaseName System -> Proof ()
-        exportTactic dpth tacticFile method cases = unsafePerformIO $ do
+        exportTactic :: String -> ProofMethod -> M.Map CaseName System -> Proof ()
+        exportTactic tacticFile method cases = unsafePerformIO $ do
           writeFile tacticFile (show method)
-          return (node method cases dpth)
+          return (node method cases)
 
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = exportTactic generatedTactic method0 cases0
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
+        checkForLoop [] (method0, (cases0, _expl0)) = trace ("default goal: "++show method0) exportTactic generatedTactic method0 cases0
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = 
+            if (cleanGoal <$> extractGoal method) `elem` skip
+              then checkForLoop suite (method0, (cases0, _expl0))
+              else trace ("Well chosen: "++show method) node method cases
+          
+          {-case method of
             --InLoop _    -> checkForLoop suite (method0, (cases0, _expl0))
             Incorrect _ -> checkForLoop suite (method0, (cases0, _expl0))
-            _ -> node method cases
-        -}
+            _ -> trace ("Picked: "++show method) node method cases --precomputedNode m s
 
-        pickGoal :: [(ProofMethod, (M.Map CaseName System, String))] -> Int -> Proof()
-        pickGoal list dpth = node method cases dpth
+            --where 
+            --  (m,s) = propagatedMethod cases method
+          -}
+
+
+        {-pickGoal :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof()
+        pickGoal list = trace ("Picked: "++show method) node method cases
           where
             scoreList = scoreGoals list
             distribution = reverse $ foldl (\acc x -> (x+ head acc):acc) [head scoreList] (tail scoreList)
@@ -1108,31 +1118,35 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
             scoreGoals :: [(ProofMethod, (M.Map CaseName System, String))] -> [Float]
             scoreGoals [] = []
-            scoreGoals ((Incorrect (i,_),_):t) = 1/int2Float i:scoreGoals t
-            scoreGoals (_:t) = 1.0:scoreGoals t
+            scoreGoals ((Incorrect (i,_,_),_):t) = 1/int2Float i:scoreGoals t
+            scoreGoals (_:t) = 1.0:scoreGoals t-}
 
         extractGoal :: ProofMethod -> Maybe Goal
         extractGoal method = case method of
-            InLoop (_, _, goal) -> Just goal
-            Incorrect (_,goal)  -> Just goal
-            SolveGoal goal      -> Just goal
+            InLoop (_, _, goal)   -> Just goal
+            Incorrect (_,_,goal)  -> Just goal
+            SolveGoal goal        -> Just goal
             _ -> Nothing
 
-        propagatedMethod cases methodOrigin dpth = if depth == 0
-          then (methodOrigin, successors)
-          else case propagatingMethod cases of
-                Incorrect (1, _)   -> (methodOrigin, successors)                               -- When badness scores reaches 1, we should be at the root and therefore shoulg go again
-                Incorrect (scr, _) -> (Incorrect (scr-1, fromJust $ extractGoal methodOrigin), successors)
-                _                  -> (methodOrigin, successors)
+        propagatedMethod cases methodOrigin = case propagatingMethod of
+                (Incorrect (_, 1, g),cs)   -> (methodOrigin, cleanSuccessors (successors $ skip++[Just $ cleanGoal g]) cases cs)                         -- When depth reaches 1, we should be at the root and therefore shoulg go again
+                (Incorrect (scr, d, g),_) -> (Incorrect (scr, d-1, fromJust $ extractGoal methodOrigin),successors $ skip++[Just $ cleanGoal g])
+                (_,_)                  -> (methodOrigin, successors skip)
            where
-                propagatingMethod cases  = foldl (\method (LNode (ProofStep proofmethod _ ) _) -> if proofmethod > method then proofmethod else method) (Sorry Nothing) successors
-                successors = M.map (prove (succ depth)) cases
+                propagatingMethod = M.foldlWithKey (\(method,s) k (LNode (ProofStep proofmethod _ ) _) -> 
+                      if proofmethod > method then (proofmethod,k) else (method,s)) (Sorry Nothing,"") (successors skip)
+                successors updateSkipList = M.mapWithKey (prove (succ depth) updateSkipList) cases
 
-        node methodOrigin cases dpth =
-          if cases == M.empty then LNode (ProofStep methodOrigin ()) M.empty else LNode (ProofStep method ()) successors_
+                pbSucc cs cn = prove (succ depth) (trace ("Backtracking: "++cn) skip) cn (cs M.! cn) --prove (succ depth)
+                cleanSuccessors s cs cn = M.insert cn (pbSucc cs cn) $ M.delete cn s --M.insert (pbSucc pbCase) 
+
+
+        node methodOrigin cases = if cases == M.empty then LNode (ProofStep methodOrigin ()) M.empty else LNode (ProofStep method ()) csuccessors
             where
                 --successors_ = M.map (prove (succ depth)) cases
-                (method, successors_) = propagatedMethod cases methodOrigin dpth
+                (method, csuccessors) = propagatedMethod cases methodOrigin
+
+        --precomputedNode method tree = trace ("Here we go") LNode (ProofStep method ()) tree
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
@@ -1143,22 +1157,225 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 -- systems.
 proveDiffSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> DiffProofContext -> Int -> DiffSystem -> DiffProof ()
 proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
-    prove d0 sys0
+    prove d0 "beginning" sys0
   where
-    prove !depth sys =
+    prove !depth c sys = trace ("Case: "++show c) $
         case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []                             -> node (DiffSorry (Just "Cannot prove")) M.empty
-          (method, (cases, _expl)):suite ->  checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+          (method, (cases, _expl)):suite ->  trace ("Following the proof: "++show method) $ if not (checkBacktracking depth sys) || trace ("Should backtrack but does not: "++show method) isNothing (extractGoal method)
+                                                then checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+                                                else trace ("Backtracking: "++show method) node (DiffBackwardSearchStep (Incorrect (incorrectnessScore method+1,depth, fromJust $ extractGoal method))) M.empty --we are going to backtrack so this node will disappear
       where
+        generatedTactic = L.get pcLemmaName (L.get dpcPCLeft ctxt) ++ ".tactic"
+
+        exportTactic :: String -> DiffProofMethod -> M.Map CaseName DiffSystem -> DiffProof ()
+        exportTactic tacticFile method cases = unsafePerformIO $ do
+          writeFile tacticFile (show method)
+          return (node method cases)
+
+        incorrectnessScore :: DiffProofMethod -> Int
+        incorrectnessScore (DiffBackwardSearchStep (Incorrect (s,_,_))) = s
+        incorrectnessScore _ = 0
+
+        countLoop :: [(Int,Int,[Goal])] -> Int
+        countLoop []          = 0
+        countLoop ((_,0,_):t) = countLoop t
+        countLoop ((_,_,_):t) = 1 + countLoop t
+
+        checkBacktracking :: Int -> DiffSystem -> Bool
+        -- alpha = 20 and delta = 3 lifted from SmartVerif paper
+        checkBacktracking _depth _system = _depth > 20 && countLoop (L.get sPathGoals (fromJust $ L.get dsSystem sys)) > 3
+
         checkForLoop :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> (DiffProofMethod, (M.Map CaseName DiffSystem, String)) -> DiffProof ()
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0
+        checkForLoop [] (method0, (cases0, _expl0)) = trace ("Picked by def: "++show method0) exportTactic generatedTactic method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            DiffBackwardSearchStep (InLoop _) -> checkForLoop suite (method0, (cases0, _expl0))
+            --InLoop _    -> checkForLoop suite (method0, (cases0, _expl0))
+            DiffBackwardSearchStep (Incorrect _) -> checkForLoop suite (method0, (cases0, _expl0))
+            _ -> trace ("Picked: "++show method) node method cases
+
+        extractGoal :: DiffProofMethod -> Maybe Goal
+        extractGoal method = case method of
+            (DiffBackwardSearchStep (InLoop (_, _, goal)))   -> Just goal
+            (DiffBackwardSearchStep (Incorrect (_,_,goal)))  -> Just goal
+            (DiffBackwardSearchStep (SolveGoal goal))        -> Just goal
+            _ -> Nothing
+
+        --propagatedMethod :: (M.Map CaseName DiffSystem) -> DiffProofMethod -> (DiffProofMethod, M.Map CaseName DiffSystem)
+        propagatedMethod cases methodOrigin = case propagatingMethod cases of
+                DiffBackwardSearchStep (Incorrect (_, 1, _))   -> (methodOrigin, successors)                               -- When badness scores reaches 1, we should be at the root and therefore shoulg go again
+                DiffBackwardSearchStep (Incorrect (scr, d, _)) -> (DiffBackwardSearchStep (Incorrect (scr, d-1, fromJust $ extractGoal methodOrigin)), successors)
+                _                  -> (methodOrigin, successors)
+           where
+                propagatingMethod :: (M.Map CaseName DiffSystem) -> DiffProofMethod
+                propagatingMethod cases  = foldl (\(DiffBackwardSearchStep method) (LNode (DiffProofStep (DiffBackwardSearchStep proofmethod) _ ) _) -> if proofmethod > method then (DiffBackwardSearchStep proofmethod) else (DiffBackwardSearchStep method)) (DiffBackwardSearchStep (Sorry Nothing)) successors
+
+                successors = M.mapWithKey (prove (succ depth)) cases
+
+        node methodOrigin cases = if cases == M.empty then LNode (DiffProofStep methodOrigin ()) M.empty else LNode (DiffProofStep method ()) successors_
+          where
+            (method, successors_) = propagatedMethod cases methodOrigin
+
+{-- | @proveSystemDFS rules se@ explores all solutions of the initial
+-- constraint system using a depth-first-search strategy to resolve the
+-- non-determinism wrt. what goal to solve next.  This proof can be of
+-- infinite depth, if the proof strategy loops.
+--
+-- Use 'annotateWithSystems' to annotate the proof tree with the constraint
+-- systems.
+proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
+proveSystemDFS heuristic tactics ctxt d0 sys0 =
+    prove d0 "beginning" sys0
+  where
+    generatedTactic = L.get pcLemmaName ctxt ++ ".tactic"
+
+    prove !depth c sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          [] | finishedSubterms ctxt sys -> node Solved M.empty
+          []                             -> node Unfinishable M.empty
+          ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || isNothing (extractGoal method)
+                                                then checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+                                                else node (Incorrect (incorrectnessScore method+1,depth, fromJust $ extractGoal method)) M.empty --we are going to backtrack so this node will disappear
+      where
+        incorrectnessScore :: ProofMethod -> Int
+        incorrectnessScore (Incorrect (s,_,_)) = s
+        incorrectnessScore _ = 0
+
+        countLoop :: [(Int,Int,[Goal])] -> Int
+        countLoop []          = 0
+        countLoop ((_,0,_):t) = countLoop t
+        countLoop ((_,_,_):t) = 1 + countLoop t
+
+        checkBacktracking :: Int -> System -> Bool
+        -- alpha = 20 and delta = 3 lifted from SmartVerif paper
+        checkBacktracking _depth _system = _depth > 20 && countLoop (L.get sPathGoals sys) > 3
+
+        exportTactic :: String -> ProofMethod -> M.Map CaseName System -> Proof ()
+        exportTactic tacticFile method cases = unsafePerformIO $ do
+          writeFile tacticFile (show method)
+          return (node method cases)
+
+        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop [] (method0, (cases0, _expl0)) = exportTactic generatedTactic method0 cases0
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
+            --InLoop _    -> checkForLoop suite (method0, (cases0, _expl0))
+            Incorrect _ -> checkForLoop suite (method0, (cases0, _expl0))
+            _ -> node method cases
+        
+
+        {-pickGoal :: [(ProofMethod, (M.Map CaseName System, String))] -> Proof()
+        pickGoal list = trace ("Picked: "++show method) node method cases
+          where
+            scoreList = scoreGoals list
+            distribution = reverse $ foldl (\acc x -> (x+ head acc):acc) [head scoreList] (tail scoreList)
+            idx = correspondingIdx (drawRand $ last distribution) distribution
+            (method, (cases, _expl)) = list !! idx
+trace ("Incorrect") 
+            ------------- Random drawing  -------------
+            --Picking the index that correspond to the drawn random
+            correspondingIdx :: Float -> [Float] -> Int
+            correspondingIdx rand = foldl (\acc i -> if rand > i then 1+acc else acc) 0
+
+            drawRand :: Float -> Float
+            drawRand sup = unsafePerformIO $ do
+                g <- newStdGen
+                let (result, _) = randomR (0, sup) g
+                return result
+
+            scoreGoals :: [(ProofMethod, (M.Map CaseName System, String))] -> [Float]
+            scoreGoals [] = []
+            scoreGoals ((Incorrect (i,_,_),_):t) = 1/int2Float i:scoreGoals t
+            scoreGoals (_:t) = 1.0:scoreGoals t-}
+
+        extractGoal :: ProofMethod -> Maybe Goal
+        extractGoal method = case method of
+            InLoop (_, _, goal)   -> Just goal
+            Incorrect (_,_,goal)  -> Just goal
+            SolveGoal goal        -> Just goal
+            _ -> Nothing
+
+        propagatedMethod cases methodOrigin = case propagatingMethod cases of
+                Incorrect (_, 1, _)   -> (methodOrigin, successors)                               -- When badness scores reaches 1, we should be at the root and therefore shoulg go again
+                Incorrect (scr, d, _) -> (Incorrect (scr, d-1, fromJust $ extractGoal methodOrigin), successors)
+                _                  -> (methodOrigin, successors)
+           where
+                propagatingMethod cases  = foldl (\method (LNode (ProofStep proofmethod _ ) _) -> if proofmethod > method then proofmethod else method) (Sorry Nothing) successors
+                successors = M.mapWithKey (prove (succ depth)) cases
+
+        node methodOrigin cases = if cases == M.empty then trace ("Empty: "++show methodOrigin) LNode (ProofStep methodOrigin ()) M.empty else LNode (ProofStep method ()) successors_
+            where
+                --successors_ = M.map (prove (succ depth)) cases
+                (method, successors_) = propagatedMethod cases methodOrigin
+
+
+-- | @proveSystemDFS rules se@ explores all solutions of the initial
+-- constraint system using a depth-first-search strategy to resolve the
+-- non-determinism wrt. what goal to solve next.  This proof can be of
+-- infinite depth, if the proof strategy loops.
+--
+-- Use 'annotateWithSystems' to annotate the proof tree with the constraint
+-- systems.
+proveDiffSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> DiffProofContext -> Int -> DiffSystem -> DiffProof ()
+proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
+    prove d0 "beginning" sys0
+  where
+    prove !depth c sys = 
+        case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []                             -> node (DiffSorry (Just "Cannot prove")) M.empty
+          (method, (cases, _expl)):suite ->  if not (checkBacktracking depth sys) || isNothing (extractGoal method)
+                                                then checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+                                                else node (DiffBackwardSearchStep (Incorrect (incorrectnessScore method+1,depth, fromJust $ extractGoal method))) M.empty --we are going to backtrack so this node will disappear
+      where
+        generatedTactic = L.get pcLemmaName (L.get dpcPCLeft ctxt) ++ ".tactic"
+
+        exportTactic :: String -> DiffProofMethod -> M.Map CaseName DiffSystem -> DiffProof ()
+        exportTactic tacticFile method cases = unsafePerformIO $ do
+          writeFile tacticFile (show method)
+          return (node method cases)
+
+        incorrectnessScore :: DiffProofMethod -> Int
+        incorrectnessScore (DiffBackwardSearchStep (Incorrect (s,_,_))) = s
+        incorrectnessScore _ = 0
+
+        countLoop :: [(Int,Int,[Goal])] -> Int
+        countLoop []          = 0
+        countLoop ((_,0,_):t) = countLoop t
+        countLoop ((_,_,_):t) = 1 + countLoop t
+
+        checkBacktracking :: Int -> DiffSystem -> Bool
+        -- alpha = 20 and delta = 3 lifted from SmartVerif paper
+        checkBacktracking _depth _system = _depth > 20 && countLoop (L.get sPathGoals (fromJust $ L.get dsSystem sys)) > 3
+
+        checkForLoop :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> (DiffProofMethod, (M.Map CaseName DiffSystem, String)) -> DiffProof ()
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop [] (method0, (cases0, _expl0)) = exportTactic generatedTactic method0 cases0
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
+            --InLoop _    -> checkForLoop suite (method0, (cases0, _expl0))
+            DiffBackwardSearchStep (Incorrect _) -> checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
 
-        node method cases =
-          LNode (DiffProofStep method ()) (M.map (prove (succ depth)) cases)
+        extractGoal :: DiffProofMethod -> Maybe Goal
+        extractGoal method = case method of
+            (DiffBackwardSearchStep (InLoop (_, _, goal)))   -> Just goal
+            (DiffBackwardSearchStep (Incorrect (_,_,goal)))  -> Just goal
+            (DiffBackwardSearchStep (SolveGoal goal))        -> Just goal
+            _ -> Nothing
+
+        --propagatedMethod :: (M.Map CaseName DiffSystem) -> DiffProofMethod -> (DiffProofMethod, M.Map CaseName DiffSystem)
+        propagatedMethod cases methodOrigin = case propagatingMethod cases of
+                DiffBackwardSearchStep (Incorrect (_, 1, _))   -> (methodOrigin, successors)                               -- When badness scores reaches 1, we should be at the root and therefore shoulg go again
+                DiffBackwardSearchStep (Incorrect (scr, d, _)) -> (DiffBackwardSearchStep (Incorrect (scr, d-1, fromJust $ extractGoal methodOrigin)), successors)
+                _                  -> (methodOrigin, successors)
+           where
+                propagatingMethod :: (M.Map CaseName DiffSystem) -> DiffProofMethod
+                propagatingMethod cases  = foldl (\(DiffBackwardSearchStep method) (LNode (DiffProofStep (DiffBackwardSearchStep proofmethod) _ ) _) -> if proofmethod > method then (DiffBackwardSearchStep proofmethod) else (DiffBackwardSearchStep method)) (DiffBackwardSearchStep(Sorry Nothing)) successors
+                
+                successors = M.mapWithKey (prove (succ depth)) cases
+
+        node methodOrigin cases = if cases == M.empty then LNode (DiffProofStep methodOrigin ()) M.empty else LNode (DiffProofStep method ()) successors_
+          where
+            (method, successors_) = propagatedMethod cases methodOrigin
+    -}
 
 ------------------------------------------------------------------------------
 -- Pretty printing

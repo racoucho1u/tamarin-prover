@@ -199,12 +199,12 @@ data ProofMethod =
   | Simplify                             -- ^ A simplification step.
   | InLoop (Int, Int, Goal)              -- ^ A goal that has been detected as part as a loop (depth, iteration, goal)
   | SolveGoal Goal                       -- ^ A goal that was solved.
-  | Incorrect (Int, Goal)                -- ^ A goal that is on a branch that have been backtracked (badness score,goal)
   | Contradiction (Maybe Contradiction)  -- ^ A contradiction could be
                                          -- derived, possibly with a reason.
   | Induction                            -- ^ Use inductive strengthening on
                                          -- the single formula constraint in
                                          -- the system.
+  | Incorrect (Int, Int, Goal)           -- ^ A goal that is on a branch that have been backtracked (badness score,depth,goal)
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
 -- | Sound transformations of diff sequents.
@@ -1246,7 +1246,8 @@ prettyProofMethod method = case method of
     Solved               -> keyword_ "SOLVED" <-> lineComment_ "trace found"
     Unfinishable         -> keyword_ "UNFINISHABLE" <-> lineComment_ "reducible operator in subterm"
     Induction            -> keyword_ "induction"
-    InLoop (d, i, goal)     -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "in loop (dpth: "++show d++", it: "++show i++")")]
+    InLoop (d, i, goal)  -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "in loop (dpth: "++show d++", it: "++show i++")")]
+    Incorrect (s,_,goal) -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "bad branch (score: "++show s++")")]
     Sorry reason         ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
     SolveGoal goal       ->
