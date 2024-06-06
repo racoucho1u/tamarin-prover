@@ -204,7 +204,7 @@ data ProofMethod =
   | Induction                            -- ^ Use inductive strengthening on
                                          -- the single formula constraint in
                                          -- the system.
-  | Incorrect (Int, Int, Goal)           -- ^ A goal that is on a branch that have been backtracked (badness score,depth,goal)
+  | Incorrect (Int, Int, Goal, [Maybe Goal])   -- ^ A goal that is on a branch that have been backtracked (badness score,depth,goal,list of goals to skip)
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
 -- | Sound transformations of diff sequents.
@@ -1247,7 +1247,7 @@ prettyProofMethod method = case method of
     Unfinishable         -> keyword_ "UNFINISHABLE" <-> lineComment_ "reducible operator in subterm"
     Induction            -> keyword_ "induction"
     InLoop (d, i, goal)  -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "in loop (dpth: "++show d++", it: "++show i++")")]
-    Incorrect (s,_,goal) -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "bad branch (score: "++show s++")")]
+    Incorrect (s,_,goal,_) -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "bad branch (score: "++show s++")")]
     Sorry reason         ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
     SolveGoal goal       ->
