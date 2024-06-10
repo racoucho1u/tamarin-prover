@@ -43,7 +43,9 @@ removeTranslationItems thy =
           ,_thyCache=(L.get thyCache thy)
           ,_thyItems = newThyItems
           ,_thyOptions =(L.get thyOptions thy)
-          ,_thyIsSapic = (L.get thyIsSapic thy)}
+          ,_thyIsSapic = (L.get thyIsSapic thy)
+          ,_thyGenerateTactic = (L.get thyGenerateTactic thy)
+          }
     where
       newThyItems = map removeTranslationElement (L.get thyItems thy)
       removeTranslationElement :: TheoryItem r p TranslationElement -> TheoryItem r p ()
