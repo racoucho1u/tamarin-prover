@@ -276,6 +276,10 @@ execProofMethod ctxt method sys =
         InLoop (_,_, goal)
           | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
+        Incorrect (_,_,Just goal,_)
+          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
+          | otherwise                        -> Nothing
+        Incorrect (_,_,Nothing,_)            -> Nothing --return M.empty
         SolveGoal goal
           | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
@@ -321,12 +325,12 @@ execProofMethod ctxt method sys =
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
     execSolveGoal :: Goal -> Bool -> Int -> Int-> Maybe (M.Map CaseName System)
-    execSolveGoal goal loop depth iteration =
+    execSolveGoal goal _loop depth iteration = 
         return . makeCaseNames . removeRedundantCases ctxt [] snd
-               . map (second cleanupSystem) . map fst . getDisj
+               . map (second cleanupSystem . fst) . getDisj
                $ reduc
       where
-        sys'   = L.set sCurrentLoop (depth,iteration) (L.set sLoopFound loop (L.set sPathGoals ((depth,iteration,[cleanGoal goal]):(L.get sPathGoals sys)) sys))
+        sys'   = L.set sCurrentLoop (depth,iteration) (L.set sLoopFound _loop (L.set sPathGoals ((depth,iteration,[cleanGoal goal]):L.get sPathGoals sys) sys))
         reduc  = runReduction solver ctxt sys' (avoid sys')
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
@@ -507,16 +511,14 @@ rankGoals ctxt ranking tacticsList = case ranking of
     where
       chosenTactic :: [Tactic ProofContext] -> Tactic ProofContext-> Tactic ProofContext
       chosenTactic   []  t = chooseError tacticsList t
-      chosenTactic (h:q) t = case (checkName h t) of
-        True  -> h
-        False -> chosenTactic q t
+      chosenTactic (h:q) t = if checkName h t then h else chosenTactic q t
 
       definedHeuristic = intercalate [','] (foldl (\acc x -> (_name x):acc ) [] tacticsList)
 
       checkName t1 t2 = (_name t1) == (_name t2)
 
-      chooseError [] _ = error $ "No tactic has been written in the theory file"
-      chooseError _  t = error $ "The tactic specified ( "++(show $ _name t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
+      chooseError [] _ = error "No tactic has been written in the theory file"
+      chooseError _  t = error $ "The tactic specified ( "++show (_name t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'ProofContext' and
@@ -536,8 +538,8 @@ rankProofMethods ranking tactics ctxt sys = do
       Just cases -> case M.toList cases of
           []                       -> return (m, (cases, expl))
           -- [(case1,sys)]            -> if L.get sLoopFound sys then return (InLoop 0, (cases, expl)) else return (m, (cases, expl))
-          ((case1,sys):_) -> if  fst (L.get sCurrentLoop sys) > 0 
-            then return (InLoop (fst $ L.get sCurrentLoop sys, snd $ L.get sCurrentLoop sys, fromJust $ fromSolveGoal m), (cases, expl)) 
+          ((_,sys1):_) -> if  fst (L.get sCurrentLoop sys1) > 0
+            then return (InLoop (fst $ L.get sCurrentLoop sys1, snd $ L.get sCurrentLoop sys1, fromJust $ fromSolveGoal m), (cases, expl))
             else return (m, (cases, expl))
       Nothing    -> []
   where
@@ -559,6 +561,19 @@ rankProofMethods ranking tactics ctxt sys = do
     fromSolveGoal :: ProofMethod -> Maybe Goal
     fromSolveGoal (SolveGoal goal) = Just goal
     fromSolveGoal _ = Nothing
+
+    prettyProofMethod :: ProofMethod -> String
+    prettyProofMethod method = case method of
+            Solved               -> "SOLVED /*trace found*/"
+            Unfinishable         -> "UNFINISHABLE /*reducible operator in subterm*/"
+            Induction            -> "induction"
+            InLoop (d, i, goal)  -> "solve(" ++ show goal ++ ") /*in loop (dpth: "++show d++", it: "++show i++")*/"
+            Incorrect (s,_,Just goal,_) -> "solve(" ++show goal ++ ") /*bad branch (score: "++show s++")*/"
+            Incorrect (s,_,_,_) -> "SimplifyBad? ++ bad branch (score: "++show s++")"
+            Sorry reason         -> "sorry" ++ show reason
+            SolveGoal goal       -> "solve(" ++show goal ++ ")"
+            Simplify             -> "simplify"
+            Contradiction reason -> "contradiction"
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'DiffProofContext' and

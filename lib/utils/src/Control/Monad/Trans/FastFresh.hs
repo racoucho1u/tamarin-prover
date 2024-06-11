@@ -40,6 +40,7 @@ import Control.Monad.State.Strict
 import Control.Monad.Except
 import Control.Monad.Reader
 import Control.Monad.Catch
+import Debug.Trace
 
 ------------------------------------------------------------------------------
 -- FreshT monad transformer
@@ -50,7 +51,7 @@ type FreshState = Integer
 
 -- | A computation that can generate fresh variables from name hints.
 newtype FreshT m a = FreshT { unFreshT :: StateT FreshState m a }
-    deriving( Functor, Applicative, Alternative, Monad, MonadPlus, MonadTrans )
+    deriving( Functor, Applicative, Alternative, Monad, MonadPlus, MonadTrans)
 
 -- | Construct a 'FreshT' action from a 'FreshState' modification.
 freshT :: (FreshState -> m (a, FreshState)) -> FreshT m a

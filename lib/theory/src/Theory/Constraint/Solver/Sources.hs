@@ -334,7 +334,7 @@ solveWithSource :: ProofContext
                 -> Goal
                 -> Maybe (Reduction [String])
 solveWithSource hnd ths goal =
-    case (solveWithSourceAndReturn hnd ths goal) of
+    case solveWithSourceAndReturn hnd ths goal of
          Nothing     -> Nothing
          Just (x, _) -> Just x
 
@@ -345,12 +345,12 @@ applySource :: ProofContext
                -> Goal       -- ^ Required goal
                -> Maybe (Reduction [String], Maybe Source)
 applySource ctxt th0 goal = case matchToGoal ctxt th0 goal of
-    Just th -> Just ((do
+    Just th -> Just (do
         markGoalAsSolved "precomputed" goal
         (names, sysTh0) <- disjunctionOfList $ getDisj $ get cdCases th
         sysTh <- (`evalBindT` keepVarBindings) . someInst $ sysTh0
         conjoinSystem sysTh
-        return names), Just th0)
+        return names, Just th0)
     Nothing -> Nothing
   where
     keepVarBindings = M.fromList (map (\v -> (v, v)) (frees goal))
@@ -369,7 +369,7 @@ saturateSources parameters ctxt thsInit  =
           if get showSaturationSteps parameters then
             trace ("[Saturating Sources] Step " ++ show n ++ " (Max " ++ show (get paramSaturationLimit parameters) ++ ")")
              $ go ths' (n + 1)
-          else 
+          else
              go ths' (n + 1)
       | n > get paramSaturationLimit parameters =
           if get showSaturationSteps parameters then

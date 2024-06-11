@@ -126,6 +126,7 @@ import           System.IO.Unsafe
 
 
 
+
 -- import Text.XHtml (meta)
 
 
@@ -1049,19 +1050,21 @@ cutOnSolvedBFSDiff =
 -- Use 'annotateWithSystems' to annotate the proof tree with the constraint
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
-proveSystemDFS heuristic tactics ctxt d0 sys0 =
+proveSystemDFS heuristic tactics ctxt d0 sys0 = trace ("First depth: "++show d0)
     prove d0 [] "beginning" sys0
   where
     generatedTactic = L.get pcLemmaName ctxt ++ ".tactic"
 
-    prove !depth skip c sys = trace ("Prove case "++show c++": "++show (length ranked)++" | d: "++show depth) $ case ranked of
-          [] | finishedSubterms ctxt sys -> node Solved M.empty
-          []                             -> node Unfinishable M.empty
+    prove !depth skip c sys =  case ranked of --trace ("Prove case "++show c++": "++show (length ranked)++" | d: "++show depth)
+          [] | finishedSubterms ctxt sys -> node "solved" Solved M.empty
+          []                             -> node "unfinishable" Unfinishable M.empty
           ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || isNothing (extractGoal method)
-                                                then checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
-                                                else trace ("Ending branch here: "++show depth) node (Incorrect (incorrectnessScore method+1,depth, extractGoal method,skip)) M.empty --we are going to backtrack so this node will disappear
+                                                then trace ("CheckLoops: "++show (length cases)++" | "++show (prettyProofMethod method)) 
+                                                      checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+                                                else trace ("Ending branch here: "++show depth++" | "++show (countLoop (L.get sPathGoals sys) > 3)) 
+                                                      node "incorrectBacktracking" (Incorrect (incorrectnessScore method+1,depth, extractGoal method,skip)) M.empty --we are going to backtrack so this node will disappear
       where
-        ranked = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys
+        ranked = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys --trace ("Ranked: "++show depth)
 
         incorrectnessScore :: ProofMethod -> Int
         incorrectnessScore (Incorrect (s,_,_,_)) = s
@@ -1074,21 +1077,21 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         checkBacktracking :: Int -> System -> Bool
         -- alpha = 20 and delta = 3 lifted from SmartVerif paper
-        checkBacktracking _depth _system = _depth > 20 && countLoop (L.get sPathGoals sys) > 3
+        checkBacktracking _depth _system = _depth > 10 && countLoop (L.get sPathGoals sys) > 2
 
         exportTactic :: String -> ProofMethod -> M.Map CaseName System -> Proof ()
-        exportTactic tacticFile method cases = node method cases
+        exportTactic tacticFile method cases = node "allBad_bydefault" method cases
           {-unsafePerformIO $ do
           writeFile tacticFile (show method)
           return (node method cases)-}
 
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = trace ("default goal: "++show method0) exportTactic generatedTactic method0 cases0
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = 
+        checkForLoop [] (method0, (cases0, _expl0)) =  exportTactic generatedTactic method0 cases0 --trace ("default goal: "++show (length cases0)++" | "++show (prettyProofMethod method0))
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) =
             if (cleanGoal <$> extractGoal method) `elem` skip
-              then trace ("Skipped: "++show method)  checkForLoop suite (method0, (cases0, _expl0)) --trace ("Skipped: "++show method) 
-              else trace ("Well chosen: "++show (length cases)++" | "++show method) node method cases --trace ("Well chosen: "++show (length cases)++" | "++show method) 
+              then checkForLoop suite (method0, (cases0, _expl0)) --trace ("Skipped: "++show (prettyProofMethod method))
+              else node "normal" method cases --trace ("Well chosen: "++show (length cases)++" | "++show (prettyProofMethod  method))
 
         extractGoal :: ProofMethod -> Maybe Goal
         extractGoal method = case method of
@@ -1097,31 +1100,55 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             SolveGoal goal        -> Just goal
             _ -> Nothing
 
+        extractBadDepth :: ProofMethod -> Int
+        extractBadDepth method = case method of
+            Incorrect (_,d,_,_)  -> d
+            _ -> 0
+
         propagatedMethod cases methodOrigin = case propagatingMethod skip (Sorry Nothing,"",M.empty) (M.toList cases) of
-                (Incorrect (_, 0, g, skl),cs,pf)   -> (methodOrigin, successors (skl++[cleanGoal <$> g]),trace ("Cases: "++show (length cases)) "computed") --successors (skl++[Just $ cleanGoal g])    -- cases cs pf                    -- When depth reaches 1, we should be at the root and therefore shoulg go again
-                (Incorrect (scr, d, g, skl),_,pf) -> trace ("|"++show d++" | "++show (length pf)) (Incorrect (scr, d-1, extractGoal methodOrigin,skl++[cleanGoal<$> g]),successors (skl++[cleanGoal <$> g]) ,"partialPrecomp")
-                (_,_,pf)                  -> (methodOrigin, pf, "precomProof") --ici on relance alors qu'on a déjà potentiellement calculé des bonnes brnaches
+                --This is in fact never used
+                (Incorrect (_,-1, g, skl),_,_)  -> error "I wish you would get trigerred" --(methodOrigin, successors (skl++[cleanGoal <$> g]), "computed")
+                (Incorrect (scr, d, g, skl),_,pf) ->
+                      trace ("|"++show d++" | "++show (length pf)) (Incorrect (scr, d-1, extractGoal methodOrigin,skl++[cleanGoal<$> g]),
+                      successors (skl++[cleanGoal <$> g]) ,"partialPrecomp(bad)")
+                (_,_,pf)                  -> (methodOrigin, pf, "precomProof")
            where
-                propagatingMethod :: [Maybe Goal] -> (ProofMethod,CaseName,M.Map CaseName (LTree CaseName (ProofStep ()))) -> [(CaseName,System)] -> (ProofMethod,CaseName,M.Map CaseName (LTree CaseName (ProofStep ())))
-                propagatingMethod _ (method,caseName,proof) [] = (method,caseName,proof)
-                propagatingMethod updateSkipList (method,caseName,proof) ((cn,_sys):t) = case prove (succ depth) updateSkipList cn _sys of
-                  (LNode (ProofStep (Incorrect (_s,d,g,skl)) _ ) _) -> (Incorrect (_s,d,g,skl),cn,proof)
-                  (LNode ps cs) -> propagatingMethod updateSkipList (method,caseName, M.insert cn (LNode ps cs) proof) t --trace ("Suivi: "++show depth++": "++cn) 
+                propagatingMethod :: [Maybe Goal] -> (ProofMethod,CaseName,M.Map CaseName (LTree CaseName (ProofStep ()))) -> [(CaseName,System)]
+                                    -> (ProofMethod,CaseName,M.Map CaseName (LTree CaseName (ProofStep ())))
+                propagatingMethod _ (m,cn,proof) [] = (m,cn,proof) --trace ("PM bases: "++show (length proof)++" | "++show methodOrigin) 
+                propagatingMethod updateSkipList (m0,cn0,proof) ((cn,_sys):t) = case prove (succ depth) updateSkipList cn _sys of
+                  (LNode (ProofStep (Incorrect (_s,d,g,skl)) _ ) _) -> if extractBadDepth m0 > d then error "Inconsistent depth" else (Incorrect (_s,d,g,skl),cn,proof) --(m0,cn0,proof)
+                  (LNode ps cs) -> propagatingMethod updateSkipList (m0,cn0,M.insert cn (LNode ps cs) proof) t --trace ("Suivi: "++show depth++": "++cn) 
 
                 --propagatingMethodB = M.foldlWithKey (\(method,s) k (LNode (ProofStep proofmethod _ ) _) -> 
                 --      if proofmethod > method then (proofmethod,k) else (method,s)) (Sorry Nothing,"") (successors skip)
                -- s = successors  skip
-                successors updateSkipList = M.mapWithKey (prove (succ depth) updateSkipList) cases
+                successors updateSkipList = M.mapWithKey (prove (succ depth) updateSkipList) cases --trace ("Succ :"++show (succ depth)++" "++show call)
 
                 --pbSucc cs cn sk = prove (succ depth) sk cn (cs M.! cn) --prove (succ depth)
                 --cleanSuccessors sk cs cn pf = M.insert cn (pbSucc cs cn sk) $ M.delete cn s --M.insert (pbSucc pbCase) 
                 --  where 
                 --      s = successors sk
 
-        node methodOrigin cases = if cases == M.empty then LNode (ProofStep methodOrigin ()) M.empty else LNode (ProofStep method ())  csuccessors
+        node call methodOrigin cases = trace ("Node: "++call++" | d: "++show depth) $ if cases == M.empty
+          then trace ("NodeWmethod: "++prettyProofMethod methodOrigin) LNode (ProofStep methodOrigin ()) M.empty --trace ("EndNode: "++show (prettyProofMethod methodOrigin)) 
+          else trace ("NodeWmethodP: "++prettyProofMethod propagMethod) LNode (ProofStep  propagMethod ()) csuccessors --trace ("End propagating: "++show (length csuccessors)++" | "++prettyProofMethod methodOrigin++" \nNow: "++prettyProofMethod propagMethod) propagMethod --(trace ("Node: "++show constructionMethod++" "++show (length csuccessors))
             where
                 --successors_ = M.map (prove (succ depth)) case
-                (method, csuccessors, constructionMethod) = propagatedMethod cases methodOrigin
+                (propagMethod, csuccessors, constructionMethod) = propagatedMethod cases methodOrigin
+
+        prettyProofMethod :: ProofMethod -> String
+        prettyProofMethod method = case method of
+            Solved               -> "SOLVED /*trace found*/"
+            Unfinishable         -> "UNFINISHABLE /*reducible operator in subterm*/"
+            Induction            -> "induction"
+            InLoop (d, i, goal)  -> "solve(" ++ show goal ++ ") /*in loop (dpth: "++show d++", it: "++show i++")*/"
+            Incorrect (s,_,Just goal,_) -> "incorrect(" ++show goal ++ ") /*bad branch (score: "++show s++")*/"
+            Incorrect (s,_,_,_) -> "SimplifyBad? ++ bad branch (score: "++show s++")"
+            Sorry reason         -> "sorry" ++ show reason
+            SolveGoal goal       -> "solve(" ++show goal ++ ")"
+            Simplify             -> "simplify"
+            Contradiction reason -> "contradiction("++show reason++")"
 
          {-case method of
             --InLoop _    -> checkForLoop suite (method0, (cases0, _expl0))

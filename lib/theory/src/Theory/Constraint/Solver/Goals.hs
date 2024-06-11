@@ -54,6 +54,7 @@ import           Term.Builtin.Convenience
 
 
 import           Utils.Misc                              (twoPartitions)
+import           Debug.Trace
 
 ------------------------------------------------------------------------------
 -- Extracting Goals
@@ -208,7 +209,7 @@ solveGoal goal = do
     rules <- askM pcRules
     case goal of
       ActionG i fa  -> solveAction  (nonSilentRules rules) (i, fa)
-      PremiseG p fa ->
+      PremiseG p fa -> 
            solvePremise (get crProtocol rules ++ get crConstruct rules) p fa
       ChainG c p    -> solveChain (get crDestruct  rules) (c, p)
       SplitG i      -> solveSplit i
