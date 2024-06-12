@@ -195,7 +195,7 @@ type CaseName = String
 data ProofMethod =
     Sorry (Maybe String)                 -- ^ Proof was not completed
   | Solved                               -- ^ An attack was found.
-  | Unfinishable                         -- ^ The proof cannot be finished (due to reducible operators in subterms)
+  | Unfinishable [Maybe Goal]            -- ^ The proof cannot be finished (due to reducible operators in subterms)
   | Simplify                             -- ^ A simplification step.
   | InLoop (Int, Int, Goal)              -- ^ A goal that has been detected as part as a loop (depth, iteration, goal)
   | SolveGoal Goal                       -- ^ A goal that was solved.
@@ -269,7 +269,7 @@ execProofMethod ctxt method sys =
           | null (openGoals sys)  && not (contradictorySystem ctxt sys)
             && finishedSubterms ctxt sys       -> return M.empty
           | otherwise                          -> Nothing
-        Unfinishable
+        Unfinishable _
           | null (openGoals sys)  && not (contradictorySystem ctxt sys)
             && not (finishedSubterms ctxt sys) -> return M.empty
           | otherwise                          -> Nothing
@@ -565,7 +565,7 @@ rankProofMethods ranking tactics ctxt sys = do
     prettyProofMethod :: ProofMethod -> String
     prettyProofMethod method = case method of
             Solved               -> "SOLVED /*trace found*/"
-            Unfinishable         -> "UNFINISHABLE /*reducible operator in subterm*/"
+            Unfinishable _        -> "UNFINISHABLE /*reducible operator in subterm*/"
             Induction            -> "induction"
             InLoop (d, i, goal)  -> "solve(" ++ show goal ++ ") /*in loop (dpth: "++show d++", it: "++show i++")*/"
             Incorrect (s,_,Just goal,_) -> "solve(" ++show goal ++ ") /*bad branch (score: "++show s++")*/"
@@ -1259,7 +1259,7 @@ smartDiffRanking ctxt sys =
 prettyProofMethod :: HighlightDocument d => ProofMethod -> d
 prettyProofMethod method = case method of
     Solved               -> keyword_ "SOLVED" <-> lineComment_ "trace found"
-    Unfinishable         -> keyword_ "UNFINISHABLE" <-> lineComment_ "reducible operator in subterm"
+    Unfinishable _       -> keyword_ "UNFINISHABLE" <-> lineComment_ "reducible operator in subterm"
     Induction            -> keyword_ "induction"
     InLoop (d, i, goal)  -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "in loop (dpth: "++show d++", it: "++show i++")")]
     Incorrect (s,_,Just goal,_) -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "bad branch (score: "++show s++")")]

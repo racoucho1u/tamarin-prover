@@ -105,7 +105,7 @@ applyMethodAtPath thy lemmaName proofPath prover i = do
       (oneStepProver method                            `mappend`
        replaceSorryProver (oneStepProver Simplify)     `mappend`
        replaceSorryProver (contradictionProver)        `mappend`
-       replaceSorryProver (oneStepProver Unfinishable) `mappend`
+       replaceSorryProver (oneStepProver (Unfinishable [])) `mappend`
        replaceSorryProver (oneStepProver Solved)
       )
 
@@ -127,7 +127,7 @@ applyMethodAtPathDiff thy s lemmaName proofPath prover i = do
       (oneStepProver method                            `mappend`
        replaceSorryProver (oneStepProver Simplify)     `mappend`
        replaceSorryProver (contradictionProver)        `mappend`
-       replaceSorryProver (oneStepProver Unfinishable) `mappend`
+       replaceSorryProver (oneStepProver (Unfinishable [])) `mappend`
        replaceSorryProver (oneStepProver Solved)
       )
 
@@ -1799,10 +1799,10 @@ prevDiffThyPath thy = go
 
 -- | Interesting proof methods that are not skipped by next/prev-smart.
 isInterestingMethod :: ProofMethod -> Bool
-isInterestingMethod (Sorry _)    = True
-isInterestingMethod Solved       = True
-isInterestingMethod Unfinishable = True
-isInterestingMethod _            = False
+isInterestingMethod (Sorry _)        = True
+isInterestingMethod Solved           = True
+isInterestingMethod (Unfinishable _) = True
+isInterestingMethod _                = False
 
 -- | Interesting diff proof methods that are not skipped by next/prev-smart.
 isInterestingDiffMethod :: DiffProofMethod -> Bool

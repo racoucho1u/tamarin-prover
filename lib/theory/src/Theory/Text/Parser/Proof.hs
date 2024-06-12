@@ -80,7 +80,7 @@ proofMethod = asum
   , symbol "solve"         *> (SolveGoal <$> parens goal)
   , symbol "contradiction" *> pure (Contradiction Nothing)
   , symbol "induction"     *> pure Induction
-  , symbol "UNFINISHABLE"  *> pure Unfinishable
+  , symbol "UNFINISHABLE"  *> pure (Unfinishable [])
   ]
 
 -- | Start parsing a proof skeleton.
