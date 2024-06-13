@@ -1060,7 +1060,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 skl0 = trace ("First depth: "++sho
     prove d0 skl0 "beginning" sys0
   where
     
-    prove !depth skip c sys = trace ("Prove case "++show c++": "++show (length ranked)++" | d: "++show depth) $ case ranked of --trace ("Prove case "++show c++": "++show (length ranked)++" | d: "++show depth)
+    prove !depth skip c sys = trace ("Prove case "++show c++" | d: "++show depth) $ case ranked of --trace ("Prove case "++show c++": "++show (length ranked)++" | d: "++show depth)
           [] | finishedSubterms ctxt sys -> node "solved" skip Solved M.empty
           []                             -> node "unfinishable" [] (Unfinishable []) M.empty
           ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || isNothing (extractGoal method)
@@ -1077,15 +1077,17 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 skl0 = trace ("First depth: "++sho
 
         checkForLoop :: [Maybe Goal] ->  [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof ()
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop s [] (method0, (cases0, _expl0)) = node "allBad_bydefault" s method0 cases0
+        checkForLoop s [] (method0, (cases0, _expl0)) = node "propaged" skipL propagMethod cs 
+          where
+              (propagMethod, cs, skipL) = propagatedMethod cases0 method0 
         checkForLoop s ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) =
             if (cleanGoal <$> extractGoal method) `elem` s
-              then checkForLoop s suite (method0, (cases0, _expl0))  
-              else node "propaged" skipL propagMethod cs 
+              then trace ("Esquive: "++show depth++" "++prettyProofMethod method) checkForLoop s suite (method0, (cases0, _expl0))  
+              else trace ("Propagated: "++show depth++" "++prettyProofMethod propagMethod) node "propaged" skipL propagMethod cs 
             where
               (propagMethod, cs, skipL) = propagatedMethod cases method 
 
-        node call skipList methodOrigin cases = if cases == M.empty  
+        node call skipList methodOrigin cases = trace ("Propagating: "++show depth++" "++prettyProofMethod methodOrigin) $ if cases == M.empty  
           then LNode (ProofStep methodOrigin ()) M.empty 
           else LNode (ProofStep  methodOrigin ()) (M.map (prove (succ depth) skipList "herewego") cases)
 
@@ -1094,14 +1096,14 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 skl0 = trace ("First depth: "++sho
                 (Incorrect (scr, d, g, skl),_,pf) ->
                       trace ("|"++show d) (Incorrect (scr, d-1, extractGoal methodOrigin,skl++[cleanGoal<$> g]),
                       M.empty,skl++[cleanGoal <$> g])
-                (_,_,pf)                  -> (methodOrigin, cases, skip)
+                (_,_,pf)                  -> trace ("AUnicorn! "++show depth++" | "++prettyProofMethod methodOrigin) (methodOrigin, cases, skip)
            where
                 propagatingMethod :: [Maybe Goal] -> (ProofMethod,CaseName,M.Map CaseName (LTree CaseName (ProofStep ()))) -> [(CaseName,System)]
                                     -> (ProofMethod,CaseName,M.Map CaseName (LTree CaseName (ProofStep ())))
                 propagatingMethod _ (m,cn,proof) [] = (m,cn,proof) --trace ("PM bases: "++show (length proof)++" | "++show methodOrigin) 
                 propagatingMethod updateSkipList (m0,cn0,proof) ((cn,_sys):t) = case prove (succ depth) updateSkipList (cn++" _ prop") _sys of
                   (LNode (ProofStep (Incorrect (_s,d,g,skl)) _ ) _) -> if extractBadDepth m0 > d then error "Inconsistent depth" else (Incorrect (_s,d,g,skl),cn,proof) --(m0,cn0,proof)
-                  (LNode ps cs) -> propagatingMethod updateSkipList (m0,cn0,M.insert cn (LNode ps cs) proof) t --trace ("Suivi: "++show depth++": "++cn) 
+                  (LNode ps cs) -> trace ("Suivi: "++show depth++": "++cn++" | "++show (length t)) propagatingMethod updateSkipList (m0,cn0,M.insert cn (LNode ps cs) proof) t --trace ("Suivi: "++show depth++": "++cn) 
 
                 --propagatingMethodB = M.foldlWithKey (\(method,s) k (LNode (ProofStep proofmethod _ ) _) -> 
                 --      if proofmethod > method then (proofmethod,k) else (method,s)) (Sorry Nothing,"") (successors skip)
