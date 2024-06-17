@@ -3,7 +3,6 @@
 --               contributing in 2019: Robert Künnemann, Johannes Wocker
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- Exporting the object AnnotatedGoal to make it accessible by Heuristic.hs and Signature.hs
@@ -14,7 +13,7 @@ module Theory.Constraint.Solver.AnnotatedGoals
   )
 where
 
-import           Theory.Constraint.System.Constraints
+import Theory.Constraint.System.Constraints
 
 data Usefulness =
     Useful
@@ -25,10 +24,7 @@ data Usefulness =
   -- ^ A goal that is likely to be constructible by the adversary.
   | CurrentlyDeducible
   -- ^ A message that is deducible for the current solution.
-  | InuLoopu
-  -- ^ A goal that have been detected as part of a loop
   deriving (Show, Eq, Ord)
-
 
 -- | Goals annotated with their number and usefulness.
 type AnnotatedGoal = (Goal, (Integer, Usefulness))

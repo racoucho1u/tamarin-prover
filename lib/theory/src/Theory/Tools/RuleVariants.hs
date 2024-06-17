@@ -10,7 +10,6 @@
 -- Copyright   : (c) 2010-2012 Benedikt Schmidt
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Benedikt Schmidt <beschmi@gmail.com>
 -- Portability : GHC only
 --
 -- Variants of protocol rules.
@@ -34,16 +33,16 @@ import qualified Data.Set                         as S
 -- import           Data.Traversable                 (traverse)
 
 -- import           Utils.Misc (stringSHA256)
- 
+
 -- import           System.IO.Unsafe
 -- import           System.IO
 -- import           System.Directory
 -- import qualified Data.Binary as B
 -- import qualified Data.ByteString.Lazy as BS
 
-import           Debug.Trace.Ignore 
+import           Debug.Trace.Ignore
 
- 
+
 tmpdir :: FilePath
 tmpdir = "/tmp/tamarin/"
 

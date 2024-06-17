@@ -7,7 +7,6 @@
 -- Copyright   : (c) 2010-2012 Benedikt Schmidt & Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Benedikt Schmidt <beschmi@gmail.com>
 --
 -- Term Algebra and related notions.
 module Term.Term.Raw (
@@ -35,6 +34,12 @@ module Term.Term.Raw (
     , fAppNoEq
     , fAppList
     , unsafefApp
+
+    -- * Subterm functions
+    , isSubterm
+    , isProperSubterm
+    , replaceSubterm
+    , replaceProperSubterm
 
     ) where
 
@@ -148,6 +153,7 @@ data TermView2 a = FExp (Term a) (Term a)   | FInv (Term a) | FMult [Term a] | O
                  | FPMult (Term a) (Term a) | FEMap (Term a) (Term a)
                  | FXor [Term a] | Zero
                  | FUnion [Term a]
+                 | FNatPlus [Term a] | NatOne
                  | FPair (Term a) (Term a)
                  | FDiff (Term a) (Term a)
                  | FAppNoEq NoEqSym [Term a]
@@ -164,8 +170,9 @@ viewTerm2 t@(FAPP (AC o) ts)
   | length ts < 2 = error $ "viewTerm2: malformed term `"++show t++"'"
   | otherwise     = (acSymToConstr o) ts
   where
-    acSymToConstr Mult  = FMult
-    acSymToConstr Union = FUnion
+    acSymToConstr Mult    = FMult
+    acSymToConstr Union   = FUnion
+    acSymToConstr NatPlus = FNatPlus
     acSymToConstr Xor   = FXor
 viewTerm2 (FAPP (C EMap) [ t1 ,t2 ]) = FEMap t1 t2
 viewTerm2 t@(FAPP (C _)  _)          = error $ "viewTerm2: malformed term `"++show t++"'"
@@ -176,6 +183,7 @@ viewTerm2 t@(FAPP (NoEq o) ts) = case ts of
     [ t1, t2 ] | o == diffSym   -> FDiff  t1 t2
     [ t1 ]     | o == invSym    -> FInv   t1
     []         | o == oneSym    -> One
+    []         | o == natOneSym -> NatOne
     []         | o == dhNeutralSym  -> DHNeutral
     _          | o `elem` ssyms -> error $ "viewTerm2: malformed term `"++show t++"'"
     _                           -> FAppNoEq o ts
@@ -225,3 +233,29 @@ foldTerm fLIT fFAPP t = go t
 instance Sized a => Sized (Term a) where
     size = foldTerm size (const $ \xs -> sum xs + 1)
 
+
+----------------------------------------------------------------------
+-- Subterm Handling
+----------------------------------------------------------------------
+
+-- | Check if a term is a subterm of another.
+isSubterm :: Eq a => Term a -> Term a -> Bool
+isSubterm t1 t2 = (t1 == t2) || isProperSubterm t1 t2
+
+-- | Check if a term is a proper subterm (i.e. subterm but not equal) of another.
+isProperSubterm :: Eq a => Term a -> Term a -> Bool
+isProperSubterm t (viewTerm -> FApp _ ts) = any (isSubterm t) ts
+isProperSubterm _ _ = False
+
+-- | Replace all subterms of a term top-down according to the supplied replacement function.
+replaceSubterm :: (Term a -> Term a) -> Term a -> Term a
+replaceSubterm f originalTerm =
+  let newTerm = f originalTerm  in
+  case viewTerm newTerm of
+    (Lit _) -> newTerm
+    FApp s ts -> termViewToTerm (FApp s (map (replaceSubterm f) ts))
+
+-- | Replace all proper subterms of a term top-down according to the supplied replacement function.
+replaceProperSubterm :: (Term a -> Term a) -> Term a -> Term a
+replaceProperSubterm f (viewTerm -> FApp s ts) = termViewToTerm (FApp s (map (replaceSubterm f) ts))
+replaceProperSubterm _ t = t

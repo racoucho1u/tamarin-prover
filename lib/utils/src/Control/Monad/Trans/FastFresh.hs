@@ -4,7 +4,6 @@
 -- Copyright   : (c) 2010 Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : GHC only
 --
 -- A monad transformer for passing a fast fresh name supply through a
@@ -100,6 +99,9 @@ instance MonadError e m => MonadError e (FreshT m) where
 
 instance MonadThrow m => MonadThrow (FreshT m) where
     throwM     = lift . throwM
+
+instance MonadCatch m => MonadCatch (FreshT m) where
+    catch m f = FreshT $ catch (unFreshT m) (unFreshT . f)
 
 instance MonadReader r m => MonadReader r (FreshT m) where
     ask       = lift ask
