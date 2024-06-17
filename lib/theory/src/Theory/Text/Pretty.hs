@@ -2,7 +2,6 @@
 -- Copyright   : (c) 2011 Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- General support for pretty printing theories.
@@ -55,6 +54,7 @@ module Theory.Text.Pretty (
   , opRequires
   , opAction
   , opPath
+  , opSubterm
   , opLess
   , opEqual
   , opDedBefore
@@ -152,7 +152,7 @@ kwVariantsModulo = kwModulo "variants"
 -- Operators
 ------------------------------------------------------------------------------
 
-opProvides, opRequires, opAction, opPath, opLess, opEqual, opDedBefore, opEdge,
+opProvides, opRequires, opAction, opPath, opSubterm, opLess, opEqual, opDedBefore, opEdge,
   opExists, opForall, opLAnd, opLOr, opImp, opIff, opDot
     :: HighlightDocument d => d
 opProvides  = operator_ ":>"
@@ -160,6 +160,7 @@ opRequires  = operator_ "<:"
 opAction    = operator_ "@"
 opPath      = operator_ ">+>"
 opLess      = operator_ "<"
+opSubterm   = operator_ "⊏"
 opEqual     = operator_ "="
 opDedBefore = operator_ "--|"
 opEdge      = operator_ ">->"

@@ -16,7 +16,6 @@ Description :  Yesod dispatch functions and default handlers.
 Copyright   :  (c) 2011 Cedric Staub
 License     :  GPL-3
 
-Maintainer  :  Cedric Staub <cstaub@ethz.ch>
 Stability   :  experimental
 Portability :  non-portable
 -}
@@ -58,6 +57,7 @@ import qualified Data.Label as L
 import Main.Console (renderDoc)
 import qualified Text.PrettyPrint.Class          as Pretty
 import System.Exit
+import Text.PrettyPrint.Html
 -- import           System.Process
 
 -- | Create YesodDispatch instance for the interface.
@@ -85,6 +85,7 @@ staticFiles = $(Yesod.Static.embed "data")
 withWebUI :: String                          -- ^ Message to output once the sever is ready.
           -> FilePath                        -- ^ Cache directory.
           -> FilePath                        -- ^ Working directory.
+          -> Bool                            -- ^ Enable server logging.
           -> Bool                            -- ^ Load last proof state if present
           -> Bool                            -- ^ Automatically save proof state
           -> TheoryLoadOptions               -- ^ Options for loading theories
@@ -93,14 +94,14 @@ withWebUI :: String                          -- ^ Message to output once the sev
           -> (SignatureWithMaude -> Either OpenTheory OpenDiffTheory -> ExceptT TheoryLoadError IO (WfErrorReport, Either ClosedTheory ClosedDiffTheory))
           -- ^ Theory closer.
           -> Bool                            -- ^ Show debugging messages?
-          -> (String, FilePath)              -- ^ Path to graph rendering binary (dot or json)
+          -> OutputCommand                   -- ^ Path to graph rendering binary (dot or json)
                                              -- ^ together with indication of choice "dot", "json", ...
           -> ImageFormat                     -- ^ The preferred image format
           -> AutoProver                      -- ^ The default autoprover.
           -> (Application -> IO b)           -- ^ Function to execute
           -> IO b
-withWebUI readyMsg cacheDir_ thDir loadState autosave thOpts thLoad thClose debug'
-          graphCmd' imgFormat' defaultAutoProver' f
+withWebUI readyMsg cacheDir_ thDir enableLogging loadState autosave thOpts thLoad thClose debug'
+          outputCmd' imgFormat' defaultAutoProver' f
   = do
     thy    <- getTheos
     thrVar <- newMVar M.empty
@@ -111,22 +112,30 @@ withWebUI readyMsg cacheDir_ thDir loadState autosave thOpts thLoad thClose debu
     -- Don't create parent dirs, as temp-dir should be created by OS.
     createDirectoryIfMissing False cacheDir_
     (`E.finally` shutdownThreads thrVar) $
-      f =<< toWaiApp WebUI
-        { workDir            = thDir
-        , cacheDir           = cacheDir_
-        , thyOpts            = thOpts
-        , loadThy            = thLoad
-        , closeThy           = thClose
-        , getStatic          = staticFiles
-        , theoryVar          = thyVar
-        , threadVar          = thrVar
-        , autosaveProofstate = autosave
-        , graphCmd           = graphCmd'
-        , imageFormat        = imgFormat'
-        , defaultAutoProver  = defaultAutoProver'
-        , debug              = debug'
-        }
+      f =<< app thrVar thyVar
   where
+    app thrVar thyVar =
+      let webUI = WebUI
+                  { workDir            = thDir
+                  , cacheDir           = cacheDir_
+                  , thyOpts            = thOpts
+                  , loadThy            = thLoad
+                  , closeThy           = thClose
+                  , getStatic          = staticFiles
+                  , theoryVar          = thyVar
+                  , threadVar          = thrVar
+                  , autosaveProofstate = autosave
+                  , outputCmd           = outputCmd'
+                  , imageFormat        = imgFormat'
+                  , defaultAutoProver  = defaultAutoProver'
+                  , debug              = debug'
+                  } in
+      if enableLogging
+      then toWaiApp webUI
+      else do
+        plain <- toWaiAppPlain webUI
+        return $ defaultMiddlewaresNoLogging plain
+          
     autosaveDir = thDir++"/"++autosaveSubdir
     getTheos = do
       existsAutosave <- doesDirectoryExist autosaveDir
@@ -183,11 +192,14 @@ loadTheories thOpts readyMsg thDir thLoad thClose autoProver = do
           die "quit-on-warning mode selected - aborting on wellformedness errors."
         Right (report, thy) -> do
           time <- getZonedTime
+          wfErrors <- case report of 
+                  [] -> pure $ "" 
+                  _ -> pure $ "<div class=\"wf-warning\">\nWARNING: the following wellformedness checks failed!<br /><br />\n" ++ (renderHtmlDoc . htmlDoc $ prettyWfErrorReport report) ++ "\n</div>"
           unless (null report) $ putStrLn $ renderDoc $ ppInteractive report path
           return $ Just
              ( idx
-             , either (\t -> Trace $ TheoryInfo idx t time Nothing True (Local path) autoProver)
-                      (\t -> Diff $ DiffTheoryInfo idx t time Nothing True (Local path) autoProver) thy
+             , either (\t -> Trace $ TheoryInfo idx t time Nothing True (Local path) autoProver wfErrors)
+                      (\t -> Diff $ DiffTheoryInfo idx t time Nothing True (Local path) autoProver wfErrors) thy 
              )
       where
         reportFailure error inFile = Pretty.vcat [ Pretty.text $ replicate 78 '-'

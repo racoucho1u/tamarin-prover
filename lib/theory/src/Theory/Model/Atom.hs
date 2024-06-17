@@ -20,7 +20,6 @@
 -- Copyright   : (c) 2011, 2012 Benedikt Schmidt & Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : GHC only
 --
 -- Formulas that represent security properties.
@@ -38,6 +37,7 @@ module Theory.Model.Atom(
   , isActionAtom
   , isSyntacticSugar
   , isLastAtom
+  , isSubtermAtom
   , isLessAtom
   , isEqAtom
   , toAtom
@@ -81,6 +81,7 @@ import Debug.Trace
 -- terms, including syntactic sugar
 data ProtoAtom s t = Action   t (Fact t)
                  | EqE  t t
+                 | Subterm t t
                  | Less t t
                  | Last t
                  | Syntactic (s t)
@@ -124,14 +125,16 @@ type SyntacticNAtom v = SyntacticAtom (VTerm Name v)
 instance (Functor s) => Functor (ProtoAtom s) where
     fmap f (Action   i fa) = Action    (f i) (fmap f fa)
     fmap f (EqE l r)       = EqE       (f l) (f r)
+    fmap f (Subterm v u)   = Subterm   (f v) (f u)
     fmap f (Less v u)      = Less      (f v) (f u)
     fmap f (Last i)        = Last      (f i)
-    fmap f (Syntactic se)   = Syntactic (fmap f se)
+    fmap f (Syntactic se)  = Syntactic (fmap f se)
 
 instance (Foldable s) => Foldable (ProtoAtom s) where
     foldMap f (Action i fa)   =
         f i `mappend` (foldMap f fa)
     foldMap f (EqE l r)       = f l `mappend` f r
+    foldMap f (Subterm i j)   = f i `mappend` f j
     foldMap f (Less i j)      = f i `mappend` f j
     foldMap f (Last i)        = f i
     foldMap f (Syntactic s)   = foldMap f s
@@ -140,9 +143,10 @@ instance (Traversable s) => Traversable (ProtoAtom s) where
     traverse f (Action i fa)   =
         Action <$> f i <*> traverse f fa
     traverse f (EqE l r)       = EqE <$> f l <*> f r
+    traverse f (Subterm v u)   = Subterm <$> f v <*> f u
     traverse f (Less v u)      = Less <$> f v <*> f u
     traverse f (Last i)        = Last <$> f i
-    traverse f (Syntactic s)       = Syntactic <$> traverse f s
+    traverse f (Syntactic s)   = Syntactic <$> traverse f s
 
 instance (IsConst c, IsVar v) 
         => Apply (Subst c v) (SyntacticSugar (VTerm c v))
@@ -161,10 +165,10 @@ instance HasFrees t => HasFrees (Atom t) where
 instance (Apply s t, Apply s (syn t)) => Apply s (ProtoAtom syn t) where
     apply subst (Action i fact)   = Action (apply subst i) (apply subst fact)
     apply subst (EqE l r)         = EqE (apply subst l) (apply subst r)
+    apply subst (Subterm i j)     = Subterm (apply subst i) (apply subst j)
     apply subst (Less i j)        = Less (apply subst i) (apply subst j)
     apply subst (Last i)          = Last (apply subst i)
     apply subst (Syntactic fa)    = Syntactic (apply subst fa)
-
 
 -- Queries
 ----------
@@ -189,14 +193,19 @@ isLessAtom ato = case ato of Less _ _ -> True; _ -> False
 isEqAtom :: Atom t -> Bool
 isEqAtom ato = case ato of EqE _ _ -> True; _ -> False
 
+-- | True iff the atom is a subterm atom.
+isSubtermAtom :: Atom t -> Bool
+isSubtermAtom ato = case ato of Subterm _ _ -> True; _ -> False
+
 
 -- | Throw away syntactic sugar
 toAtom:: ProtoAtom s t -> Atom t
-toAtom (Syntactic _) = Syntactic Unit2
-toAtom (Action t fa) = Action t fa
-toAtom (EqE t t')    = EqE t t'
-toAtom (Less t t')   = Less t t'
-toAtom (Last t)      = Last t
+toAtom (Syntactic _)  = Syntactic Unit2
+toAtom (Action t fa)  = Action t fa
+toAtom (EqE t t')     = EqE t t'
+toAtom (Subterm t t') = Subterm t t'
+toAtom (Less t t')    = Less t t'
+toAtom (Last t)       = Last t
 
 replaceLvarsort :: LSort -> LSort 
 replaceLvarsort LSortFresh = LSortMsg
@@ -234,6 +243,7 @@ prettyProtoAtom ppS _ (Syntactic s) = ppS s
 prettyProtoAtom _ ppT (EqE l r) =
     sep [ppT l <-> opEqual, ppT r]
     -- sep [prettyNTerm l <-> text "≈", prettyNTerm r]
+prettyProtoAtom _ ppT (Subterm l r) = sep [ppT l <-> opSubterm, ppT r]
 prettyProtoAtom _ _ (Less u v) = text (show u) <-> opLess <-> text (show v)
 prettyProtoAtom _ _ (Last i)   = operator_ "last" <> parens (text (show i))
 

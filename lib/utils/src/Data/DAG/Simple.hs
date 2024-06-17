@@ -4,12 +4,12 @@
 -- Copyright   : (c) 2010,2012 Simon Meier
 -- License     : GPL v3 (see LICENSE)
 -- 
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 --
 -- Simple  vertice list based representation of DAGs and some common operations on it.
 module Data.DAG.Simple (
   -- * Computing with binary relations
     Relation
+  , transRed
   , inverse
   , image
   , reachableSet
@@ -30,10 +30,29 @@ import           Control.Monad.RWS
 import           Data.List
 import qualified Data.DList as D
 import qualified Data.Set   as S
+import           Data.Maybe
 
 -- import Test.QuickCheck.Property (label)
 -- import Test.QuickCheck (quickCheck)
 
+
+-- | Transitive reduction for a DAG
+transRed :: Ord a => [(a,a)] -> [(a,a)]
+transRed dag =
+     foldl' visit [] ( mapMaybe indexToRel indexV)
+    where
+        topoOrdDag = toposort dag
+        i = [1.. (length topoOrdDag -1)]
+        indexV = foldr (\x acc -> zip (reverse [0..x-1]) (repeat x)++ acc) [] i
+        indexToRel ji =
+            let r = (,)  (topoOrdDag !! fst ji ) (topoOrdDag !! snd ji)
+            in (if r `elem` dag then Just r else Nothing)
+        visit newEdges x
+            | snd x `S.member` reachableSet [fst x] newEdges = newEdges
+            | otherwise = x : newEdges
+
+             
+               
 -- | Produce a topological sorting of the given relation. If the relation is
 -- cyclic, then the result is at least some permutation of all elements of
 -- the given relation.

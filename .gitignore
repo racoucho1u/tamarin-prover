@@ -1,6 +1,7 @@
 .hsenv
 hsenv.log
 dist
+dist-newstyle
 cabal-dev
 testbed
 case-studies/**/*.spthy
@@ -42,6 +43,7 @@ stack.yaml.lock
 
 *.iml
 .idea/
+.vscode/
 out/
 
 *.pv
@@ -51,4 +53,8 @@ out/
 
 **/benchmark
 **/input
+<<<<<<< HEAD
 **/diff
+=======
+**/diff
+>>>>>>> tamarin-prover/develop
