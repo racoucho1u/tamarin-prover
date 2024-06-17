@@ -546,7 +546,7 @@ rankProofMethods ranking tactics ctxt sys = do
                AvoidInduction -> [(Simplify, ""), (Induction, "")]
                UseInduction   -> [(Induction, ""), (Simplify, "")]
             )
-        <|> solveGoalMethod <$> (rankGoals ctxt ranking tactics sys $ openGoals sys) 
+        <|> solveGoalMethod <$> ranked (rankGoals ctxt ranking tactics sys $ openGoals sys) 
     case execProofMethod ctxt m sys of
       Just cases -> case M.toList cases of 
           []              -> return (m, (cases, expl)) 
