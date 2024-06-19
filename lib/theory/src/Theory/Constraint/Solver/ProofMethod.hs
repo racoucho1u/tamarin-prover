@@ -209,7 +209,7 @@ data ProofMethod =
   | Solved                               -- ^ An attack was found.
   | Unfinishable                         -- ^ The proof cannot be finished (due to reducible operators in subterms)
   | Simplify                             -- ^ A simplification step.
-  | InLoop (Int, Int, Goal, Int)              -- ^ A goal that has been detected as part as a loop (depth of the loop, goal, nb of time through the loop)
+  | InLoop (Int, Int, Goal, Int)         -- ^ A goal that has been detected as part as a loop (depth of the loop, goal, nb of time through the loop) and score but where
   | SolveGoal Goal                       -- ^ A goal that was solved.
   | Contradiction (Maybe Contradiction)  -- ^ A contradiction could be
                                          -- derived, possibly with a reason.

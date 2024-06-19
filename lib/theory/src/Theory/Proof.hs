@@ -1286,7 +1286,9 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            InLoop (s,d,goal,iteration) -> if chooseLoop s d iteration (length $ L.get sPathGoals sys) then node (InLoop (s,d,goal,iteration)) (M.map (applyIteration d) cases) sys else checkForLoop suite (method0, (cases0, _expl0))
+            InLoop (s,d,goal,iteration) -> if chooseLoop s d iteration (length $ L.get sPathGoals sys) 
+              then node (InLoop (s,d,goal,iteration)) (M.map (applyIteration d) cases) sys 
+              else checkForLoop suite (method0, (cases0, _expl0))
             --InLoop (d,goal,iteration) -> if chooseLoop d iteration then node (InLoop (d,goal,iteration+1)) cases sys else checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases sys
 
