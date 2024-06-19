@@ -121,6 +121,10 @@ import           Theory.Model
 import           Theory.Text.Pretty
 
 
+
+
+
+
 ------------------------------------------------------------------------------
 -- Utility: Trees with uniquely labelled edges.
 ------------------------------------------------------------------------------
@@ -907,7 +911,7 @@ cutOnSolvedSingleThreadDFSDiff prf0 =
 -- FIXME: Note that this function may use a lot of space, as it holds onto the
 -- whole proof tree.
 cutOnSolvedDFS :: Proof (Maybe a) -> Proof (Maybe a)
-cutOnSolvedDFS prf0 = 
+cutOnSolvedDFS prf0 =
     go (4 :: Integer) $ insertPaths prf0
   where
     go dMax prf = case findSolved 0 prf of
@@ -1051,7 +1055,69 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-    prove d0 False sys0
+      prove d0 False sys0 
+
+  where
+      prove !depth keepGoing sys  = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt (trace ("Prove: "++show depth) sys) of
+          [] | finishedSubterms ctxt sys -> node Solved M.empty False
+          []                             -> node Unfinishable M.empty False
+          ((method, (cases, _expl)):suite) -> if not (L.get sLoopFound sys) || keepGoing
+                                                then trace ("CheckLoops: "++show depth++" | "++show method)
+                                                     --trace ("Node: "++show method) node method cases
+                                                      checkForLoop ((method, (cases, _expl)):suite) (method, cases)
+                                                else trace ("Ending branch here: "++show depth++" | "++show (1+L.get sNbLoop sys)++" | "++show method)
+                                                      node (InLoop (L.get sNbLoop sys+1, extractGoal method)) M.empty keepGoing
+
+        where
+          checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, M.Map CaseName System) -> Proof () --(M.Map Goal Int)
+          checkForLoop [] (method0, cases0) = trace ("Default: "++show depth++" | "++show method0) node propagMethod cs True
+            where
+                (propagMethod, cs) = propagateMethod cases0 method0
+          checkForLoop ((method, (cases, _expl)):suite) (method0, cases0) = trace ("Method: "++show depth++" | "++show method) $ 
+            if isInLoop method 
+              then trace ("SkipS: "++show depth++" | "++show method) 
+                              checkForLoop suite (method0, cases0)
+              else 
+                case propagMethod of           --if getScore method s > Nothing
+                  InLoop _ -> trace ("Skip: "++show depth++" | "++show method) 
+                                --node propagMethod M.empty
+                                node propagMethod M.empty False
+                  _        -> trace ("Go"++show depth++" | "++show method++" "++show (length cases)) 
+                                node propagMethod cases False--trace ("Mini: "++show m++" | "++show method++"\n"++show s)
+                  where
+                    (propagMethod, cs) = propagateMethod cases (trace ("Propag"++ show method) method)
+              
+          extractGoal method = case method of
+            InLoop (_, goal) -> goal
+            SolveGoal goal     -> Just goal
+            _ -> Nothing
+
+          isInLoop :: ProofMethod -> Bool
+          isInLoop (InLoop (0,_)) = True
+          isInLoop _          = False
+
+          propagateMethod cases methodOrigin = case propagatingMethod (Sorry Nothing) (M.toList cases) of 
+              InLoop (0,g) -> trace ("| "++show depth++" U "++show (extractGoal methodOrigin)) (methodOrigin, M.empty) -- ++show method
+              InLoop (s,g) -> trace ("| "++show depth++" "++show (s-1)++" "++show (extractGoal methodOrigin)) (InLoop (s-1,extractGoal methodOrigin),cases) -- ++" "++show method
+              m            -> trace ("|| "++show depth++" "++show m) (methodOrigin, cases) -- ++show method
+            where
+              propagatingMethod :: ProofMethod -> [(CaseName,System)] -> ProofMethod
+              propagatingMethod method [] = method
+              propagatingMethod method ((cn,_sys):t) = case prove (succ depth) keepGoing _sys of
+                  (LNode (ProofStep (InLoop (s,g)) _ ) _) -> InLoop (s,g)
+                  (LNode ps cs) -> propagatingMethod method t --M.insert cn (LNode ps cs) proof
+
+              --successors = M.map (prove (succ depth)) cases
+
+          node :: ProofMethod -> M.Map CaseName System -> Bool -> Proof()
+          node methodOrigin casesOrigin kG =  trace ("Node: "++show depth++" "++show methodOrigin) LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) kG) (trace ("Blu: "++show (length casesOrigin)) casesOrigin))--trace ("Node: "++show methodOrigin) $ 
+              {-if casesOrigin == M.empty 
+                then LNode (ProofStep methodOrigin ()) M.empty 
+                else trace ("Node though"++show (length casesOrigin)) 
+                      LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) kG) (trace ("Blu: "++show (length casesOrigin)) casesOrigin))-}
+
+                  
+  {-  prove d0 False sys0
   where
 
     prove !depth keepGoing sys =
@@ -1066,27 +1132,27 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         chooseMethod [] method0 cases0 _ = node method0 cases0 True
         chooseMethod ((BlackListed _ , (cases, _)):l) method0 cases0 keepGoing = chooseMethod l method0 cases0 keepGoing
         chooseMethod ((method, (cases, _)):list) method0 cases0 keepGoing = if skip then chooseMethod list method0 cases0 keepGoing else (nodeFinal,skip)
-            where 
+            where
                 (nodeFinal, skip) = node method cases keepGoing
 
         node methodOrigin cases keepGoing =
-          if (cases == M.empty) then ((LNode (ProofStep methodOrigin ()) M.empty),skip) else ((LNode (ProofStep method ()) successors_),skip)
+          if cases == M.empty then ((LNode (ProofStep methodOrigin ()) M.empty),skip) else ((LNode (ProofStep method ()) successors_),skip)
 
-            where 
+            where
                 --successors_ = M.map (prove (succ depth)) cases
                 (method, successors_, skip) = propagatedMethod cases methodOrigin keepGoing
 
         extractGoal method = case method of
-            InLoop (idx, goal) -> Just goal             
+            InLoop (idx, goal) -> Just goal
             BlackListed goal   -> Just goal
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
         propagatedMethod cases methodOrigin keepGoing = if keepGoing then (methodOrigin, successors, False)
-            else case propagatingMethod cases of 
-                InLoop (1,g)     -> (BlackListed (fromJust $ extractGoal methodOrigin), successors, True)
-                InLoop (idx,g)   -> (InLoop (idx-1,(fromJust $ extractGoal methodOrigin)), successors, False)
-                BlackListed goal -> (methodOrigin, successors, False)
+            else case propagatingMethod cases of
+                InLoop (1,g)     -> trace ("|m "++show depth) (BlackListed (fromJust $ extractGoal methodOrigin), successors, True)
+                InLoop (idx,g)   -> trace ("|b "++show depth) (InLoop (idx-1,fromJust $ extractGoal methodOrigin), successors, False)
+                BlackListed goal -> trace ("|f "++show depth) (methodOrigin, successors, False)
                 _                -> (methodOrigin, successors, False)
 
           where
@@ -1095,7 +1161,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 
                 successors = M.map (prove (succ depth) keepGoing) cases
 
-
+-}
 
 
 
