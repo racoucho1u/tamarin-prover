@@ -1281,9 +1281,9 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
     -- loops are not deprioritized
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          [] | finishedSubterms ctxt sys -> node Solved M.empty
-          []                             -> node Unfinishable M.empty
-          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl)) -- if depth < 15 then  else avoidLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+          [] | finishedSubterms ctxt sys -> node Solved M.empty sys
+          []                             -> node Unfinishable M.empty sys
+          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, cases) -- if depth < 15 then  else avoidLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
         {-exportTactic :: [(Int,[Goal])] -> String
         exportTactic [] = ""
@@ -1292,13 +1292,13 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
             cg = concatMap (("\n1: "++) . show . cleanGoal) lg --if i > 0 then concatMap (("\n1: "++) . show . cleanGoal) lg else ""
         -}
 
-        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof System
+        checkForLoop :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> Proof System
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
+        checkForLoop [] (method0, cases0) = node method0 cases0 sys
+        checkForLoop ((method, (cases, _expl)):suite) (method0, cases0) = case method of
             InLoop (s,d,goal,iteration) -> if chooseLoop s d iteration (length $ L.get sPathGoals sys) 
               then node (InLoop (s,d,goal,iteration)) (M.map (applyIteration d) cases) sys 
-              else checkForLoop suite (method0, (cases0, _expl0))
+              else checkForLoop suite (method0, cases0)
             --InLoop (d,goal,iteration) -> if chooseLoop d iteration then node (InLoop (d,goal,iteration+1)) cases sys else checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases sys
 
