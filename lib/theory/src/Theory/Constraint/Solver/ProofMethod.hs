@@ -49,7 +49,7 @@ import qualified Data.Label                                as L
 import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate) --elem
 import qualified Data.Map                                  as M
 import qualified Data.MultiSet                             as MS
-import           Data.Maybe                                (catMaybes, fromMaybe, listToMaybe,mapMaybe)
+import           Data.Maybe                                (catMaybes, fromMaybe, listToMaybe, mapMaybe)
 -- import           Data.Monoid
 import           Data.Ord                                  (comparing)
 import qualified Data.Set                                  as S

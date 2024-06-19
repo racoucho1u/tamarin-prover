@@ -1281,7 +1281,8 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
     -- loops are not deprioritized
 
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []   -> node Solved M.empty sys
+          [] | finishedSubterms ctxt sys -> node Solved M.empty
+          []                             -> node Unfinishable M.empty
           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl)) -- if depth < 15 then  else avoidLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
         {-exportTactic :: [(Int,[Goal])] -> String
