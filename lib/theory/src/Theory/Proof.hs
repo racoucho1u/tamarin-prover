@@ -1082,10 +1082,10 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                   InLoop _ -> trace ("Skip: "++show depth++" | "++show method) 
                                 --node propagMethod M.empty
                                 node propagMethod M.empty False
-                  _        -> trace ("Go"++show depth++" | "++show method++" "++show (length cases)) 
+                  _        -> trace ("Go: "++show depth++" | "++show method++" "++show (length cases)) 
                                 node propagMethod cases False--trace ("Mini: "++show m++" | "++show method++"\n"++show s)
                   where
-                    (propagMethod, cs) = propagateMethod cases (trace ("Propag"++ show method) method)
+                    (propagMethod, cs) = propagateMethod cases (trace ("Propag: "++ show method) method)
               
           extractGoal method = case method of
             InLoop (_, goal) -> goal
@@ -1110,11 +1110,10 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
               --successors = M.map (prove (succ depth)) cases
 
           node :: ProofMethod -> M.Map CaseName System -> Bool -> Proof()
-          node methodOrigin casesOrigin kG =  trace ("Node: "++show depth++" "++show methodOrigin) LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) kG) (trace ("Blu: "++show (length casesOrigin)) casesOrigin))--trace ("Node: "++show methodOrigin) $ 
-              {-if casesOrigin == M.empty 
-                then LNode (ProofStep methodOrigin ()) M.empty 
-                else trace ("Node though"++show (length casesOrigin)) 
-                      LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) kG) (trace ("Blu: "++show (length casesOrigin)) casesOrigin))-}
+          node methodOrigin casesOrigin kG =  
+            trace ("Node: "++show depth++" | cases: "++show (length casesOrigin)++" "++show methodOrigin) 
+            LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) kG) (trace ("Blu: "++show (length casesOrigin)) casesOrigin))
+              
 
                   
   {-  prove d0 False sys0
