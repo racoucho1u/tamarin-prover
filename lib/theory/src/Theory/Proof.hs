@@ -1055,17 +1055,59 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-      prove d0 False sys0 
+      prove d0 False sys0
+  where
+      prove !depth keepGoing sys  = trace ("Proving: "++show depth) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+        [] | finishedSubterms ctxt sys -> node Solved M.empty False
+        []                             -> node Unfinishable M.empty False
+        --((InLoop (n,g), (cases, _expl)):suite) -> trace ("Je suis stoppé: "++show g) node (InLoop (n,g)) M.empty False
+        ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases)
+
+        where
+          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> Proof ()
+          explore [] (method0, cases0) = trace ("Explore1: "++show method0) node method0 cases0 True
+          explore ((InLoop (n,g), (cases, _expl)):suite) _ = trace ("Autoban: "++show g) node (InLoop (n,g)) M.empty False
+          explore ((method, (cases, _expl)):suite) (method0, cases0)       = trace ("Explore0: "++show method) $ case propagatedMethod of 
+              InLoop (0,_) -> trace ("Skipping to nxt "++show method) explore suite (method0,cases0)
+              InLoop (n,g) -> trace ("Ended    branch "++show method) node (InLoop (n,g)) M.empty False
+              _            -> trace ("Finished branch "++show method) node method cases False
+              where
+                propagatedMethod =  propagateMethod cases method
+          
+
+          propagateMethod cases methodOrigin = case propagatingMethod (Sorry Nothing) (M.toList cases) of
+              InLoop (0,_) -> trace ("a | "++show methodOrigin) methodOrigin
+              InLoop (s,_) -> trace (show s++" | "++show methodOrigin) InLoop (s-1,extractGoal methodOrigin)
+              _            -> trace ("b | "++show methodOrigin) methodOrigin
+            where
+              propagatingMethod :: ProofMethod -> [(CaseName,System)] -> ProofMethod
+              propagatingMethod method [] = method
+              propagatingMethod method ((cn,_sys):t) = case prove (succ depth) keepGoing _sys of
+                  (LNode (ProofStep (InLoop (s,g)) _ ) _) -> InLoop (s,g)
+                  (LNode ps cs)                           -> propagatingMethod method t --M.insert cn (LNode ps cs) proof
+
+          extractGoal method = case method of
+            InLoop (_, goal) -> goal
+            SolveGoal goal     -> Just goal
+            _ -> Nothing
+
+          node :: ProofMethod -> M.Map CaseName System -> Bool -> Proof()
+          node methodOrigin casesOrigin kG =
+            LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) kG) casesOrigin)
+
+proveSystemDFS2 :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
+proveSystemDFS2 heuristic tactics ctxt d0 sys0 =
+      prove d0 False sys0
 
   where
       prove !depth keepGoing sys  = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt (trace ("Prove: "++show depth) sys) of
           [] | finishedSubterms ctxt sys -> node Solved M.empty False
           []                             -> node Unfinishable M.empty False
-          ((method, (cases, _expl)):suite) -> if not (L.get sLoopFound sys) || keepGoing
-                                                then trace ("CheckLoops: "++show depth++" | "++show method)
+          ((method, (cases, _expl)):suite) -> if isNothing (isInLoop method) || keepGoing
+                                                then trace ("CheckLoops: "++show depth++" | "++show method++" "++show (isInLoop method))
                                                      --trace ("Node: "++show method) node method cases
                                                       checkForLoop ((method, (cases, _expl)):suite) (method, cases)
-                                                else trace ("Ending branch here: "++show depth++" | "++show (1+L.get sNbLoop sys)++" | "++show method)
+                                                else trace ("Ending branch here: "++show depth++" | "++show (1+L.get sNbLoop sys)) -- ++" | "++show method)
                                                       node (InLoop (L.get sNbLoop sys+1, extractGoal method)) M.empty keepGoing
 
         where
@@ -1073,30 +1115,31 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
           checkForLoop [] (method0, cases0) = trace ("Default: "++show depth++" | "++show method0) node propagMethod cs True
             where
                 (propagMethod, cs) = propagateMethod cases0 method0
-          checkForLoop ((method, (cases, _expl)):suite) (method0, cases0) = trace ("Method: "++show depth++" | "++show method) $ 
-            if isInLoop method 
-              then trace ("SkipS: "++show depth++" | "++show method) 
+          checkForLoop ((method, (cases, _expl)):suite) (method0, cases0) = trace ("Method: "++show depth++" | "++show method) $
+            if isJust $ isInLoop method
+              then trace ("SkipS: "++show depth++" | "++show method)
                               checkForLoop suite (method0, cases0)
-              else 
+              else
                 case propagMethod of           --if getScore method s > Nothing
-                  InLoop _ -> trace ("Skip: "++show depth++" | "++show method) 
+                  InLoop (0,_) -> trace ("Skip: "++show depth++" | "++show method)
+                                  checkForLoop suite (method0, cases0)
                                 --node propagMethod M.empty
-                                node propagMethod M.empty False
-                  _        -> trace ("Go: "++show depth++" | "++show method++" "++show (length cases)) 
+                  InLoop _ -> trace ("Meh"++show depth++" | "++show method) node propagMethod M.empty False
+                  _        -> trace ("Go: "++show depth++" | "++show method++" "++show (length cases))
                                 node propagMethod cases False--trace ("Mini: "++show m++" | "++show method++"\n"++show s)
                   where
                     (propagMethod, cs) = propagateMethod cases (trace ("Propag: "++ show method) method)
-              
+
           extractGoal method = case method of
             InLoop (_, goal) -> goal
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
-          isInLoop :: ProofMethod -> Bool
-          isInLoop (InLoop (0,_)) = True
-          isInLoop _          = False
+          isInLoop :: ProofMethod -> Maybe Int
+          isInLoop (InLoop (n,_)) = Just n
+          isInLoop _          = Nothing
 
-          propagateMethod cases methodOrigin = case propagatingMethod (Sorry Nothing) (M.toList cases) of 
+          propagateMethod cases methodOrigin = case propagatingMethod (Sorry Nothing) (M.toList cases) of
               InLoop (0,g) -> trace ("| "++show depth++" U "++show (extractGoal methodOrigin)) (methodOrigin, M.empty) -- ++show method
               InLoop (s,g) -> trace ("| "++show depth++" "++show (s-1)++" "++show (extractGoal methodOrigin)) (InLoop (s-1,extractGoal methodOrigin),cases) -- ++" "++show method
               m            -> trace ("|| "++show depth++" "++show m) (methodOrigin, cases) -- ++show method
@@ -1110,12 +1153,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
               --successors = M.map (prove (succ depth)) cases
 
           node :: ProofMethod -> M.Map CaseName System -> Bool -> Proof()
-          node methodOrigin casesOrigin kG =  
-            trace ("Node: "++show depth++" | cases: "++show (length casesOrigin)++" "++show methodOrigin) 
+          node methodOrigin casesOrigin kG =
+            trace ("Node: "++show depth++" | cases: "++show (length casesOrigin)++" "++show methodOrigin)
             LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) kG) (trace ("Blu: "++show (length casesOrigin)) casesOrigin))
-              
 
-                  
+
+
   {-  prove d0 False sys0
   where
 

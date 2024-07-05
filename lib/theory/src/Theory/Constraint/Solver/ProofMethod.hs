@@ -559,8 +559,8 @@ rankProofMethods ranking tactics ctxt sys =
       case execProofMethod ctxt m sys of
         Just cases -> case M.toList cases of
             []              -> return (m, (cases, expl))
-            ((case1,sys):_) -> if (L.get sBlackListFound sys) then return (Backtracked $ fromJust $ fromSolveGoal m, (cases, expl))
-                                else if (L.get sLoopFound sys) then return (InLoop (L.get sNbLoop sys, fromSolveGoal m) , (cases, "InLoop "++ (show $ L.get sNbLoop sys)))
+            ((case1,sys):_) -> if L.get sBlackListFound sys then return (Backtracked $ fromJust $ fromSolveGoal m, (cases, expl))
+                                else if L.get sLoopFound sys then return (InLoop (L.get sNbLoop sys, fromSolveGoal m) , (cases, "InLoop "++ show (L.get sNbLoop sys)))
                                       else return (m, (cases, expl))
                               {-if L.get sLoopFound sys then return (InLoop (L.get sNbLoop sys,  fromSolveGoal m) , (cases, "InLoop "++ (show $ L.get sNbLoop sys)))
                                       else return (m, (cases, expl))-}
