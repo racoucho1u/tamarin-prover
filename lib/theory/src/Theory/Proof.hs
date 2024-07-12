@@ -1055,34 +1055,34 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-      prove d0 False sys0
+      prove d0 [] sys0
   where
-      prove !depth keepGoing sys  = trace ("Proving: "++show depth) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-        [] | finishedSubterms ctxt sys -> node Solved M.empty False
-        []                             -> node Unfinishable M.empty False
-        --((InLoop (n,g), (cases, _expl)):suite) -> trace ("Je suis stoppé: "++show g) node (InLoop (n,g)) M.empty False
-        ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases)
+      prove !depth ignoreGoals sys  = trace ("Proving: "++show depth++" "++show ignoreGoals) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+        [] | finishedSubterms ctxt sys -> node Solved M.empty ignoreGoals
+        []                             -> node Unfinishable M.empty ignoreGoals
+        ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases) ignoreGoals
 
         where
-          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> Proof ()
-          explore [] (method0, cases0) = trace ("Explore1: "++show method0) node method0 cases0 True
-          explore ((InLoop (n,g), (cases, _expl)):suite) _ = trace ("Autoban: "++show g) node (InLoop (n,g)) M.empty False
-          explore ((method, (cases, _expl)):suite) (method0, cases0)       = trace ("Explore0: "++show method) $ case propagatedMethod of 
-              InLoop (0,_) -> trace ("Skipping to nxt "++show method) explore suite (method0,cases0)
-              InLoop (n,g) -> trace ("Ended    branch "++show method) node (InLoop (n,g)) M.empty False
-              _            -> trace ("Finished branch "++show method) node method cases False
+          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Maybe Goal] -> Proof ()
+          explore [] (method0, cases0) igG = trace ("Explore1: "++show (length cases0)++" "++show method0) node (InLoop (0,extractGoal method0)) cases0 (extractGoal method0:igG) --
+          explore ((InLoop (n,g), (cases, _expl)):suite) _ igG =
+              if g `elem` igG then node (InLoop (n,g)) cases igG else node (InLoop (n,g)) M.empty igG --else trace ("Autoban: "++show g) node (InLoop (n,g)) M.empty igG
+          explore ((method, (cases, _expl)):suite) (method0, cases0) igG = case propagatedMethod of --trace ("Explore0: "++show method) $ 
+              InLoop (0,_) -> explore suite (method0,cases0) igG --trace ("Skipping to nxt "++show method) 
+              InLoop (n,g) -> node (InLoop (n,g)) M.empty igG    --trace ("Ended    branch "++show method)
+              _            -> node method cases igG              --trace ("Finished branch "++show method)
               where
                 propagatedMethod =  propagateMethod cases method
-          
+
 
           propagateMethod cases methodOrigin = case propagatingMethod (Sorry Nothing) (M.toList cases) of
-              InLoop (0,_) -> trace ("a | "++show methodOrigin) methodOrigin
-              InLoop (s,_) -> trace (show s++" | "++show methodOrigin) InLoop (s-1,extractGoal methodOrigin)
-              _            -> trace ("b | "++show methodOrigin) methodOrigin
+              InLoop (0,_) -> methodOrigin                          -- trace ("a | "++show methodOrigin) 
+              InLoop (s,_) -> InLoop (s-1,extractGoal methodOrigin) --trace (show s++" | "++show methodOrigin) 
+              _            -> methodOrigin                          --trace ("b | "++show methodOrigin) 
             where
               propagatingMethod :: ProofMethod -> [(CaseName,System)] -> ProofMethod
               propagatingMethod method [] = method
-              propagatingMethod method ((cn,_sys):t) = case prove (succ depth) keepGoing _sys of
+              propagatingMethod method ((cn,_sys):t) = case prove (succ depth) ignoreGoals _sys of
                   (LNode (ProofStep (InLoop (s,g)) _ ) _) -> InLoop (s,g)
                   (LNode ps cs)                           -> propagatingMethod method t --M.insert cn (LNode ps cs) proof
 
@@ -1091,9 +1091,11 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
-          node :: ProofMethod -> M.Map CaseName System -> Bool -> Proof()
-          node methodOrigin casesOrigin kG =
-            LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) kG) casesOrigin)
+          node :: ProofMethod -> M.Map CaseName System -> [Maybe Goal] -> Proof()
+          node methodOrigin casesOrigin igG = trace ("Node: "++show igG++"  "++show (length casesOrigin)++" "++show methodOrigin) $
+            LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) igG) casesOrigin)
+              where
+                successors = M.map (prove (succ depth) igG) casesOrigin
 
 proveSystemDFS2 :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS2 heuristic tactics ctxt d0 sys0 =
