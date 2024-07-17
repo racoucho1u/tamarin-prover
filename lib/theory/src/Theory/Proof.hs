@@ -1061,19 +1061,20 @@ proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContex
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
       prove d0 [] "" "init" sys0 
   where
-      prove !depth ignoreGoals casename caller sys = if not (null ignoreGoals) 
-        then error ("Not null ignoreGoals"++show depth++"\n"++show ignoreGoals++"\n"++casename++"\n"++caller)
-        else trace ("Proving: "++casename++" "++caller++" "++show ignoreGoals) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+      prove !depth ignoreGoals casename caller sys = trace ("Proving: "++casename++" "++caller++" "++show ignoreGoals) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+        --if not (null ignoreGoals) 
+        --then error ("Not null ignoreGoals"++show depth++"\n"++show ignoreGoals++"\n"++casename++"\n"++caller)
+        --else trace ("Proving: "++casename++" "++caller++" "++show ignoreGoals) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
         [] | finishedSubterms ctxt sys -> trace ("Solved: "++show ignoreGoals) node casename Solved M.empty ignoreGoals
         []                             -> trace ("Unfinishable: "++show ignoreGoals) node casename Unfinishable M.empty ignoreGoals
         ((method, (cases, _expl)):suite) -> explore casename ((method, (cases, _expl)):suite) (method,cases) ignoreGoals
 
         where
           explore :: String -> [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Maybe Goal] -> Proof ()
-          explore cn [] (method0, cases0) igG = traceStack ("Explore1: "++show (length cases0)++" "++cn++" "++show method0) node cn method0 cases0 (extractGoal method0:igG) --(InLoop (0,extractGoal method0))
+          explore cn [] (method0, cases0) igG = traceStack ("Explore1: "++show (length cases0)++" "++cn++" "++show method0) node cn method0 cases0 ((fmap freeme (extractGoal method0)):igG) --(InLoop (0,extractGoal method0))
           --explore cn [(method, (cases, _expl))] (method0, cases0) igG = trace ("Last chance billy boy: "++show method) node cn method cases (extractGoal method:igG)
           explore cn ((InLoop (n,g), (cases, _expl)):suite) _ igG =
-              if trace ("Test presence: "++show cn++" "++show (g `elem` igG )++"\n"++show g++"\n"++show igG) g `elem` igG 
+              if trace ("Test presence: "++show cn++" "++show ((fmap freeme g) `elem` igG )++"\n"++show g++"\n"++show igG) (fmap freeme g) `elem` igG 
                 then trace ("Persisting: "++show g) node cn (InLoop (n,g)) cases igG 
                 else trace ("Autoban: "++show g) node cn (InLoop (n,g)) M.empty igG --else 
           explore cn ((method, (cases, _expl)):suite) (method0, cases0) igG = trace ("Explore0: "++show method) $  case propagatedMethod of --
@@ -1109,10 +1110,11 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             _ -> Nothing
 
           node :: String -> ProofMethod -> M.Map CaseName System -> [Maybe Goal] -> Proof()
-          node cn methodOrigin casesOrigin igG = trace ("Node: "++show (length casesOrigin)++" "++show igG++" "++show methodOrigin) $
-            LNode (ProofStep methodOrigin ()) ( M.mapWithKey (prove (succ depth) igG "node") casesOrigin )
-              --where
-              --  successors = M.map (prove (succ depth) igG) casesOrigin
+          node cn methodOrigin casesOrigin igG = trace ("Node: "++show minode) 
+                  nodule
+              where
+                successors = trace ("Succ: "++show (length casesOrigin)) M.mapWithKey (prove (succ depth) igG "node") casesOrigin
+                nodule = LNode (ProofStep methodOrigin ()) successors
 
 proveSystemDFS2 :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS2 heuristic tactics ctxt d0 sys0 =
