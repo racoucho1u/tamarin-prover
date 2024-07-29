@@ -1059,176 +1059,55 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-      prove d0 [] "" "init" sys0 
+      prove d0 [] sys0 
   where
-      prove !depth ignoreGoals casename caller sys = trace ("Proving: "++casename++" "++caller++" "++show ignoreGoals) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-        --if not (null ignoreGoals) 
-        --then error ("Not null ignoreGoals"++show depth++"\n"++show ignoreGoals++"\n"++casename++"\n"++caller)
-        --else trace ("Proving: "++casename++" "++caller++" "++show ignoreGoals) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-        [] | finishedSubterms ctxt sys -> trace ("Solved: "++show ignoreGoals) node casename Solved M.empty ignoreGoals
-        []                             -> trace ("Unfinishable: "++show ignoreGoals) node casename Unfinishable M.empty ignoreGoals
-        ((method, (cases, _expl)):suite) -> explore casename ((method, (cases, _expl)):suite) (method,cases) ignoreGoals
+      prove !depth ignoreGoals sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+        [] | finishedSubterms ctxt sys -> node Solved M.empty ignoreGoals
+        []                             -> node Unfinishable M.empty ignoreGoals
+        ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases) ignoreGoals
 
         where
-          explore :: String -> [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Maybe Goal] -> Proof ()
-          explore cn [] (method0, cases0) igG = traceStack ("Explore1: "++show (length cases0)++" "++cn++" "++show method0) node cn method0 cases0 ((fmap freeme (extractGoal method0)):igG) --(InLoop (0,extractGoal method0))
-          --explore cn [(method, (cases, _expl))] (method0, cases0) igG = trace ("Last chance billy boy: "++show method) node cn method cases (extractGoal method:igG)
-          explore cn ((InLoop (n,g), (cases, _expl)):suite) _ igG =
-              if trace ("Test presence: "++show cn++" "++show ((fmap freeme g) `elem` igG )++"\n"++show g++"\n"++show igG) (fmap freeme g) `elem` igG 
-                then trace ("Persisting: "++show g) node cn (InLoop (n,g)) cases igG 
-                else trace ("Autoban: "++show g) node cn (InLoop (n,g)) M.empty igG --else 
-          explore cn ((method, (cases, _expl)):suite) (method0, cases0) igG = trace ("Explore0: "++show method) $  case propagatedMethod of --
-              InLoop (0,_) -> trace ("Skipping to nxt "++show cn++" "++show method) explore cn suite (method0,cases0) igG --
-              InLoop (n,g) -> trace ("Ended    branch "++show cn++" "++show method) $ 
+          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Maybe Goal] -> Proof ()
+          explore [] (method0, cases0) igG = node method0 cases0 (fmap freeme (extractGoal method0):igG) 
+          explore ((InLoop (n,g), (cases, _expl)):suite) _ igG =
+              if fmap freeme g `elem` igG 
+                then node (InLoop (n,g)) cases igG 
+                else node (InLoop (n,g)) M.empty igG --else 
+          explore ((method, (cases, _expl)):suite) (method0, cases0) igG = case propagatedMethod of --
+              InLoop (0,_) -> explore suite (method0,cases0) igG --
+              InLoop (n,g) ->
                   if g `elem` igG 
-                    then trace ("Keep going "++show cn++" "++show method) node cn (InLoop (n,g)) cases igG 
-                    else trace ("Stop here "++show cn++" "++show method) node cn (InLoop (n,g)) M.empty igG   --
-              _            -> trace ("Finished branch "++show cn++" "++show method) node cn method cases igG
-                --if depth > 3
-                              --  then trace ("For the test: "++show cn++" "++show method) node cn (InLoop (0,extractGoal method)) cases igG 
-                              --  else trace ("Finished branch "++show cn++" "++show method) node cn method cases igG              --
-              where
-                propagatedMethod =  trace ("P: "++show method) propagateMethod cases method igG
+                    then node (InLoop (n,g)) cases igG 
+                    else node (InLoop (n,g)) M.empty igG   --
+              _            -> node method cases igG
+            where
+                propagatedMethod =  propagateMethod cases method igG
 
 
-          propagateMethod cases methodOrigin ignore = trace ("Calling propagating: "++show ignore++" "++show methodOrigin) $ case propagatingMethod (Sorry Nothing) (M.toList cases) of
+          propagateMethod cases methodOrigin ignore = case propagatingMethod (Sorry Nothing) (M.toList cases) of
               InLoop (0,_) -> if not (null ignore)
                                 then propagateMethod cases methodOrigin []
-                                else traceStack ("a | "++show methodOrigin) methodOrigin                          --  
-              InLoop (s,_) -> trace (show s++" | "++show methodOrigin)  InLoop (s-1,extractGoal methodOrigin) --
-              _            -> trace ("b | "++show methodOrigin)  methodOrigin                          --
-            where
-              propagatingMethod :: ProofMethod -> [(CaseName,System)] -> ProofMethod
-              propagatingMethod method [] = trace ("Goal set: "++show method) method
-              propagatingMethod method ((cn,_sys):t) = trace ("Propagating for case: "++show cn) $ case prove (succ depth) ignoreGoals cn "propag" _sys  of
-                  (LNode (ProofStep (InLoop (s,g)) _ ) _) -> trace ("I got you babe: "++show cn++" "++" "++show s++" "++show g) InLoop (s,g)
-                  (LNode ps cs)                           -> trace ("Case down, next: "++show cn) propagatingMethod method t --M.insert cn (LNode ps cs) proof
-
-          extractGoal method = case method of
-            InLoop (_, goal) -> goal
-            SolveGoal goal     -> Just goal
-            _ -> Nothing
-
-          node :: String -> ProofMethod -> M.Map CaseName System -> [Maybe Goal] -> Proof()
-          node cn methodOrigin casesOrigin igG = trace ("Node: "++show minode) 
-                  nodule
-              where
-                successors = trace ("Succ: "++show (length casesOrigin)) M.mapWithKey (prove (succ depth) igG "node") casesOrigin
-                nodule = LNode (ProofStep methodOrigin ()) successors
-
-proveSystemDFS2 :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
-proveSystemDFS2 heuristic tactics ctxt d0 sys0 =
-      prove d0 False sys0
-
-  where
-      prove !depth keepGoing sys  = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt (trace ("Prove: "++show depth) sys) of
-          [] | finishedSubterms ctxt sys -> node Solved M.empty False
-          []                             -> node Unfinishable M.empty False
-          ((method, (cases, _expl)):suite) -> if isNothing (isInLoop method) || keepGoing
-                                                then trace ("CheckLoops: "++show depth++" | "++show method++" "++show (isInLoop method))
-                                                     --trace ("Node: "++show method) node method cases
-                                                      checkForLoop ((method, (cases, _expl)):suite) (method, cases)
-                                                else trace ("Ending branch here: "++show depth++" | "++show (1+L.get sNbLoop sys)) -- ++" | "++show method)
-                                                      node (InLoop (L.get sNbLoop sys+1, extractGoal method)) M.empty keepGoing
-
-        where
-          checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, M.Map CaseName System) -> Proof () --(M.Map Goal Int)
-          checkForLoop [] (method0, cases0) = trace ("Default: "++show depth++" | "++show method0) node propagMethod cs True
-            where
-                (propagMethod, cs) = propagateMethod cases0 method0
-          checkForLoop ((method, (cases, _expl)):suite) (method0, cases0) = trace ("Method: "++show depth++" | "++show method) $
-            if isJust $ isInLoop method
-              then trace ("SkipS: "++show depth++" | "++show method)
-                              checkForLoop suite (method0, cases0)
-              else
-                case propagMethod of           --if getScore method s > Nothing
-                  InLoop (0,_) -> trace ("Skip: "++show depth++" | "++show method)
-                                  checkForLoop suite (method0, cases0)
-                                --node propagMethod M.empty
-                  InLoop _ -> trace ("Meh"++show depth++" | "++show method) node propagMethod M.empty False
-                  _        -> trace ("Go: "++show depth++" | "++show method++" "++show (length cases))
-                                node propagMethod cases False--trace ("Mini: "++show m++" | "++show method++"\n"++show s)
-                  where
-                    (propagMethod, cs) = propagateMethod cases (trace ("Propag: "++ show method) method)
-
-          extractGoal method = case method of
-            InLoop (_, goal) -> goal
-            SolveGoal goal     -> Just goal
-            _ -> Nothing
-
-          isInLoop :: ProofMethod -> Maybe Int
-          isInLoop (InLoop (n,_)) = Just n
-          isInLoop _          = Nothing
-
-          propagateMethod cases methodOrigin = case propagatingMethod (Sorry Nothing) (M.toList cases) of
-              InLoop (0,g) -> trace ("| "++show depth++" U "++show (extractGoal methodOrigin)) (methodOrigin, M.empty) -- ++show method
-              InLoop (s,g) -> trace ("| "++show depth++" "++show (s-1)++" "++show (extractGoal methodOrigin)) (InLoop (s-1,extractGoal methodOrigin),cases) -- ++" "++show method
-              m            -> trace ("|| "++show depth++" "++show m) (methodOrigin, cases) -- ++show method
+                                else methodOrigin                          --  
+              InLoop (s,_) -> InLoop (s-1,extractGoal methodOrigin) --
+              _            -> methodOrigin                          --
             where
               propagatingMethod :: ProofMethod -> [(CaseName,System)] -> ProofMethod
               propagatingMethod method [] = method
-              propagatingMethod method ((cn,_sys):t) = case prove (succ depth) keepGoing _sys of
+              propagatingMethod method ((cn,_sys):t) = case prove (succ depth) ignoreGoals _sys  of
                   (LNode (ProofStep (InLoop (s,g)) _ ) _) -> InLoop (s,g)
-                  (LNode ps cs) -> propagatingMethod method t --M.insert cn (LNode ps cs) proof
+                  (LNode ps cs)                           -> propagatingMethod method t
 
-              --successors = M.map (prove (succ depth)) cases
-
-          node :: ProofMethod -> M.Map CaseName System -> Bool -> Proof()
-          node methodOrigin casesOrigin kG =
-            trace ("Node: "++show depth++" | cases: "++show (length casesOrigin)++" "++show methodOrigin)
-            LNode (ProofStep methodOrigin ()) (M.map (prove (succ depth) kG) (trace ("Blu: "++show (length casesOrigin)) casesOrigin))
-
-
-
-  {-  prove d0 False sys0
-  where
-
-    prove !depth keepGoing sys =
-        case rankedGoals of
-          []                                    -> fst $ node Solved M.empty keepGoing
-          (InLoop (idx,g) , (cases, _expl)):_   -> if keepGoing then fst $ node (InLoop (idx,g)) cases False else fst $ node (InLoop (idx,g)) M.empty keepGoing --
-          (method, (cases, _expl)):list         -> fst $ chooseMethod ((method, (cases, _expl)):list) method cases keepGoing
-      where
-
-        rankedGoals = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys
-
-        chooseMethod [] method0 cases0 _ = node method0 cases0 True
-        chooseMethod ((BlackListed _ , (cases, _)):l) method0 cases0 keepGoing = chooseMethod l method0 cases0 keepGoing
-        chooseMethod ((method, (cases, _)):list) method0 cases0 keepGoing = if skip then chooseMethod list method0 cases0 keepGoing else (nodeFinal,skip)
-            where
-                (nodeFinal, skip) = node method cases keepGoing
-
-        node methodOrigin cases keepGoing =
-          if cases == M.empty then ((LNode (ProofStep methodOrigin ()) M.empty),skip) else ((LNode (ProofStep method ()) successors_),skip)
-
-            where
-                --successors_ = M.map (prove (succ depth)) cases
-                (method, successors_, skip) = propagatedMethod cases methodOrigin keepGoing
-
-        extractGoal method = case method of
-            InLoop (idx, goal) -> Just goal
-            BlackListed goal   -> Just goal
+          extractGoal method = case method of
+            InLoop (_, goal) -> goal
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
-        propagatedMethod cases methodOrigin keepGoing = if keepGoing then (methodOrigin, successors, False)
-            else case propagatingMethod cases of
-                InLoop (1,g)     -> trace ("|m "++show depth) (BlackListed (fromJust $ extractGoal methodOrigin), successors, True)
-                InLoop (idx,g)   -> trace ("|b "++show depth) (InLoop (idx-1,fromJust $ extractGoal methodOrigin), successors, False)
-                BlackListed goal -> trace ("|f "++show depth) (methodOrigin, successors, False)
-                _                -> (methodOrigin, successors, False)
-
-          where
-                --Choose among the cases which method to propagate following the order _ < BlackListed < InLoop n (given InLopp is the most problematic)
-                propagatingMethod cases  = foldl (\method (LNode (ProofStep proofmethod _ ) _) -> if proofmethod > method then proofmethod else method) (Sorry Nothing) successors
-
-                successors = M.map (prove (succ depth) keepGoing) cases
-
--}
-
-
-
-
+          node :: ProofMethod -> M.Map CaseName System -> [Maybe Goal] -> Proof()
+          node methodOrigin casesOrigin igG = 
+                  nodule
+              where
+                successors = M.map (prove (succ depth) igG) casesOrigin
+                nodule = LNode (ProofStep methodOrigin ()) successors
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
@@ -1238,16 +1117,54 @@ proveSystemDFS2 heuristic tactics ctxt d0 sys0 =
 -- Use 'annotateWithSystems' to annotate the proof tree with the constraint
 -- systems.
 proveDiffSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> DiffProofContext -> Int -> DiffSystem -> DiffProof ()
-proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
-    prove d0 sys0
+proveDiffSystemDFS heuristic tactics ctxt d0 sys0 = trace "using this"
+    prove d0 [] sys0
   where
-    prove !depth sys =
+    prove !depth ignoreGoals sys =
         case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []                         -> node (DiffSorry (Just "Cannot prove")) M.empty
-          (method, (cases, _expl)):_ -> node method cases
+          []                         -> node (DiffSorry (Just "Cannot prove")) M.empty ignoreGoals
+          (method, (cases, _expl)):_ -> node method cases ignoreGoals
       where
-        node method cases =
-          LNode (DiffProofStep method ()) (M.map (prove (succ depth)) cases)
+        explore :: [(DiffProofMethod, (M.Map CaseName DiffSystem,String))] -> (DiffProofMethod, M.Map CaseName DiffSystem) -> [Maybe Goal] -> DiffProof ()
+        explore [] (method0, cases0) igG = node method0 cases0 (fmap freeme (extractGoal method0):igG) 
+        explore ((DiffBackwardSearchStep (InLoop (n,g)), (cases, _expl)):suite) _ igG =
+              if fmap freeme g `elem` igG 
+                then node (DiffBackwardSearchStep (InLoop (n,g))) cases igG 
+                else node (DiffBackwardSearchStep (InLoop (n,g))) M.empty igG --else 
+        explore ((method, (cases, _expl)):suite) (method0, cases0) igG = case propagatedMethod of --
+              DiffBackwardSearchStep (InLoop (0,_)) -> explore suite (method0,cases0) igG --
+              DiffBackwardSearchStep (InLoop (n,g)) ->
+                  if g `elem` igG 
+                    then node (DiffBackwardSearchStep (InLoop (n,g))) cases igG 
+                    else node (DiffBackwardSearchStep (InLoop (n,g))) M.empty igG   --
+              _            -> node method cases igG
+          where
+              propagatedMethod =  propagateMethod cases method igG
+
+        propagateMethod cases methodOrigin ignore = case propagatingMethod (DiffBackwardSearchStep $ Sorry Nothing) (M.toList cases) of
+              DiffBackwardSearchStep (InLoop (0,_)) -> if not (null ignore)
+                                then propagateMethod cases methodOrigin []
+                                else methodOrigin                          --  
+              DiffBackwardSearchStep (InLoop (s,_)) -> DiffBackwardSearchStep $ InLoop (s-1,extractGoal methodOrigin)
+              _            -> methodOrigin                          --
+            where
+              propagatingMethod :: DiffProofMethod -> [(CaseName,DiffSystem)] -> DiffProofMethod
+              propagatingMethod method [] = method
+              propagatingMethod method ((cn,_sys):t) = case prove (succ depth) ignoreGoals _sys  of
+                  (LNode (DiffProofStep (DiffBackwardSearchStep (InLoop (s,g))) _ ) _) -> DiffBackwardSearchStep $ InLoop (s,g)
+                  (LNode ps cs)                           -> propagatingMethod method t
+
+        extractGoal method = case method of
+            DiffBackwardSearchStep (InLoop (_, goal)) -> goal
+            DiffBackwardSearchStep (SolveGoal goal)   -> Just goal
+            _ -> Nothing
+
+        node :: DiffProofMethod -> M.Map CaseName DiffSystem -> [Maybe Goal] -> DiffProof()
+        node method cases igG =
+            diffnodule 
+          where
+            successors = M.map (prove (succ depth) igG) cases
+            diffnodule = LNode (DiffProofStep method ()) successors
 
 ------------------------------------------------------------------------------
 -- Pretty printing
