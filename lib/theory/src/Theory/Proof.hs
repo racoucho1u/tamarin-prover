@@ -1164,7 +1164,7 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 = trace "using this"
             _ -> Nothing
 
         node :: DiffProofMethod -> M.Map CaseName DiffSystem -> [Maybe Goal] -> DiffProof()
-        node method cases igG =
+        node method cases igG = trace (show diffnodule)
             diffnodule 
           where
             successors = M.map (prove (succ depth) igG) cases
