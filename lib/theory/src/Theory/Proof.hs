@@ -113,8 +113,11 @@ import           Debug.Trace
 
 import           Control.Basics
 import           Control.DeepSeq
+import           Control.Exception (evaluate)
 import qualified Control.Monad.State              as S
 import           Control.Parallel.Strategies
+
+import           System.IO.Unsafe
 
 import           Theory.Constraint.Solver
 import           Theory.Model
@@ -1081,7 +1084,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
                     else node (InLoop (n,g)) M.empty igG   --
               _            -> node method cases igG
             where
-                propagatedMethod =  propagateMethod cases method igG
+                propagatedMethod = propagateMethod cases method igG
 
 
           propagateMethod cases methodOrigin ignore = case propagatingMethod (Sorry Nothing) (M.toList cases) of
@@ -1103,11 +1106,12 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             _ -> Nothing
 
           node :: ProofMethod -> M.Map CaseName System -> [Maybe Goal] -> Proof()
-          node methodOrigin casesOrigin igG = 
-                  nodule
-              where
-                successors = M.map (prove (succ depth) igG) casesOrigin
-                nodule = LNode (ProofStep methodOrigin ()) successors
+          node methodOrigin casesOrigin igG = trace (show nodule)
+                      nodule
+                  where
+                    --successors cs = unsafePerformIO $ evaluate . force $ M.map (prove (succ depth) igG) cs
+                    successors = M.map (prove (succ depth) igG) casesOrigin
+                    nodule = LNode (ProofStep methodOrigin ()) successors
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
