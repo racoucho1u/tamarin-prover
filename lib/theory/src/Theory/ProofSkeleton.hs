@@ -58,7 +58,7 @@ incrementalToSkeletonDiffProof = fmap (fmap (const ()))
 -- | Create a new unproven lemma from a formula modulo E.
 unprovenLemma :: String -> [LemmaAttribute] -> TraceQuantifier -> LNFormula
               -> Lemma ProofSkeleton
-unprovenLemma name atts qua fm = Lemma name qua fm atts (unproven ())
+unprovenLemma name atts qua fm = Lemma name qua fm atts (unproven [] ())
 
 skeletonLemma :: String -> [LemmaAttribute] -> TraceQuantifier -> f -> p -> ProtoLemma f p
 skeletonLemma name atts qua fm = Lemma name qua fm atts
@@ -66,7 +66,7 @@ skeletonLemma name atts qua fm = Lemma name qua fm atts
 -- | Create a new unproven diff lemma.
 unprovenDiffLemma :: String -> [LemmaAttribute]
               -> DiffLemma DiffProofSkeleton
-unprovenDiffLemma name atts = DiffLemma name atts (diffUnproven ())
+unprovenDiffLemma name atts = DiffLemma name atts (diffUnproven [] ())
 
 skeletonDiffLemma :: String -> [LemmaAttribute] -> DiffProofSkeleton -> DiffLemma DiffProofSkeleton
 skeletonDiffLemma = DiffLemma

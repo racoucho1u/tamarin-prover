@@ -99,17 +99,17 @@ proofSkeleton =
     solvedProof <|> finalProof <|> interProof
   where
     solvedProof =
-        symbol "SOLVED" *> pure (LNode (ProofStep Solved ()) M.empty)
+        symbol "SOLVED" *> pure (LNode (ProofStep Solved [] ()) M.empty)
 
     finalProof = do
         method <- symbol "by" *> proofMethod
-        return (LNode (ProofStep method ()) M.empty)
+        return (LNode (ProofStep method [] ()) M.empty)
 
     interProof = do
         method <- proofMethod
         cases  <- (sepBy oneCase (symbol "next") <* symbol "qed") <|>
                   ((return . (,) "") <$> proofSkeleton          )
-        return (LNode (ProofStep method ()) (M.fromList cases))
+        return (LNode (ProofStep method [] ()) (M.fromList cases))
 
     oneCase = (,) <$> (symbol "case" *> identifier) <*> proofSkeleton
 
@@ -130,16 +130,16 @@ diffProofSkeleton =
     solvedProof <|> finalProof <|> interProof
   where
     solvedProof =
-        symbol "MIRRORED" *> pure (LNode (DiffProofStep DiffMirrored ()) M.empty)
+        symbol "MIRRORED" *> pure (LNode (DiffProofStep DiffMirrored [] ()) M.empty)
 
     finalProof = do
         method <- symbol "by" *> diffProofMethod
-        return (LNode (DiffProofStep method ()) M.empty)
+        return (LNode (DiffProofStep method [] ()) M.empty)
 
     interProof = do
         method <- diffProofMethod
         cases  <- (sepBy oneCase (symbol "next") <* symbol "qed") <|>
                   ((return . (,) "") <$> diffProofSkeleton          )
-        return (LNode (DiffProofStep method ()) (M.fromList cases))
+        return (LNode (DiffProofStep method [] ()) (M.fromList cases))
 
     oneCase = (,) <$> (symbol "case" *> identifier) <*> diffProofSkeleton

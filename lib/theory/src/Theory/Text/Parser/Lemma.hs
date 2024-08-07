@@ -63,7 +63,7 @@ protoLemma parseFormula workDir = skeletonLemma <$> (symbol "lemma" *> optional 
                       <*> (option [] $ list (lemmaAttribute False workDir))
                       <*> (colon *> option AllTraces traceQuantifier)
                       <*> doubleQuoted parseFormula
-                      <*> (startProofSkeleton <|> pure (unproven ()))
+                      <*> (startProofSkeleton <|> pure (unproven [] ()))
 
 
 -- | Parse a lemma.
@@ -78,4 +78,4 @@ plainLemma = protoLemma plainFormula
 diffLemma :: Maybe FilePath -> Parser (DiffLemma DiffProofSkeleton)
 diffLemma workDir = skeletonDiffLemma <$> (symbol "diffLemma" *> identifier)
                               <*> (option [] $ list (lemmaAttribute True workDir))
-                              <*> (colon *> (diffProofSkeleton <|> pure (diffUnproven ())))
+                              <*> (colon *> (diffProofSkeleton <|> pure (diffUnproven [] ())))

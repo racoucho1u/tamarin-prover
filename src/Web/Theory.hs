@@ -102,11 +102,11 @@ applyMethodAtPath thy lemmaName proofPath prover i = do
     methods <- (map fst . rankProofMethods ranking tactic ctxt) <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyProverAtPath thy lemmaName proofPath
-      (oneStepProver method                            `mappend`
-       replaceSorryProver (oneStepProver Simplify)     `mappend`
-       replaceSorryProver (contradictionProver)        `mappend`
-       replaceSorryProver (oneStepProver Unfinishable) `mappend`
-       replaceSorryProver (oneStepProver Solved)
+      (oneStepProver [] method                            `mappend`
+       replaceSorryProver (oneStepProver [] Simplify)     `mappend`
+       replaceSorryProver (contradictionProver)           `mappend`
+       replaceSorryProver (oneStepProver [] Unfinishable) `mappend`
+       replaceSorryProver (oneStepProver [] Solved)
       )
 
 applyMethodAtPathDiff :: ClosedDiffTheory -> Side -> String -> ProofPath
@@ -124,11 +124,11 @@ applyMethodAtPathDiff thy s lemmaName proofPath prover i = do
     methods <- (map fst . rankProofMethods ranking tactic ctxt) <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyProverAtPathDiff thy s lemmaName proofPath
-      (oneStepProver method                            `mappend`
-       replaceSorryProver (oneStepProver Simplify)     `mappend`
-       replaceSorryProver (contradictionProver)        `mappend`
-       replaceSorryProver (oneStepProver Unfinishable) `mappend`
-       replaceSorryProver (oneStepProver Solved)
+      (oneStepProver [] method                            `mappend`
+       replaceSorryProver (oneStepProver [] Simplify)     `mappend`
+       replaceSorryProver (contradictionProver)           `mappend`
+       replaceSorryProver (oneStepProver [] Unfinishable) `mappend`
+       replaceSorryProver (oneStepProver [] Solved)
       )
 
 applyDiffMethodAtPath :: ClosedDiffTheory -> String -> ProofPath
@@ -146,11 +146,11 @@ applyDiffMethodAtPath thy lemmaName proofPath prover i = do
     methods <- (map fst . rankDiffProofMethods ranking tactic ctxt) <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyDiffProverAtPath thy lemmaName proofPath
-      (oneStepDiffProver method                        `mappend`
-       replaceDiffSorryProver (oneStepDiffProver (DiffBackwardSearchStep Simplify)) `mappend`
+      (oneStepDiffProver [] method                        `mappend`
+       replaceDiffSorryProver (oneStepDiffProver [] (DiffBackwardSearchStep Simplify)) `mappend`
        replaceDiffSorryProver (contradictionDiffProver)    `mappend`
-       replaceDiffSorryProver (oneStepDiffProver DiffMirrored)    `mappend`
-       replaceDiffSorryProver (oneStepDiffProver DiffUnfinishable)
+       replaceDiffSorryProver (oneStepDiffProver [] DiffMirrored)    `mappend`
+       replaceDiffSorryProver (oneStepDiffProver [] DiffUnfinishable)
       )
 
 applyProverAtPath :: ClosedTheory -> String -> ProofPath

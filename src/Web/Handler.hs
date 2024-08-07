@@ -1140,7 +1140,7 @@ getDeleteStepR idx path = do
 
     go (TheoryProof lemma proofPath) ti = modifyTheory ti
       (\thy -> return $
-          applyProverAtPath thy lemma proofPath (sorryProver (Just "removed")))
+          applyProverAtPath thy lemma proofPath (sorryProver (Just "removed") []))
       (const path)
       (JsonAlert "Sorry, but removing the selected proof step failed!")
 
@@ -1160,7 +1160,7 @@ getDeleteStepDiffR idx path = do
 
     goDiff (DiffTheoryProof s lemma proofPath) ti = modifyDiffTheory ti
       (\thy -> return $
-          applyProverAtPathDiff thy s lemma proofPath (sorryProver (Just "removed")))
+          applyProverAtPathDiff thy s lemma proofPath (sorryProver (Just "removed") []))
       (const path)
       (JsonAlert "Sorry, but removing the selected proof step failed!")
 
@@ -1171,7 +1171,7 @@ getDeleteStepDiffR idx path = do
 
     goDiff (DiffTheoryDiffProof lemma proofPath) ti = modifyDiffTheory ti
       (\thy -> return $
-          applyDiffProverAtPath thy lemma proofPath (sorryDiffProver (Just "removed")))
+          applyDiffProverAtPath thy lemma proofPath (sorryDiffProver (Just "removed") []))
       (const path)
       (JsonAlert "Sorry, but removing the selected proof step failed!")
 
