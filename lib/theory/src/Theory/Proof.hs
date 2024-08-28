@@ -1056,17 +1056,17 @@ cutOnSolvedBFSDiff =
 -- Use 'annotateWithSystems' to annotate the proof tree with the constraint
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> [Maybe Goal] -> Proof ()
-proveSystemDFS heuristic tactics ctxt d0 sys0 skl0 = trace ("First depth: "++show d0)
+proveSystemDFS heuristic tactics ctxt d0 sys0 skl0 =
     prove d0 skl0 "beginning" sys0
   where
     
-    prove !depth skip c sys = trace ("Prove case "++show c++" | d: "++show depth) $ case ranked of --trace ("Prove case "++show c++": "++show (length ranked)++" | d: "++show depth)
+    prove !depth skip c sys = case ranked of --trace ("Prove case "++show c++": "++show (length ranked)++" | d: "++show depth)
           [] | finishedSubterms ctxt sys -> node "solved" skip Solved M.empty
           []                             -> node "unfinishable" [] (Unfinishable []) M.empty
           ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || isNothing (extractGoal method)
                                                 then --trace ("CheckLoops: "++show (length cases)++" | "++show depth++" | "++show (prettyProofMethod method))
-                                                      checkForLoop skip ((method, (cases, _expl)):suite) (trace ("CheckLoop: "++show depth++" | "++show method) (method, (cases, _expl)))
-                                                else trace ("Ending branch here: "++show depth)
+                                                      checkForLoop skip ((method, (cases, _expl)):suite) (method, (cases, _expl))
+                                                else
                                                       node "incorrectBacktracking" skip (Incorrect (incorrectnessScore method+1,depth, extractGoal method,skip)) M.empty --we are going to backtrack so this node will disappear
       where
         ranked = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys --trace ("Ranked: "++show depth)
@@ -1221,12 +1221,12 @@ proveDiffSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> DiffPro
 proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 "beginning" sys0
   where
-    prove !depth c sys = trace ("Case: "++show c) $
+    prove !depth c sys =
         case rankDiffProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []                             -> node (DiffSorry (Just "Cannot prove")) M.empty
-          (method, (cases, _expl)):suite ->  trace ("Following the proof: "++show method) $ if not (checkBacktracking depth sys) || trace ("Should backtrack but does not: "++show method) isNothing (extractGoal method)
+          (method, (cases, _expl)):suite ->  if not (checkBacktracking depth sys) || isNothing (extractGoal method)
                                                 then checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
-                                                else trace ("Backtracking: "++show method) node (DiffBackwardSearchStep (Incorrect (incorrectnessScore method+1,depth, extractGoal method,[]))) M.empty --we are going to backtrack so this node will disappear
+                                                else node (DiffBackwardSearchStep (Incorrect (incorrectnessScore method+1,depth, extractGoal method,[]))) M.empty --we are going to backtrack so this node will disappear
       where
         generatedTactic = L.get pcLemmaName (L.get dpcPCLeft ctxt) ++ ".tactic"
 
@@ -1250,11 +1250,11 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
 
         checkForLoop :: [(DiffProofMethod, (M.Map CaseName DiffSystem, String))] -> (DiffProofMethod, (M.Map CaseName DiffSystem, String)) -> DiffProof ()
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, (cases0, _expl0)) = trace ("Picked by def: "++show method0) exportTactic generatedTactic method0 cases0
+        checkForLoop [] (method0, (cases0, _expl0)) = exportTactic generatedTactic method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
             --InLoop _    -> checkForLoop suite (method0, (cases0, _expl0))
             DiffBackwardSearchStep (Incorrect _) -> checkForLoop suite (method0, (cases0, _expl0))
-            _ -> trace ("Picked: "++show method) node method cases
+            _ -> node method cases
 
         extractGoal :: DiffProofMethod -> Maybe Goal
         extractGoal method = case method of
@@ -1270,9 +1270,12 @@ proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
                 _                  -> (methodOrigin, successors)
            where
                 propagatingMethod :: (M.Map CaseName DiffSystem) -> DiffProofMethod
-                propagatingMethod cases  = foldl (\(DiffBackwardSearchStep method) (LNode (DiffProofStep (DiffBackwardSearchStep proofmethod) _ ) _) -> if proofmethod > method then (DiffBackwardSearchStep proofmethod) else (DiffBackwardSearchStep method)) (DiffBackwardSearchStep (Sorry Nothing)) successors
+                propagatingMethod cases  = trace ("Borne: "++show successors) $ foldl treatMethod (DiffBackwardSearchStep (Sorry Nothing)) successors
 
                 successors = M.mapWithKey (prove (succ depth)) cases
+
+                treatMethod (DiffBackwardSearchStep method) (LNode (DiffProofStep (DiffBackwardSearchStep proofmethod) _ ) _) = if proofmethod > method then (DiffBackwardSearchStep proofmethod) else (DiffBackwardSearchStep method)
+                treatMethod _ (LNode (DiffProofStep m _ ) _) = m
 
         node methodOrigin cases = if cases == M.empty then LNode (DiffProofStep methodOrigin ()) M.empty else LNode (DiffProofStep method ()) successors_
           where
