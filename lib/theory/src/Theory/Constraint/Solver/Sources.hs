@@ -341,7 +341,7 @@ applySource ctxt th0 goal = case matchToGoal ctxt th0 goal of
 -- conclusion are used for the saturation.
 saturateSources
     :: ProofContext -> [Source] -> [Source]
-saturateSources ctxt thsInit =
+saturateSources ctxt thsInit = 
     (go thsInit 1)
   where
     go :: [Source] -> Integer -> [Source]
@@ -362,7 +362,7 @@ precomputeSources
     :: ProofContext
     -> [LNGuarded]       -- ^ Restrictions.
     -> [Source]
-precomputeSources ctxt restrictions =
+precomputeSources ctxt restrictions =  
     map cleanupCaseNames (saturateSources ctxt rawSources)
   where
     cleanupCaseNames = modify cdCases $ fmap $ first $

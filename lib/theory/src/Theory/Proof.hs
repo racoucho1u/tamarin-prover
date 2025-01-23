@@ -1031,15 +1031,29 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [TacticI ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-    prove d0 sys0
+    trace "First call" $ prove d0 sys0
   where
-    prove !depth sys =
-        case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []                         -> node Solved M.empty
-          (method, (cases, _expl)):_ -> node method cases
+    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+              []                         -> node Solved M.empty
+              (method, (cases, _expl)):_ -> node method cases
       where
-        node method cases =
+
+        node method cases = trace ("Prove: "++show method++" "++show (M.keys cases))
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+
+          {-prove !depth sys 
+        | n > 10 = node Collapsing cs
+        | otherwise = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          []                         -> node Solved M.empty
+          (method, (cases, _expl)):_ -> if n < 10 then node Simplify cases else node method cases
+      where
+        n = length (M.toList $ L.get sNodes sys)
+        m = if n < 10 then "Ah non "++show n else "System: "++show n++" "++show (M.toList $ L.get sNodes sys)
+
+        cs = 
+
+        node method cases =
+          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)-}
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
