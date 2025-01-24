@@ -118,6 +118,7 @@ import qualified Control.Monad.State              as S
 import           Control.Parallel.Strategies
 
 import           Theory.Constraint.Solver
+import           Theory.Constraint.Solver.Goals
 import           Theory.Model
 import           Theory.Text.Pretty
 
@@ -626,11 +627,24 @@ orelseDiff p1 p2 = DiffProver $ \ctxt d se prf ->
 tryProver :: Prover -> Prover
 tryProver =  (`orelse` mempty)
 
+
+-- updateSystem :: Maybe Goal ->System -> System
+-- updateSystem collapse se = 
+
 -- | Try to execute one proof step using the given proof method.
-oneStepProver :: ProofMethod -> Prover
-oneStepProver method = Prover $ \ctxt _ se _ -> do
-    cases <- execProofMethod ctxt method se
-    return $ LNode (ProofStep method (Just se)) (M.map (unproven . Just) cases)
+-- oneStepProver :: ProofMethod -> Prover
+-- oneStepProver method = trace ("One step prover: "++show method) Prover $ \ctxt _ se _ -> do
+--     cases <- execProofMethod ctxt method se
+--     trace ("One step prover: "++show (M.keys cases)) return $ LNode (ProofStep method (Just se)) (M.map (unproven . Just) cases)
+oneStepProver :: Maybe Goal -> ProofMethod -> Prover
+oneStepProver collapse method = Prover $ \ctxt _ se _ -> do
+    cases <- execProofMethod ctxt method (update se)
+    trace ("One step prover: "++(show $ update se)) return $ LNode (ProofStep method (Just (update se))) (M.map (unproven . Just) cases)
+
+      where 
+        update se = case collapse of
+          Nothing -> se
+          Just c -> trace "CHANGING!" L.modify sGoals (M.insert c (GoalStatus False 10 False)) (L.set sCollapsed (Just c) se)  
 
 -- | Try to execute one proof step using the given proof method.
 oneStepDiffProver :: DiffProofMethod -> DiffProver
@@ -716,7 +730,7 @@ firstProver = foldr orelse failProver
 contradictionProver :: Prover
 contradictionProver = Prover $ \ctxt d sys prf ->
     runProver
-        (firstProver $ map oneStepProver $
+        (firstProver $ map (oneStepProver Nothing) $
             (Contradiction . Just <$> contradictions ctxt sys))
         ctxt d sys prf
 
@@ -1031,15 +1045,15 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [TacticI ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
-    trace "First call" $ prove d0 sys0
+    trace "First call" $ prove d0 "rootcase" sys0
   where
-    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+    prove !depth caseName sys = trace ("Prove: "++show caseName) $ case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
               []                         -> node Solved M.empty
               (method, (cases, _expl)):_ -> node method cases
       where
 
-        node method cases = trace ("Prove: "++show method++" "++show (M.keys cases))
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+        node method cases = trace ("Node: "++show method++" Nodecases: "++show (M.keys cases))
+          LNode (ProofStep method ()) (M.mapWithKey (prove (succ depth)) cases)
 
           {-prove !depth sys 
         | n > 10 = node Collapsing cs

@@ -45,6 +45,7 @@ import           Accountability.Generation    (checkPreTransWellformedness)
 import           Debug.Trace                  (trace)
 
 import           Data.Char                    (toUpper)
+import qualified Data.Label                   as L
 import           Data.List
 import qualified Data.Map                     as M
 import           Data.Maybe
@@ -86,6 +87,7 @@ import           Web.Settings
 import           Web.Types
 
 
+
 ------------------------------------------------------------------------------
 -- Various other functions
 ------------------------------------------------------------------------------
@@ -102,13 +104,14 @@ applyMethodAtPath thy lemmaName proofPath prover i = do
         heuristic = selectHeuristic prover ctxt
         ranking = useHeuristic heuristic (length proofPath)
         tacticI = selectTacticI prover ctxt
-    methods <- (map fst . rankProofMethods ranking tacticI ctxt) <$> sys
-    method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
-    applyProverAtPath thy lemmaName proofPath
-      (oneStepProver method                        `mappend`
-       replaceSorryProver (oneStepProver Simplify) `mappend`
+        collapseGoal = maybe Nothing (L.get sCollapsed) sys
+    methodsAndCases <- (rankProofMethods ranking tacticI ctxt) <$> sys
+    methodCases <-  trace ("Apply method at path: "++show sys) $ if length methodsAndCases >= i then Just (methodsAndCases !! (i-1)) else Nothing
+    trace ("Apply method: "++show methodCases) $ applyProverAtPath thy lemmaName proofPath
+      (oneStepProver collapseGoal (fst methodCases)                        `mappend`
+       replaceSorryProver (oneStepProver Nothing Simplify) `mappend`
        replaceSorryProver (contradictionProver)    `mappend`
-       replaceSorryProver (oneStepProver Solved)
+       replaceSorryProver (oneStepProver Nothing Solved)
       )
 
 applyMethodAtPathDiff :: ClosedDiffTheory -> Side -> String -> ProofPath
@@ -126,10 +129,10 @@ applyMethodAtPathDiff thy s lemmaName proofPath prover i = do
     methods <- (map fst . rankProofMethods ranking tacticI ctxt) <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyProverAtPathDiff thy s lemmaName proofPath
-      (oneStepProver method                        `mappend`
-       replaceSorryProver (oneStepProver Simplify) `mappend`
+      (oneStepProver Nothing method                        `mappend`
+       replaceSorryProver (oneStepProver Nothing Simplify) `mappend`
        replaceSorryProver (contradictionProver)    `mappend`
-       replaceSorryProver (oneStepProver Solved)
+       replaceSorryProver (oneStepProver Nothing Solved)
       )
 
 applyDiffMethodAtPath :: ClosedDiffTheory -> String -> ProofPath
@@ -400,7 +403,7 @@ theoryIndex renderUrl tidx thy = foldr1 ($-$)
     messageLink         = overview "Message theory" (text "") TheoryMessage
     ruleLink            = overview ruleLinkMsg rulesInfo TheoryRules
     ruleLinkMsg         = "Multiset rewriting rules" ++
-                          if null(theoryRestrictions thy) then "" else " and restrictions"
+                          if null (theoryRestrictions thy) then "" else " and restrictions"
 
     reqCasesLink name k = overview name (casesInfo k) (TheorySource k 0 0)
 
@@ -482,7 +485,7 @@ diffTheoryIndex renderUrl tidx thy = foldr1 ($-$)
     messageLink s isdiff = overview (show s ++ ": Message theory" ++ if isdiff then " [Diff]" else "") (text "") (DiffTheoryMessage s isdiff)
     ruleLink s isdiff    = overview (ruleLinkMsg s isdiff) (rulesInfo s isdiff) (DiffTheoryRules s isdiff)
     ruleLinkMsg s isdiff = show s ++ ": Multiset rewriting rules " ++
-                           (if null(diffTheorySideRestrictions s thy) then "" else " and restrictions") ++ (if isdiff then " [Diff]" else "")
+                           (if null (diffTheorySideRestrictions s thy) then "" else " and restrictions") ++ (if isdiff then " [Diff]" else "")
 
     reqCasesLink s name k isdiff = overview name (casesInfo s k isdiff) (DiffTheorySource s k isdiff 0 0)
 
@@ -579,7 +582,7 @@ subProofSnippet renderUrl tidx ti lemma proofPath ctxt prf =
     heuristic               = selectHeuristic (tiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
     tacticI                 = selectTacticI (tiAutoProver ti) ctxt
-    proofMethods            = rankProofMethods ranking tacticI ctxt
+    proofMethods            = trace "subproofsnippet" rankProofMethods ranking tacticI ctxt
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
         [ withTag "h4" [] (text "Case" <-> text name)

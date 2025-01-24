@@ -41,7 +41,7 @@ import           Data.Label                                hiding (get)
 import qualified Data.Label                                as L
 import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate,tails)
 import qualified Data.Map                                  as M
-import           Data.Maybe                                (catMaybes, fromMaybe)
+import           Data.Maybe                                (catMaybes, fromMaybe, isJust)
 -- import           Data.Monoid
 import           Data.Ord                                  (comparing)
 import qualified Data.Set                                  as S
@@ -69,6 +69,7 @@ import           Theory.Model
 import           Theory.Text.Pretty
 
 import           Text.Regex.PCRE
+
 
 
 ------------------------------------------------------------------------------
@@ -239,7 +240,7 @@ instance HasFrees DiffProofMethod where
 -- and all variable indices reset.
 execProofMethod :: ProofContext
                 -> ProofMethod -> System -> Maybe (M.Map CaseName System)
-execProofMethod ctxt method sys = trace ("Solved? "++show method) $
+execProofMethod ctxt method sys = trace ("exec proof mtehod: "++show method++"sys exec: "++show sys) $
       case method of
         Sorry _                  -> return M.empty
         Solved
@@ -247,7 +248,7 @@ execProofMethod ctxt method sys = trace ("Solved? "++show method) $
           | otherwise                 -> Nothing
         SolveGoal goal
           | goal `M.member` L.get sGoals sys -> trace ("Solving: "++ show goal) execSolveGoal goal
-          | otherwise                        -> Nothing
+          | otherwise                        -> trace ("Il y a un serpent dans ma botte") Nothing
         Simplify                 -> singleCase simplifySystem
         Induction                -> M.map cleanupSystem <$> execInduction
         Contradiction _
@@ -287,13 +288,13 @@ execProofMethod ctxt method sys = trace ("Solved? "++show method) $
                                   (fmap $ concat . intersperse "_")
                                   (trace ("Call to solver "++show goal) (solveWithSource ctxt ths goal))
                     trace ("Name: "++name) simplifySystem
-                    trace ("After sys simplifcation: "++name) return name
+                    return name
 
         makeCaseNames = trace ("MakeCaseName "++show goal)
             M.fromListWith (error "case names not unique")
-          . uniqueListBy (comparing fst) id distinguish 
+          . uniqueListBy (comparing fst) id distinguish
           where
-            distinguish n = 
+            distinguish n =
                 [ (\(x,y) -> (x ++ "_case_" ++ pad (show i), y))
                 | i <- [(1::Int)..] ]
               where
@@ -464,14 +465,15 @@ rankProofMethods ranking tactics ctxt sys = do
             )
         <|> (solveGoalMethod <$> (rankGoals ctxt ranking tactics sys' $ openGoals sys'))
     case execProofMethod ctxt m sys' of
-      Just cases ->  return (m, (cases, expl)) --trace ("Rankproof: "++show(M.keys cases))
+      Just cases ->  return (m, (cases, expl))
       Nothing    -> []
   where
-    sys' = if length keys < 3 then sys else trace ("Introducting collapsed goal"++show collapseGoal) modify sGoals (M.insert collapseGoal callapseStatus) sys
+    sys' = if length keys < 3 || isJust (L.get sCollapsed sys) then sys 
+                else L.set sCollapsed (Just collapseGoal) (modify sGoals (M.insert collapseGoal collapseStatus) sys)
 
     keys = M.keys $ L.get sNodes sys
     collapseGoal = collapse (node2goals $ pairing keys)
-    callapseStatus = GoalStatus False 0 False
+    collapseStatus = GoalStatus False 10 False
 
     -- create a case disjunction with all possible timepoint equality
     collapse :: [LNGuarded] -> Goal
