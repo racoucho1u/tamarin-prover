@@ -96,7 +96,7 @@ applyMethodAtPath :: ClosedTheory -> String -> ProofPath
                   -> AutoProver            -- ^ How to extract/order the proof methods.
                   -> Int                   -- What proof method to use.
                   -> Maybe ClosedTheory
-applyMethodAtPath thy lemmaName proofPath prover i = do
+applyMethodAtPath thy lemmaName proofPath prover i = trace "applyMethodAtPath" $ do
     lemma <- lookupLemma lemmaName thy
     subProof <- get lProof lemma `atPath` proofPath
     let ctxt  = getProofContext lemma thy
@@ -107,8 +107,9 @@ applyMethodAtPath thy lemmaName proofPath prover i = do
         collapseGoal = maybe Nothing (L.get sCollapsed) sys
     methodsAndCases <- (rankProofMethods ranking tacticI ctxt) <$> sys
     methodCases <-  trace ("Apply method at path: "++show sys) $ if length methodsAndCases >= i then Just (methodsAndCases !! (i-1)) else Nothing
+    --collapseStatus <- L.get sCollapsed $ head (map snd (M.toList (fst $ snd methodCases)))
     trace ("Apply method: "++show methodCases) $ applyProverAtPath thy lemmaName proofPath
-      (oneStepProver collapseGoal (fst methodCases)                        `mappend`
+      (oneStepProver (L.get sCollapsed $ head (map snd (M.toList (fst $ snd methodCases)))) (fst methodCases)                        `mappend`
        replaceSorryProver (oneStepProver Nothing Simplify) `mappend`
        replaceSorryProver (contradictionProver)    `mappend`
        replaceSorryProver (oneStepProver Nothing Solved)
