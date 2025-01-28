@@ -209,7 +209,7 @@ solveGoal goal = do
            solvePremise (get crProtocol rules ++ get crConstruct rules) p fa
       ChainG c p    -> solveChain (get crDestruct  rules) (c, p)
       SplitG i      -> solveSplit i
-      DisjG disj    -> trace ("Solve goal: "++show disj) solveDisjunction disj
+      DisjG disj    -> solveDisjunction disj
 
 -- The following functions are internal to 'solveGoal'. Use them with great
 -- care.
@@ -394,7 +394,7 @@ solveSplit x = do
 -- In contrast to the paper, we use n-ary disjunctions and also split over all
 -- of them at once.
 solveDisjunction :: Disj LNGuarded -> Reduction String
-solveDisjunction disj = trace ("DisjN: "++show (zip [(1::Int)..] $ getDisj disj)) $do
+solveDisjunction disj = do
     (i, gfm) <- disjunctionOfList $ zip [(1::Int)..] $ getDisj disj
-    trace ("DisjName: "++show i++"/"++show gfm) $ insertFormula gfm
+    insertFormula gfm --
     return $ "case_" ++ show i

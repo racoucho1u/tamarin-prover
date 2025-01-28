@@ -96,7 +96,7 @@ applyMethodAtPath :: ClosedTheory -> String -> ProofPath
                   -> AutoProver            -- ^ How to extract/order the proof methods.
                   -> Int                   -- What proof method to use.
                   -> Maybe ClosedTheory
-applyMethodAtPath thy lemmaName proofPath prover i = trace "applyMethodAtPath" $ do
+applyMethodAtPath thy lemmaName proofPath prover i = do
     lemma <- lookupLemma lemmaName thy
     subProof <- get lProof lemma `atPath` proofPath
     let ctxt  = getProofContext lemma thy
@@ -104,12 +104,11 @@ applyMethodAtPath thy lemmaName proofPath prover i = trace "applyMethodAtPath" $
         heuristic = selectHeuristic prover ctxt
         ranking = useHeuristic heuristic (length proofPath)
         tacticI = selectTacticI prover ctxt
-        collapseGoal = maybe Nothing (L.get sCollapsed) sys
     methodsAndCases <- (rankProofMethods ranking tacticI ctxt) <$> sys
-    methodCases <-  trace ("Apply method at path: "++show sys) $ if length methodsAndCases >= i then Just (methodsAndCases !! (i-1)) else Nothing
+    methodCases <- if length methodsAndCases >= i then Just (methodsAndCases !! (i-1)) else Nothing
     --collapseStatus <- L.get sCollapsed $ head (map snd (M.toList (fst $ snd methodCases)))
-    trace ("Apply method: "++show methodCases) $ applyProverAtPath thy lemmaName proofPath
-      (oneStepProver (L.get sCollapsed $ head (map snd (M.toList (fst $ snd methodCases)))) (fst methodCases)                        `mappend`
+    applyProverAtPath thy lemmaName proofPath
+      (oneStepProver (maybe Nothing (L.get sCollapsed) (listToMaybe (map snd (M.toList (fst $ snd methodCases))))) (fst methodCases)                        `mappend`
        replaceSorryProver (oneStepProver Nothing Simplify) `mappend`
        replaceSorryProver (contradictionProver)    `mappend`
        replaceSorryProver (oneStepProver Nothing Solved)
@@ -583,7 +582,7 @@ subProofSnippet renderUrl tidx ti lemma proofPath ctxt prf =
     heuristic               = selectHeuristic (tiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
     tacticI                 = selectTacticI (tiAutoProver ti) ctxt
-    proofMethods            = trace "subproofsnippet" rankProofMethods ranking tacticI ctxt
+    proofMethods            = rankProofMethods ranking tacticI ctxt
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
         [ withTag "h4" [] (text "Case" <-> text name)

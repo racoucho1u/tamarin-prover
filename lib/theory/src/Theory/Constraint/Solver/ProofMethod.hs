@@ -240,15 +240,16 @@ instance HasFrees DiffProofMethod where
 -- and all variable indices reset.
 execProofMethod :: ProofContext
                 -> ProofMethod -> System -> Maybe (M.Map CaseName System)
-execProofMethod ctxt method sys = trace ("exec proof mtehod: "++show method++"sys exec: "++show sys) $
+execProofMethod ctxt method sys = 
       case method of
         Sorry _                  -> return M.empty
         Solved
           | null (plainOpenGoals sys) -> return M.empty
           | otherwise                 -> Nothing
         SolveGoal goal
-          | goal `M.member` L.get sGoals sys -> trace ("Solving: "++ show goal) execSolveGoal goal
-          | otherwise                        -> trace ("Il y a un serpent dans ma botte") Nothing
+          | goal `M.member` L.get sGoals sys  -> execSolveGoal False goal
+          -- | Just goal == L.get sCollapsed sys -> trace ("Using sCollapsed") execSolveGoal True goal
+          | otherwise                         -> Nothing
         Simplify                 -> singleCase simplifySystem
         Induction                -> M.map cleanupSystem <$> execInduction
         Contradiction _
@@ -276,8 +277,8 @@ execProofMethod ctxt method sys = trace ("exec proof mtehod: "++show method++"sy
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
-    execSolveGoal :: Goal -> Maybe (M.Map CaseName System)
-    execSolveGoal goal = trace ("ExecSolveGoal: "++show goal)
+    execSolveGoal :: Bool -> Goal -> Maybe (M.Map CaseName System)
+    execSolveGoal updateFormulas goal =
         return . makeCaseNames . removeRedundantCases ctxt [] snd
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
@@ -286,11 +287,11 @@ execProofMethod ctxt method sys = trace ("exec proof mtehod: "++show method++"sy
         ths    = L.get pcSources ctxt
         solver = do name <- maybe (solveGoal goal)
                                   (fmap $ concat . intersperse "_")
-                                  (trace ("Call to solver "++show goal) (solveWithSource ctxt ths goal))
-                    trace ("Name: "++name) simplifySystem
+                                  (solveWithSource ctxt ths goal)
+                    simplifySystem 
                     return name
 
-        makeCaseNames = trace ("MakeCaseName "++show goal)
+        makeCaseNames = 
             M.fromListWith (error "case names not unique")
           . uniqueListBy (comparing fst) id distinguish
           where
@@ -298,7 +299,7 @@ execProofMethod ctxt method sys = trace ("exec proof mtehod: "++show method++"sy
                 [ (\(x,y) -> (x ++ "_case_" ++ pad (show i), y))
                 | i <- [(1::Int)..] ]
               where
-                l      = trace ("Distinguish: "++show n) length (show n)
+                l      = length (show n)
                 pad cs = replicate (l - length cs) '0' ++ cs
 
     -- Apply induction: possible if the system contains only
@@ -409,7 +410,7 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
     startBackwardSearch rulename = M.insert ("LHS") (backwardSearchSystem LHS sys rulename) $ M.insert ("RHS") (backwardSearchSystem RHS sys rulename) $ M.empty
 
     applyStep :: ProofMethod -> Side -> System -> Maybe (M.Map CaseName DiffSystem)
-    applyStep m s sys' = case (execProofMethod (eitherProofContext ctxt s) m sys') of
+    applyStep m s sys' = trace "Apply step" $ case (execProofMethod (eitherProofContext ctxt s) m sys') of
                            Nothing    -> Nothing
                            Just cases -> Just $ M.map (\x -> L.set dsSystem (Just x) sys) cases
 
@@ -468,12 +469,17 @@ rankProofMethods ranking tactics ctxt sys = do
       Just cases ->  return (m, (cases, expl))
       Nothing    -> []
   where
-    sys' = if length keys < 3 || isJust (L.get sCollapsed sys) then sys 
+    sys' = if length keys < 3 then sys -- || isJust (L.get sCollapsed sys) 
                 else L.set sCollapsed (Just collapseGoal) (modify sGoals (M.insert collapseGoal collapseStatus) sys)
+
+    --sys' = if length keys < 3 then sys -- || isJust (L.get sCollapsed sys) 
+    --            else L.set sCollapsed (Just collapseGoal) (modify sFormulas (S.insert collapseFormula) sys)
 
     keys = M.keys $ L.get sNodes sys
     collapseGoal = collapse (node2goals $ pairing keys)
-    collapseStatus = GoalStatus False 10 False
+    collapseStatus = GoalStatus False 0 False
+
+    collapseFormula = GDisj $ Disj (node2goals $ pairing keys)
 
     -- create a case disjunction with all possible timepoint equality
     collapse :: [LNGuarded] -> Goal

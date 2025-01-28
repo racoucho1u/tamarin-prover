@@ -107,6 +107,7 @@ import           Data.Binary
 import           Data.List
 import qualified Data.Label                       as L
 import qualified Data.Map                         as M
+import qualified Data.Set                         as Se
 import           Data.Maybe
 -- import           Data.Monoid
 
@@ -456,7 +457,7 @@ checkProof :: ProofContext
            -> Proof a
            -> Proof (Maybe a, Maybe System)
 checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
-    case (method, execProofMethod ctxt method sys) of
+    case (method, trace "Check proof" execProofMethod ctxt method sys) of
         (Sorry reason, _         ) -> sorryNode reason cs
         (_           , Just cases) -> node method $ checkChildren cases
         (_           , Nothing   ) ->
@@ -519,7 +520,7 @@ annotateWithSystems ctxt =
       where
         extract msg = fromMaybe (error $ "annotateWithSystems: " ++ msg)
         csAnn       = extract "proof method execution failed" $
-                      execProofMethod ctxt method sysOrig
+                      trace ("annotate with sys") execProofMethod ctxt method sysOrig
 
 -- | Annotate a proof with the constraint systems of all intermediate steps
 -- under the assumption that all proof steps are valid. If some proof steps
@@ -639,12 +640,12 @@ tryProver =  (`orelse` mempty)
 oneStepProver :: Maybe Goal -> ProofMethod -> Prover
 oneStepProver collapse method = Prover $ \ctxt _ se _ -> do
     cases <- execProofMethod ctxt method (update se)
-    trace ("One step prover: "++(show $ update se)) return $ LNode (ProofStep method (Just (update se))) (M.map (unproven . Just) cases)
+    return $ LNode (ProofStep method (Just (update se))) (M.map (unproven . Just) cases)
 
       where 
         update se = case collapse of
-          Nothing -> se
-          Just c -> trace "CHANGING!" L.modify sGoals (M.insert c (GoalStatus False 10 False)) (L.set sCollapsed (Just c) se)  
+          Just (DisjG c) -> L.modify sFormulas (Se.insert $ GDisj c) (L.modify sGoals (M.insert (DisjG c)  (GoalStatus False 10 False)) (L.set sCollapsed (Just (DisjG c) ) se))
+          _ -> se
 
 -- | Try to execute one proof step using the given proof method.
 oneStepDiffProver :: DiffProofMethod -> DiffProver
@@ -728,7 +729,7 @@ firstProver = foldr orelse failProver
 
 -- | Prover that does one contradiction step.
 contradictionProver :: Prover
-contradictionProver = Prover $ \ctxt d sys prf ->
+contradictionProver = trace "Contradiction prover" Prover $ \ctxt d sys prf ->
     runProver
         (firstProver $ map (oneStepProver Nothing) $
             (Contradiction . Just <$> contradictions ctxt sys))

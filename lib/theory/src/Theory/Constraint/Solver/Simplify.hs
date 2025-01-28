@@ -58,7 +58,7 @@ import           Theory.Text.Pretty
 -- system does not change anymore.
 simplifySystem :: Reduction ()
 simplifySystem = do
-    isdiff <- getM sDiffSystem
+    isdiff <- getM sDiffSystem  
     -- Start simplification, indicating that some change happened
     go (0 :: Int) [Changed]
     if isdiff
@@ -83,6 +83,7 @@ simplifySystem = do
           --f0 <- getM sFormulas
           -- Perform one initial substitution. We do not have to consider its
           -- changes as 'substSystem' is idempotent.
+          void substSystem
           --trace ("Formulas before simp: "++show f0) void substSystem
           -- Perform one simplification pass.
           isdiff <- getM sDiffSystem
@@ -334,11 +335,11 @@ evalFormulaAtoms = do
 -- represent *unknown*.
 --
 partialAtomValuation :: ProofContext -> System -> LNAtom -> Maybe Bool
-partialAtomValuation ctxt sys =
+partialAtomValuation ctxt sys = 
     eval
   where
     runMaude   = (`runReader` get pcMaudeHandle ctxt)
-    before     = alwaysBefore sys
+    before     = alwaysBefore sys 
     lessRel    = rawLessRel sys
     nodesAfter = \i -> filter (i /=) $ S.toList $ D.reachableSet [i] lessRel
 
