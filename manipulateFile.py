@@ -1,0 +1,98 @@
+import subprocess
+import sys
+import argparse
+
+
+WRAPPER_PATH = "tamarin_wrapper.py"
+# original_file = "SourceOfUniqueness.spthy"
+original_file = "examples/ccs18-5G/5G-AKA-bindingChannel/5G_AKA.spthy"
+TIMEOUT_FACTOR = 5
+# mininum timeout in seconds
+MIN_TIMEOUT = 10
+
+tactic = "tactic: sqn_ue_nodecrease\ndeprio:\n\tallGoal \"ActionG#vk(Fact{factTag=KUFact factAnnotations=fromList[] factTerms=[f1(~k pair(SqnHSS RAND))]}\"\ndeprio:\n\tallGoal \"ActionG#vk(Fact{factTag=KUFact factAnnotations=fromList[] factTerms=[f1(~k pair(Union(SqnUE dif) RAND))]}\"\ndeprio:\n\tallGoal \"ActionG#vk(Fact{factTag=KUFact factAnnotations=fromList[] factTerms=[Xor(f5(~k RAND) Union(SqnUE dif))]}\"\n\n"
+
+def add_tactic_to_file(filename,tactic):
+    with open(filename, "r") as f:
+        contents = f.readlines()
+
+    last_line = len(contents)-1
+    while (not 'end' in contents[last_line]) and (last_line>0):
+        last_line -= 1
+        
+    contents.insert(last_line-1, tactic)
+
+    with open(filename, "w") as f:
+        contents = "".join(contents)
+        f.write(contents)
+
+    # print(contents)
+
+
+def tamarin_wrapper_call(arg_list, time_out=6000):
+    return subprocess.Popen(
+        ["python3", WRAPPER_PATH]
+        + arg_list
+        + [
+            "-t",
+            str(time_out),
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    ).communicate()
+
+def prove_with_tactic(filename,lemma_name,heuristic,tactic_nb,timeout=6000):
+
+    out, err = tamarin_wrapper_call([filename, "-s", f"--lemma={lemma_name}",f"--tam=\"--heuristic={heuristic}\""],timeout)
+    if err:
+        print(
+            "Sanity check failed for: "
+            + filename
+            + "\nError: "
+            + err.decode(),
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    for line in out.decode().rstrip().split("\n"):
+        # Successful calls to the wrapper should produce a triple (data, status,time)
+        # while timedout calls should produce the tuple (data, status,time,tactic)
+        # not sure yet how the killed proofs are handled
+
+        data = line.split(" ")
+        # total_time += float(data[2])
+
+        tactic = ""
+        if "tactic:" in line:
+            tacticRough = line.split("tactic:")[1]
+            deprios = tacticRough.replace("---","\n")
+            tactic = "\ntactic: "+lemma_name+"_"+str(tactic_nb)+"\n"+deprios+"\n\n"
+
+            add_tactic_to_file(filename,tactic)
+
+        return(data[:4],tactic)
+        
+# Idea: we try to prove the lemma until 1)we have a proof, 2)we meet the user defined bound for the number of proof, 3)the exported tactic does not change anymore
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="Tries to prove a lemma given a heuristic, \
+                                        if proof fails, generate a tactic and tries again with it."
+    )
+    parser.add_argument("spthy_file", help="path to target spthy file")
+    parser.add_argument("lemma", help="lemma that need to be proven",)
+    parser.add_argument("-b", "--bound", default=3, help="max number of proof attempt")
+    parser.add_argument("--heuristic", default="s", help="heuristic to use as the default for first attempt")
+
+    args = parser.parse_args()
+    file_path = args.spthy_file
+    lemma = args.lemma
+    bound, proof_attempt = int(args.bound), 0
+    heuristic = args.heuristic
+    tactic,tactic_updated = "","new"
+
+    while proof_attempt<bound and tactic != tactic_updated and tactic_updated != "":
+        print(f"Proving with heuristic: {heuristic}")
+        tactic = tactic_updated
+        status, tactic_updated = prove_with_tactic(file_path,lemma,heuristic,proof_attempt,100)
+        heuristic = "{"+lemma+"_"+str(proof_attempt)+"}"
+        proof_attempt += 1

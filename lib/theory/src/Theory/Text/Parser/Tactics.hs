@@ -127,6 +127,7 @@ tacticFunctions = M.fromList
                       , ("defaultNoise", defaultNoise)
                       , ("reasonableNoncesNoise",reasonableNoncesNoise)
                       , ("nonAbsurdGoal", nonAbsurdGoal)
+                      , ("allGoal", allGoal)
                       , ("ignoreN", ignoreN)
                       ]
   where
@@ -232,6 +233,14 @@ tacticFunctions = M.fromList
     isInFactTerms (s:_) ((ActionG _ Fact { factTag = _ ,factAnnotations =  _ , factTerms = [test]}, _ ), _, _ ) = show test =~ s
     isInFactTerms _ (_, _, _) = False
 
+    allGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
+    allGoal (s:_) ((goal,(_,_)),_,_) = filteredParam == filteredGoal
+        where
+            filterChar st = filter (/= '"') $ filter (/= ')') $ filter (/= '(') st
+            filteredParam = filterChar s
+            filteredGoal = filterChar $ show (cleanGoal goal)
+    allGoal _ (_, _, _) = False
+
 nameToFunction :: (String,[String]) -> (AnnotatedGoal, ProofContext, System) -> Bool
 nameToFunction (s,param) = case M.lookup s tacticFunctions of
   Just f  -> f param
@@ -244,6 +253,7 @@ nameToFunction (s,param) = case M.lookup s tacticFunctions of
             "regex"                 -> "match between the pretty goal and the given regex"
             "isFactName"            -> "match against the fact name"
             "isInFactTerms"         -> "match against the fact terms"
+            "allGoal"               -> "match against the goal (tactic auto generated)"
             "nonAbsurdGoal"         -> "match non absurd goals (vacarme oracle)"
             "dhreNoise"             -> "match diffie-hellman (vacarme oracle)"
             "defaultNoise"          -> "match default facts (vacarme oracle)"
