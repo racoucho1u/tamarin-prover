@@ -12,7 +12,7 @@ def prettyPrintDeprioTactic(sortedDic):
 		if i != "End of branch\n":
 			goal = i.replace('"','')
 			s += "deprio: ---"
-			s += "\tallGoal \""+goal[:-1]+"\"---"	
+			s += "allGoal \""+goal[:-1]+"\"---"	
 	return(s)
 
 def prettyPrintPrioTactic(sortedDic):
@@ -40,13 +40,15 @@ def extractTacticsFile(filename):
 
 def extractTacticsParams(lines):
 	goals = []
+	tactic = ""
 	for l in lines:
 		lsplit = l.split("---")
 		if len(lsplit) > 1:
 			goals.append(lsplit[2])
-	iterationDic = Counter(goals)
-	sortedT = {k: v for k, v in sorted(iterationDic.items(), key=lambda item: item[1])}
-	tactic = prettyPrintDeprioTactic(sortedT)
+	if len(goals)>0:
+		iterationDic = Counter(goals)
+		sortedT = {k: v for k, v in sorted(iterationDic.items(), key=lambda item: item[1])}
+		tactic = prettyPrintDeprioTactic(sortedT)
 	return(tactic)
 
 # if __name__ == __main__:

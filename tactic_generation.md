@@ -10,7 +10,7 @@ For now, we need to use external scripts because when Tamarin gets killed (runs 
 There are three python files required:
 * **manipulateFile.py**: Main file. Tries to prove the lemma passed as parameter (with the newest tactic) until it is proven, the maximal number of proof attempts have been reached or the tactic generated in an attempt is the same as the previous generated tactic (no new insight gained). It is also responsible for adding the newest generated tactic in the spthy file. Use: 
 ```
-python3 manipulateFile.py spthy_file lemma_name [-b,--bound,--heuristic]
+python3 manipulateFile.py spthy_file lemma_name [-b,--bound,--heuristic,--timeout]
 ```
 * **tamarin_wrapper.py**: Wrapper for calling Tamarin, slightly modified version of the same script in [Tamarin Lemmas](https://projects.cispa.saarland/alexander.dax/tamarinlemmas).
 * **tacticExportPoC.py**: Files with the functions to generated tactics.

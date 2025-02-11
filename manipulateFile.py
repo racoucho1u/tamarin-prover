@@ -82,6 +82,7 @@ if __name__ == '__main__':
     parser.add_argument("lemma", help="lemma that need to be proven",)
     parser.add_argument("-b", "--bound", default=3, help="max number of proof attempt")
     parser.add_argument("--heuristic", default="s", help="heuristic to use as the default for first attempt")
+    parser.add_argument("--timeout", default=6000, help="timeout in s, default:6000")
 
     args = parser.parse_args()
     file_path = args.spthy_file
@@ -89,10 +90,17 @@ if __name__ == '__main__':
     bound, proof_attempt = int(args.bound), 0
     heuristic = args.heuristic
     tactic,tactic_updated = "","new"
+    timeout = args.timeout
 
     while proof_attempt<bound and tactic != tactic_updated and tactic_updated != "":
         print(f"Proving with heuristic: {heuristic}")
         tactic = tactic_updated
-        status, tactic_updated = prove_with_tactic(file_path,lemma,heuristic,proof_attempt,100)
+        status, tactic_updated = prove_with_tactic(file_path,lemma,heuristic,proof_attempt,timeout)
+        if 'True' in status or 'False' in status:
+            with open('results/scriptResult', 'a') as r:
+                r.write(f"Prove lemma {lemma} (file:{file_path}) with heuristic: {heuristic}.\n")
+            break
         heuristic = "{"+lemma+"_"+str(proof_attempt)+"}"
         proof_attempt += 1
+    with open('results/scriptResult', 'a') as r:
+        r.write(f"Cannot prove lemma {lemma} (file:{file_path}) after {proof_attempt} attempts (timeout={timeout}s).\n")

@@ -189,7 +189,7 @@ def get_implications(status, orders, nextvalue, restrictions):
 
 
 
-def execute_model(model, commands, flag_processor, log, silent, timeout):
+def execute_model(model, commands, log, silent, timeout):
     results = []
     for (model, command, lemma) in commands:
         if not silent:
@@ -202,10 +202,10 @@ def execute_model(model, commands, flag_processor, log, silent, timeout):
         if res in ["TamarinError", "timeout", "AssociativeFailure"]:
             steps = -1
             tactic = te.extractTacticsParams(status)
-            print(tactic)
             status = res
-            if not ignore:
-                results.append([lemma, status, finaltime, steps, tactic])
+            results.append([lemma, status, finaltime, steps, tactic])
+            with open('results/scriptResulta', 'a') as r:
+                r.write(tactic)
         else:
             tmplist = res.split()
             steps = tmplist[tmplist.index('steps)') - 1][1:]
@@ -237,36 +237,12 @@ def main(parsed_args):
         start_full_exec = time.time()
         cleaned_results = execute_model(model,
                                         commands,
-                                        flags,
                                         query_dict[model]["log"],
                                         query_dict[model]["silent"],
                                         query_dict[model]["timeout"])
         finalprocesstime = time.time() - start_full_exec
-        tablelist = [["Lemma", "Verified", "Time", "#Steps", "List of Flags"]]
-        tablelist += cleaned_results
-        with open('results/recent_results_%s.csv' % model.split('/')[0], 'w') as r:
-            writer = csv.writer(r)
-            writer.writerows(cleaned_results)
-    silent = False
-    for key in query_dict.keys():
-        silent = query_dict[key]["silent"]
-        break
-    if not silent:
-        print(" ")
-        print(" ")
-        print(" ")
-        table_term = tabulate(fulltable, headers='firstrow', tablefmt='fancy_grid')
-        print(table_term)
-        exec_time = time.time() - start_exec_time
-        print(exec_time)
-    else:
-        for model in query_dict.keys():
-            with open('results/recent_results_%s.csv' % model.split('/')[0], 'r') as r:
-                for l in r.readlines():
-                    l = l.replace(" ", "").strip()
-                    tmplist = l.split(',')
-                    print(f"tmplist: {tmplist}")
-                    print(' '.join(tmplist))
+        for l in cleaned_results:
+            print(" ".join(str(x) for x in l))
 
 
 def pre_process():
