@@ -204,8 +204,6 @@ def execute_model(model, commands, log, silent, timeout):
             tactic = te.extractTacticsParams(status)
             status = res
             results.append([lemma, status, finaltime, steps, tactic])
-            with open('results/scriptResulta', 'a') as r:
-                r.write(tactic)
         else:
             tmplist = res.split()
             steps = tmplist[tmplist.index('steps)') - 1][1:]
