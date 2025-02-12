@@ -41,9 +41,12 @@ def tamarin_wrapper_call(arg_list, time_out=6000):
         stderr=subprocess.PIPE,
     ).communicate()
 
-def prove_with_tactic(filename,lemma_name,heuristic,tactic_nb,timeout=6000):
+def prove_with_tactic(filename,lemma_name,heuristic,tactic_nb,diff,timeout=6000):
 
-    out, err = tamarin_wrapper_call([filename, "-s", f"--lemma={lemma_name}",f"--tam=\"--heuristic={heuristic}\""],timeout)
+    diffFlag = ""
+    if diff:
+        diffFlag = "--diff"
+    out, err = tamarin_wrapper_call([filename, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {diffFlag}"],timeout)
     if err:
         print(
             "Sanity check failed for: "
@@ -80,9 +83,10 @@ if __name__ == '__main__':
     )
     parser.add_argument("spthy_file", help="path to target spthy file")
     parser.add_argument("lemma", help="lemma that need to be proven",)
-    parser.add_argument("-b", "--bound", default=3, help="max number of proof attempt")
-    parser.add_argument("--heuristic", default="s", help="heuristic to use as the default for first attempt")
-    parser.add_argument("--timeout", default=6000, help="timeout in s, default:6000")
+    parser.add_argument("-b", "--bound", type=int, default=3, help="max number of proof attempt")
+    parser.add_argument("--heuristic", type=str, default="s", help="heuristic to use as the default for first attempt")
+    parser.add_argument("--timeout", type=int, default=6000, help="timeout in s, default:6000")
+    parser.add_argument("--diff", action='store_true', help="timeout in s, default:6000")
 
     args = parser.parse_args()
     file_path = args.spthy_file
@@ -91,16 +95,26 @@ if __name__ == '__main__':
     heuristic = args.heuristic
     tactic,tactic_updated = "","new"
     timeout = args.timeout
+    diff = args.diff
+    proved = False
 
     while proof_attempt<bound and tactic != tactic_updated and tactic_updated != "":
-        print(f"Proving with heuristic: {heuristic}")
+        print(f"Proving with {lemma} heuristic: {heuristic}")
         tactic = tactic_updated
-        status, tactic_updated = prove_with_tactic(file_path,lemma,heuristic,proof_attempt,timeout)
+        status, tactic_updated = prove_with_tactic(file_path,lemma,heuristic,proof_attempt,diff,timeout)
         if 'True' in status or 'False' in status:
+            proved = True
             with open('results/scriptResult', 'a') as r:
                 r.write(f"Prove lemma {lemma} (file:{file_path}) with heuristic: {heuristic}.\n")
             break
         heuristic = "{"+lemma+"_"+str(proof_attempt)+"}"
         proof_attempt += 1
-    with open('results/scriptResult', 'a') as r:
-        r.write(f"Cannot prove lemma {lemma} (file:{file_path}) after {proof_attempt} attempts (timeout={timeout}s).\n")
+    if (proof_attempt==bound):
+        with open('results/scriptResult', 'a') as r:
+            r.write(f"Cannot prove lemma {lemma} (file:{file_path}) after {proof_attempt} attempts (timeout={timeout}s): attempts bound reached ({bound}).\n")
+    if tactic == tactic_updated:
+        with open('results/scriptResult', 'a') as r:
+            r.write(f"Cannot prove lemma {lemma} (file:{file_path}) after {proof_attempt} attempts (timeout={timeout}s): no tactic no longer changing.\n")
+    if tactic == tactic_updated and not proved:
+        with open('results/scriptResult', 'a') as r:
+            r.write(f"Cannot prove lemma {lemma} (file:{file_path}) after {proof_attempt} attempts (timeout={timeout}s): new tactic empty.\n")

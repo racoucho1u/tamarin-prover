@@ -64,17 +64,12 @@ def run_tamarin(cmd, timeout, silent, log):
                     return line, True
                 if "falsified" in line:
                     return line, False
-            print("Scripting error")
-            print(cmd)
-            print(output)
-            print(proof_results)
-            raise ValueError
-        else:
-            print("Scripting error")
-            print(cmd)
-            print(output)
-            print(proof_results)
-            raise ValueError
+        with open ("debugFile",'a') as df:
+            df.write("Scripting error\n")
+            df.write(cmd+"\n")
+            df.write(str(output)+"\n")
+            df.write(str(proof_results)+"\n")
+        raise ValueError
 
     except subprocess.TimeoutExpired as timeErr:
         os.killpg(os.getpgid(process.pid), signal.SIGTERM)
