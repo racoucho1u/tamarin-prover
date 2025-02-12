@@ -11,6 +11,7 @@
 
 module Theory.Text.Parser.Signature (
     heuristic
+    , collapseBound
     , builtins
     , options
     , functions
@@ -49,6 +50,7 @@ import Data.Label.Total
 import Data.Label.Mono (Lens)
 import Theory.Sapic
 import qualified Data.Functor
+import GHC.Num
 
 
  -- Describes the mapping between Maude Signatures and the builtin Name
@@ -219,6 +221,8 @@ export thy = do
                     '"'  -> mzero
                     _    -> return c
 
+collapseBound :: Parser Integer
+collapseBound = symbol "collapse-bound" *> char ':' *> skipMany (char ' ') *> natural <* lexeme spaces
 
 heuristic :: Bool -> Maybe FilePath -> Parser [GoalRanking ProofContext]
 heuristic diff workDir = symbol "heuristic" *> char ':' *> skipMany (char ' ') *> many1 (goalRanking diff workDir) <* lexeme spaces

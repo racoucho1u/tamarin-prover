@@ -136,6 +136,8 @@ module Theory (
   , addHeuristic
   , addDiffHeuristic
   , addDiffTacticI
+  , addCollapseBound
+  , addDiffCollapseBound
   , removeLemma
   , removeLemmaDiff
   , filterLemma

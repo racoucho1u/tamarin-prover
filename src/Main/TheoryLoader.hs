@@ -130,6 +130,9 @@ theoryLoadFlags =
   , flagNone ["quiet"] (addEmptyArg "quiet")
       "Do not display computation steps of oracle or tactic."
 
+  , flagOpt "10" ["collapse-bound"] (updateArg "collapse-bound") "INT"
+      "Bind the number of nodes in the tree before Tamarin tries to collapse nodes together (for attack finding)."
+
 --  , flagOpt "" ["diff"] (updateArg "diff") "OFF|ON"
 --      "Turn on observational equivalence (default OFF)."
   ]

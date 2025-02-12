@@ -26,6 +26,7 @@ module Theory.Text.Parser (
   ) where
 
 import           Prelude                    hiding (id, (.))
+import           GHC.Num
 import           Data.Foldable              (asum)
 import           Data.Label
 import           Data.Maybe
@@ -50,7 +51,10 @@ import Theory.Text.Parser.Signature
 import Theory.Text.Parser.Tactics
 import Theory.Text.Parser.Restriction
 import Theory.Text.Parser.Sapic
+import TheoryObject (thyCollapseBound)
 
+
+import Debug.Trace
 ------------------------------------------------------------------------------
 -- Lexing and parsing theory files and proof methods
 ------------------------------------------------------------------------------
@@ -209,13 +213,15 @@ theory inFile = do
     thy' <- symbol_ "begin"
         *> addItems inFile (set thyName thyId (defaultOpenTheory ("diff" `S.member` flags0)))
         <* symbol "end"
-    return thy'
+    return $ trace (show (get thyCollapseBound thy')) thy'
   where
     addItems :: Maybe FilePath -> OpenTheory -> Parser OpenTheory
     addItems inFile0 thy = asum
       [ do thy' <- liftedAddHeuristic thy =<< heuristic False workDir
            addItems inFile0 thy'
       , do thy' <- liftedAddTacticI thy =<< tactic False
+           addItems inFile0 thy'
+      , do thy' <- liftedAddCollapseBound thy . fmap integerToInt . Just =<< collapseBound
            addItems inFile0 thy'
       , do thy' <- builtins thy
            msig <- sig <$> getState
@@ -344,6 +350,10 @@ theory inFile = do
         Just thy' -> return thy'
         Nothing   -> fail $ "default tactic already defined"
 
+    liftedAddCollapseBound thy cb = case addCollapseBound cb thy of
+        Just thy' -> return thy'
+        Nothing   -> fail $ "default heuristic already defined"
+
 -- | Parse a diff theory.
 diffTheory :: Maybe FilePath
        -> Parser OpenDiffTheory
@@ -362,6 +372,8 @@ diffTheory inFile = do
       [ do thy' <- liftedAddHeuristic thy =<< heuristic True workDir
            addItems inFile0 thy'
       , do thy' <- liftedAddTacticI thy =<< tactic True
+           addItems inFile0 thy'
+      , do thy' <- liftedAddCollapseBound thy . fmap integerToInt . Just =<< collapseBound
            addItems inFile0 thy'
       , do
            diffbuiltins
@@ -455,13 +467,18 @@ diffTheory inFile = do
                 return (s </> x)
 
 
-    liftedAddHeuristic thy h = case addDiffHeuristic h thy of
+    liftedAddCollapseBound thy dcb = case addDiffCollapseBound dcb thy of
         Just thy' -> return thy'
         Nothing   -> fail $ "default heuristic already defined"
 
+    liftedAddHeuristic thy h = case addDiffHeuristic h thy of
+        Just thy' -> return thy'
+        Nothing   -> fail $ "default heuristic already defined"
+     
     liftedAddTacticI thy t = case addDiffTacticI t thy of
         Just thy' -> return thy'
         Nothing   -> fail $ "default tactic already defined"
+        
 
     liftedAddDiffRule thy ru = case addOpenProtoDiffRule ru thy of
         Just thy' -> return thy'

@@ -20,6 +20,7 @@ module TheoryObject (
   , thyCache
   , thyItems
   , thyOptions
+  , thyCollapseBound
   , diffThyName
   , diffThyItems
   , diffThySignature
@@ -31,6 +32,7 @@ module TheoryObject (
   , diffThyHeuristic
   , thyTacticI
   , diffThyTacticI
+  , diffThyCollapseBound
   , DiffLemma(..)
   , ProcessDef(..)
   , Predicate(..)
@@ -72,6 +74,8 @@ module TheoryObject (
   , addDiffHeuristic
   , addTacticI
   , addDiffTacticI
+  , addCollapseBound
+  , addDiffCollapseBound
   , removeLemma
   , removeLemmaDiff
   , removeDiffLemma
@@ -160,17 +164,19 @@ import qualified Data.Set as S
 import Theory.Syntactic.Predicate
 import Data.ByteString.Char8 (unpack)
 
+import Debug.Trace
 
 -- | A theory contains a single set of rewriting rules modeling a protocol
 -- and the lemmas that
 data Theory sig c r p s = Theory {
-         _thyName      :: String
-       , _thyHeuristic :: [GoalRanking ProofContext]
-       , _thyTacticI   :: [TacticI ProofContext]
-       , _thySignature :: sig
-       , _thyCache     :: c
-       , _thyItems     :: [TheoryItem r p s]
-       , _thyOptions   :: Option
+         _thyName           :: String
+       , _thyHeuristic      :: [GoalRanking ProofContext]
+       , _thyTacticI        :: [TacticI ProofContext]
+       , _thySignature      :: sig
+       , _thyCache          :: c
+       , _thyItems          :: [TheoryItem r p s]
+       , _thyOptions        :: Option
+       , _thyCollapseBound  :: Maybe Int
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
@@ -188,6 +194,7 @@ data DiffTheory sig c r r2 p p2 = DiffTheory {
        , _diffThyDiffCacheLeft  :: c
        , _diffThyDiffCacheRight :: c
        , _diffThyItems          :: [DiffTheoryItem r r2 p p2]
+       , _diffThyCollapseBound  :: Maybe Int
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 $(mkLabels [''DiffTheory])
@@ -481,21 +488,29 @@ addDiffLemma l thy = do
 
 -- | Add a new default heuristic. Fails if a heuristic is already defined.
 addHeuristic :: [GoalRanking ProofContext] -> Theory sig c r p s -> Maybe (Theory sig c r p s)
-addHeuristic h (Theory n [] t sig c i o) = Just (Theory n h t sig c i o)
+addHeuristic h (Theory n [] t sig c i o cb) = Just (Theory n h t sig c i o cb)
 addHeuristic _ _ = Nothing
 
 addDiffHeuristic :: [GoalRanking ProofContext] -> DiffTheory sig c r r2 p p2 -> Maybe (DiffTheory sig c r r2 p p2)
-addDiffHeuristic h (DiffTheory n [] t sig cl cr dcl dcr i) = Just (DiffTheory n h t sig cl cr dcl dcr i)
+addDiffHeuristic h (DiffTheory n [] t sig cl cr dcl dcr i dcb) = Just (DiffTheory n h t sig cl cr dcl dcr i dcb)
 addDiffHeuristic _ _ = Nothing
 
 addTacticI :: TacticI ProofContext -> Theory sig c r p s -> Maybe (Theory sig c r p s)
-addTacticI t (Theory n h [] sig c i o) = Just (Theory n h [t] sig c i o)
-addTacticI t (Theory n h l sig c i o) = Just (Theory n h (l++[t]) sig c i o)
--- addTacticI _ _ = Nothing
+addTacticI t (Theory n h [] sig c i o cb) = Just (Theory n h [t] sig c i o cb)
+addTacticI t (Theory n h l sig c i o cb) = Just (Theory n h (l++[t]) sig c i o cb)
 
 addDiffTacticI :: TacticI ProofContext -> DiffTheory sig c r r2 p p2 -> Maybe (DiffTheory sig c r r2 p p2)
-addDiffTacticI t (DiffTheory n h [] sig cl cr dcl dcr i) = Just (DiffTheory n h [t] sig cl cr dcl dcr i)
-addDiffTacticI t (DiffTheory n h l sig cl cr dcl dcr i) = Just (DiffTheory n h (l++[t]) sig cl cr dcl dcr i)
+addDiffTacticI t (DiffTheory n h [] sig cl cr dcl dcr i dcb) = Just (DiffTheory n h [t] sig cl cr dcl dcr i dcb)
+addDiffTacticI t (DiffTheory n h l sig cl cr dcl dcr i dcb) = Just (DiffTheory n h (l++[t]) sig cl cr dcl dcr i dcb)
+
+
+addCollapseBound :: Maybe Int -> Theory sig c r p s -> Maybe (Theory sig c r p s)
+addCollapseBound cb (Theory n h t sig c i o Nothing) = Just (Theory n h t sig c i o cb)
+addCollapseBound _ _ = Nothing
+
+addDiffCollapseBound :: Maybe Int -> DiffTheory sig c r r2 p p2 -> Maybe (DiffTheory sig c r r2 p p2)
+addDiffCollapseBound dcb (DiffTheory n h t sig cl cr dcl dcr i Nothing) = Just (DiffTheory n h t sig cl cr dcl dcr i dcb)
+addDiffCollapseBound _ _ = Nothing
 
 -- | Remove a lemma by name. Fails, if the lemma does not exist.
 removeLemma :: String -> Theory sig c r p s -> Maybe (Theory sig c r p s)

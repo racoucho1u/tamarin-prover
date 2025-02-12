@@ -469,17 +469,22 @@ rankProofMethods ranking tactics ctxt sys = do
       Just cases ->  return (m, (cases, expl))
       Nothing    -> []
   where
-    sys' = if length keys < 3 then sys -- || isJust (L.get sCollapsed sys) 
+
+    sys' = trace ("Bound: "++show ( L.get pcCollapseBound ctxt)) $ if collapseDecision $ L.get pcCollapseBound ctxt then sys -- || isJust (L.get sCollapsed sys) 
                 else L.set sCollapsed (Just collapseGoal) (modify sGoals (M.insert collapseGoal collapseStatus) sys)
 
     --sys' = if length keys < 3 then sys -- || isJust (L.get sCollapsed sys) 
     --            else L.set sCollapsed (Just collapseGoal) (modify sFormulas (S.insert collapseFormula) sys)
 
+    collapseDecision bound = case bound of 
+      Nothing -> True
+      Just b -> length keys < b
+
     keys = M.keys $ L.get sNodes sys
     collapseGoal = collapse (node2goals $ pairing keys)
     collapseStatus = GoalStatus False 0 False
 
-    collapseFormula = GDisj $ Disj (node2goals $ pairing keys)
+    --collapseFormula = GDisj $ Disj (node2goals $ pairing keys)
 
     -- create a case disjunction with all possible timepoint equality
     collapse :: [LNGuarded] -> Goal

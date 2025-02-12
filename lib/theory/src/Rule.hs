@@ -129,7 +129,7 @@ closeRuleCache restrictions typAsms forcedInjFacts sig protoRules intrRules isdi
         sig classifiedRules injFactInstances RawSource [] AvoidInduction Nothing Nothing 
         (error "closeRuleCache: trace quantifier should not matter here")
         (error "closeRuleCache: lemma name should not matter here") [] isdiff
-        (all isSubtermRule {-- $ trace (show destr ++ " - " ++ show (map isSubtermRule destr))-} destr) (any isConstantRule destr)
+        (all isSubtermRule {-- $ trace (show destr ++ " - " ++ show (map isSubtermRule destr))-} destr) (any isConstantRule destr) Nothing
 
     -- inj fact instances
     injFactInstances = forcedInjFacts `S.union`

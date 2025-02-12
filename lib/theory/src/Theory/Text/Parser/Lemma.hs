@@ -17,6 +17,7 @@ module Theory.Text.Parser.Lemma(
 where
 
 import           Prelude                    hiding (id, (.))
+import           GHC.Num
 import           Data.Foldable              (asum)
 -- import           Data.Monoid                hiding (Last)
 import           Control.Applicative        hiding (empty, many, optional)
@@ -52,6 +53,7 @@ lemmaAttribute diff workDir = asum
   , symbol "output"  *> opEqual *> (LemmaModule <$> list constructorp)
   , symbol "left"          *> pure LHSLemma
   , symbol "right"         *> pure RHSLemma
+  , symbol "collapse-bound" *> opEqual *> (LemmaCollapseBound <$> (fmap integerToInt) natural)
 --   , symbol "both"          *> pure BothLemma
   ]
 

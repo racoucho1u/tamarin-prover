@@ -85,6 +85,7 @@ module Theory.Constraint.System (
   , pcDiffContext
   , pcTrueSubterm
   , pcConstantRHS
+  , pcCollapseBound
   , dpcPCLeft
   , dpcPCRight
   , dpcProtoRules
@@ -710,6 +711,7 @@ data ProofContext = ProofContext
        , _pcDiffContext        :: Bool -- true if diff proof
        , _pcTrueSubterm        :: Bool -- true if in all rules the RHS is a subterm of the LHS
        , _pcConstantRHS        :: Bool -- true if there are rules with a constant RHS
+       , _pcCollapseBound      :: Maybe Int
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 

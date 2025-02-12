@@ -67,10 +67,10 @@ closeDiffTheoryWithMaude sig thy0 autoSources =
   if autoSources && (containsPartialDeconstructions (cacheLeft items) || containsPartialDeconstructions (cacheRight items))
     then
       proveDiffTheory (const True) (const True) checkProof checkDiffProof
-        (DiffTheory (L.get diffThyName thy0) h t sig (cacheLeft items') (cacheRight items') (diffCacheLeft items') (diffCacheRight items') items')
+        (DiffTheory (L.get diffThyName thy0) h t sig (cacheLeft items') (cacheRight items') (diffCacheLeft items') (diffCacheRight items') items' (L.get diffThyCollapseBound thy0))
     else
       proveDiffTheory (const True) (const True) checkProof checkDiffProof
-        (DiffTheory (L.get diffThyName thy0) h t sig (cacheLeft items) (cacheRight items) (diffCacheLeft items) (diffCacheRight items) items)
+        (DiffTheory (L.get diffThyName thy0) h t sig (cacheLeft items) (cacheRight items) (diffCacheLeft items) (diffCacheRight items) items (L.get diffThyCollapseBound thy0)) 
   where
     h              = L.get diffThyHeuristic thy0
     t              = L.get diffThyTacticI thy0
@@ -136,9 +136,9 @@ closeDiffTheoryWithMaude sig thy0 autoSources =
 
     -- extract protocol rules
     leftClosedRules  :: [DiffTheoryItem DiffProtoRule ClosedProtoRule IncrementalDiffProof s] -> [ClosedProtoRule]
-    leftClosedRules its = leftTheoryRules  (DiffTheory errClose errClose errClose errClose errClose errClose errClose errClose its)
+    leftClosedRules its = leftTheoryRules  (DiffTheory errClose errClose errClose errClose errClose errClose errClose errClose its errClose)
     rightClosedRules :: [DiffTheoryItem DiffProtoRule ClosedProtoRule IncrementalDiffProof s] -> [ClosedProtoRule]
-    rightClosedRules its = rightTheoryRules (DiffTheory errClose errClose errClose errClose errClose errClose errClose errClose its)
+    rightClosedRules its = rightTheoryRules (DiffTheory errClose errClose errClose errClose errClose errClose errClose errClose its errClose)
     errClose  = error "closeDiffTheory"
 
     addSolvingLoopBreakers = useAutoLoopBreakersAC
@@ -163,10 +163,10 @@ closeTheoryWithMaude sig thy0 autoSources =
   if autoSources && containsPartialDeconstructions (cache items)
     then
         proveTheory (const True) checkProof
-      $ Theory (L.get thyName thy0) h t sig (cache items') items' (L.get thyOptions thy0)
+      $ Theory (L.get thyName thy0) h t sig (cache items') items' (L.get thyOptions thy0) (L.get thyCollapseBound thy0)
     else
         proveTheory (const True) checkProof
-      $ Theory (L.get thyName thy0) h t sig (cache items) items (L.get thyOptions thy0)
+      $ Theory (L.get thyName thy0) h t sig (cache items) items (L.get thyOptions thy0) (L.get thyCollapseBound thy0)
   where
     h          = L.get thyHeuristic thy0
     t          = L.get thyTacticI thy0
@@ -220,7 +220,7 @@ closeTheoryWithMaude sig thy0 autoSources =
 
     -- extract protocol rules
     rules :: [TheoryItem ClosedProtoRule IncrementalProof s] -> [ClosedProtoRule]
-    rules its = theoryRules (Theory errClose errClose errClose errClose errClose its errClose)
+    rules its = theoryRules (Theory errClose errClose errClose errClose errClose its errClose errClose)
     errClose = error "closeTheory"
 
     addSolvingLoopBreakers = useAutoLoopBreakersAC
@@ -429,19 +429,19 @@ applyPartialEvaluationDiff evalStyle autoSources thy0 =
 -- | Open a theory by dropping the closed world assumption and values whose
 -- soundness depends on it.
 openTheory :: ClosedTheory -> OpenTheory
-openTheory  (Theory n h t sig c items opts) = openTranslatedTheory(
+openTheory  (Theory n h t sig c items opts cb) = openTranslatedTheory(
     Theory n h t (toSignaturePure sig) (openRuleCache c)
     -- We merge duplicate rules if they were split into variants
       (mergeOpenProtoRules $ map (mapTheoryItem openProtoRule incrementalToSkeletonProof) items)
-      opts)
+      opts cb)
 
 -- | Open a theory by dropping the closed world assumption and values whose
 -- soundness depends on it.
 openDiffTheory :: ClosedDiffTheory -> OpenDiffTheory
-openDiffTheory  (DiffTheory n h t sig c1 c2 c3 c4 items) =
+openDiffTheory  (DiffTheory n h t sig c1 c2 c3 c4 items dcb) =
     -- We merge duplicate rules if they were split into variants
     DiffTheory n h t (toSignaturePure sig) (openRuleCache c1) (openRuleCache c2) (openRuleCache c3) (openRuleCache c4)
-      (mergeOpenProtoRulesDiff $ map (mapDiffTheoryItem id (\(x, y) -> (x, (openProtoRule y))) (\(DiffLemma s a p) -> (DiffLemma s a (incrementalToSkeletonDiffProof p))) (\(x, Lemma a b c d e) -> (x, Lemma a b c d (incrementalToSkeletonProof e)))) items)
+      (mergeOpenProtoRulesDiff $ map (mapDiffTheoryItem id (\(x, y) -> (x, (openProtoRule y))) (\(DiffLemma s a p) -> (DiffLemma s a (incrementalToSkeletonDiffProof p))) (\(x, Lemma a b c d e) -> (x, Lemma a b c d (incrementalToSkeletonProof e)))) items) dcb
 
 
 ------------------------------------------------------------------------------
