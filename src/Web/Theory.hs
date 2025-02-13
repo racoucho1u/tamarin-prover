@@ -88,6 +88,7 @@ import           Web.Types
 
 
 
+
 ------------------------------------------------------------------------------
 -- Various other functions
 ------------------------------------------------------------------------------
@@ -104,7 +105,8 @@ applyMethodAtPath thy lemmaName proofPath prover i = do
         heuristic = selectHeuristic prover ctxt
         ranking = useHeuristic heuristic (length proofPath)
         tacticI = selectTacticI prover ctxt
-    methodsAndCases <- (rankProofMethods ranking tacticI ctxt) <$> sys
+        cbound  = selectCollapseBound prover ctxt
+    methodsAndCases <- (rankProofMethods ranking tacticI cbound ctxt) <$> sys
     methodCases <- if length methodsAndCases >= i then Just (methodsAndCases !! (i-1)) else Nothing
     --collapseStatus <- L.get sCollapsed $ head (map snd (M.toList (fst $ snd methodCases)))
     applyProverAtPath thy lemmaName proofPath
@@ -126,7 +128,8 @@ applyMethodAtPathDiff thy s lemmaName proofPath prover i = do
         heuristic = selectHeuristic prover ctxt
         ranking = useHeuristic heuristic (length proofPath)
         tacticI = selectTacticI prover ctxt
-    methods <- (map fst . rankProofMethods ranking tacticI ctxt) <$> sys
+        cbound  = selectCollapseBound prover ctxt
+    methods <- (map fst . rankProofMethods ranking tacticI cbound ctxt) <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyProverAtPathDiff thy s lemmaName proofPath
       (oneStepProver Nothing method                        `mappend`
@@ -147,7 +150,8 @@ applyDiffMethodAtPath thy lemmaName proofPath prover i = do
         heuristic = selectDiffHeuristic prover ctxt
         ranking = useHeuristic heuristic (length proofPath)
         tacticI = selectDiffTacticI prover ctxt
-    methods <- (map fst . rankDiffProofMethods ranking tacticI ctxt) <$> sys
+        cbound  = selectDiffCollapseBound prover ctxt
+    methods <- (map fst . rankDiffProofMethods ranking tacticI cbound ctxt) <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyDiffProverAtPath thy lemmaName proofPath
       (oneStepDiffProver method                        `mappend`
@@ -582,7 +586,8 @@ subProofSnippet renderUrl tidx ti lemma proofPath ctxt prf =
     heuristic               = selectHeuristic (tiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
     tacticI                 = selectTacticI (tiAutoProver ti) ctxt
-    proofMethods            = rankProofMethods ranking tacticI ctxt
+    collapseB               = selectCollapseBound (tiAutoProver ti) ctxt
+    proofMethods            = rankProofMethods ranking tacticI collapseB ctxt
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
         [ withTag "h4" [] (text "Case" <-> text name)
@@ -675,7 +680,8 @@ subProofDiffSnippet renderUrl tidx ti s lemma proofPath ctxt prf =
     heuristic               = selectHeuristic (dtiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
     tacticI                 = selectTacticI (dtiAutoProver ti) ctxt
-    proofMethods            = rankProofMethods ranking tacticI ctxt
+    collapseB               = selectCollapseBound (dtiAutoProver ti) ctxt
+    proofMethods            = rankProofMethods ranking tacticI collapseB ctxt
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
         [ withTag "h4" [] (text "Case" <-> text name)
@@ -781,7 +787,8 @@ subDiffProofSnippet renderUrl tidx ti lemma proofPath ctxt prf =
     heuristic               = selectDiffHeuristic (dtiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
     tacticI                 = selectDiffTacticI (dtiAutoProver ti) ctxt
-    diffProofMethods        = rankDiffProofMethods ranking tacticI ctxt
+    collapseB               = selectDiffCollapseBound (dtiAutoProver ti) ctxt
+    diffProofMethods        = rankDiffProofMethods ranking tacticI collapseB ctxt
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
         [ withTag "h4" [] (text "Case" <-> text name)
@@ -1402,7 +1409,7 @@ imgDiffThyPath imgFormat dotCommand cacheDir_ compact simplificationLevel abbrev
             lem <- lookupDiffLemma lemma thy
             let ctxt = getDiffProofContext lem thy
             side <- get dsSide diffSequent
-            let isSolved s sys' = (rankProofMethods GoalNrRanking [defaultTacticI] (eitherProofContext ctxt s) sys') == [] -- checks if the system is solved
+            let isSolved s sys' = (rankProofMethods GoalNrRanking [defaultTacticI] Nothing (eitherProofContext ctxt s) sys') == [] -- checks if the system is solved
             nsequent <- get dsSystem diffSequent
             -- Here we can potentially get Nothing if there is no mirror DG
             let sequentList = snd $ getMirrorDGandEvaluateRestrictions ctxt diffSequent (isSolved side nsequent)

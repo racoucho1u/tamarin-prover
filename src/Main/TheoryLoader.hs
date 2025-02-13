@@ -459,15 +459,16 @@ closeDiffThyWithMaude sig as thy0 = do
                   replaceSorryProver $ runAutoProver $ constructAutoProver as
              | otherwise            = mempty
 
--- | Construct an 'AutoProver' from the given arguments (--bound,
+-- | Construct an 'AutoProver' from the given arguments (--bound, --collapse-bound
 -- --stop-on-trace).
 constructAutoProver :: Arguments -> AutoProver
 constructAutoProver as =
-    AutoProver heuristic Nothing proofBound stopOnTrace
+    AutoProver heuristic Nothing proofBound collapseBound stopOnTrace
   where
     -- handles to relevant arguments
     --------------------------------
     proofBound      = read <$> findArg "bound" as
+    collapseBound    = read <$> findArg "collapse-bound" as
 
     heuristic = case findArg "heuristic" as of
         Just rawRankings@(_:_) -> Just $ roundRobinHeuristic
@@ -487,11 +488,12 @@ constructAutoProver as =
 -- --stop-on-trace).
 constructAutoDiffProver :: Arguments -> AutoProver
 constructAutoDiffProver as =
-    AutoProver heuristic Nothing proofBound stopOnTrace
+    AutoProver heuristic Nothing proofBound collapseBound stopOnTrace
   where
     -- handles to relevant arguments
     --------------------------------
     proofBound      = read <$> findArg "bound" as
+    collapseBound    = read <$> findArg "collapse-bound" as
 
     heuristic = case findArg "heuristic" as of
         Just rawRankings@(_:_) -> Just $ roundRobinHeuristic

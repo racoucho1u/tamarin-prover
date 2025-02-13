@@ -29,6 +29,7 @@ import           Data.Monoid                         (Sum(..))
 import           Theory.Text.Pretty
 import OpenTheory
 import Pretty
+import Debug.Trace
 
 ------------------------------------------------------------------------------
 -- Closed theory querying / construction / modification
@@ -91,7 +92,7 @@ getProtoRuleEsDiff s = S.toList . S.fromList . map ((L.get oprRuleE) . openProto
 
 -- | Get the proof context for a lemma of the closed theory.
 getProofContext :: Lemma a -> ClosedTheory -> ProofContext
-getProofContext l thy = ProofContext
+getProofContext l thy = trace ("Get proofContext: "++show (L.get thyCollapseBound thy)) $ ProofContext
     ( L.get thySignature                       thy)
     ( L.get (crcRules . thyCache)              thy)
     ( L.get (crcInjectiveFactInsts . thyCache) thy)
@@ -256,6 +257,7 @@ getDiffProofContext l thy = DiffProofContext (proofContext LHS) (proofContext RH
         _  -> Just lattr
       where
         lattr = L.get diffThyTacticI thy
+        
 
 -- | The facts with injective instances in this theory
 getInjectiveFactInsts :: ClosedTheory -> S.Set FactTag

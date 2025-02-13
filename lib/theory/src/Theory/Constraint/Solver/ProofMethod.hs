@@ -415,7 +415,7 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
                            Just cases -> Just $ M.map (\x -> L.set dsSystem (Just x) sys) cases
 
     isSolved :: Side -> System -> Bool
-    isSolved s sys' = (rankProofMethods GoalNrRanking [defaultTacticI] (eitherProofContext ctxt s) sys') == [] -- checks if the system is solved
+    isSolved s sys' = (rankProofMethods GoalNrRanking [defaultTacticI] Nothing (eitherProofContext ctxt s) sys') == [] -- checks if the system is solved
 
 ------------------------------------------------------------------------------
 -- Heuristics
@@ -455,9 +455,10 @@ rankGoals ctxt ranking tacticsList = case ranking of
 -- 'ProofMethod's and their corresponding results in this 'ProofContext' and
 -- for this 'System'. If the resulting list is empty, then the constraint
 -- system is solved.
-rankProofMethods :: GoalRanking ProofContext -> [TacticI ProofContext] -> ProofContext -> System
+rankProofMethods :: GoalRanking ProofContext -> [TacticI ProofContext] -> Maybe Int
+                 -> ProofContext -> System
                  -> [(ProofMethod, (M.Map CaseName System, String))]
-rankProofMethods ranking tactics ctxt sys = do
+rankProofMethods ranking tactics cbound ctxt sys = do
     (m, expl) <-
             (contradiction <$> contradictions ctxt sys')
         <|> (case L.get pcUseInduction ctxt of
@@ -470,7 +471,7 @@ rankProofMethods ranking tactics ctxt sys = do
       Nothing    -> []
   where
 
-    sys' = trace ("Bound: "++show ( L.get pcCollapseBound ctxt)) $ if collapseDecision $ L.get pcCollapseBound ctxt then sys -- || isJust (L.get sCollapsed sys) 
+    sys' = if collapseDecision cbound then sys -- || isJust (L.get sCollapsed sys) 
                 else L.set sCollapsed (Just collapseGoal) (modify sGoals (M.insert collapseGoal collapseStatus) sys)
 
     --sys' = if length keys < 3 then sys -- || isJust (L.get sCollapsed sys) 
@@ -521,9 +522,10 @@ rankProofMethods ranking tactics ctxt sys = do
 -- 'ProofMethod's and their corresponding results in this 'DiffProofContext' and
 -- for this 'DiffSystem'. If the resulting list is empty, then the constraint
 -- system is solved.
-rankDiffProofMethods :: GoalRanking ProofContext -> [TacticI ProofContext] -> DiffProofContext -> DiffSystem
+rankDiffProofMethods :: GoalRanking ProofContext -> [TacticI ProofContext] -> Maybe Int
+                 -> DiffProofContext -> DiffSystem
                  -> [(DiffProofMethod, (M.Map CaseName DiffSystem, String))]
-rankDiffProofMethods ranking tactics ctxt sys = do
+rankDiffProofMethods ranking tactics cbound ctxt sys = do
     (m, expl) <-
             [(DiffRuleEquivalence, "Prove equivalence using rule equivalence")]
         <|> [(DiffMirrored, "Backward search completed")]
@@ -532,7 +534,7 @@ rankDiffProofMethods ranking tactics ctxt sys = do
         <|> (case (L.get dsSide sys, L.get dsSystem sys) of
                   (Just s, Just sys') -> map (\x -> (DiffBackwardSearchStep (fst x), "Do backward search step"))
                                           $ filter (\x -> not $ fst x == Induction)
-                                          $ rankProofMethods ranking tactics (eitherProofContext ctxt s) sys'
+                                          $ rankProofMethods ranking tactics cbound (eitherProofContext ctxt s) sys'
                   (_     , _        ) -> [])
     case execDiffProofMethod ctxt m sys of
       Just cases -> return (m, (cases, expl))
