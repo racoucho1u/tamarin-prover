@@ -50,7 +50,7 @@ import Data.Label.Total
 import Data.Label.Mono (Lens)
 import Theory.Sapic
 import qualified Data.Functor
-import GHC.Num
+
 
 
  -- Describes the mapping between Maude Signatures and the builtin Name

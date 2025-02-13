@@ -48,12 +48,12 @@ lemmaAttribute diff workDir = asum
   , symbol "diff_reuse"    *> pure ReuseDiffLemma
   , symbol "use_induction" *> pure InvariantLemma
   , symbol "hide_lemma" *> opEqual *> (HideLemma <$> identifier)
-  , symbol "heuristic"  *> opEqual *> (LemmaHeuristic <$> many1 (goalRanking diff workDir))
+  , symbol "heuristic"  *> trace ("Heuristic parsing called") opEqual *> (LemmaHeuristic <$> many1 (goalRanking diff workDir))
   , symbol "tactic"       *> (LemmaTacticI <$> identifier)
   , symbol "output"  *> opEqual *> (LemmaModule <$> list constructorp)
   , symbol "left"          *> pure LHSLemma
   , symbol "right"         *> pure RHSLemma
-  , symbol "collapse-bound" *> opEqual *> (LemmaCollapseBound <$> (fmap integerToInt) natural)
+  , symbol "collapse-bound" *> trace ("Coolapsed parsing called") opEqual *> (LemmaCollapseBound <$> fmap integerToInt natural)
 --   , symbol "both"          *> pure BothLemma
   ]
 

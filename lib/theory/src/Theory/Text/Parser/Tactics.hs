@@ -111,7 +111,7 @@ deprio = do
 
 
 tactic :: Bool -> Parser (TacticI ProofContext)
-tactic diff = do
+tactic diff = trace ("Tactic parsing called") $ do
     tName <- tacticName
     presort <- option (SmartRanking diff) (selectedPreSort diff)
     prios <- option [] $ many1 prio

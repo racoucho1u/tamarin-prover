@@ -342,15 +342,15 @@ theory inFile = do
         Just thy' -> return thy'
         Nothing   -> fail $ "duplicate process: " ++ get pName pDef
 
-    liftedAddHeuristic thy h = case addHeuristic h thy of
+    liftedAddHeuristic thy h = trace ("Add heuristictheory: "++show h) $case addHeuristic h thy of
         Just thy' -> return thy'
         Nothing   -> fail $ "default heuristic already defined"
 
-    liftedAddTacticI thy t = case addTacticI t thy of
+    liftedAddTacticI thy t = trace ("Add tactictheory: "++show t) $ case addTacticI t thy of
         Just thy' -> return thy'
         Nothing   -> fail $ "default tactic already defined"
 
-    liftedAddCollapseBound thy cb = case addCollapseBound cb thy of
+    liftedAddCollapseBound thy cb = trace ("Add cboundtheory: "++show cb) $ case addCollapseBound cb thy of
         Just thy' -> return thy'
         Nothing   -> fail $ "default heuristic already defined"
 

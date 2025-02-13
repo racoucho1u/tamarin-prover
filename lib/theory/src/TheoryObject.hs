@@ -714,17 +714,18 @@ prettyEitherRestriction (s, rstr) =
     safety = isSafetyFormula $ formulaToGuarded_ $ L.get rstrFormula rstr
 
 prettyTactic :: HighlightDocument d => TacticI ProofContext -> d
-prettyTactic tactic = kwTactic <> colon <> space <> (text $ _name tactic) 
+prettyTactic tactic = kwTactic <> colon <> space <> (text $ _name tactic)
     $-$ kwPresort <> colon <> space <> (char $ goalRankingToChar $ _presort tactic) $-$ sep
         [ ppTabTab  "prio"  (map stringRankingPrio $ _prios tactic) (map stringsPrio $ _prios tactic)
         , ppTabTab "deprio" (map stringRankingDeprio $ _deprios tactic) (map stringsDeprio $ _deprios tactic)
         , char '\n'
         ]
-   where 
+   where
 
         -- pretty print for a prio block
-        ppTab "prio" (rankingName,xs) = kwPrio <> colon <> space <> (text rankingName) $-$ (nest 2 $ vcat $ map text xs) 
-        ppTab "deprio" (rankingName,xs) = kwDeprio <> colon <> space <> (text rankingName) $-$ (nest 2 $ vcat $ map text xs)
+        ppTab "prio" (rankingName,xs) = kwPrio <> colon <> space <> text rankingName $-$ (nest 2 $ vcat $ map text xs)
+        ppTab "deprio" (rankingName,xs) = kwDeprio <> colon <> space <> text rankingName $-$ (nest 2 $ vcat $ map text xs)
+        ppTab _ _ = emptyDoc
         --ppTab "prio" _ xs =  kwPrio <> colon $-$ (nest 2 $ vcat $ map text xs)
         --ppTab "deprio" _ xs = kwDeprio <> colon $-$ (nest 2 $ vcat $ map text xs)
 

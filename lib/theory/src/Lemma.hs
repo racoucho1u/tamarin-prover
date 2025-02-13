@@ -94,7 +94,7 @@ prettyLemmaAttribute (LemmaTacticI t)      = text ("tactic=" ++ t)
 prettyLemmaAttribute (LemmaModule h)       = text ("output=[" ++ intercalate "," (map show h)  ++ "]")
 prettyLemmaAttribute LHSLemma              = text "left"
 prettyLemmaAttribute RHSLemma              = text "right"
-prettyLemmaAttribute (LemmaCollapseBound b)= text ("collapse bound="++show b)
+prettyLemmaAttribute (LemmaCollapseBound b)= text ("collapse-bound="++show b)
 --     prettyLemmaAttribute BothLemma      = text "both"
 
 

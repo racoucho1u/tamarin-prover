@@ -107,7 +107,7 @@ getProofContext l thy = trace ("Get proofContext: "++show (L.get thyCollapseBoun
     False
     (all isSubtermRule  $ filter isDestrRule $ intruderRules $ L.get (crcRules . thyCache) thy)
     (any isConstantRule $ filter isDestrRule $ intruderRules $ L.get (crcRules . thyCache) thy)
-    ( L.get thyCollapseBound thy )
+    specifiedCollapseBound
   where
     kind    = lemmaSourceKind l
     cases   = case kind of RawSource     -> crcRawSources
@@ -117,7 +117,7 @@ getProofContext l thy = trace ("Get proofContext: "++show (L.get thyCollapseBoun
       | otherwise                                                        = AvoidInduction
 
     -- Heuristic specified for the lemma > globally specified heuristic > default heuristic
-    specifiedHeuristic = case lattr of
+    specifiedHeuristic = trace ("Specified heuristic: "++show lattr) $ case lattr of
         Just lh -> Just lh
         Nothing  -> case L.get thyHeuristic thy of
                     [] -> Nothing
@@ -132,6 +132,13 @@ getProofContext l thy = trace ("Get proofContext: "++show (L.get thyCollapseBoun
         _  -> Just lattr
       where
         lattr = L.get thyTacticI thy
+
+    specifiedCollapseBound = case lattr of 
+        Just justB -> justB
+        _ -> Nothing
+      where
+        lattr = headMay [Just b
+                    | LemmaCollapseBound b <-  L.get lAttributes l]
 
 -- | Get the proof context for a lemma of the closed theory.
 getProofContextDiff :: Side -> Lemma a -> ClosedDiffTheory -> ProofContext
@@ -257,7 +264,7 @@ getDiffProofContext l thy = DiffProofContext (proofContext LHS) (proofContext RH
         _  -> Just lattr
       where
         lattr = L.get diffThyTacticI thy
-        
+
 
 -- | The facts with injective instances in this theory
 getInjectiveFactInsts :: ClosedTheory -> S.Set FactTag
