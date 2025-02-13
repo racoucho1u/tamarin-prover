@@ -363,6 +363,9 @@ data GoalStatus = GoalStatus
     , _gsLoopBreaker :: Bool
        -- True if this goal should be solved with care because it may lead to
        -- non-termination.
+    , _gsCollapse :: Bool
+       -- True if this goal has been generated to try to collapse the proof 
+       -- tree.
     }
     deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
@@ -1483,13 +1486,13 @@ allOpenGoalsAreSimpleFacts :: DiffProofContext -> System -> Bool
 allOpenGoalsAreSimpleFacts ctxt sys = M.foldlWithKey goalIsSimpleFact True (L.get sGoals sys)
   where
     goalIsSimpleFact :: Bool -> Goal -> GoalStatus -> Bool
-    goalIsSimpleFact ret (ActionG _ fact)         (GoalStatus solved _ _) = ret && (solved || ((isTrivialFact fact /= Nothing) && (isKUFact fact)))
-    goalIsSimpleFact ret (ChainG _ _)             (GoalStatus solved _ _) = ret && solved
-    goalIsSimpleFact ret (PremiseG (nid, _) fact) (GoalStatus solved _ _) = ret && (solved || (isTrivialFact fact /= Nothing) && (not (isProtocolRule r) || (getOriginalRule ctxt LHS r == getOriginalRule ctxt RHS r)))
+    goalIsSimpleFact ret (ActionG _ fact)         (GoalStatus solved _ _ _) = ret && (solved || ((isTrivialFact fact /= Nothing) && (isKUFact fact)))
+    goalIsSimpleFact ret (ChainG _ _)             (GoalStatus solved _ _ _) = ret && solved
+    goalIsSimpleFact ret (PremiseG (nid, _) fact) (GoalStatus solved _ _ _) = ret && (solved || (isTrivialFact fact /= Nothing) && (not (isProtocolRule r) || (getOriginalRule ctxt LHS r == getOriginalRule ctxt RHS r)))
       where
         r = nodeRule nid sys
-    goalIsSimpleFact ret (SplitG _)               (GoalStatus solved _ _) = ret && solved
-    goalIsSimpleFact ret (DisjG _)                (GoalStatus solved _ _) = ret && solved
+    goalIsSimpleFact ret (SplitG _)               (GoalStatus solved _ _ _) = ret && solved
+    goalIsSimpleFact ret (DisjG _)                (GoalStatus solved _ _ _) = ret && solved
 
 -- | Returns true if the current system is a diff system
 isDiffSystem :: System -> Bool

@@ -491,9 +491,9 @@ reducibleFormula fm = case fm of
 
 -- | Combine the status of two goals.
 combineGoalStatus :: GoalStatus -> GoalStatus -> GoalStatus
-combineGoalStatus (GoalStatus solved1 age1 loops1)
-                  (GoalStatus solved2 age2 loops2) =
-    GoalStatus (solved1 || solved2) (min age1 age2) (loops1 || loops2)
+combineGoalStatus (GoalStatus solved1 age1 loops1 collapse1)
+                  (GoalStatus solved2 age2 loops2 collapse2) =
+    GoalStatus (solved1 || solved2) (min age1 age2) (loops1 || loops2) (collapse1 || collapse2)
 
 -- | Insert a goal and its status with a new age. Merge status if goal exists.
 insertGoalStatus :: Goal -> GoalStatus -> Reduction ()
@@ -504,7 +504,7 @@ insertGoalStatus goal status = do
 
 -- | Insert a 'Goal' and store its age.
 insertGoal :: Goal -> Bool -> Reduction ()
-insertGoal goal looping = insertGoalStatus goal (GoalStatus False 0 looping)
+insertGoal goal looping = insertGoalStatus goal (GoalStatus False 0 looping False)
 
 -- | Mark the given goal as solved.
 markGoalAsSolved :: String -> Goal -> Reduction ()

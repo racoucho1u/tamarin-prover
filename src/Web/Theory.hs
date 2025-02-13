@@ -106,11 +106,12 @@ applyMethodAtPath thy lemmaName proofPath prover i = do
         ranking = useHeuristic heuristic (length proofPath)
         tacticI = selectTacticI prover ctxt
         cbound  = selectCollapseBound prover ctxt
-    methodsAndCases <- (rankProofMethods ranking tacticI cbound ctxt) <$> sys
+    methodsAndCases <- rankProofMethods ranking tacticI cbound ctxt <$> sys
     methodCases <- if length methodsAndCases >= i then Just (methodsAndCases !! (i-1)) else Nothing
+    let cgoal = L.get sCollapsed =<< listToMaybe (map snd (M.toList (fst $ snd methodCases)))
     --collapseStatus <- L.get sCollapsed $ head (map snd (M.toList (fst $ snd methodCases)))
     applyProverAtPath thy lemmaName proofPath
-      (oneStepProver (maybe Nothing (L.get sCollapsed) (listToMaybe (map snd (M.toList (fst $ snd methodCases))))) (fst methodCases)                        `mappend`
+      (oneStepProver cgoal (fst methodCases)  `mappend`
        replaceSorryProver (oneStepProver Nothing Simplify) `mappend`
        replaceSorryProver (contradictionProver)    `mappend`
        replaceSorryProver (oneStepProver Nothing Solved)

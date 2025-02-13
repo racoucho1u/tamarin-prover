@@ -92,7 +92,7 @@ getProtoRuleEsDiff s = S.toList . S.fromList . map ((L.get oprRuleE) . openProto
 
 -- | Get the proof context for a lemma of the closed theory.
 getProofContext :: Lemma a -> ClosedTheory -> ProofContext
-getProofContext l thy = trace ("Get proofContext: "++show (L.get thyCollapseBound thy)) $ ProofContext
+getProofContext l thy = ProofContext
     ( L.get thySignature                       thy)
     ( L.get (crcRules . thyCache)              thy)
     ( L.get (crcInjectiveFactInsts . thyCache) thy)
@@ -117,7 +117,7 @@ getProofContext l thy = trace ("Get proofContext: "++show (L.get thyCollapseBoun
       | otherwise                                                        = AvoidInduction
 
     -- Heuristic specified for the lemma > globally specified heuristic > default heuristic
-    specifiedHeuristic = trace ("Specified heuristic: "++show lattr) $ case lattr of
+    specifiedHeuristic = case lattr of
         Just lh -> Just lh
         Nothing  -> case L.get thyHeuristic thy of
                     [] -> Nothing

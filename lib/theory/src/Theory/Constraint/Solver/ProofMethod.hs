@@ -39,7 +39,7 @@ import           Data.Binary
 import           Data.Function                             (on)
 import           Data.Label                                hiding (get)
 import qualified Data.Label                                as L
-import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate,tails)
+import           Data.List                                 (intersperse,partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate,tails,sort)
 import qualified Data.Map                                  as M
 import           Data.Maybe                                (catMaybes, fromMaybe, isJust)
 -- import           Data.Monoid
@@ -69,6 +69,7 @@ import           Theory.Model
 import           Theory.Text.Pretty
 
 import           Text.Regex.PCRE
+
 
 
 
@@ -247,8 +248,8 @@ execProofMethod ctxt method sys =
           | null (plainOpenGoals sys) -> return M.empty
           | otherwise                 -> Nothing
         SolveGoal goal
-          | goal `M.member` L.get sGoals sys  -> execSolveGoal False goal
-          -- | Just goal == L.get sCollapsed sys -> trace ("Using sCollapsed") execSolveGoal True goal
+          | goal `M.member` L.get sGoals sys  -> execSolveGoal goal
+          | Just goal == (ordGoal <$> (L.get sCollapsed sys)) -> execSolveGoal goal
           | otherwise                         -> Nothing
         Simplify                 -> singleCase simplifySystem
         Induction                -> M.map cleanupSystem <$> execInduction
@@ -264,6 +265,14 @@ execProofMethod ctxt method sys =
        . renamePrecise
        . set sSubst emptySubst
 
+    -- test the equality of collapseGoal since sometimes haskell twist the Disj order 
+    ordEq (GAto (EqE i j)) = (GAto (EqE (min i j) (max i j)))
+    ordEq gato = gato
+
+    ordGoal :: Goal -> Goal
+    ordGoal (DisjG (Disj {getDisj = lng})) = DisjG (Disj $ sort (map ordEq lng))
+    ordGoal g = g
+
     -- expect only one or no subcase in the given case distinction
     singleCase m =
         case    removeRedundantCases ctxt [] id . map cleanupSystem
@@ -277,8 +286,8 @@ execProofMethod ctxt method sys =
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
-    execSolveGoal :: Bool -> Goal -> Maybe (M.Map CaseName System)
-    execSolveGoal updateFormulas goal =
+    execSolveGoal :: Goal -> Maybe (M.Map CaseName System)
+    execSolveGoal goal =
         return . makeCaseNames . removeRedundantCases ctxt [] snd
                . map (second cleanupSystem) . map fst . getDisj
                $ reduc
@@ -410,7 +419,7 @@ execDiffProofMethod ctxt method sys = -- error $ show ctxt ++ show method ++ sho
     startBackwardSearch rulename = M.insert ("LHS") (backwardSearchSystem LHS sys rulename) $ M.insert ("RHS") (backwardSearchSystem RHS sys rulename) $ M.empty
 
     applyStep :: ProofMethod -> Side -> System -> Maybe (M.Map CaseName DiffSystem)
-    applyStep m s sys' = trace "Apply step" $ case (execProofMethod (eitherProofContext ctxt s) m sys') of
+    applyStep m s sys' = case execProofMethod (eitherProofContext ctxt s) m sys' of
                            Nothing    -> Nothing
                            Just cases -> Just $ M.map (\x -> L.set dsSystem (Just x) sys) cases
 
@@ -448,8 +457,8 @@ rankGoals ctxt ranking tacticsList = case ranking of
 
       checkName t1 t2 = (_name t1) == (_name t2)
 
-      chooseError [] t = error $ "No tactic has been written in the theory file"
-      chooseError l  t = error $ "The tactic specified ( "++(show $ _name t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
+      chooseError [] _ = error "No tactic has been written in the theory file"
+      chooseError _  t = error $ "The tactic specified ( "++(show $ _name t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'ProofContext' and
@@ -483,7 +492,7 @@ rankProofMethods ranking tactics cbound ctxt sys = do
 
     keys = M.keys $ L.get sNodes sys
     collapseGoal = collapse (node2goals $ pairing keys)
-    collapseStatus = GoalStatus False 0 False
+    collapseStatus = GoalStatus False 0 False True
 
     --collapseFormula = GDisj $ Disj (node2goals $ pairing keys)
 
@@ -676,7 +685,7 @@ itRanking tactic ags ctxt _sys = result
       preorderedDeprio = if (Nothing `elem` indexDeprio) then map (snd . unzip) (tail groupedDeprio) else map (snd . unzip) groupedDeprio -- recovering ranked goals only (no prio = Nothing = fst)
 
       deprioRankingFunctions = map rankingDeprio (_deprios tactic)
-      rankingFunToBeAppliedDeprio = chooseRankingFunctionByPrio prioRankingFunctions (map head groupedPrio)
+      rankingFunToBeAppliedDeprio = chooseRankingFunctionByPrio deprioRankingFunctions (map head groupedPrio)
       deprioReorderedGoals = applyRankingFunctions rankingFunToBeAppliedDeprio preorderedDeprio
 
       rankedDeprioGoals = concat deprioReorderedGoals
@@ -687,18 +696,18 @@ itRanking tactic ags ctxt _sys = result
 
       -- Check whether a goal match a prio
       isPrio :: [(AnnotatedGoal, ProofContext, System) -> Bool] -> ProofContext -> System -> AnnotatedGoal -> Bool
-      isPrio list agoal ctxt sys = or $ (sequenceA list) (sys,agoal,ctxt)
+      isPrio list agoal cx sys = or $ (sequenceA list) (sys,agoal,cx)
 
       -- Try to match all prio with all goals
       applyIsPrio :: [[(AnnotatedGoal, ProofContext, System) -> Bool]] -> ProofContext -> System -> AnnotatedGoal -> [Bool]
       applyIsPrio [] _ _ _ = []
-      applyIsPrio [xs] agoal ctxt sys = isPrio xs agoal ctxt sys:[]
-      applyIsPrio (h:t) agoal ctxt sys = isPrio h agoal ctxt sys:applyIsPrio t agoal ctxt sys
+      applyIsPrio [xs] agoal cx sys = isPrio xs agoal cx sys:[]
+      applyIsPrio (h:t) agoal cx sys = isPrio h agoal cx sys:applyIsPrio t agoal cx sys
 
       chooseRankingFunctionByPrio :: [Maybe ([AnnotatedGoal] -> [AnnotatedGoal])] -> [(Maybe Int,AnnotatedGoal)] -> [Maybe ([AnnotatedGoal] -> [AnnotatedGoal])]
       chooseRankingFunctionByPrio [] _ = []
       chooseRankingFunctionByPrio _ [] = []
-      chooseRankingFunctionByPrio rf [(Nothing,_)] = []
+      chooseRankingFunctionByPrio _ [(Nothing,_)] = []
       chooseRankingFunctionByPrio rf [(Just n,_)] = [rf !! n]
       chooseRankingFunctionByPrio rf ((Nothing,_):t) = (chooseRankingFunctionByPrio rf t)
       chooseRankingFunctionByPrio rf ((Just n,_):t) = (rf !! n):(chooseRankingFunctionByPrio rf t)

@@ -459,7 +459,7 @@ checkProof :: ProofContext
            -> Proof a
            -> Proof (Maybe a, Maybe System)
 checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
-    case (method, trace "Check proof" execProofMethod ctxt method sys) of
+    case (method, execProofMethod ctxt method sys) of
         (Sorry reason, _         ) -> sorryNode reason cs
         (_           , Just cases) -> node method $ checkChildren cases
         (_           , Nothing   ) ->
@@ -522,7 +522,7 @@ annotateWithSystems ctxt =
       where
         extract msg = fromMaybe (error $ "annotateWithSystems: " ++ msg)
         csAnn       = extract "proof method execution failed" $
-                      trace ("annotate with sys") execProofMethod ctxt method sysOrig
+                      execProofMethod ctxt method sysOrig
 
 -- | Annotate a proof with the constraint systems of all intermediate steps
 -- under the assumption that all proof steps are valid. If some proof steps
@@ -636,7 +636,7 @@ tryProver =  (`orelse` mempty)
 
 -- | Try to execute one proof step using the given proof method.
 -- oneStepProver :: ProofMethod -> Prover
--- oneStepProver method = trace ("One step prover: "++show method) Prover $ \ctxt _ se _ -> do
+-- oneStepProver method = Prover $ \ctxt _ se _ -> do
 --     cases <- execProofMethod ctxt method se
 --     trace ("One step prover: "++show (M.keys cases)) return $ LNode (ProofStep method (Just se)) (M.map (unproven . Just) cases)
 oneStepProver :: Maybe Goal -> ProofMethod -> Prover
@@ -646,8 +646,9 @@ oneStepProver collapse method = Prover $ \ctxt _ se _ -> do
 
       where 
         update se = case collapse of
-          Just (DisjG c) -> L.modify sFormulas (Se.insert $ GDisj c) (L.modify sGoals (M.insert (DisjG c)  (GoalStatus False 10 False)) (L.set sCollapsed (Just (DisjG c) ) se))
+          Just (DisjG c) -> L.modify sFormulas (Se.insert $ GDisj c) (L.modify sGoals (M.insert (DisjG c)  (GoalStatus False 0 False True)) (L.set sCollapsed (Just (DisjG c) ) se))
           _ -> se
+            
 
 -- | Try to execute one proof step using the given proof method.
 oneStepDiffProver :: DiffProofMethod -> DiffProver
@@ -1055,15 +1056,15 @@ cutOnSolvedBFSDiff =
 -- systems.
 proveSystemDFS :: Heuristic ProofContext -> [TacticI ProofContext] -> Maybe Int -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics cbound ctxt d0 sys0 =
-    trace "First call" $ prove d0 "rootcase" sys0
+    prove d0 sys0
   where
-    prove !depth caseName sys = trace ("Prove: "++show caseName) $ case rankProofMethods (useHeuristic heuristic depth) tactics cbound ctxt sys of
+    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics cbound ctxt sys of
               []                         -> node Solved M.empty
               (method, (cases, _expl)):_ -> node method cases
       where
 
-        node method cases = trace ("Node: "++show method++" Nodecases: "++show (M.keys cases))
-          LNode (ProofStep method ()) (M.mapWithKey (prove (succ depth)) cases)
+        node method cases =
+          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
           {-prove !depth sys 
         | n > 10 = node Collapsing cs

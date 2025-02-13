@@ -189,7 +189,7 @@ plainOpenGoals sys = openGoalsLeft
   where
     openGoalsLeft = filter isOpen (M.toList $ L.get sGoals sys)
     isOpen(_, status) = case status of
-      GoalStatus s _ _ -> not s
+      GoalStatus s _ _ _ -> not s
 
 ------------------------------------------------------------------------------
 -- Solving 'Goal's
