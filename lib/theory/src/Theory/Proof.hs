@@ -127,6 +127,7 @@ import           Theory.Text.Pretty
 
 
 
+
 ------------------------------------------------------------------------------
 -- Utility: Trees with uniquely labelled edges.
 ------------------------------------------------------------------------------
@@ -458,11 +459,11 @@ checkProof :: ProofContext
            -> System
            -> Proof a
            -> Proof (Maybe a, Maybe System)
-checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
+checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) = trace ("Removeme | checkParam: "++show method++"\n"++show (execProofMethod ctxt method sys)) $
     case (method, execProofMethod ctxt method sys) of
-        (Sorry reason, _         ) -> sorryNode reason cs
-        (_           , Just cases) -> node method $ checkChildren cases
-        (_           , Nothing   ) ->
+        (Sorry reason, _         ) -> trace ("Removeme | reason: "++show reason) sorryNode reason cs
+        (_           , Just cases) -> trace ("Removeme | justcs: "++show method) node method $ checkChildren cases
+        (_           , Nothing   ) -> trace ("Removeme | error : "++show method)
             sorryNode (Just "invalid proof step encountered")
                       (M.singleton "" prf)
   where
@@ -689,7 +690,7 @@ focusDiff path prover =
 -- | Check the proof and handle new cases using the given prover.
 checkAndExtendProver :: Prover -> Prover
 checkAndExtendProver prover0 = Prover $ \ctxt d se prf ->
-    return $ mapProofInfo snd $ checkProof ctxt (prover ctxt) d se prf
+    trace ("Removeme | checkandextand: "++show prf) return $ mapProofInfo snd $ checkProof ctxt (prover ctxt) d se prf
   where
     unhandledCase   = sorry (Just "unhandled case") Nothing
     prover ctxt d se =
@@ -732,7 +733,7 @@ firstProver = foldr orelse failProver
 
 -- | Prover that does one contradiction step.
 contradictionProver :: Prover
-contradictionProver = trace "Contradiction prover" Prover $ \ctxt d sys prf ->
+contradictionProver = Prover $ \ctxt d sys prf ->
     runProver
         (firstProver $ map (oneStepProver Nothing) $
             (Contradiction . Just <$> contradictions ctxt sys))
@@ -1066,19 +1067,6 @@ proveSystemDFS heuristic tactics cbound ctxt d0 sys0 =
         node method cases =
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
-          {-prove !depth sys 
-        | n > 10 = node Collapsing cs
-        | otherwise = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []                         -> node Solved M.empty
-          (method, (cases, _expl)):_ -> if n < 10 then node Simplify cases else node method cases
-      where
-        n = length (M.toList $ L.get sNodes sys)
-        m = if n < 10 then "Ah non "++show n else "System: "++show n++" "++show (M.toList $ L.get sNodes sys)
-
-        cs = 
-
-        node method cases =
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)-}
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the

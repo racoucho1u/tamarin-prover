@@ -213,7 +213,7 @@ theory inFile = do
     thy' <- symbol_ "begin"
         *> addItems inFile (set thyName thyId (defaultOpenTheory ("diff" `S.member` flags0)))
         <* symbol "end"
-    return $ trace (show (get thyCollapseBound thy')) thy'
+    return thy'
   where
     addItems :: Maybe FilePath -> OpenTheory -> Parser OpenTheory
     addItems inFile0 thy = asum

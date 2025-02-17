@@ -188,7 +188,7 @@ plainOpenGoals:: System -> [(Goal, GoalStatus)]
 plainOpenGoals sys = openGoalsLeft
   where
     openGoalsLeft = filter isOpen (M.toList $ L.get sGoals sys)
-    isOpen(_, status) = case status of
+    isOpen(g, status) = trace ("Removeme | isopen: "++show g++" / "++show status) $ case status of
       GoalStatus s _ _ _ -> not s
 
 ------------------------------------------------------------------------------

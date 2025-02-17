@@ -80,11 +80,9 @@ simplifySystem = do
       | otherwise                     = do
           -- Store original system for reporting
           se0 <- gets id
-          --f0 <- getM sFormulas
           -- Perform one initial substitution. We do not have to consider its
           -- changes as 'substSystem' is idempotent.
           void substSystem
-          --trace ("Formulas before simp: "++show f0) void substSystem
           -- Perform one simplification pass.
           isdiff <- getM sDiffSystem
           -- In the diff case, we cannot enfore N4-N6.

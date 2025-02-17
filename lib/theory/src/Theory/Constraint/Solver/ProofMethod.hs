@@ -243,19 +243,25 @@ execProofMethod :: ProofContext
                 -> ProofMethod -> System -> Maybe (M.Map CaseName System)
 execProofMethod ctxt method sys = 
       case method of
-        Sorry _                  -> return M.empty
+        Sorry _                                -> return M.empty
         Solved
-          | null (plainOpenGoals sys) -> return M.empty
-          | otherwise                 -> Nothing
+          | null (openGoals sys)  && not (contradictorySystem ctxt sys)
+            && finishedSubterms ctxt sys       -> return M.empty
+          | otherwise                          -> Nothing
+        Unfinishable
+          | null (openGoals sys)  && not (contradictorySystem ctxt sys)
+            && not (finishedSubterms ctxt sys) -> return M.empty
+          | otherwise                          -> Nothing
         SolveGoal goal
           | goal `M.member` L.get sGoals sys  -> execSolveGoal goal
-          | Just goal == (ordGoal <$> (L.get sCollapsed sys)) -> execSolveGoal goal
+          --When the goal is too big, Haskell reorder the EqE in the Disj preventing the goal to match
+          | Just goal == (ordGoal <$> L.get sCollapsed sys) -> execSolveGoal goal
           | otherwise                         -> Nothing
-        Simplify                 -> singleCase simplifySystem
-        Induction                -> M.map cleanupSystem <$> execInduction
+        Simplify                               -> singleCase simplifySystem
+        Induction                              -> M.map cleanupSystem <$> execInduction
         Contradiction _
-          | null (contradictions ctxt sys) -> Nothing
-          | otherwise                      -> Just M.empty
+          | null (contradictions ctxt sys)     -> Nothing
+          | otherwise                          -> Just M.empty
   where
     -- at this point it is safe to remove the free substitution, as all
     -- systems have it fully applied (by the virtue of a call to
@@ -480,7 +486,7 @@ rankProofMethods ranking tactics cbound ctxt sys = do
       Nothing    -> []
   where
 
-    sys' = if collapseDecision cbound then sys -- || isJust (L.get sCollapsed sys) 
+    sys' = trace ("Removeme | cbound: "++show cbound) $ if collapseDecision cbound then sys -- || isJust (L.get sCollapsed sys) 
                 else L.set sCollapsed (Just collapseGoal) (modify sGoals (M.insert collapseGoal collapseStatus) sys)
 
     --sys' = if length keys < 3 then sys -- || isJust (L.get sCollapsed sys) 
