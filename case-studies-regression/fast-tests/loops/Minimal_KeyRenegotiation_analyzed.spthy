@@ -2,12 +2,13 @@ theory KeyRenegotiation_Minimal begin
 
 // Function signature and definition of the equational theory E
 
-functions: fst/1[destructor], pair/2, sdec/2[destructor], senc/2,
-           snd/1[destructor]
+functions: fst/1, pair/2, sdec/2, senc/2, snd/1
 equations:
     fst(<x.1, x.2>) = x.1,
     sdec(senc(x.1, x.2), x.2) = x.1,
     snd(<x.1, x.2>) = x.2
+
+
 
 
 
@@ -126,26 +127,28 @@ next
   qed
 qed
 
-/* All well-formedness checks were successful. */
+
+
+
+
+
+
+
+
+
+
+/* All wellformedness checks were successful. */
+
+/*
+Generated from:
+Tamarin version 1.9.0
+Maude version 3.4
+Git revision: f187584ba8325431d43d5e0a58baa381ac2c3f47, branch: develop
+Compiled at: 2024-10-29 14:19:56.449404967 UTC
+*/
 
 end
 /* Output
-maude tool: 'maude'
- checking version: 3.0. OK.
- checking installation: OK.
-
-
-analyzing: examples/loops/Minimal_KeyRenegotiation.spthy
-
-------------------------------------------------------------------------------
-analyzed: examples/loops/Minimal_KeyRenegotiation.spthy
-
-  output:          examples/loops/Minimal_KeyRenegotiation.spthy.tmp
-  processing time: 0.071918046s
-  Secret_reachable (exists-trace): verified (5 steps)
-  secrecy (all-traces): verified (23 steps)
-
-------------------------------------------------------------------------------
 
 ==============================================================================
 summary of summaries:
@@ -153,7 +156,8 @@ summary of summaries:
 analyzed: examples/loops/Minimal_KeyRenegotiation.spthy
 
   output:          examples/loops/Minimal_KeyRenegotiation.spthy.tmp
-  processing time: 0.071918046s
+  processing time: 0.12s
+  
   Secret_reachable (exists-trace): verified (5 steps)
   secrecy (all-traces): verified (23 steps)
 

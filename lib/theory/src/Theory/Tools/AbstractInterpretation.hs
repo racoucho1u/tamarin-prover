@@ -6,7 +6,6 @@
 -- Copyright   : (c) 2012 Benedikt Schmidt & Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 --
 -- Abstract interpretation for partial evaluation of multiset rewriting
 -- systems.
@@ -85,6 +84,7 @@ interpretAbstractly unifyFactEqs initState addFact stateFacts rus =
 
 -- | How to report on performing a partial evaluation.
 data EvaluationStyle = Silent | Summary | Tracing
+  deriving Show
 
 -- | Concrete partial evaluator activated with flag: --partial-evaluation
 partialEvaluation :: EvaluationStyle

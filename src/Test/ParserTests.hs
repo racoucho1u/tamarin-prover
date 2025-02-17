@@ -2,7 +2,6 @@
 -- Copyright   : (c) 2012 Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 --
 -- Unit tests for checking that all examples parse properly.
 module Test.ParserTests (
@@ -59,7 +58,7 @@ testParseFile optionalProver inpFile = TestLabel inpFile $ TestCase $ do
     parse msg str = case parseOpenTheoryString [] str  of
         Left err  -> do _ <- assertFailure $ withLineNumbers $ indent $ show err
                         return (error "testParseFile: dead code")
-        Right thy -> normalizeTheory <$> openTranslatedTheory <$> addMessageDeductionRuleVariants (removeTranslationItems thy)
+        Right thy -> normalizeTheory <$> openTranslatedTheory <$> (return $ addMessageDeductionRuleVariants (removeTranslationItems thy))
       where
         withLineNumbers err =
             unlines $ zipWith (\i l -> nr (show i) ++ l) [(1::Int)..] ls

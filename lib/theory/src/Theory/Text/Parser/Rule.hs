@@ -3,7 +3,6 @@
 --               contributing in 2019: Robert Künnemann, Johannes Wocker
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- Parsing Rules
@@ -21,7 +20,6 @@ where
 import           Prelude                    hiding (id, (.))
 import qualified Data.ByteString            as B
 import qualified Data.ByteString.Char8      as BC
-import           Data.Foldable              (asum)
 import           Data.Label
 import           Data.Either
 import           Data.Maybe
@@ -36,11 +34,10 @@ import           Text.Parsec                hiding ((<|>))
 import           Term.Substitution
 import           Theory
 import           Theory.Text.Parser.Token
-import Theory.Text.Parser.Let
-import Theory.Text.Parser.Fact
-import Theory.Text.Parser.Term
-import Theory.Text.Parser.Formula
-
+import           Theory.Text.Parser.Let
+import           Theory.Text.Parser.Fact
+import           Theory.Text.Parser.Term
+import           Theory.Text.Parser.Formula
 
 -- | Parse a "(modulo ..)" information.
 modulo :: String -> Parser ()
@@ -71,6 +68,10 @@ ruleAttribute = asum
     [ symbol "colour=" *> (Just . RuleColor <$> parseColor)
     , symbol "color="  *> (Just . RuleColor <$> parseColor)
     , symbol "process="  *> parseAndIgnore
+    , symbol "derivchecks" *> ignore
+    , symbol "no_derivcheck" *> ignore
+    , symbol "role=" *> (Just . Role <$> parseRole)
+    , symbol "issapicrule" *> return (Just IsSAPiCRule)
     ]
   where
     parseColor = do
@@ -82,6 +83,11 @@ ruleAttribute = asum
                         _ <-  symbol "\""
                         _ <- manyTill anyChar (try (symbol "\""))
                         return Nothing
+    ignore = return (Just IgnoreDerivChecks)
+    parseRole = do
+        _ <- symbol "\""
+        role <- manyTill anyChar (try (symbol "\""))
+        return role
 
 ruleAttributesp :: Parser [RuleAttribute]
 ruleAttributesp = option [] $ catMaybes <$> list ruleAttribute

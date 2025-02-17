@@ -3,7 +3,6 @@
 --               contributing in 2019: Robert Künnemann, Johannes Wocker
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- Parsing protocol theories. See the MANUAL for a high-level description of
@@ -29,7 +28,7 @@ genericletBlock varp termp = many1 definition
 letBlock :: Parser LNSubst
 letBlock = do
         _  <- letIdentifier
-        ls <-genericletBlock (sortedLVar [LSortMsg]) (msetterm False llit)
+        ls <-genericletBlock (sortedLVar [LSortMsg, LSortNat]) (msetterm False llit)
         _  <- symbol "in"
         return $ toSubst ls
   where

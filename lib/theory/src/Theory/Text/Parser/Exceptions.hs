@@ -4,7 +4,6 @@
 --               contributing in 2019: Robert Künnemann, Johannes Wocker
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- Exceptions used in the parser
@@ -40,7 +39,9 @@ instance Show (ParsingException) where
     show (DuplicateItem (LemmaItem lem)) =  "duplicate lemma: " ++ get lName lem
     show (DuplicateItem (RestrictionItem rstr)) =  "duplicate restriction: " ++ get rstrName rstr
     show (DuplicateItem (TextItem _)) =  undefined
+    show (DuplicateItem (ConfigBlockItem b)) =  "duplicate configuration block:" ++ show b
     show (DuplicateItem (PredicateItem pr)) =  "duplicate predicate: " ++ render (prettyFact prettyLVar (get pFact pr))
+    show (DuplicateItem (MacroItem mc)) = "duplicate macro: " ++ render (prettyMacros mc)
     show (DuplicateItem (TranslationItem (ProcessDefItem pDef))) =
         "duplicate process: " ++ get pName pDef
     show (DuplicateItem (TranslationItem (ProcessItem _))) = "duplicate process item"
@@ -49,6 +50,8 @@ instance Show (ParsingException) where
     show (DuplicateItem (TranslationItem (SignatureBuiltin s))) = "duplicate BuiltIn signature: " ++ show s
     show (DuplicateItem (TranslationItem (DiffEquivLemma _))) = "duplicate diff equiv lemma item"
     show (DuplicateItem (TranslationItem (EquivLemma _ _))) = "duplicate equiv lemma item"    
+    show (DuplicateItem (TranslationItem (AccLemmaItem _))) = "duplicate accountability lemma item"
+    show (DuplicateItem (TranslationItem (CaseTestItem _))) = "duplicate case test item"
     show TryingToAddFreshRule = "The fresh rule is implicitely contained in the theory and does not need to be added."
 
 instance Catch.Exception ParsingException

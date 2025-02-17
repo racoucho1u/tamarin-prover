@@ -2,7 +2,6 @@
 -- Copyright   : (c) 2010, 2011 Benedikt Schmidt & Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : GHC only
 --
 -- Main module for the Tamarin prover.
@@ -10,39 +9,47 @@ module Main.Mode.Batch (
     batchMode
   ) where
 
-import           Control.Basics
-import           Control.DeepSeq                 (force)
-import           Control.Exception               (evaluate)
-import           Data.List
-import           Data.Maybe
-import           System.Console.CmdArgs.Explicit as CmdArgs
-import           System.FilePath
-import           System.Timing                   (timed)
-import           Extension.Data.Label
+import Control.Applicative ((<|>))
+import Control.Monad (guard, (<=<))
+import Control.Monad.Except (runExceptT)
+import Control.Monad.IO.Class (MonadIO(liftIO))
+import Data.Bifunctor (bimap)
+import Data.List
+import Data.Maybe (isJust)
+import System.Console.CmdArgs.Explicit as CmdArgs
+import System.Exit (die)
+import System.FilePath
+import System.Timing (timedIO)
+import Extension.Data.Label
+import Data.Bitraversable (Bitraversable(bitraverse))
 
-import qualified Text.PrettyPrint.Class          as Pretty
+import Text.PrettyPrint.Class qualified as Pretty
+import Text.Printf (printf)
 
-import           Theory
-import           Theory.Tools.Wellformedness     (checkWellformednessDiff)
+import Theory hiding (closeTheory)
+import Theory.Module
+import Theory.Tools.Wellformedness (prettyWfErrorReport)
 
-import qualified Sapic
-import qualified Export
+import Main.Console
+import Main.Environment
+import Main.TheoryLoader
+import Main.Utils
+import Data.Label qualified as L
+import Data.Map qualified as M
+import Theory.Constraint.System.Dot
+import Text.Dot qualified as D
+import Theory.Constraint.System.Graph.Graph
+import Theory.Constraint.System.JSON (sequentsToJSONPretty)
 
-import           Main.Console
-import           Main.Environment
-import           Main.TheoryLoader
-import           Main.Utils
-
-import           Theory.Module
--- import           Debug.Trace
+import ClosedTheory (prettyPrecomputation,prettyDiffPrecomputation)
 
 -- | Batch processing mode.
 batchMode :: TamarinMode
 batchMode = tamarinMode
-    "batch"
-    "Security protocol analysis and verification."
-    setupFlags
-    run
+  "batch"
+  "Security protocol analysis and verification."
+  setupFlags
+  run
   where
     setupFlags defaultMode = defaultMode
       { modeArgs       = ([], Just $ flagArg (updateArg "inFile") "FILES")
@@ -57,6 +64,9 @@ batchMode = tamarinMode
 
               , flagNone ["parse-only"] (addEmptyArg "parseOnly")
                   "Just parse the input file and pretty print it as-is"
+
+              , flagNone ["precompute-only"] (addEmptyArg "precomputeOnly")
+                  "Just run precomputation and show partial deconstructions"
               ] ++
               outputFlags ++
               toolFlags
@@ -68,51 +78,99 @@ batchMode = tamarinMode
     outputFlags =
       [ flagOpt "" ["output","o"] (updateArg "outFile") "FILE" "Output file"
       , flagOpt "" ["Output","O"] (updateArg "outDir") "DIR"  "Output directory"
-      , flagOpt "spthy" ["output-module", "m"] (updateArg "outModule") moduleList
-        moduleDescriptions
+      , flagOpt "spthy" ["output-module", "m"] (updateArg "outModule") moduleList moduleDescriptions
+      , flagReq ["output-json","oj"] (updateArg "traceJSON") "FILE" "Serialize found traces as JSON to FILE."
+      , flagReq ["output-dot","od"] (updateArg "traceDot") "FILE" "Serialize found traces as dot to FILE."
       ]
     moduleConstructors = enumFrom minBound :: [ModuleType]
     moduleList = intercalate "|" $ map show moduleConstructors
-    moduleDescriptions = "What to output:" ++ intercalate " " (map (\x -> "\n -"++description x) moduleConstructors) ++ "."
+    moduleDescriptions = "What to output:" ++ unwords (map (\x -> "\n -"++description x) moduleConstructors) ++ "."
 
 -- | Process a theory file.
 run :: TamarinMode -> Arguments -> IO ()
 run thisMode as
   | null inFiles = helpAndExit thisMode (Just "no input files given")
-  | argExists "parseOnly" as || argExists "outModule" as = do
-      mapM_ processThy inFiles
-      putStrLn ""
-  | otherwise  = do
-      _ <- ensureMaude as
-      putStrLn ""
-      summaries <- mapM processThy inFiles
-      putStrLn ""
-      putStrLn $ replicate 78 '='
-      putStrLn "summary of summaries:"
-      putStrLn ""
-      putStrLn $ renderDoc $ Pretty.vcat $ intersperse (Pretty.text "") summaries
-      putStrLn ""
-      putStrLn $ replicate 78 '='
+  | argExists "parseOnly" as = do
+      res <- mapM (processThy "") inFiles
+      let (docs, _) = unzip res
+
+      mapM_ (putStrLn . renderDoc) docs
+  | argExists "precomputeOnly" as = do
+      versionData <- ensureMaudeAndGetVersion as
+      res <- mapM (processThy versionData) inFiles
+      let (docs, _) = unzip res
+      mapM_ (putStrLn . renderDoc) docs
+  | argExists "outModule" as = do
+      versionData <- ensureMaudeAndGetVersion as
+      res <- mapM (processThy versionData) inFiles
+      let (docs, _) = unzip res
+
+      mapM_ (putStrLn . renderDoc) docs
+  | otherwise = do
+      versionData <- ensureMaudeAndGetVersion as
+      resTimed <- mapM (timedIO . processThy versionData) inFiles
+      let (docs, reps, times) = unzip3 $ fmap (\((d, r), t) -> (d, r, t)) resTimed
+
+      if writeOutput then do
+        let maybeOutFiles = mapM mkOutPath inFiles
+        outFiles <- case maybeOutFiles of
+          Just f -> pure f
+          Nothing -> die "Please specify a valid output file/directory"
+        let repsWithInfo = ppRep <$> zip4 inFiles (Just <$> outFiles) (Just <$> times) reps
+        let summary = Pretty.vcat $ intersperse (Pretty.text "") repsWithInfo
+
+        mapM_ (\(o, d) -> writeFileWithDirs o (renderDoc d)) (zip outFiles docs)
+        putStrLn $ renderDoc $ ppSummary summary
+      else do
+        let repsWithInfo = ppRep <$> zip4 inFiles (repeat Nothing) (Just <$> times) reps
+        let summary = Pretty.vcat $ intersperse (Pretty.text "") repsWithInfo
+
+        mapM_ (putStrLn . renderDoc) docs
+        putStrLn $ renderDoc $ ppSummary summary
+
   where
+    ppSummary summary = Pretty.vcat [ Pretty.text ""
+                                    , Pretty.text $ replicate 78 '='
+                                    , Pretty.text "summary of summaries:"
+                                    , Pretty.text ""
+                                    , summary
+                                    , Pretty.text ""
+                                    , Pretty.text $ replicate 78 '=' ]
+
+    ppRep (inFile, outFile, time, summary) =
+      Pretty.vcat
+        [ Pretty.text $ "analyzed: " ++ inFile
+        , Pretty.text ""
+        , Pretty.text ""
+        , Pretty.nest 2 $ Pretty.vcat
+          [ maybe Pretty.emptyDoc (\o -> Pretty.text $ "output:          " ++ o) outFile
+          , maybe Pretty.emptyDoc (\t -> Pretty.text $ printf "processing time: %.2fs" (realToFrac t :: Double)) time
+          , Pretty.text ""
+          , summary
+          ]
+        ]
+
     -- handles to arguments
     -----------------------
-    inFiles    = reverse $ findArg "inFile" as
+    inFiles = reverse $ findArg "inFile" as
+
+    thyLoadOptions = case mkTheoryLoadOptions as of
+      Left (ArgumentError e) -> error e
+      Right opts             -> opts
 
     -- output generation
     --------------------
-
-    dryRun = not (argExists "outFile" as || argExists "outDir" as)
+    writeOutput = argExists "outFile" as || argExists "outDir" as
 
     mkOutPath :: FilePath  -- ^ Input file name.
-              -> FilePath  -- ^ Output file name.
+              -> Maybe FilePath  -- ^ Output file name.
     mkOutPath inFile =
-        fromMaybe (error "please specify an output file or directory") $
-            do outFile <- findArg "outFile" as
-               guard (outFile /= "")
-               return outFile
-            <|>
-            do outDir <- findArg "outDir" as
-               return $ mkAutoPath outDir (takeBaseName inFile)
+      do outFile <- findArg "outFile" as
+         guard (outFile /= "")
+         pure outFile
+      <|>
+      do outDir <- findArg "outDir" as
+         pure $ mkAutoPath outDir (takeBaseName inFile)
 
     -- automatically generate the filename for output
     mkAutoPath :: FilePath -> String -> FilePath
@@ -123,94 +181,134 @@ run thisMode as
     -- theory processing functions
     ------------------------------
 
-    processThy :: FilePath -> IO Pretty.Doc
-    processThy inFile
-      | argExists "parseOnly" as && argExists "diff" as =
-          out (const Pretty.emptyDoc) (return . prettyOpenDiffTheory) (loadOpenDiffThy   as inFile)
-      | argExists "parseOnly" as || argExists "outModule" as =
-          out (const Pretty.emptyDoc) choosePretty (loadOpenThy as inFile)
-      | argExists "diff" as =
-          out ppWfAndSummaryDiff      (return . prettyClosedDiffTheory) (loadClosedDiffThy as inFile)
-      | otherwise        = do
-          (thy,report) <- loadClosedThyWf as inFile
-          out (ppWfAndSummary report) (return . prettyClosedTheory) (return thy)
+    processThy :: String -> FilePath -> IO (Pretty.Doc, Pretty.Doc)
+    processThy versionData inFile = either handleError pure <=< runExceptT $ do
+      srcThy <- liftIO $ readFile inFile
+      thy    <- loadTheory thyLoadOptions srcThy inFile
+
+      let sig = either (._thySignature) (._diffThySignature) thy
+      sig'   <- liftIO $ toSignatureWithMaude thyLoadOptions.maudePath sig
+
+      -- | Pretty print the theory as is without performing any checks.
+      if thyLoadOptions.parseOnlyMode then
+        pure $ (, Pretty.emptyDoc) $ either prettyOpenTheory prettyOpenDiffTheory thy
+
+      -- | Execute precomputation steps and print the partial deconstructions
+      else if thyLoadOptions.precomputeOnlyMode then do
+        (report, thy') <- closeTheory versionData thyLoadOptions sig' thy
+        case thy' of
+          Left thy'' -> do
+            pure (ppWf report Pretty.$--$ prettyPrecomputation thy'', ppWf report)
+          Right thy'' -> do
+            pure (ppWf report Pretty.$--$ prettyDiffPrecomputation thy'', ppWf report)
+    
+      -- | Translate and check thoery based on specified output module.
+      else if isTranslateOnlyMode then do
+        (report, thy') <- translateAndCheckTheory versionData thyLoadOptions sig' thy
+
+        let thy'' = bimap (modify thyItems (++ (TextItem <$> formalComments thy')))
+                          (modify diffThyItems (++ (DiffTextItem <$> formalComments thy')))
+                          thy'
+
+        (, ppWf report) <$> either (liftIO . prettyOpenTheoryByModule thyLoadOptions)
+                                   (pure . prettyOpenDiffTheory)
+                                   thy''
+
+      -- | Close and potentially prove theory.
+      else do
+        (report, thy') <- closeTheory versionData thyLoadOptions sig' thy
+        _ <- liftIO $ bitraverse outputTraces (const $ return ()) thy'
+
+        pure $
+          either (\t -> (prettyClosedTheory t,     ppWf report Pretty.$--$ prettyClosedSummary t))
+                 (\d -> (prettyClosedDiffTheory d, ppWf report Pretty.$--$ prettyClosedDiffSummary d))
+                 thy'
       where
-        ppAnalyzed = Pretty.text $ "analyzed: " ++ inFile
-        ppWfAndSummary report thy = do
-            report
-            Pretty.$--$ prettyClosedSummary thy
+        formalComments =
+          filter (/= ("", "")) . either theoryFormalComments diffTheoryFormalComments
 
-        ppWfAndSummaryDiff thy = do
-            reportWellformednessDoc $ checkWellformednessDiff (openDiffTheory thy) (get diffThySignature thy)
-            Pretty.$--$ prettyClosedDiffSummary thy
+        isTranslateOnlyMode = isJust thyLoadOptions.outputModule
 
-        choosePretty = case getOutputModule as of
-          ModuleSpthy      -> return . prettyOpenTheory  <=< Sapic.warnings -- output as is, including SAPIC elements
-          ModuleSpthyTyped -> return . prettyOpenTheory <=< Sapic.typeTheory <=< Sapic.warnings  -- additionally type
-          ModuleMsr        -> return . prettyOpenTranslatedTheory
-            <=< (return . (filterLemma $ lemmaSelector as))
-            <=< (return . removeTranslationItems)
-            <=< Sapic.typeTheory
-            <=< Sapic.warnings
-          ModuleProVerif              -> Export.prettyProVerifTheory (lemmaSelector as) <=< Sapic.typeTheoryEnv <=< Sapic.warnings
-          ModuleProVerifEquivalence   -> Export.prettyProVerifEquivTheory <=< Sapic.typeTheoryEnv <=< Sapic.warnings
-          ModuleDeepSec               -> Export.prettyDeepSecTheory <=< Sapic.typeTheory <=< Sapic.warnings
+        handleError e@(ParserError _) = die $ show e
+        handleError (WarningError report) = do
+          putStrLn $ renderDoc $ Pretty.vcat $ [ Pretty.text ""
+                                               , Pretty.text "WARNING: the following wellformedness checks failed!" ]
+                                            ++ [ Pretty.text "" | not $ null report ]
+                                            ++ [ prettyWfErrorReport report
+                                               , Pretty.text "" ]
+          die "quit-on-warning mode selected - aborting on wellformedness errors."
 
-        out :: (a -> Pretty.Doc) -> (a -> IO Pretty.Doc) -> IO a -> IO Pretty.Doc
-        out summaryDoc fullDoc load
-          | dryRun    = do
-              thy <- load
-              doc <- fullDoc thy
-              putStrLn $ renderDoc doc
-              return $ ppAnalyzed Pretty.$--$ Pretty.nest 2 (summaryDoc thy)
-          | otherwise = do
-              putStrLn $ ""
-              putStrLn $ "analyzing: " ++ inFile
-              putStrLn $ ""
-              let outFile = mkOutPath inFile
-              (thySummary, t) <- timed $ do
-                  thy <- load
-                  doc <- fullDoc thy
-                  writeFileWithDirs outFile $ renderDoc doc
-                  -- ensure that the summary is in normal form
-                  evaluate $ force $ summaryDoc thy
-              let summary = Pretty.vcat
-                    [ ppAnalyzed
-                    , Pretty.text $ ""
-                    , Pretty.text $ "  output:          " ++ outFile
-                    , Pretty.text $ "  processing time: " ++ show t
-                    , Pretty.text $ ""
-                    , Pretty.nest 2 thySummary
-                    ]
-              putStrLn $ replicate 78 '-'
-              putStrLn $ renderDoc summary
-              putStrLn $ ""
-              putStrLn $ replicate 78 '-'
-              return summary
+        ppWf []  = Pretty.emptyDoc
+        ppWf rep = Pretty.vcat $
+          Pretty.text ("WARNING: " ++ show (length rep) ++ " wellformedness check failed!")
+          : [ Pretty.text   "         The analysis results might be wrong!" | thyLoadOptions.proveMode ]
 
-    {- TO BE REACTIVATED once infrastructure from interactive mode can be used
+        -- | Output any found traces of the analyzed theory in dot/JSON format if the corresponing command line option is set.
+        -- The output is dumped into a single file per format. Multiple dot graphs are simply concatenated into a single file,
+        -- while the JSON schema already allows for multiple graphs.
+        outputTraces :: ClosedTheory -> IO ()
+        outputTraces thy = do
+            let graphOptions = defaultGraphOptions
+                dotOptions = defaultDotOptions
+                serializeDot (label, system) = D.showDot label $ dotSystemCompact graphOptions dotOptions system
+                serializeJSON = sequentsToJSONPretty graphOptions
+                labelledSystems = map (\(lemma, proof, system) ->
+                  let label = traceOutputLabel graphOptions dotOptions lemma proof in
+                  (label, system)) systemsWithMetadata
 
-    -- static html generation
-    -------------------------
+            case findArg "traceDot" as of
+              Nothing -> pure ()
+              Just outfile ->
+                let serialized = intercalate "\n" $ map serializeDot labelledSystems in
+                writeFile outfile serialized
 
-    generateHtml :: FilePath      -- ^ Input file
-                 -> ClosedTheory  -- ^ Theory to pretty print
-                 -> IO ()
-    generateHtml inFile thy = do
-      cmdLine  <- getCommandLine
-      time     <- getCurrentTime
-      cpu      <- getCpuModel
-      template <- getHtmlTemplate
-      theoryToHtml $ GenerationInput {
-          giHeader      = "Generated by " ++ htmlVersionStr
-        , giTime        = time
-        , giSystem      = cpu
-        , giInputFile   = inFile
-        , giTemplate    = template
-        , giOutDir      = mkOutPath inFile
-        , giTheory      = thy
-        , giCmdLine     = cmdLine
-        , giCompress    = not $ argExists "noCompress" as
-        }
+            case findArg "traceJSON" as of
+              Nothing -> pure ()
+              Just outfile ->
+                let serialized = serializeJSON labelledSystems in
+                writeFile outfile serialized
+          where
+            -- | Collect all solved (i.e. a trace was found) systems of the theory along with their
+            -- path in the proof and the lemma in which they appear in the given theory.
+            systemsWithMetadata :: [(Lemma IncrementalProof, ProofPath, System)]
+            systemsWithMetadata = do
+              lemma <- getLemmas thy
+              let proof = L.get lProof lemma
+              [(lemma, proofPath, system) | (proofPath, system) <- proofSystems proof]
 
-    -}
+            -- | Collect all solved (i.e. a trace was found) systems of the theory along with their
+            -- path in the proof.
+            proofSystems :: IncrementalProof -> [(ProofPath, System)]
+            proofSystems (LNode (ProofStep Solved (Just rootSystem)) _) =  [([], rootSystem)]
+            proofSystems (LNode (ProofStep _ _) children) =
+              [(l : ls, system) | (l, subProof) <- M.toList children
+                                , (ls, system) <- proofSystems subProof ]
+
+            -- | Make a label for use in the trace output out of all relevant information for a constraint system.
+            traceOutputLabel :: GraphOptions
+                             -> DotOptions
+                             -> Lemma IncrementalProof
+                             -> ProofPath
+                             -> String
+            traceOutputLabel graphOptions dotOptions lemma proofPath =
+              "trace_"
+              ++ L.get thyName thy                         -- Name of the theory in which the constraint system appears.
+              ++ "_"
+              ++ traceLabelOptions graphOptions dotOptions -- Graph options are included in a short format.
+              ++ "_"
+              ++ L.get lName lemma                         -- Name of the lemma in which the constraint system appears.
+              ++ intercalate "-" proofPath                 -- Path through the proof where the constraint system is located.
+
+            -- | Format the graph rendering options in a concise way.
+            traceLabelOptions :: GraphOptions -> DotOptions -> String
+            traceLabelOptions graphOptions dotOptions =
+              let s1 = show $ L.get goSimplificationLevel graphOptions
+                  s2 = if L.get goShowAutoSource graphOptions then "AS1" else "AS0"
+                  s3 = if L.get goClustering graphOptions then "CL1" else "CL0"
+                  s4 = if L.get goAbbreviate graphOptions then "A1" else "A0"
+                  s5 = if L.get goCompress graphOptions then "C1" else "C0"
+                  s6 = case L.get doNodeStyle dotOptions of
+                         FullBoringNodes -> "NF"
+                         CompactBoringNodes -> "NB"
+              in
+                intercalate "-" [s1, s2, s3, s4, s5, s6]

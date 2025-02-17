@@ -2,8 +2,10 @@ theory InEventRestrictionPrivateChannel begin
 
 // Function signature and definition of the equational theory E
 
-functions: fst/1[destructor], pair/2, snd/1[destructor]
+functions: fst/1, pair/2, snd/1
 equations: fst(<x.1, x.2>) = x.1, snd(<x.1, x.2>) = x.2
+
+
 
 heuristic: p
 
@@ -33,39 +35,51 @@ solve( State_( ) ▶₀ #a )
   qed
 qed
 
-rule (modulo E) Init[color=#ffffff, process="event A( );"]:
+
+
+
+
+
+
+rule (modulo E) Init[color=#ffffff, process="event A( );", issapicrule]:
    [ ] --[ Init( ) ]-> [ State_( ) ]
 
   /* has exactly the trivial AC variant */
 
-rule (modulo E) eventA_0_[color=#ffffff, process="event A( );"]:
+rule (modulo E) eventA_0_[color=#ffffff, process="event A( );",
+                          issapicrule]:
    [ State_( ) ] --[ A( ), Event( ) ]-> [ State_1( ) ]
 
   /* has exactly the trivial AC variant */
 
-rule (modulo E) inca_0_1[color=#ffffff, process="in('c','a');"]:
+rule (modulo E) inca_0_1[color=#ffffff, process="in('c','a');",
+                         issapicrule]:
    [ State_1( ), Message( 'c', x ) ] --> [ Let_11( x ), Ack( 'c', x ) ]
 
   /* has exactly the trivial AC variant */
 
-rule (modulo E) inca_2_1[color=#ffffff, process="in('c','a');"]:
+rule (modulo E) inca_2_1[color=#ffffff, process="in('c','a');",
+                         issapicrule]:
    [ State_1( ), In( <'c', x> ) ]
   --[ ChannelIn( <'c', x> ) ]->
    [ Let_11( x ) ]
 
   /* has exactly the trivial AC variant */
 
-rule (modulo E) inca_1_1[color=#ffffff, process="in('c','a');"]:
+rule (modulo E) inca_1_1[color=#ffffff, process="in('c','a');",
+                         issapicrule]:
    [ Let_11( 'a' ) ] --> [ State_11( ) ]
 
   /* has exactly the trivial AC variant */
 
-rule (modulo E) inca_3_1[color=#ffffff, process="in('c','a');"]:
+rule (modulo E) inca_3_1[color=#ffffff, process="in('c','a');",
+                         issapicrule]:
    [ Let_11( 'a' ) ] --> [ State_11( ) ]
 
   /* has exactly the trivial AC variant */
 
-rule (modulo E) eventB_0_11[color=#ffffff, process="event B( );"]:
+rule (modulo E) eventB_0_11[color=#ffffff, process="event B( );",
+                            issapicrule]:
    [ State_11( ) ] --[ B( ), Event( ) ]-> [ ]
 
   /* has exactly the trivial AC variant */
@@ -83,25 +97,25 @@ restriction in_event:
       (∀ #t1 xp.
         (K( xp ) @ #t1) ⇒ (((#t1 < #t2) ∨ (#t1 = #t2)) ∨ (#t3 < #t1))))"
 
-/* All well-formedness checks were successful. */
+/*
+WARNING: the following wellformedness checks failed!
+
+Facts occur in the left-hand-side but not in any right-hand-side 
+=================================================================
+
+  1. in rule "inca_0_1":  factName `Message' arity: 2 multiplicity: Linear
+*/
+
+/*
+Generated from:
+Tamarin version 1.9.0
+Maude version 3.4
+Git revision: f187584ba8325431d43d5e0a58baa381ac2c3f47, branch: develop
+Compiled at: 2024-10-29 14:19:56.449404967 UTC
+*/
 
 end
 /* Output
-maude tool: 'maude'
- checking version: 3.0. OK.
- checking installation: OK.
-
-
-analyzing: examples/sapic/fast/feature-inevent-restriction/inevent-restriction-private-channel.spthy
-
-------------------------------------------------------------------------------
-analyzed: examples/sapic/fast/feature-inevent-restriction/inevent-restriction-private-channel.spthy
-
-  output:          examples/sapic/fast/feature-inevent-restriction/inevent-restriction-private-channel.spthy.tmp
-  processing time: 0.036844654s
-  test (all-traces): verified (5 steps)
-
-------------------------------------------------------------------------------
 
 ==============================================================================
 summary of summaries:
@@ -109,7 +123,11 @@ summary of summaries:
 analyzed: examples/sapic/fast/feature-inevent-restriction/inevent-restriction-private-channel.spthy
 
   output:          examples/sapic/fast/feature-inevent-restriction/inevent-restriction-private-channel.spthy.tmp
-  processing time: 0.036844654s
+  processing time: 0.08s
+  
+  WARNING: 1 wellformedness check failed!
+           The analysis results might be wrong!
+  
   test (all-traces): verified (5 steps)
 
 ==============================================================================

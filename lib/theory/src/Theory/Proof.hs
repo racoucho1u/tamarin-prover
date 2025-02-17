@@ -9,7 +9,6 @@
 -- Copyright   : (c) 2010-2012 Simon Meier & Benedikt Schmidt
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : GHC only
 --
 -- Types to represent proofs.
@@ -28,6 +27,7 @@ module Theory.Proof (
   , ProofPath
   , atPath
   , atPathDiff
+  , modifyAtPath
   , insertPaths
   , insertPathsDiff
 
@@ -50,8 +50,8 @@ module Theory.Proof (
 
   , selectHeuristic
   , selectDiffHeuristic
-  , selectTacticI
-  , selectDiffTacticI
+  , selectTactic
+  , selectDiffTactic
 
   -- ** Incremental proof construction
   , IncrementalProof
@@ -224,7 +224,7 @@ instance HasFrees a => HasFrees (DiffProofStep a) where
     foldFreesOcc  _ _ = const mempty
     mapFrees f (DiffProofStep m i)  = DiffProofStep <$> mapFrees f m <*> mapFrees f i
 
-    
+
 ------------------------------------------------------------------------------
 -- Proof Trees
 ------------------------------------------------------------------------------
@@ -344,7 +344,7 @@ boundDiffProofDepth bound =
       | 0 < n     = LNode ps                     $ M.map (go (pred n)) cs
       | otherwise = diffSorry (Just $ "bound " ++ show bound ++ " hit") info
 
-      
+
 -- | Fold a proof.
 foldProof :: Monoid m => (ProofStep a -> m) -> Proof a -> m
 foldProof f =
@@ -392,15 +392,19 @@ data ProofStatus =
        | IncompleteProof    -- ^ There is a annotated sorry,
                             --   but no annotated solved step.
        | TraceFound         -- ^ There is an annotated solved step
-    deriving ( Show, Generic, NFData, Binary )
+       | UnfinishableProof  -- ^ The proof cannot be finished (due to reducible operators in subterms)
+                            --   i.e. all ends are either Completed or Unfinishable (if a trace is found, then the status is TraceFound)
+    deriving ( Show, Generic, NFData, Binary, Eq )
 
 instance Semigroup ProofStatus where
     TraceFound <> _                        = TraceFound
     _ <> TraceFound                        = TraceFound
     IncompleteProof <> _                   = IncompleteProof
     _ <> IncompleteProof                   = IncompleteProof
-    _ <> CompleteProof                     = CompleteProof
+    UnfinishableProof <> _                 = UnfinishableProof
+    _ <> UnfinishableProof                 = UnfinishableProof
     CompleteProof <> _                     = CompleteProof
+    _ <> CompleteProof                     = CompleteProof
     UndeterminedProof <> UndeterminedProof = UndeterminedProof
 
 
@@ -409,17 +413,20 @@ instance Monoid ProofStatus where
 
 -- | The status of a 'ProofStep'.
 proofStepStatus :: ProofStep (Maybe a) -> ProofStatus
-proofStepStatus (ProofStep _         Nothing ) = UndeterminedProof
-proofStepStatus (ProofStep Solved    (Just _)) = TraceFound
-proofStepStatus (ProofStep (Sorry _) (Just _)) = IncompleteProof
-proofStepStatus (ProofStep _         (Just _)) = CompleteProof
+proofStepStatus (ProofStep _            Nothing ) = UndeterminedProof
+proofStepStatus (ProofStep Solved       (Just _)) = TraceFound
+proofStepStatus (ProofStep Unfinishable (Just _)) = UnfinishableProof
+proofStepStatus (ProofStep (Sorry _)    (Just _)) = IncompleteProof
+proofStepStatus (ProofStep _            (Just _)) = CompleteProof
 
 -- | The status of a 'DiffProofStep'.
 diffProofStepStatus :: DiffProofStep (Maybe a) -> ProofStatus
-diffProofStepStatus (DiffProofStep _             Nothing ) = UndeterminedProof
-diffProofStepStatus (DiffProofStep DiffAttack    (Just _)) = TraceFound
-diffProofStepStatus (DiffProofStep (DiffSorry _) (Just _)) = IncompleteProof
-diffProofStepStatus (DiffProofStep _             (Just _)) = CompleteProof
+diffProofStepStatus (DiffProofStep _                Nothing ) = UndeterminedProof
+diffProofStepStatus (DiffProofStep DiffAttack       (Just _)) = TraceFound
+diffProofStepStatus (DiffProofStep (DiffSorry _)    (Just _)) = IncompleteProof
+diffProofStepStatus (DiffProofStep DiffUnfinishable (Just _)) = UnfinishableProof
+diffProofStepStatus (DiffProofStep _                (Just _)) = CompleteProof
+
 
 {- TODO: Test and probably improve
 
@@ -498,7 +505,7 @@ checkDiffProof ctxt prover d sys prf@(LNode (DiffProofStep method info) cs) =
       where
         unhandledCase = mapDiffProofInfo ((,) Nothing) . prover d
 
-        
+
 -- | Annotate a proof with the constraint systems of all intermediate steps
 -- under the assumption that all proof steps are valid. If some proof steps
 -- might be invalid, then you must use 'checkProof', which handles them
@@ -738,35 +745,45 @@ contradictionDiffProver = DiffProver $ \ctxt d sys prf ->
 -- Automatic Prover's
 ------------------------------------------------------------------------------
 
-data SolutionExtractor = CutDFS | CutBFS | CutSingleThreadDFS | CutNothing
+data SolutionExtractor = CutDFS | CutBFS | CutSingleThreadDFS | CutNothing | CutAfterSorry
     deriving( Eq, Ord, Show, Read, Generic, NFData, Binary )
 
 data AutoProver = AutoProver
     { apDefaultHeuristic :: Maybe (Heuristic ProofContext)
-    , apDefaultTacticI   :: Maybe [TacticI ProofContext]
+    , apDefaultTactic   :: Maybe [Tactic ProofContext]
     , apBound            :: Maybe Int
     , apCut              :: SolutionExtractor
+    , quitOnEmptyOracle  :: Bool
     }
     deriving ( Generic, NFData, Binary )
 
 selectHeuristic :: AutoProver -> ProofContext -> Heuristic ProofContext
-selectHeuristic prover ctx = fromMaybe (defaultHeuristic False)
+selectHeuristic prover ctx = setQuitOnEmpty $ fromMaybe (defaultHeuristic False)
                              (apDefaultHeuristic prover <|> L.get pcHeuristic ctx)
+  where
+    setQuitOnEmpty :: Heuristic ProofContext -> Heuristic ProofContext
+    setQuitOnEmpty (Heuristic rankings) = Heuristic (map aux rankings)
+
+    aux :: GoalRanking a -> GoalRanking a
+    aux (OracleRanking _ o) = OracleRanking (quitOnEmptyOracle prover) o
+    aux (OracleSmartRanking _ o) = OracleSmartRanking (quitOnEmptyOracle prover) o
+    aux (InternalTacticRanking _ t) = InternalTacticRanking (quitOnEmptyOracle prover) t
+    aux gr = gr
 
 selectDiffHeuristic :: AutoProver -> DiffProofContext -> Heuristic ProofContext
 selectDiffHeuristic prover ctx = fromMaybe (defaultHeuristic True)
                                  (apDefaultHeuristic prover <|> L.get pcHeuristic (L.get dpcPCLeft ctx))
 
-selectTacticI :: AutoProver -> ProofContext -> [TacticI ProofContext]
-selectTacticI prover ctx = fromMaybe [defaultTacticI]
-                             (apDefaultTacticI prover <|> L.get pcTacticI ctx)
+selectTactic :: AutoProver -> ProofContext -> [Tactic ProofContext]
+selectTactic prover ctx = fromMaybe [defaultTactic]
+                             (apDefaultTactic prover <|> L.get pcTactic ctx)
 
-selectDiffTacticI :: AutoProver -> DiffProofContext -> [TacticI ProofContext]
-selectDiffTacticI prover ctx = fromMaybe [defaultTacticI]
-                                 (apDefaultTacticI prover <|> L.get pcTacticI (L.get dpcPCLeft ctx))
+selectDiffTactic :: AutoProver -> DiffProofContext -> [Tactic ProofContext]
+selectDiffTactic prover ctx = fromMaybe [defaultTactic]
+                                 (apDefaultTactic prover <|> L.get pcTactic (L.get dpcPCLeft ctx))
 
 runAutoProver :: AutoProver -> Prover
-runAutoProver aut@(AutoProver _ _  bound cut) =
+runAutoProver aut@(AutoProver _ _  bound cut _) =
     mapProverProof cutSolved $ maybe id boundProver bound autoProver
   where
     cutSolved = case cut of
@@ -774,6 +791,7 @@ runAutoProver aut@(AutoProver _ _  bound cut) =
       CutBFS             -> cutOnSolvedBFS
       CutSingleThreadDFS -> cutOnSolvedSingleThreadDFS
       CutNothing         -> id
+      CutAfterSorry      -> cutAfterFirstSorry
 
     -- | The standard automatic prover that ignores the existing proof and
     -- tries to find one by itself.
@@ -781,7 +799,7 @@ runAutoProver aut@(AutoProver _ _  bound cut) =
     autoProver = Prover $ \ctxt depth sys _ ->
         return $ fmap (fmap Just)
                $ annotateWithSystems ctxt sys
-               $ proveSystemDFS (selectHeuristic aut ctxt) (selectTacticI aut ctxt) ctxt depth sys
+               $ proveSystemDFS (selectHeuristic aut ctxt) (selectTactic aut ctxt) ctxt depth sys
 
     -- | Bound the depth of proofs generated by the given prover.
     boundProver :: Int -> Prover -> Prover
@@ -789,13 +807,14 @@ runAutoProver aut@(AutoProver _ _  bound cut) =
         boundProofDepth b <$> runProver p ctxt d se prf
 
 runAutoDiffProver :: AutoProver -> DiffProver
-runAutoDiffProver aut@(AutoProver _ _ bound cut) =
+runAutoDiffProver aut@(AutoProver _ _ bound cut _) =
     mapDiffProverDiffProof cutSolved $ maybe id boundProver bound autoProver
   where
     cutSolved = case cut of
       CutDFS             -> cutOnSolvedDFSDiff
       CutBFS             -> cutOnSolvedBFSDiff
       CutSingleThreadDFS -> cutOnSolvedSingleThreadDFSDiff
+      CutAfterSorry      -> cutAfterFirstSorryDiff
       CutNothing         -> id
 
     -- | The standard automatic prover that ignores the existing proof and
@@ -804,7 +823,7 @@ runAutoDiffProver aut@(AutoProver _ _ bound cut) =
     autoProver = DiffProver $ \ctxt depth sys _ ->
         return $ fmap (fmap Just)
                $ annotateWithDiffSystems ctxt sys
-               $ proveDiffSystemDFS (selectDiffHeuristic aut ctxt) (selectDiffTacticI aut ctxt) ctxt depth sys
+               $ proveDiffSystemDFS (selectDiffHeuristic aut ctxt) (selectDiffTactic aut ctxt) ctxt depth sys
 
     -- | Bound the depth of proofs generated by the given prover.
     boundProver :: Int -> DiffProver -> DiffProver
@@ -963,7 +982,7 @@ cutOnSolvedDFSDiff prf0 =
           LNode pstep (M.fromList [(label, extractSolved ps subprf)])
         Nothing     ->
           error "Theory.Constraint.cutOnSolvedDFSDiff: impossible, extractSolved failed, invalid path"
-          
+
 -- | Search for attacks in a BFS manner.
 cutOnSolvedBFS :: Proof (Maybe a) -> Proof (Maybe a)
 cutOnSolvedBFS =
@@ -975,6 +994,7 @@ cutOnSolvedBFS =
         case S.runState (checkLevel l prf) CompleteProof of
           (_, UndeterminedProof) -> error "cutOnSolvedBFS: impossible"
           (_, CompleteProof)     -> prf
+          (_, UnfinishableProof) -> prf
           (_, IncompleteProof)   -> go (l+1) prf
           (prf', TraceFound)     ->
               trace ("attack found at depth: " ++ show l) prf'
@@ -1004,6 +1024,7 @@ cutOnSolvedBFSDiff =
         case S.runState (checkLevel l prf) CompleteProof of
           (_, UndeterminedProof) -> error "cutOnSolvedBFS: impossible"
           (_, CompleteProof)     -> prf
+          (_, UnfinishableProof) -> prf
           (_, IncompleteProof)   -> go (l+1) prf
           (prf', TraceFound)     ->
               trace ("attack found at depth: " ++ show l) prf'
@@ -1022,6 +1043,33 @@ cutOnSolvedBFSDiff =
       | isNothing (dpsInfo step) = return prf
       | otherwise                = LNode step <$> traverse (checkLevel (l-1)) cs
 
+cutAfterFirstSorry :: Proof (Maybe a) -> Proof (Maybe a)
+cutAfterFirstSorry = snd . go False
+  where
+    go :: Bool -> Proof (Maybe a) -> (Bool, Proof (Maybe a))
+    go _      n@(LNode (ProofStep (Sorry _) _) _)         = (True, n)
+    go abort  n@(LNode (ProofStep Solved _) _)            = (abort, n)
+    go abort  n@(LNode (ProofStep Unfinishable _) _)      = (abort, n)
+    go abort  n@(LNode (ProofStep (Contradiction _) _) _) = (abort, n)
+    go True     (LNode (ProofStep _ ann) _)               = (True, LNode (ProofStep (Sorry Nothing) ann) M.empty)
+    go False    (LNode r cs) =
+      let (abort, cs') = M.mapAccum go False cs
+      in (abort, LNode r cs')
+
+
+cutAfterFirstSorryDiff :: DiffProof (Maybe a) -> DiffProof (Maybe a)
+cutAfterFirstSorryDiff = snd . go False
+  where
+    go :: Bool -> DiffProof (Maybe a) -> (Bool, DiffProof (Maybe a))
+    go _      n@(LNode (DiffProofStep (DiffSorry _) _) _)     = (True, n)
+    go abort  n@(LNode (DiffProofStep DiffMirrored _) _)      = (abort, n)
+    go abort  n@(LNode (DiffProofStep DiffUnfinishable _) _)  = (abort, n)
+    go abort  n@(LNode (DiffProofStep DiffAttack _) _)        = (abort, n)
+    go True     (LNode (DiffProofStep _ ann) _)               = (True, LNode (DiffProofStep (DiffSorry Nothing) ann) M.empty)
+    go False    (LNode r cs) =
+      let (abort, cs') = M.mapAccum go False cs
+      in (abort, LNode r cs')
+
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
 -- non-determinism wrt. what goal to solve next.  This proof can be of
@@ -1029,15 +1077,17 @@ cutOnSolvedBFSDiff =
 --
 -- Use 'annotateWithSystems' to annotate the proof tree with the constraint
 -- systems.
-proveSystemDFS :: Heuristic ProofContext -> [TacticI ProofContext] -> ProofContext -> Int -> System -> Proof ()
+proveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof ()
 proveSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 sys0
   where
     prove !depth sys =
         case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
-          []                         -> node Solved M.empty
-          (method, (cases, _expl)):_ -> node method cases
+          [] | finishedSubterms ctxt sys -> node Solved M.empty
+          []                             -> node Unfinishable M.empty
+          (method, (cases, _expl)):_     -> node method cases
       where
+
         node method cases =
           LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
@@ -1048,7 +1098,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
 --
 -- Use 'annotateWithSystems' to annotate the proof tree with the constraint
 -- systems.
-proveDiffSystemDFS :: Heuristic ProofContext -> [TacticI ProofContext] -> DiffProofContext -> Int -> DiffSystem -> DiffProof ()
+proveDiffSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> DiffProofContext -> Int -> DiffSystem -> DiffProof ()
 proveDiffSystemDFS heuristic tactics ctxt d0 sys0 =
     prove d0 sys0
   where
@@ -1123,6 +1173,7 @@ showProofStatus ExistsNoTrace   TraceFound        = "falsified - found trace"
 showProofStatus ExistsNoTrace   CompleteProof     = "verified"
 showProofStatus ExistsSomeTrace CompleteProof     = "falsified - no trace found"
 showProofStatus ExistsSomeTrace TraceFound        = "verified"
+showProofStatus _               UnfinishableProof = "analysis cannot be finished (reducible operators in subterms)"
 showProofStatus _               IncompleteProof   = "analysis incomplete"
 showProofStatus _               UndeterminedProof = "analysis undetermined"
 
@@ -1130,6 +1181,7 @@ showProofStatus _               UndeterminedProof = "analysis undetermined"
 showDiffProofStatus :: ProofStatus -> String
 showDiffProofStatus TraceFound        = "falsified - found trace"
 showDiffProofStatus CompleteProof     = "verified"
+showDiffProofStatus UnfinishableProof = "analysis cannot be finished (reducible operators in subterms)"
 showDiffProofStatus IncompleteProof   = "analysis incomplete"
 showDiffProofStatus UndeterminedProof = "analysis undetermined"
 
