@@ -1,14 +1,13 @@
 -- |
 -- Copyright   : (c) 2010-2012 Benedikt Schmidt
 -- License     : GPL v3 (see LICENSE)
--- 
--- Maintainer  : Benedikt Schmidt <beschmi@gmail.com>
+--
 --
 -- Computing the variants of a term.
 module Term.Narrowing.Variants.Compute (
     computeVariantsBound
   , computeVariants
-  
+
   -- * for testing
   , compareSubstVariant
 ) where
@@ -90,7 +89,7 @@ narrowVariant tstart maxdepth =
         minimized = filterMaximalBy fst cmp variants
         tag t xs = [ (t,a) | a <- xs]
         (explored',new) = map snd *** map snd $ partition fst minimized
-        cmp a b = runWithMaude $ compareSubstVariant tstart (varSubst.snd $ a) (varSubst.snd $ b)
+        cmp a b = runWithMaude $ compareSubstVariant tstart (varSubst . snd $ a) (varSubst . snd $ b)
 
         variantsFrom' (Variant pos0 substComposed) =
           zipWith (\i substComposed' -> Variant (pos0++[i]) substComposed')
@@ -132,7 +131,7 @@ narrowSeqStepComplexity (checked, var@(Variant _ subst)) =
 
 -- | @computeVariants t d@ compute the variants of term @t@ with bound @d@.
 --   The rewriting rules are taken from the Maude context.
-computeVariantsBound :: LNTerm -> Maybe Int 
+computeVariantsBound :: LNTerm -> Maybe Int
                      -> WithMaude (Maybe [LNSubstVFresh])
 computeVariantsBound t d = reader $ \hnd -> (\res -> trace (show ("ComputeVariantsBound", t, res)) res) $
     case (`runReader` hnd) $ narrowVariant t d of

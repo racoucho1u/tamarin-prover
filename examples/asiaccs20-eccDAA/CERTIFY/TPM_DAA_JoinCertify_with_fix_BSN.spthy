@@ -40,7 +40,7 @@ SP1 - Correctness
 SP7 - Authentication
 
   oracle_auth_aliveness_host_very_weak (all-traces): verified (4 steps)
-  oracle_auth_aliveness_host (all-traces): verified (1114 steps)
+  oracle_auth_aliveness_host (all-traces): verified (307 steps)
   oracle_auth_aliveness_issuer (all-traces): verified (4 steps)
   oracle_auth_weak_agreement_host (all-traces): verified (1789 steps)
   oracle_auth_non_injective_agreement_host_issuer (all-traces): verified (1790 steps)
@@ -75,9 +75,8 @@ functions:  accept/0, MAC/2, KDF_AES/1, KDF_EK/1,KDF_a/3, QPub/2, QName/2, certD
     	 BSN/1, F1/1, F2/1, H_p/1,PointG1/2, Message/1, Q_K/1, certify/1, publicData/1
     	 
 
-equations:  
-    	
-    	calcE( 
+equations:
+      calcE( 
         minus(
         	multp(
             	plus(
@@ -522,7 +521,7 @@ prio:
     regex "\!KU\( KDF_AES\(~TPM"
 
 
-
+// Protocol Restrictions (Axioms)
 
 restriction equality: 	     "All #i    x y    .  Eq( x, y ) @ i ==> x = y"
 
@@ -908,7 +907,7 @@ rule TPM2_ActivateCredential:
 	Q_N_rec=<'1', 'SHA256',H_SHA256(Q_PD)>    	//calculate Q_N_rec which should be the same as Q_N
 	k_e_rec=KDF_a(<'1', s_rec>,'STORAGE',Q_N_rec)    //calculate k_e_1 which should be the same as k_e	
 	k_h_rec=KDF_a(<'1', s_rec>,'INTEGRITY','NULL')    //calculate k_h_1 which should be the same as k_h
-	//recalculate the MAC
+	//recalculate the MACvpn.inria.fr/all
 	curlyH_rec=MAC(<'1', len16(curlyK_hat),curlyK_hat,Q_N_rec>,k_h_rec)
 	//retrieve the challenge curlyK
 	curlyK_1_rec=snd(sdec(curlyK_hat,k_e_rec))

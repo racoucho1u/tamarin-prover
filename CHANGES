@@ -1,3 +1,82 @@
+* 1.10.0
+  - Tree-sitter grammar for spthy added, integrated into regression
+
+  - Better debug tracing and GHCI debugging
+
+  - Manual integrated into the repo to keep in sync; many manual improvements
+
+  - Adding warnings for non-subterm convergent theories to allow user to spot this
+
+  - Added --precompute-only option
+  
+  - Improved graphs using clusters to represent roles and sessions
+  
+  - Removed auto-generated aes file
+  
+  - Removed nat constructor if natural-numbers built-in is not used
+
+  - Public, fresh, and nat names can now be arbitrary single quoted strings (but may not include additional single quotes and newlines inside)
+  
+  - Removed term 'goal' from Tamarin's interfaces and manual, replaced by "proof method" or "constraint"
+  
+  - Click on graphs opens image in new tab
+  
+  - Added new interactive prover that stops when oracle returns nothing
+  
+  - Added option to output traces in batch mode
+
+  - Derivability checks presentation improvements
+
+  - Added option --no-logging to suppress yesod server logs
+
+  - Numerous bug fixes, some refactoring and code cleanup
+
+  - Added many examples from different published papers
+
+  - Allow Maude up to 3.5 (default 3.4)
+
+  - Using stack LTS resolver 22.39 and GHC 9.6.6 now [stack update, stack upgrade may be needed]
+
+* 1.8.0
+  - Support for natural numbers and subterm reasoning
+
+  - Tactics language added, improves over oracle use
+
+  - SAPIC:
+    improvements and extensions, including an export functionality targeting ProVerif and DeepSec;
+    boundedness checks;
+    SAPIC now also supports natural numbers (deprecating use of multisets)
+
+  - Advanced DH (subgroups) with additional neutral group element added to Diffie-Hellman builtin
+
+  - Added macros
+
+  - Improved warnings:
+    Added checks to notify user of likely modeling errors as warnings, regarding equational theory use
+    Added warning to notify if a fact occurs in LHS, but never in any RHS (thus not executable)
+    Generally made warnings more readable
+
+  - Improved graph visualization:
+    auto sources annotations are hidden in graphs by default except when proving sources lemmas
+    less relation arrows are colored depending on their causes
+    a transitive reduction is applied by default to make graphs more readable
+    
+  - More verbose Tamarin self-identification on --version
+
+  - Allow optional trailing commas in lists
+
+  - Refactoring of Theory.hs, and other smaller files
+
+  - Use GitHub actions for automated regression tests
+
+  - Numerous bug fixes
+
+  - Added many examples from different published papers
+
+  - Allow Maude up to 3.3.1 (default 3.2.1)
+
+  - Using stack LTS resolver 20.26 and GHC 9.2.8 now [stack update, stack upgrade may be needed]
+
 * 1.6.1
   - Further SAPIC integration
 

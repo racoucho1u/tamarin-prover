@@ -27,7 +27,7 @@ import Items.LemmaItem
 import Text.PrettyPrint.Highlight
 import Theory.Text.Pretty
 import Theory.Model
-import Theory.Constraint.Solver
+--import Theory.Constraint.Solver
 import Data.List (intercalate)
 
 
@@ -84,17 +84,17 @@ prettyLemmaName l = case L.get lAttributes l of
             (brackets $ fsep $ punctuate comma $ map prettyLemmaAttribute as)
 
 prettyLemmaAttribute :: Document d => LemmaAttribute -> d
-prettyLemmaAttribute SourceLemma           = text "sources"
-prettyLemmaAttribute ReuseLemma            = text "reuse"
-prettyLemmaAttribute ReuseDiffLemma        = text "diff_reuse"
-prettyLemmaAttribute InvariantLemma        = text "use_induction"
-prettyLemmaAttribute (HideLemma s)         = text ("hide_lemma=" ++ s)
-prettyLemmaAttribute (LemmaHeuristic h)    = text ("heuristic=" ++ (prettyGoalRankings h))
-prettyLemmaAttribute (LemmaTacticI t)      = text ("tactic=" ++ t)
-prettyLemmaAttribute (LemmaModule h)       = text ("output=[" ++ intercalate "," (map show h)  ++ "]")
-prettyLemmaAttribute LHSLemma              = text "left"
-prettyLemmaAttribute RHSLemma              = text "right"
+prettyLemmaAttribute SourceLemma        = text "sources"
+prettyLemmaAttribute ReuseLemma         = text "reuse"
+prettyLemmaAttribute ReuseDiffLemma     = text "diff_reuse"
+prettyLemmaAttribute InvariantLemma     = text "use_induction"
+prettyLemmaAttribute (HideLemma s)      = text ("hide_lemma=" ++ s)
+prettyLemmaAttribute (LemmaHeuristic h) = text ("heuristic=" ++ (prettyGoalRankings h))
+prettyLemmaAttribute (LemmaModule h)    = text ("output=[" ++ intercalate "," (map show h)  ++ "]")
+prettyLemmaAttribute LHSLemma           = text "left"
+prettyLemmaAttribute RHSLemma           = text "right"
 prettyLemmaAttribute (LemmaCollapseBound b)= text ("collapse-bound="++show b)
+prettyLemmaAttribute _                  = emptyDoc
 --     prettyLemmaAttribute BothLemma      = text "both"
 
 

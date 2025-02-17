@@ -2,15 +2,17 @@ theory FOO_Eligibility begin
 
 // Function signature and definition of the equational theory E
 
-functions: blind/2, checksign/2, commit/2, fst/1[destructor], open/2,
-           pair/2, pk/1, sign/2, snd/1[destructor], unblind/2
-equations:
+functions: blind/2, checksign/2, commit/2, fst/1, open/2, pair/2, pk/1,
+           sign/2, snd/1, unblind/2
+equations [convergent]:
     checksign(sign(m, k), pk(k)) = m,
     fst(<x.1, x.2>) = x.1,
     open(commit(m, r), r) = m,
     snd(<x.1, x.2>) = x.2,
     unblind(blind(m, r), r) = m,
     unblind(sign(blind(m, r), sk), r) = sign(m, sk)
+
+
 
 
 
@@ -326,27 +328,34 @@ qed
 
 
 
-/* All well-formedness checks were successful. */
+
+
+
+
+
+
+/*
+WARNING: the following wellformedness checks failed!
+
+Message Derivation Checks
+=========================
+
+  The variables of the following rule(s) are not derivable from their premises, you may be performing unintended pattern matching.
+
+Rule C_2: 
+Failed to derive Variable(s): x
+*/
+
+/*
+Generated from:
+Tamarin version 1.9.0
+Maude version 3.4
+Git revision: f187584ba8325431d43d5e0a58baa381ac2c3f47, branch: develop
+Compiled at: 2024-10-29 14:19:56.449404967 UTC
+*/
 
 end
 /* Output
-maude tool: 'maude'
- checking version: 3.0. OK.
- checking installation: OK.
-
-
-analyzing: examples/post17/foo_eligibility.spthy
-
-------------------------------------------------------------------------------
-analyzed: examples/post17/foo_eligibility.spthy
-
-  output:          examples/post17/foo_eligibility.spthy.tmp
-  processing time: 1.735064526s
-  types (all-traces): verified (44 steps)
-  exec (exists-trace): verified (9 steps)
-  eligibility (all-traces): verified (11 steps)
-
-------------------------------------------------------------------------------
 
 ==============================================================================
 summary of summaries:
@@ -354,7 +363,11 @@ summary of summaries:
 analyzed: examples/post17/foo_eligibility.spthy
 
   output:          examples/post17/foo_eligibility.spthy.tmp
-  processing time: 1.735064526s
+  processing time: 1.36s
+  
+  WARNING: 1 wellformedness check failed!
+           The analysis results might be wrong!
+  
   types (all-traces): verified (44 steps)
   exec (exists-trace): verified (9 steps)
   eligibility (all-traces): verified (11 steps)

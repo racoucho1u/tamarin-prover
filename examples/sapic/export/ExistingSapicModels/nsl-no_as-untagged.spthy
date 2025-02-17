@@ -21,6 +21,8 @@ theory NeedhamSchroeder
 
 begin
 
+builtins: dest-pairing
+
 functions: pk/1, aenc/2, adec/2[destructor]
 
 equations: adec(aenc(m,pk(sk)),sk)=m
@@ -121,13 +123,13 @@ equivLemma:
  ( new skA; ( !( P(skA))
 |
  ( new skB;
-        out(att,pk(skB)); ! (  new Nb; new test; Qleak(skB,Nb,test,pk(skA))) )
+        out(pk(skB)); ! (  new Nb; new test; Qleak(skB,Nb,test,pk(skA))) )
 ))
 
  ( new skA; ( !( P(skA))
 |
  ( new skB;
-        out(att,pk(skB)); ! (  new Nb; new test; Qleak(skB,Nb,Nb,pk(skA))) )
+        out(pk(skB)); ! (  new Nb; new test; Qleak(skB,Nb,Nb,pk(skA))) )
 ))
 
 

@@ -5,7 +5,6 @@
 -- Copyright   : (c) 2010-2012 Benedikt Schmidt & Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Benedikt Schmidt <beschmi@gmail.com>
 --
 -- AC-unification of DH terms using Maude as a backend.
 module Term.Maude.Process (
@@ -98,7 +97,7 @@ startMaude maudePath maudeSig = do
     mv <- newMVar =<< startMaudeProcess maudePath maudeSig
     -- Add a finalizer to the MVar that stops maude.
     _  <- mkWeakMVar mv $ withMVar mv $ \mp -> do
-        terminateProcess (mProc mp) <* waitForProcess (mProc mp)      
+        terminateProcess (mProc mp) <* waitForProcess (mProc mp)
     -- return the maude handle
     return (MaudeHandle maudePath maudeSig mv)
 

@@ -11,7 +11,7 @@ Organization
 How to reproduce the results (authentication and secrecy properties)
 --------------------------------------------------------------------
 
-This analysis uses version 1.4.0 of the [Tamarin-prover](https://github.com/tamarin-prover/tamarin-prover). Instructions for the installation and usage can be found in chapter 2 of the [manual](https://tamarin-prover.github.io/manual/book/002_installation.html).
+This analysis uses version 1.4.0 of the [Tamarin-prover](https://github.com/tamarin-prover/tamarin-prover). Instructions for the installation and usage can be found in chapter 2 of the [manual](https://tamarin-prover.github.io/manual/master/book/002_installation.html).
 
 
 Due to the complexity of the proofs, oracle files that guide the proof search are required. These files need to be passed as argument as shown below:
@@ -20,7 +20,7 @@ $ tamarin-prover interactive --heuristic=O --oraclename=5G_AKA.oracle .
 ```
 Once an interactive Tamarin session is launched, one can select and load the appropriate Tamarin file (`5G_AKA.spthy`) and navigate through the model and the different lemmas.
 
-Lemmas that are annotated (in the Tamarin models) with `proof (automatic)` or `attack (automatic)` can be proven (or disproven) automatically using our oracle (clicking 'a'). Lemmas that are annotated with `attack (stored)` cannot be disproven automatically, due to a bug in the Tamarin-prover. This bug forces the user to carry out the proof in the interactive mode (see below) and to click '1' until the attack is found. We both provide an oracle that allows to semi-automatically find the attack this way (oracle automatically selects the goal that should be solved first at each step of the proof), and stored proofs that can be used to quickly see and check our attacks.
+Lemmas that are annotated (in the Tamarin models) with `proof (automatic)` or `attack (automatic)` can be proven (or disproven) automatically using our oracle (clicking 'a'). Lemmas that are annotated with `attack (stored)` cannot be disproven automatically, due to a bug in the Tamarin-prover. This bug forces the user to carry out the proof in the interactive mode (see below) and to click '1' until the attack is found. We both provide an oracle that allows to semi-automatically find the attack this way (oracle automatically selects the proof method that should be solved first at each step of the proof), and stored proofs that can be used to quickly see and check our attacks.
 
 The stored attack can be reloaded with the tool. Corresponding proof scripts are provided in `5G-AKA-nonBindingChannel/proofs` and `5G-AKA-bindingChannel/proofs`. For loading, e.g., the lemma `noninjectiveagreement_seaf_ue_kseaf_keyConf_noRev`, the following command can be used:
 ```

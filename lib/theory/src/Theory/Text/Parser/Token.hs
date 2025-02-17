@@ -2,7 +2,6 @@
 -- Copyright   : (c) 2010-2012 Simon Meier, Benedikt Schmidt
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- Tokenizing infrastructure
@@ -34,6 +33,7 @@ module Theory.Text.Parser.Token (
 
   , freshName
   , pubName
+  , natName
 
 
   , typep
@@ -56,6 +56,7 @@ module Theory.Text.Parser.Token (
   , opXor
 
   , opEqual
+  , opSubterm
   , opLess
   , opAt
   , opForall
@@ -84,6 +85,7 @@ module Theory.Text.Parser.Token (
   , opSlash
   , opMinus
   , opPlus
+  , opUnion
   , opLeftarrow
   , opRightarrow
   , opLongleftarrow
@@ -96,6 +98,7 @@ module Theory.Text.Parser.Token (
   , brackets
   , singleQuoted
   , doubleQuoted
+  , stringLiteral
 
   -- * List parsing
   , commaSep
@@ -117,7 +120,6 @@ module Theory.Text.Parser.Token (
 
 import           Prelude             hiding (id, (.))
 
-import           Data.Foldable       (asum)
 -- import           Data.Label
 -- import           Data.Binary
 import           Data.List (foldl')
@@ -311,6 +313,10 @@ commaSep1 = flip sepEndBy1 comma
 list :: Parser a -> Parser [a]
 list = brackets . commaSep
 
+-- | Parse an arbitrary string literal
+stringLiteral :: Parser String
+stringLiteral = T.stringLiteral spthy
+
 -- | A formal comment; i.e., (header, body)
 formalComment :: Parser (String, String)
 formalComment = T.lexeme spthy $ do
@@ -356,10 +362,11 @@ sortedLVar ss =
 
     mkPrefixParser s = do
         case s of
-          LSortMsg   -> pure ()
-          LSortPub   -> void $ char '$'
-          LSortFresh -> void $ char '~'
-          LSortNode  -> void $ char '#'
+          LSortMsg       -> pure ()
+          LSortPub       -> void $ char '$'
+          LSortFresh     -> void $ char '~'
+          LSortNode      -> void $ char '#'
+          LSortNat       -> void $ char '%'
         (n, i) <- indexedIdentifier
         return (LVar n s i)
 
@@ -369,7 +376,7 @@ lvar = sortedLVar [minBound..]
 
 -- | Parse a non-node variable.
 msgvar :: Parser LVar
-msgvar = sortedLVar [LSortFresh, LSortPub, LSortMsg]
+msgvar = sortedLVar [LSortFresh, LSortPub, LSortNat, LSortMsg]
 
 -- | Parse a graph node variable.
 nodevar :: Parser NodeId
@@ -378,13 +385,22 @@ nodevar = asum
   , (\(n, i) -> LVar n LSortNode i) <$> indexedIdentifier ]
   <?> "timepoint variable"
 
+-- | Parse a non-empty single-quoted string
+-- | that does not contain a single-quote or newline.
+singleQuotedString :: Parser String
+singleQuotedString = singleQuoted $ many1 (noneOf "'\n")
+
 -- | Parse a literal fresh name, e.g., @~'n'@.
 freshName :: Parser String
-freshName = try (symbol "~" *> singleQuoted identifier)
+freshName = try (symbol "~" *> singleQuotedString)
 
 -- | Parse a literal public name, e.g., @'n'@.
 pubName :: Parser String
-pubName = singleQuoted identifier
+pubName = singleQuotedString
+
+-- | Parse a literal nat name, e.g. @%'n'@.
+natName :: Parser String
+natName = try (symbol "%" *> singleQuotedString)
 
 -- | Parse a Sapic Type
 typep :: Parser SapicType
@@ -400,9 +416,30 @@ typep = ( try (symbol defaultSapicTypeS) *> return Nothing)
 --   are all valid, but
 --   x: pub: foo
 --   is not
+-- We first redefine lvars but forbidding the suffix
+
+sortedLVarNoSuffix :: [LSort] -> Parser LVar
+sortedLVarNoSuffix ss =
+    asum $ map mkPrefixParser ss
+  where
+    mkPrefixParser s = do
+        case s of
+          LSortMsg       -> pure ()
+          LSortPub       -> void $ char '$'
+          LSortFresh     -> void $ char '~'
+          LSortNode      -> void $ char '#'
+          LSortNat       -> void $ char '%'
+        (n, i) <- indexedIdentifier
+        return (LVar n s i)
+
+-- | An arbitrary logical variable.
+lvarNoSuffix :: Parser LVar
+lvarNoSuffix = sortedLVarNoSuffix [minBound..]
+
+
 sapicvar :: Parser SapicLVar
 sapicvar = do
-        v <- lvar
+        v <- lvarNoSuffix
         t <- option Nothing $ colon *> typep
         return (SapicLVar v t)
 
@@ -440,9 +477,13 @@ opExp = symbol_ "^"
 opMult :: Parser ()
 opMult = symbol_ "*"
 
--- | The addition operator @*@.
+-- | The addition operator @%+@.
 opPlus :: Parser ()
-opPlus = symbol_ "+"
+opPlus = symbol_ "%+"
+
+-- | The multiset operator @+@.
+opUnion :: Parser ()
+opUnion = symbol_ "++" <|> symbol_ "+"
 
 -- | The xor operator @XOR@ or @⊕@.
 opXor :: Parser ()
@@ -452,7 +493,7 @@ opXor = symbol_ "XOR" <|> symbol_ "⊕"
 opLess :: Parser ()
 opLess = symbol_ "<"
 
--- | The multiset comparison operator @(<)@. 
+-- | The multiset comparison operator @(<)@.
 opLessTerm :: Parser ()
 opLessTerm = symbol_ "(<)"
 
@@ -463,6 +504,10 @@ opAt = symbol_ "@"
 -- | The equality operator @=@.
 opEqual :: Parser ()
 opEqual = symbol_ "="
+
+-- | The equality operator @=@.
+opSubterm :: Parser ()
+opSubterm = symbol_ "<<" <|> symbol_ "⊏"
 
 -- | The logical-forall operator @All@ or @∀@.
 opForall :: Parser ()

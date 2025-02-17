@@ -5,15 +5,10 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TemplateHaskell       #-}
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE FlexibleContexts   #-}
-{-# LANGUAGE DeriveGeneric        #-}
-{-# LANGUAGE DeriveAnyClass       #-}
 -- |
 -- Copyright   : (c) 2011, 2012 Benedikt Schmidt & Simon Meier
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : GHC only
 --
 -- Facts used to formulate and reason about protocol execution.
@@ -33,6 +28,7 @@ module Theory.Model.Fact (
   , isPersistentFact
   , isProtoFact
   , isInFact
+  , isKLogFact
 
   , factTagName
   , showFactTag
@@ -84,6 +80,7 @@ module Theory.Model.Fact (
   , protoFact
   , protoFactAnn
   , annotateFact
+  , applyMacroInFact
 
   -- * NFact
   , NFact
@@ -119,6 +116,7 @@ import qualified Data.Set               as S
 
 import           Term.Unification
 import           Term.Rewriting.Norm
+import           Term.Macro
 
 import           Text.PrettyPrint.Class
 
@@ -299,6 +297,11 @@ protoFactAnn multi name an ts = Fact (ProtoFact multi name (length ts)) an ts
 annotateFact :: S.Set FactAnnotation -> Fact t -> Fact t
 annotateFact ann' (Fact tag ann ts) = Fact tag (S.union ann' ann) ts
 
+-- | Apply macros in fact
+applyMacroInFact :: [Macro] -> LNFact -> LNFact
+applyMacroInFact mcs (Fact tag annot terms) = let mTerms = map (applyMacros mcs) terms in
+                                              Fact tag annot mTerms
+
 -- Queries on facts
 -------------------
 
@@ -311,6 +314,10 @@ isProtoFact _                            = False
 isInFact :: Fact t -> Bool
 isInFact (Fact InFact _ _) = True
 isInFact _                 = False
+
+-- | True iff the fact is the non-special Log-fact K() from the intruder rule isend
+isKLogFact :: Fact t -> Bool
+isKLogFact f = isProtoFact f && (factTagName (factTag f) == "K")
 
 -- | View a protocol fact.
 protoFactView :: LNFact -> Maybe [LNTerm]

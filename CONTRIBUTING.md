@@ -44,7 +44,7 @@ The Tamarin Prover is distributed through a number of channels: source and binar
 
 1. Make the new release on Github. @rsasse or @jdreier usually does this.
 
-   1. run `python3 regressionTests.py` and check for any error
+   1. run `python3 regressionTests.py -s` and check for any error
 
    2. run `tamarin-prover test`
 
@@ -142,4 +142,34 @@ git subtree push --prefix etc https://github.com/$github_user/editors $branch
 3. FYI: if we ever want to add another subtree, we use:
 ```
 git subtree add --prefix $local_dir $remote_url $remote_branch --squash
+```
+
+Debugging
+---------
+
+We provide a module tailored to debugging the codebase in the REPL.
+The module is provided in `src/Main/ScratchPad.hs` and you can load it by running `stack ghci` in the top-level directory of this repository.
+It is important that you run this command in the top-level directory.
+If not, there will be an error.
+
+After you entered GHCI, you must load the scratch pad module using the command `:m *Main.ScratchPad`. If you then run the function `debug`, the debugging starts!
+
+The `ScratchPad` module is designed such that you can explore the proof tree using the functions `paths` and `methodsAt` and debug by modifying `debugInput` and `debugM`.
+You can find more documentation in the `Main.ScratchPad` module.
+
+Here is a complete example of how debugging could work:
+```
+stack ghci
+ghci> :m *Main.ScratchPad
+ghci> debug
+[Theory NAXOS_eCK] Theory loaded
+[Theory NAXOS_eCK] Theory translated
+[Theory NAXOS_eCK] Derivation checks started
+[Theory NAXOS_eCK] Derivation checks ended
+[Theory NAXOS_eCK] Theory closed
+--- starting constraint solving ---
+[Saturating Sources] Step 1 (Max 5)
+[Saturating Sources] Done
+The constraint system contains the following annotated nodes
+#i2
 ```

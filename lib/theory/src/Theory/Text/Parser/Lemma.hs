@@ -3,7 +3,6 @@
 --               contributing in 2019: Robert Künnemann, Johannes Wocker, Kevin Morio
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- Parsing Lemmas
@@ -48,8 +47,7 @@ lemmaAttribute diff workDir = asum
   , symbol "diff_reuse"    *> pure ReuseDiffLemma
   , symbol "use_induction" *> pure InvariantLemma
   , symbol "hide_lemma" *> opEqual *> (HideLemma <$> identifier)
-  , symbol "heuristic"  *> opEqual *> (LemmaHeuristic <$> many1 (goalRanking diff workDir))
-  , symbol "tactic"       *> (LemmaTacticI <$> identifier)
+  , symbol "heuristic"  *> opEqual *> (LemmaHeuristic <$> goalRanking diff workDir)
   , symbol "output"  *> opEqual *> (LemmaModule <$> list constructorp)
   , symbol "left"          *> pure LHSLemma
   , symbol "right"         *> pure RHSLemma

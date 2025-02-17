@@ -3,7 +3,6 @@
 --               contributing in 2019: Robert Künnemann, Johannes Wocker
 -- License     : GPL v3 (see LICENSE)
 --
--- Maintainer  : Simon Meier <iridcode@gmail.com>
 -- Portability : portable
 --
 -- Parsing Standard and Guarded Formulas
@@ -15,7 +14,6 @@ module Theory.Text.Parser.Formula
   )
 where
 import           Prelude                    hiding (id, (.))
-import           Data.Foldable              (asum)
 -- import           Data.Monoid                hiding (Last)
 import           Control.Applicative        hiding (empty, many, optional)
 import           Control.Category
@@ -51,6 +49,7 @@ blatom varp nodep = fmap (fmapTerm (fmap Free)) <$> asum
       -- Predicates can be called for timepoints in addition to other logical vars.
       -- Note that lexemes that are ambigous (e.g., a variable without a sort)
       -- will be interpreted by varp.
+  , Subterm     <$> try (msetterm False (vlit varp) <* opSubterm) <*> msetterm False (vlit varp) <?> "subterm predicate"    
   , Less        <$> try (nodevarTerm <* opLess)    <*> nodevarTerm   <?> "less atom"
   , smallerp varp <?> "multiset comparisson"
   , EqE         <$> try (termp <* opEqual) <*> termp <?> "term equality"
@@ -72,7 +71,7 @@ fatom varp nodep = asum
   ]
   where
     quantification = do
-        q <- (forall <$ opForall) <|> (exists <$ opExists)
+        q <- (forAll <$ opForall) <|> (exists <$ opExists)
         vs <- many1 (try varp <|> nodep)  <* dot
         f  <- iff varp nodep
         return $ foldr (hinted q) f vs
