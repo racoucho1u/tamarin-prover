@@ -721,7 +721,7 @@ isIntruderRule :: HasRuleName r => r -> Bool
 isIntruderRule ru =
     case ruleName ru of IntrInfo _ -> True; ProtoInfo _ -> False
 
--- | True iff the rule is an intruder rule
+-- | True iff the rule is a protocol rule
 isProtocolRule :: HasRuleName r => r -> Bool
 isProtocolRule ru =
     case ruleName ru of IntrInfo _ -> False; ProtoInfo _ -> True

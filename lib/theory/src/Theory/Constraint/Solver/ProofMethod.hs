@@ -528,9 +528,11 @@ rankProofMethods ranking tactics cbound ctxt sys =
 
     collapseDecision bound = case bound of 
       Nothing -> True
-      Just b -> length keys < b
+      Just b -> M.size protRules < b
 
     keys = M.keys $ L.get sNodes sys
+    protRules = M.filter (\x -> not (isFreshRule x) && isProtocolRule x) (L.get sNodes sys)
+    --protRules = M.filter ((not isFreshRule) &&& isProtocolRule) (L.get sNodes sys)
     collapseGoal = collapse (node2goals $ pairing keys)
     collapseStatus = GoalStatus False 0 False True
 
