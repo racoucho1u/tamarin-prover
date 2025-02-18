@@ -466,11 +466,11 @@ checkProof :: ProofContext
            -> System
            -> Proof a
            -> Proof (Maybe a, Maybe System)
-checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) = trace ("Removeme | checkParam: "++show method++"\n"++show (execProofMethod ctxt method sys)) $
+checkProof ctxt prover d sys prf@(LNode (ProofStep method info) cs) =
     case (method, execProofMethod ctxt method sys) of
-        (Sorry reason, _         ) -> trace ("Removeme | reason: "++show reason) sorryNode reason cs
-        (_           , Just cases) -> trace ("Removeme | justcs: "++show method) node method $ checkChildren cases
-        (_           , Nothing   ) -> trace ("Removeme | error : "++show method)
+        (Sorry reason, _         ) -> sorryNode reason cs
+        (_           , Just cases) -> node method $ checkChildren cases
+        (_           , Nothing   ) -> 
             sorryNode (Just "invalid proof step encountered")
                       (M.singleton "" prf)
   where
@@ -697,7 +697,7 @@ focusDiff path prover =
 -- | Check the proof and handle new cases using the given prover.
 checkAndExtendProver :: Prover -> Prover
 checkAndExtendProver prover0 = Prover $ \ctxt d se prf ->
-    trace ("Removeme | checkandextand: "++show prf) return $ mapProofInfo snd $ checkProof ctxt (prover ctxt) d se prf
+    return $ mapProofInfo snd $ checkProof ctxt (prover ctxt) d se prf
   where
     unhandledCase   = sorry (Just "unhandled case") Nothing
     prover ctxt d se =

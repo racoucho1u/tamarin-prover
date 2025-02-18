@@ -93,12 +93,11 @@ solve pathIdx methodIdx prf =
   let mPath = M.lookup pathIdx $ rpPaths prf
       iPrf = rpProof prf
       ctxt = rpCtxt prf
-      cbound = L.get pcCollapseBound ctxt
   in do
   (path, methods) <- maybeREPL "illegal path index" mPath
   method <- maybeREPL "illegal method index" (methods !?! methodIdx)
   sys <- maybeREPL "illegal path" (iPrf `atPath` path >>= psInfo . root)
-  iPrf' <- maybeREPL "applying method failed" $ modifyAtPath (runProver (oneStepProver Nothing method) ctxt (length path) sys) path iPrf
+  iPrf' <- maybeREPL "applying method failed" $ modifyAtPath (runProver (oneStepProver (L.get sCollapsed sys) method) ctxt (length path) sys) path iPrf
   return (REPLProof iPrf' ctxt (collectPaths ctxt iPrf'))
   where
     (!?!) :: [a] -> Int -> Maybe a

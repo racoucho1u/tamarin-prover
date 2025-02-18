@@ -520,7 +520,7 @@ rankProofMethods ranking tactics cbound ctxt sys =
         Nothing    -> []
   where
 
-    sys' = trace ("Removeme | cbound: "++show cbound) $ if collapseDecision cbound then sys -- || isJust (L.get sCollapsed sys) 
+    sys' = if collapseDecision cbound then sys -- || isJust (L.get sCollapsed sys) 
                 else L.set sCollapsed (Just collapseGoal) (modify sGoals (M.insert collapseGoal collapseStatus) sys)
 
     --sys' = if length keys < 3 then sys -- || isJust (L.get sCollapsed sys) 
