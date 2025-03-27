@@ -1270,7 +1270,9 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
     -- Escape new
     --Try to find a goal that is not in loop, if none, take the first one
 
-    prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+    prove !depth sys = 
+      --appendFile "exportTactic" "New branch new me\n"
+      case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           []   -> node Solved M.empty sys
           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
@@ -1280,7 +1282,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
         checkForLoop [(method, (cases, _expl))] (method0, (cases0, _expl0)) = node method0 cases0 sys
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
-            InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
+            InLoop _ -> trace ("---"++show depth++"---"++show (cleanGoal g)) checkForLoop suite (method0, (cases0, _expl0))
             otherwise -> node method cases sys
 
         node method cases _sys = 
