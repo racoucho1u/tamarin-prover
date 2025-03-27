@@ -1282,7 +1282,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 = prove d0 sys0
         checkForLoop [(method, (cases, _expl))] (method0, (cases0, _expl0)) = node method0 cases0 sys
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 sys
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
-            InLoop g -> trace ("---"++show depth++"---"++show (cleanGoal g)) checkForLoop suite (method0, (cases0, _expl0))
+            InLoop (_,_,g,_) -> trace ("---"++show depth++"---"++show (cleanGoal g)) checkForLoop suite (method0, (cases0, _expl0))
             otherwise -> node method cases sys
 
         node method cases _sys = 
