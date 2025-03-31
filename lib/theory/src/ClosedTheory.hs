@@ -33,6 +33,8 @@ import           Theory.Text.Pretty
 import OpenTheory
 import Pretty
 
+import Debug.Trace
+
 ------------------------------------------------------------------------------
 -- Closed theory querying / construction / modification
 ------------------------------------------------------------------------------
@@ -104,7 +106,7 @@ getProofContext l thy = ProofContext
     specifiedHeuristic
     specifiedTactic
     (toSystemTraceQuantifier $ L.get lTraceQuantifier l)
-    (L.get lName l)
+    (trace ("Removeme | lemmaName: "++show (L.get lName l)) L.get lName l)
     ([ h | HideLemma h <- L.get lAttributes l])
     ( L.get (verboseOption.thyOptions)         thy)
     False

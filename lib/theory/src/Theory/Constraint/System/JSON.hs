@@ -47,6 +47,9 @@ import           Text.PrettyPrint.Class     -- for Doc and the pretty printing f
 import           Theory.Constraint.System   
 import           Theory.Model
 
+--Removeme
+import Debug.Trace
+
 -------------------------------------------------------------------------------------------------
 -- Data structure for JSON graphs                                                              --
 -- adapted from https://github.com/jsongraph/json-graph-specification                          --
@@ -392,7 +395,7 @@ sequentToJSONGraphs pretty label se =
                           ++ (lastAtomToJSONGraphNode $ L.get sLastAtom se)
                           ++ (map (unsolvedActionAtomsToJSONGraphNode pretty) $ unsolvedActionAtoms se)
                           ++ (missingNodesToJSONGraphNodes se $ S.toList $ L.get sEdges se)
-              , jgEdges = (map (edgeToJSONGraphEdge se) $ S.toList $ L.get sEdges se)
+              , jgEdges = trace ("Removeme: "++show(getLessAtoms se) ) (map (edgeToJSONGraphEdge se) $ S.toList $ L.get sEdges se)
                           ++ (map lessAtomsToJSONGraphEdge $ S.toList $ getLessAtoms se)
                           ++ (map unsolvedchainToJSONGraphEdge $ unsolvedChains se)
               } 
