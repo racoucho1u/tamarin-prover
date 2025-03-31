@@ -181,7 +181,7 @@ mergeMapsWith leftOnly rightOnly combine l r =
 -- Proof Steps
 ------------------------------------------------------------------------------
 
--- | A proof steps is a proof method together with additional context-dependent
+-- | A proof steps is a uproof method together with additional context-dependent
 -- information.
 data ProofStep a = ProofStep
      { psMethod :: ProofMethod
@@ -638,7 +638,7 @@ tryProver =  (`orelse` mempty)
 oneStepProver :: ProofMethod -> Prover
 oneStepProver method = Prover $ \ctxt _ se _ -> do
     cases <- execProofMethod ctxt method se
-    return $ trace ("Hello "++show cases) LNode (ProofStep method (Just se)) (M.map (unproven . Just) cases)
+    return $ LNode (ProofStep method (Just se)) (M.map (unproven . Just) cases)
 
 -- | Try to execute one proof step using the given proof method.
 oneStepDiffProver :: DiffProofMethod -> DiffProver
@@ -786,7 +786,7 @@ runAutoProver aut@(AutoProver _ _  bound cut) =
     -- | The standard automatic prover that ignores the existing proof and
     -- tries to find one by itself.
     autoProver :: Prover
-    autoProver = trace ("Bound" ++ show bound) (Prover $ \ctxt depth sys _ ->
+    autoProver = (Prover $ \ctxt depth sys _ ->
         return $ fmap (fmap Just)
                $ annotateWithSystems ctxt sys
                $ proveSystemDFS (selectHeuristic aut ctxt) (selectTactic aut ctxt) ctxt depth sys)
@@ -1063,11 +1063,10 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0--exportTactic generatedTactic method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
-            InLoop _ -> checkForLoop suite (method0, (cases0, _expl0))
+            InLoop (_,_,g) -> trace ("---"++show depth++"---"++show (cleanGoal g)) checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
 
-        node method cases = 
-          LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
+        node method cases = LNode (ProofStep method ()) (M.map (prove (succ depth)) cases)
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the

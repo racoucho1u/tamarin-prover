@@ -760,7 +760,7 @@ itRanking tactic ags ctxt _sys = result
 --   for each lemma separately, using the user chosen defaultMethod heuristic
 --   as the baseline.
 internalTacticRanking :: Tactic ProofContext -> ProofContext -> System -> [AnnotatedGoal] -> [AnnotatedGoal]
-internalTacticRanking tactic ctxt _sys ags0 = trace logMsg res
+internalTacticRanking tactic ctxt _sys ags0 = res --trace logMsg res
     where
         defaultMethod =  _presort tactic                        -- retrieve baseline heuristic 
         ags = rankGoals ctxt defaultMethod [tactic] _sys ags0   -- get goals accordingly
@@ -776,7 +776,7 @@ internalTacticRanking tactic ctxt _sys ags0 = trace logMsg res
                      ++ inp
                      ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> START OUTPUT\n"
                      ++ prettyOut
-                     ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Oracle call\n"
+                     ++ "\n>>>>>>>>>>>>>>>>>>>>>>>> END Tactic call\n"
 
 -- | Utilities for SAPiC translations specifically 
 
