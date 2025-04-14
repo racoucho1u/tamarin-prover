@@ -290,11 +290,11 @@ foundAtMultiSet goal ([]:t) = foundAtMultiSet goal t
 foundAtMultiSet goal (h:t)
       | sameFirstTerm goal (head h) && sameName goal (head h) = if any (customSubset mst) msL && any (customSubset varG) varH
                 then Just (2, 1)
-                else second (1 +) <$> foundAtMultiSet goal t -- trace ("Ptitcailloux: "++show goal++" : "++show (functionSymGoal goal)++"\nMoyencailloux: "++show h++"\nCailloux:" ++ show (firstTerm goal)) $
+                else second (1 +) <$> foundAtMultiSet goal t 
       | sameName goal (head h) = if any (customSubset mst) msL && any (customSubset varG) varH
                 then Just (3,1)
                 else second (1 +) <$> foundAtMultiSet goal t
-      | otherwise = second (1 +) <$> foundAtMultiSet goal t --trace ("Not matched: "++show goal++" : "++show (functionSymGoal goal)++"\nMoyencailloux: "++show h++"\nCailloux:" ++ show (firstTerm goal))
+      | otherwise = second (1 +) <$> foundAtMultiSet goal t 
   where
     mst = functionSymGoal goal
     msL = map functionSymGoal h
@@ -302,24 +302,17 @@ foundAtMultiSet goal (h:t)
     varG = varGoal goal
     varH = map varGoal h
 
-    --constG = constGoal goal
-    --constH = map constGoal h
-    -- && any (customSubset constG) constH 
-    -- block detection for h(h(x)), or need a default case at True
 
     customSubset refMST refMS = refMS `MS.isSubsetOf` refMST
-        -- | null refMS = False
-        -- | otherwise  = trace ("Comp: "++show goal++" | "++show h++"\n"++show refMST++" | "++show refMS++" | "++show (refMS `MS.isSubsetOf` refMST)) refMS `MS.isSubsetOf` refMST -- || (mst `MS.isSubsetOf` refMS)
 
     sameName :: Goal -> Goal -> Bool
-    sameName (ActionG _ f1) (ActionG _ f2) =  factTag f1 == factTag f2 --trace ("Name: "++show (factTag f1))
+    sameName (ActionG _ f1) (ActionG _ f2) =  factTag f1 == factTag f2 
     sameName (PremiseG _ f1) (PremiseG _ f2) = factTag f1 == factTag f2
     sameName _ _ = False
 
     firstTerm :: Goal -> Maybe FunSym --Maybe LNTerm
-    firstTerm (ActionG _ f)  = fromMaybe Nothing $ listToMaybe $ map firstFunctionSymbol $ factTerms f --trace ("Fst term: "++show (head $ map firstFunctionSymbol $ factTerms f))
+    firstTerm (ActionG _ f)  = fromMaybe Nothing $ listToMaybe $ map firstFunctionSymbol $ factTerms f 
     firstTerm (PremiseG _ f) = fromMaybe Nothing $ listToMaybe $ map firstFunctionSymbol $ factTerms f
-    --firstTerm (PremiseG _ f) = trace ("FT: "++show f) insideJobi <$> headMay (factTerms f)
     firstTerm _ = Nothing
 
     sameFirstTerm :: Goal -> Goal -> Bool
@@ -329,8 +322,6 @@ foundAtMultiSet goal (h:t)
       (fstG, fstB) -> fstG == fstB
 
 
---Meilleure généralisation: chaque Maybe Int comes with its own gravity score, we sort on the smallest not Nothing one and take its depth
---Ask if we sould rather go this way or by depth loop
 customComparison :: Maybe Int -> Maybe (Int,Int) -> (Int, Int)
 customComparison Nothing Nothing   = (0,0)
 customComparison Nothing (Just (s,n))  = (s,n)
@@ -360,7 +351,7 @@ execProofMethod ctxt method sys =
           | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
         SolveGoal goal
-          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys --trace ("5: "++show goal) 
+          | goal `M.member` L.get sGoals sys -> checkForLoop goal sys
           | otherwise                        -> Nothing
         Simplify                 -> singleCase simplifySystem
         Induction                -> M.map cleanupSystem <$> execInduction
@@ -389,7 +380,7 @@ execProofMethod ctxt method sys =
       where check sys' = cleanupSystem sys /= sys'
 
     checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goal s = executedProofMethod -- filterProvedMethod executedProofMethod --trace ("Coucou genou:"++show index++": "++show (cleanGoal goal))
+    checkForLoop goal s = executedProofMethod 
         where
             indexId = foundAt (cleanGoal goal) (map (map cleanGoal . fth4 ) (L.get sPathGoals s))
             resMult = foundAtMultiSet goal (map fth4 (L.get sPathGoals s))
@@ -398,10 +389,6 @@ execProofMethod ctxt method sys =
             (iteration, depth, l) = if index > 0 then (snd4 fatherGoal+1, index, True) else (0,0,False) --snd3 fatherGoal+index
 
             executedProofMethod = execSolveGoal goal l score depth iteration
-
-            filterProvedMethod epm = case epm of
-              Just mlist -> if length (M.toList mlist) > 6 then execSolveGoal goal True 1 0 1 else epm
-              Nothing  -> epm
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
@@ -425,10 +412,8 @@ execProofMethod ctxt method sys =
         updateSys _sys score index it g = unsafePerformIO $ do
             let currentPathGoals = L.get sPathGoals _sys
                 sys2 = if _loop
-                  --why did I want to remove goal at index?
-                  --then L.set sNbLoop (index,it) (L.set sLoopFound _loop (L.set sPathGoals ((it,index,[cleanGoal g]):take (index-1) currentPathGoals++drop index currentPathGoals) _sys))
-                  then L.set sNbLoop (score,index,it) (L.set sLoopFound _loop (L.set sPathGoals ((score,it,index,[cleanGoal g]):currentPathGoals) _sys)) --trace ("SYSLOOPTRUE: "++show index++" "++show it++" "++show _loop++show (cleanGoal g))
-                  else L.set sNbLoop (score,index,it) (L.set sLoopFound _loop (L.set sPathGoals ((0,0,0,[cleanGoal g]):currentPathGoals) _sys)) --trace ("SYSLOOPFALS: "++show index++" "++show it++" "++show _loop++show (cleanGoal g))
+                  then L.set sNbLoop (score,index,it) (L.set sLoopFound _loop (L.set sPathGoals ((score,it,index,[cleanGoal g]):currentPathGoals) _sys)) 
+                  else L.set sNbLoop (score,index,it) (L.set sLoopFound _loop (L.set sPathGoals ((0,0,0,[cleanGoal g]):currentPathGoals) _sys)) 
             return sys2
 
         makeCaseNames =
@@ -662,7 +647,7 @@ rankProofMethods ranking tactics ctxt sys =
 
     fromSolveGoal :: ProofMethod -> System -> a0 -> b0 -> (ProofMethod, (a0, b0))
     fromSolveGoal (SolveGoal goal) sys1 cases expl = (InLoop (fst3 $ L.get sNbLoop sys1,snd3 $ L.get sNbLoop sys1, goal, thd3 $ L.get sNbLoop sys1), (cases, expl))
-    fromSolveGoal m sys1 cases expl = trace ("FromJust: "++show m++"\n"++show (L.get sNbLoop sys1)++" "++show (L.get sPathGoals sys1)) (m, (cases, expl))
+    fromSolveGoal m sys1 cases expl = (m, (cases, expl))
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'DiffProofContext' and

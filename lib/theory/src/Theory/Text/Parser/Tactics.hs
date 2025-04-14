@@ -139,7 +139,7 @@ tacticFunctions = M.fromList
 
     ignoreN :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
     ignoreN n ((goal,_),_,sys) = case n of
-            [i] -> trace ("I: "++show iteration++" "++show goal) iteration >= (read i :: Int)
+            [i] -> iteration >= (read i :: Int)
             _   -> error "ignoreN takes a int as parameter"
         where
             indexId = foundAt (cleanGoal goal) (map (map cleanGoal . fth4) (L.get sPathGoals sys))
