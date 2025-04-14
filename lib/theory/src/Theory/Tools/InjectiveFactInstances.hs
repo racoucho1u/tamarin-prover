@@ -115,7 +115,7 @@ simpleInjectiveFactInstances reducible rules = S.fromList $ do
 
     combineAll :: [Maybe [[MonotonicBehaviour]]] -> FactTag -> Maybe [[MonotonicBehaviour]]
     combineAll list _ | any isNothing list = Nothing  -- if any of the elements say that the tag is not injective, then return nothing
-    combineAll (Just behaviours : Just behaviours1 : rest) tag = --trace (show("combineAll", behaviours, behaviours1, (map (map combine) $ zipWith zip behaviours behaviours1))) $
+    combineAll (Just behaviours : Just behaviours1 : rest) tag = 
                                                                  combineAll (Just (map (map combine) $ zipWith zip behaviours behaviours1):rest) tag
     combineAll [x] _ = x
     combineAll [] tag = M.lookup tag candidates  --start with the empty shape of Unspecified
@@ -183,7 +183,7 @@ simpleInjectiveFactInstances reducible rules = S.fromList $ do
                   getBehaviour (t1, t2) | elemNotBelowReducible reducible t2 t1 = StrictlyDecreasing
                   getBehaviour _ = Unstable
 
-                  behaviours = --trace (show("zipped,final", zipped, map (map getBehaviour) zipped)) $
+                  behaviours = 
                                map (map getBehaviour) zipped
 
         -- get the corresponding fact in the premise
