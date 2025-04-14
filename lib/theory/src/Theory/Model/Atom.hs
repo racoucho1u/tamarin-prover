@@ -212,8 +212,8 @@ replaceLvarsort LSortFresh = LSortMsg
 replaceLvarsort s = s
 
 insideJobi :: VTerm Name LVar -> VTerm Name LVar
-insideJobi (viewTerm -> Lit (Var v )) = (termViewToTerm (Lit (Var ( LVar (lvarName v) (replaceLvarsort $ lvarSort v) 0)) )) --trace ("List: "++(show $ v)++" litname: "++(show $ (lvarName v))++" litsort: "++(show $ (lvarSort v))) 
-insideJobi (viewTerm -> FApp fun list) = (termViewToTerm ( FApp fun (map insideJobi list) )) --trace ("List: list: "++(show $ list)++" fun: "++(show $ (fun))++" list: "++(show $ (map insideJobi list))) 
+insideJobi (viewTerm -> Lit (Var v )) = (termViewToTerm (Lit (Var ( LVar (lvarName v) (replaceLvarsort $ lvarSort v) 0)) )) 
+insideJobi (viewTerm -> FApp fun list) = (termViewToTerm ( FApp fun (map insideJobi list) )) 
 insideJobi c = c
 {-insideJobi (viewTerm -> Lit (Var v )) = termViewToTerm ( Lit (Var ( LVar (lvarName v) (lvarSort v) 0)) )
 insideJobi jobi = jobi-}
@@ -223,11 +223,11 @@ insideJob (viewTerm -> Lit (Var v )) = case v of Free f -> termViewToTerm ( Lit 
 insideJob bound = bound
 
 changeBVarAtom :: Atom (VTerm Name (BVar LVar)) -> Atom (VTerm Name (BVar LVar))
-changeBVarAtom (Action v (Fact t1 t2 t3)) = Action (insideJob v) (Fact t1 t2 (map insideJob t3)) --trace ("List: v: "++(show $ v)++" t1: "++(show $ t1)++" t2: "++(show $ t2)++" t3: "++(show $ t3))
+changeBVarAtom (Action v (Fact t1 t2 t3)) = Action (insideJob v) (Fact t1 t2 (map insideJob t3)) 
 changeBVarAtom (Less t1 t2) = Less (insideJob t1) (insideJob t2)
 changeBVarAtom (EqE  t1 t2) = EqE (insideJob t1) (insideJob t2)
 changeBVarAtom (Last t) = Last (insideJob t)
-changeBVarAtom (Syntactic fa) = trace ("\nSyntaxic atom: " ++ show fa) Syntactic fa
+changeBVarAtom (Syntactic fa) = Syntactic fa
 
 ------------------------------------------------------------------------------
 -- Pretty-Printing
