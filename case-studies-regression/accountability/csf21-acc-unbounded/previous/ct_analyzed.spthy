@@ -221,7 +221,7 @@ rule (modulo E) locktestCA_0_1111121[color=#408069,
 
 rule (modulo E) lookupcaproofOfIDspkasignored_0_111112111[color=#408080,
                                                           process="lookup <$ca.4, 'proofOfID', $s.3, pk.2> as ignored.1",
-                                                          issapicrule]:
+                                                          issapicrule, derivchecks]:
    [ State_111112111( lock.1, pk.2, $s.3, $ca.4 ) ]
   --[ IsIn( <$ca.4, 'proofOfID', $s.3, pk.2>, ignored.1 ) ]->
    [ State_1111121111( ignored.1, lock.1, pk.2, $s.3, $ca.4 ) ]
@@ -229,7 +229,7 @@ rule (modulo E) lookupcaproofOfIDspkasignored_0_111112111[color=#408080,
   /*
   rule (modulo AC) lookupcaproofOfIDspkasignored_0_111112111[color=#408080,
                                                              process="lookup <$ca.4, 'proofOfID', $s.3, pk.2> as ignored.1",
-                                                             issapicrule]:
+                                                             issapicrule, derivchecks]:
      [ State_111112111( lock, pk, $s, $ca ) ]
     --[ IsIn( <$ca, 'proofOfID', $s, pk>, ignored ) ]->
      [ State_1111121111( ignored, lock, pk, $s, $ca ) ]
@@ -280,7 +280,7 @@ rule (modulo E) unlocktestCA_0_111112111111[color=#408080,
 
 rule (modulo E) lookupcaproofOfIDspkasignored_1_111112111[color=#408080,
                                                           process="lookup <$ca.4, 'proofOfID', $s.3, pk.2> as ignored.1",
-                                                          issapicrule]:
+                                                          issapicrule, derivchecks]:
    [ State_111112111( lock.1, pk.2, $s.3, $ca.4 ) ]
   --[ IsNotSet( <$ca.4, 'proofOfID', $s.3, pk.2> ) ]->
    [ State_1111121112( lock.1, pk.2, $s.3, $ca.4 ) ]
@@ -288,7 +288,7 @@ rule (modulo E) lookupcaproofOfIDspkasignored_1_111112111[color=#408080,
   /*
   rule (modulo AC) lookupcaproofOfIDspkasignored_1_111112111[color=#408080,
                                                              process="lookup <$ca.4, 'proofOfID', $s.3, pk.2> as ignored.1",
-                                                             issapicrule]:
+                                                             issapicrule, derivchecks]:
      [ State_111112111( lock, pk, $s, $ca ) ]
     --[ IsNotSet( <$ca, 'proofOfID', $s, pk> ) ]->
      [ State_1111121112( lock, pk, $s, $ca ) ]
@@ -353,7 +353,7 @@ rule (modulo E) locklog_0_111121[color=#40805d, process="lock 'log';",
 
 rule (modulo E) lookuplalogspkcasx_0_11112111[color=#408067,
                                               process="lookup <$la.2, 'log', $s.4, pk.3, 'c1'> as x1.1",
-                                              issapicrule]:
+                                              issapicrule, derivchecks]:
    [ State_11112111( $la.2, lock.2, pk.3, $s.4 ) ]
   --[ IsIn( <$la.2, 'log', $s.4, pk.3, 'c1'>, x1.1 ) ]->
    [ State_111121111( x1.1, $la.2, lock.2, pk.3, $s.4 ) ]
@@ -361,7 +361,7 @@ rule (modulo E) lookuplalogspkcasx_0_11112111[color=#408067,
   /*
   rule (modulo AC) lookuplalogspkcasx_0_11112111[color=#408067,
                                                  process="lookup <$la.2, 'log', $s.4, pk.3, 'c1'> as x1.1",
-                                                 issapicrule]:
+                                                 issapicrule, derivchecks]:
      [ State_11112111( $la, lock, pk, $s ) ]
     --[ IsIn( <$la, 'log', $s, pk, 'c1'>, x1 ) ]->
      [ State_111121111( x1, $la, lock, pk, $s ) ]
@@ -369,7 +369,7 @@ rule (modulo E) lookuplalogspkcasx_0_11112111[color=#408067,
 
 rule (modulo E) lookuplalogspksasx_0_111121111[color=#408067,
                                                process="lookup <$la.2, 'log', $s.4, pk.3, 's1'> as x2.1",
-                                               issapicrule]:
+                                               issapicrule, derivchecks]:
    [ State_111121111( x1.1, $la.2, lock.2, pk.3, $s.4 ) ]
   --[ IsIn( <$la.2, 'log', $s.4, pk.3, 's1'>, x2.1 ) ]->
    [ State_1111211111( x1.1, x2.1, $la.2, lock.2, pk.3, $s.4 ) ]
@@ -377,7 +377,7 @@ rule (modulo E) lookuplalogspksasx_0_111121111[color=#408067,
   /*
   rule (modulo AC) lookuplalogspksasx_0_111121111[color=#408067,
                                                   process="lookup <$la.2, 'log', $s.4, pk.3, 's1'> as x2.1",
-                                                  issapicrule]:
+                                                  issapicrule, derivchecks]:
      [ State_111121111( x1, $la, lock, pk, $s ) ]
     --[ IsIn( <$la, 'log', $s, pk, 's1'>, x2 ) ]->
      [ State_1111211111( x1, x2, $la, lock, pk, $s ) ]
@@ -427,7 +427,7 @@ rule (modulo E) unlocklog_0_111121111111[color=#408067,
 
 rule (modulo E) lookuplalogspksasx_1_111121111[color=#408067,
                                                process="lookup <$la.2, 'log', $s.4, pk.3, 's1'> as x2.1",
-                                               issapicrule]:
+                                               issapicrule, derivchecks]:
    [ State_111121111( x1.1, $la.2, lock.2, pk.3, $s.4 ) ]
   --[ IsNotSet( <$la.2, 'log', $s.4, pk.3, 's1'> ) ]->
    [ State_1111211112( x1.1, $la.2, lock.2, pk.3, $s.4 ) ]
@@ -435,7 +435,7 @@ rule (modulo E) lookuplalogspksasx_1_111121111[color=#408067,
   /*
   rule (modulo AC) lookuplalogspksasx_1_111121111[color=#408067,
                                                   process="lookup <$la.2, 'log', $s.4, pk.3, 's1'> as x2.1",
-                                                  issapicrule]:
+                                                  issapicrule, derivchecks]:
      [ State_111121111( x1, $la, lock, pk, $s ) ]
     --[ IsNotSet( <$la, 'log', $s, pk, 's1'> ) ]->
      [ State_1111211112( x1, $la, lock, pk, $s ) ]
@@ -485,7 +485,7 @@ rule (modulo E) unlocklog_0_111121111211[color=#408067,
 
 rule (modulo E) lookuplalogspkcasx_1_11112111[color=#408067,
                                               process="lookup <$la.2, 'log', $s.4, pk.3, 'c1'> as x1.1",
-                                              issapicrule]:
+                                              issapicrule, derivchecks]:
    [ State_11112111( $la.2, lock.2, pk.3, $s.4 ) ]
   --[ IsNotSet( <$la.2, 'log', $s.4, pk.3, 'c1'> ) ]->
    [ State_111121112( $la.2, lock.2, pk.3, $s.4 ) ]
@@ -493,7 +493,7 @@ rule (modulo E) lookuplalogspkcasx_1_11112111[color=#408067,
   /*
   rule (modulo AC) lookuplalogspkcasx_1_11112111[color=#408067,
                                                  process="lookup <$la.2, 'log', $s.4, pk.3, 'c1'> as x1.1",
-                                                 issapicrule]:
+                                                 issapicrule, derivchecks]:
      [ State_11112111( $la, lock, pk, $s ) ]
     --[ IsNotSet( <$la, 'log', $s, pk, 'c1'> ) ]->
      [ State_111121112( $la, lock, pk, $s ) ]
@@ -501,7 +501,7 @@ rule (modulo E) lookuplalogspkcasx_1_11112111[color=#408067,
 
 rule (modulo E) lookuplalogspksasx_0_111121112[color=#408067,
                                                process="lookup <$la.2, 'log', $s.4, pk.3, 's1'> as x2.2",
-                                               issapicrule]:
+                                               issapicrule, derivchecks]:
    [ State_111121112( $la.2, lock.2, pk.3, $s.4 ) ]
   --[ IsIn( <$la.2, 'log', $s.4, pk.3, 's1'>, x2.2 ) ]->
    [ State_1111211121( $la.2, lock.2, x2.2, pk.3, $s.4 ) ]
@@ -509,7 +509,7 @@ rule (modulo E) lookuplalogspksasx_0_111121112[color=#408067,
   /*
   rule (modulo AC) lookuplalogspksasx_0_111121112[color=#408067,
                                                   process="lookup <$la.2, 'log', $s.4, pk.3, 's1'> as x2.2",
-                                                  issapicrule]:
+                                                  issapicrule, derivchecks]:
      [ State_111121112( $la, lock, pk, $s ) ]
     --[ IsIn( <$la, 'log', $s, pk, 's1'>, x2 ) ]->
      [ State_1111211121( $la, lock, x2, pk, $s ) ]
@@ -5538,9 +5538,6 @@ Failed to derive Variable(s): lock, $la.1, pk.1, $s.2, $ca.3
 Rule locktestCA_0_1111121: 
 Failed to derive Variable(s): lock.1, pk.2, $s.3, $ca.4
 
-Rule lookupcaproofOfIDspkasignored_0_111112111: 
-Failed to derive Variable(s): ignored.1, lock.1, pk.2, $s.3, $ca.4
-
 Rule eventHonestCAca_0_1111121111: 
 Failed to derive Variable(s): ignored.1, lock.1, pk.2, $s.3, $ca.4
 
@@ -5549,9 +5546,6 @@ Failed to derive Variable(s): ignored.1, lock.1, pk.2, $s.3, $ca.4
 
 Rule unlocktestCA_0_111112111111: 
 Failed to derive Variable(s): ignored.1, lock.1, pk.2, $s.3, $ca.4
-
-Rule lookupcaproofOfIDspkasignored_1_111112111: 
-Failed to derive Variable(s): lock.1, pk.2, $s.3, $ca.4
 
 Rule eventDishonestCAca_0_1111121112: 
 Failed to derive Variable(s): lock.1, pk.2, $s.3, $ca.4
@@ -5565,12 +5559,6 @@ Failed to derive Variable(s): lock.1, pk.2, $s.3, $ca.4
 Rule locklog_0_111121: 
 Failed to derive Variable(s): $la.2, lock.2, pk.3, $s.4
 
-Rule lookuplalogspkcasx_0_11112111: 
-Failed to derive Variable(s): x1.1, $la.2, lock.2, pk.3, $s.4
-
-Rule lookuplalogspksasx_0_111121111: 
-Failed to derive Variable(s): x1.1, x2.1, $la.2, lock.2, pk.3, $s.4
-
 Rule eventHonestLA_0_1111211111: 
 Failed to derive Variable(s): x1.1, x2.1, $la.2, lock.2, pk.3, $s.4
 
@@ -5580,9 +5568,6 @@ Failed to derive Variable(s): x1.1, x2.1, $la.2, lock.2, pk.3, $s.4
 Rule unlocklog_0_111121111111: 
 Failed to derive Variable(s): x1.1, x2.1, $la.2, lock.2, pk.3, $s.4
 
-Rule lookuplalogspksasx_1_111121111: 
-Failed to derive Variable(s): x1.1, $la.2, lock.2, pk.3, $s.4
-
 Rule eventDishonestLAla_0_1111211112: 
 Failed to derive Variable(s): x1.1, $la.2, lock.2, pk.3, $s.4
 
@@ -5591,12 +5576,6 @@ Failed to derive Variable(s): x1.1, $la.2, lock.2, pk.3, $s.4
 
 Rule unlocklog_0_111121111211: 
 Failed to derive Variable(s): x1.1, $la.2, lock.2, pk.3, $s.4
-
-Rule lookuplalogspkcasx_1_11112111: 
-Failed to derive Variable(s): $la.2, lock.2, pk.3, $s.4
-
-Rule lookuplalogspksasx_0_111121112: 
-Failed to derive Variable(s): $la.2, lock.2, x2.2, pk.3, $s.4
 
 Rule eventDishonestLAla_0_1111211121: 
 Failed to derive Variable(s): $la.2, lock.2, x2.2, pk.3, $s.4
@@ -5685,10 +5664,10 @@ Failed to derive Variable(s): $id.1, S.1, entity.1, $la.3, pk.4, lock.5
 
 /*
 Generated from:
-Tamarin version 1.9.0
+Tamarin version 1.11.0
 Maude version 3.4
-Git revision: f187584ba8325431d43d5e0a58baa381ac2c3f47, branch: develop
-Compiled at: 2024-10-29 14:19:56.449404967 UTC
+Git revision: f406d926a9eca90938ec0f955316087bb842bb6e (with uncommited changes), branch: error_messages
+Compiled at: 2025-02-20 12:12:04.473468 UTC
 */
 
 end
@@ -5700,7 +5679,7 @@ summary of summaries:
 analyzed: examples/accountability/csf21-acc-unbounded/previous/ct.spthy
 
   output:          examples/accountability/csf21-acc-unbounded/previous/ct.spthy.tmp
-  processing time: 23.20s
+  processing time: 14.81s
   
   WARNING: 3 wellformedness check failed!
            The analysis results might be wrong!

@@ -329,7 +329,7 @@ solve( (∃ matchingSession #i3 matchingRole.
             case Init_1
             solve( Sid( matchingSession,
                         <$B, $A, Y, 'g'^h1(<~ex, sk($A)>), matchingRole>
-                   ) @ #i3 )
+                   ) @ #i3.1 )
               case Init_2
               by contradiction /* from formulas */
             next
@@ -426,7 +426,7 @@ solve( (∃ matchingSession #i3 matchingRole.
         case Resp_1
         solve( Sid( matchingSession,
                     <$A, $B, X, 'g'^h1(<~ey, sk($B)>), matchingRole>
-               ) @ #i3 )
+               ) @ #i3.1 )
           case Init_2
           solve( Init_1( ~ex, $A, $B ) ▶₀ #i3 )
             case Init_1
@@ -603,10 +603,10 @@ qed
 
 /*
 Generated from:
-Tamarin version 1.9.0
+Tamarin version 1.11.0
 Maude version 3.4
-Git revision: f187584ba8325431d43d5e0a58baa381ac2c3f47, branch: develop
-Compiled at: 2024-10-29 14:19:56.449404967 UTC
+Git revision: f406d926a9eca90938ec0f955316087bb842bb6e (with uncommited changes), branch: error_messages
+Compiled at: 2025-02-20 12:12:04.473468 UTC
 */
 
 end
@@ -618,7 +618,7 @@ summary of summaries:
 analyzed: examples/features//private_function_symbols/NAXOS_eCK_private.spthy
 
   output:          examples/features//private_function_symbols/NAXOS_eCK_private.spthy.tmp
-  processing time: 1.07s
+  processing time: 0.70s
   
   eCK_key_secrecy (all-traces): verified (89 steps)
 
