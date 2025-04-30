@@ -13,6 +13,8 @@ module Theory.Text.Parser.Lemma(
       , plainLemma
       , lemmaWithMsig
       , diffLemma
+      , removeCommentBlock
+      , removeComments
 )
 where
 

@@ -140,7 +140,7 @@ applyDiffMethodAtPath thy lemmaName proofPath prover i = do
     methods <- (map fst . rankDiffProofMethods ranking tactic ctxt) <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyDiffProverAtPath thy lemmaName proofPath
-      (   oneStepDiffProver method                                 
+      (   oneStepDiffProver method
        <> replaceDiffSorryProver (oneStepDiffProver (DiffBackwardSearchStep Simplify))
        <> replaceDiffSorryProver contradictionDiffProver
        <> replaceDiffSorryProver (oneStepDiffProver DiffMirrored)
@@ -240,8 +240,8 @@ proofIndex l tidx renderUrl mkRoute =
 
         superfluousStep = withTag "span" [("class","hl_superfluous")] ppMethod
 
-        invalidatedStep = if psMethod step == Invalidated 
-                            then stepLink ["hl_medium"] <-> 
+        invalidatedStep = if psMethod step == Invalidated
+                            then stepLink ["hl_medium"] <->
                                   (linkToPath renderUrl (TheoryVerifyR tidx $ TheoryProof l []) ["hl_medium"] $ text "verify it")
                             else stepLink ["hl_medium"]
 
@@ -297,9 +297,9 @@ lemmaIndex renderUrl tidx l =
                      ] )
 
         $-$
-        (linkToPath renderUrl lemmaEdit ["edit"] $ text "edit lemma") 
+        (linkToPath renderUrl lemmaEdit ["edit"] $ text "edit lemma")
         <->
-        text " or " 
+        text " or "
         <->
         (linkToPath renderUrl lemmaDelete ["delete"] $ text "delete lemma")
 
@@ -311,9 +311,9 @@ lemmaIndex renderUrl tidx l =
     (linkToPath renderUrl lemmaAdd ["add"] $ text "add lemma")
   where
 
-    lemmaEdit = TheoryPathMR tidx $ TheoryEdit $ get lName l
-    lemmaDelete = TheoryPathMR tidx $ TheoryDelete $ get lName l
-    lemmaAdd = TheoryPathMR tidx $ TheoryAdd $ get lName l
+    lemmaEdit = TheoryPathMR tidx $ TheoryEditLemma $ get lName l
+    lemmaDelete = TheoryPathMR tidx $ TheoryDeleteLemma $ get lName l
+    lemmaAdd = TheoryPathMR tidx $ TheoryAddLemma $ get lName l
 
     annPrf = annotateLemmaProof l
     mkRoute proofPath = TheoryPathMR tidx (TheoryProof (get lName l) proofPath)
@@ -370,11 +370,13 @@ theoryIndex renderUrl tidx thy = foldr1 ($-$)
     , text ""
     , tacticLink
     , text ""
+    , (linkToPath renderUrl (TheoryPathMR tidx $ TheoryAddTactic $ "<firstTactic>") ["addTactic"] $ text "add tactic")
+    , text ""
     , reqCasesLink "Raw sources" RawSource
     , text ""
     , reqCasesLink "Refined sources " RefinedSource
     , text ""
-    , (linkToPath renderUrl (TheoryPathMR tidx $ TheoryAdd $ "<first>") ["add"] $ text "add lemma")
+    , (linkToPath renderUrl (TheoryPathMR tidx $ TheoryAddLemma $ "<firstLemma>") ["add"] $ text "add lemma")
     , text ""
     , vcat $ intersperse (text "") lemmas
     , text ""
@@ -400,7 +402,7 @@ theoryIndex renderUrl tidx thy = foldr1 ($-$)
     messageLink         = overview "Message theory" (text "") TheoryMessage
     ruleLink            = overview ruleLinkMsg rulesInfo TheoryRules
     ruleLinkMsg         = "Multiset rewriting rules" ++
-                          if null(theoryRestrictions thy) then "" else " and restrictions"
+                          if null (theoryRestrictions thy) then "" else " and restrictions"
     tacticLink          = overview "Tactic(s)" (text "") TheoryTactic
 
     reqCasesLink name k = overview name (casesInfo k) (TheorySource k 0 0)
@@ -483,7 +485,7 @@ diffTheoryIndex renderUrl tidx thy = foldr1 ($-$)
     messageLink s isdiff = overview (show s ++ ": Message theory" ++ if isdiff then " [Diff]" else "") (text "") (DiffTheoryMessage s isdiff)
     ruleLink s isdiff    = overview (ruleLinkMsg s isdiff) (rulesInfo s isdiff) (DiffTheoryRules s isdiff)
     ruleLinkMsg s isdiff = show s ++ ": Multiset rewriting rules " ++
-                           (if null(diffTheorySideRestrictions s thy) then "" else " and restrictions") ++ (if isdiff then " [Diff]" else "")
+                           (if null (diffTheorySideRestrictions s thy) then "" else " and restrictions") ++ (if isdiff then " [Diff]" else "")
 
     reqCasesLink s name k isdiff = overview name (casesInfo s k isdiff) (DiffTheorySource s k isdiff 0 0)
 
@@ -590,7 +592,7 @@ subProofSnippet renderUrl renderImgUrl tidx ti lemma proofPath ctxt prf =
     depth                   = length proofPath
     heuristic               = selectHeuristic (tiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
-    tactic                 = selectTactic (tiAutoProver ti) ctxt
+    tactic                  = selectTactic (tiAutoProver ti) ctxt
     proofMethods            = rankProofMethods ranking tactic ctxt
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
@@ -684,7 +686,7 @@ subProofDiffSnippet renderUrl tidx ti s lemma proofPath ctxt prf =
     depth                   = length proofPath
     heuristic               = selectHeuristic (dtiAutoProver ti) ctxt
     ranking                 = useHeuristic heuristic depth
-    tactic                 = selectTactic (dtiAutoProver ti) ctxt
+    tactic                  = selectTactic (dtiAutoProver ti) ctxt
     proofMethods            = rankProofMethods ranking tactic ctxt
     subCases                = concatMap refSubCase $ M.toList $ children prf
     refSubCase (name, prf') =
@@ -876,13 +878,13 @@ reqCasesDiffSnippet renderUrl tidx s kind isdiff thy = vcat $
 -- | Build the Html document showing the rules of the theory.
 rulesSnippet :: HtmlDocument d => ClosedTheory -> d
 rulesSnippet thy = vcat
-    [ if null(theoryMacros thy) then text empty
-                                else ppWithHeader "Macros" $ 
+    [ if null (theoryMacros thy) then text empty
+                                else ppWithHeader "Macros" $
         (prettyMacros $ theoryMacros thy)
     , ppWithHeader "Fact Symbols with Injective Instances" $
         (if null injFacts then text "None" else fsepList (text . showInjFact) injFacts)
     , ppWithHeader "Multiset Rewriting Rules" $
-        (if null(theoryMacros thy) then text empty else text "(Shown with macros application)") <-> (vsep $ map prettyRuleAC msrRules)
+        (if null (theoryMacros thy) then text empty else text "(Shown with macros application)") <-> (vsep $ map prettyRuleAC msrRules)
     , ppWithHeader "Restrictions of the Set of Traces" $
         vsep $ map prettyRestriction $ theoryRestrictions thy
     ]
@@ -916,13 +918,41 @@ messageSnippet thy = vcat
         (vcat (intersperse (text "") $ s))
 
 -- | Build the Html document showing the message theory.
-tacticSnippet :: HtmlDocument d => ClosedTheory -> d
-tacticSnippet thy = ppSection "Tactic(s)" (map prettyTactic $ get thyTactic thy)
+tacticSnippet ::  HtmlDocument d
+           => RenderUrl                   -- ^ The url rendering function
+           -> TheoryIdx                   -- ^ The theory index
+           -> ClosedTheory 
+           -> d
+tacticSnippet renderUrl tidx thy = ppSection "Tactic(s)" (map (tacticIndex renderUrl tidx) $ get thyTactic thy)
   where
     ppSection header s =
       withTag "h2" [] (text header) $$ withTag "p"
         [("class","monospace rules")]
         (vcat (intersperse (text "") $ s))
+
+-- | Render the indexing links for a single tactic    
+tacticIndex :: HtmlDocument d
+           => RenderUrl                   -- ^ The url rendering function
+           -> TheoryIdx                   -- ^ The theory index
+           -> Tactic ProofContext         -- ^ The lemma
+           -> d 
+tacticIndex renderUrl tidx t = 
+      prettyTactic t 
+      $-$
+        linkToPath renderUrl lemmaEdit ["editTactic"] (text "edit tactic")
+        <->
+        text " or "
+        <->
+        linkToPath renderUrl lemmaDelete ["deleteTactic"] (text "delete tactic")
+        $-$
+        text ""
+        $-$
+        linkToPath renderUrl lemmaAdd ["addTactic"] (text "add tactic")
+  where
+    lemmaEdit = TheoryPathMR tidx $ TheoryEditTactic $ _tname t
+    lemmaDelete = TheoryPathMR tidx $ TheoryDeleteTactic $ _tname t
+    lemmaAdd = TheoryPathMR tidx $ TheoryAddTactic $ _tname t
+ 
 
 -- | Build the Html document showing the diff rules of the diff theory.
 rulesDiffSnippet :: HtmlDocument d => ClosedDiffTheory -> d
@@ -942,13 +972,13 @@ rulesDiffSnippet thy = vcat
 -- | Build the Html document showing the either rules of the diff theory.
 rulesDiffSnippetSide :: HtmlDocument d => Side -> Bool -> ClosedDiffTheory -> d
 rulesDiffSnippetSide s isdiff thy = vcat
-    [ if null(diffTheoryMacros thy) then text empty
+    [ if null (diffTheoryMacros thy) then text empty
                                      else ppWithHeader "Macros" $
         (prettyMacros $ diffTheoryMacros thy)
     ,ppWithHeader "Fact Symbols with Injective Instances" $
         (if null injFacts then text "None" else fsepList (text . showInjFact) injFacts)
     , ppWithHeader "Multiset Rewriting Rules" $
-        (if null(diffTheoryMacros thy) then text empty else text "(Shown with macros application)") <-> (vsep $ map prettyRuleAC msrRules)
+        (if null (diffTheoryMacros thy) then text empty else text "(Shown with macros application)") <-> (vsep $ map prettyRuleAC msrRules)
     , ppWithHeader "Restrictions of the Set of Traces" $
         vsep $ map prettyRestriction $ diffTheorySideRestrictions s thy
     ]
@@ -988,8 +1018,9 @@ htmlThyPath :: RenderUrl      -- ^ The function for rendering Urls.
             -> TheoryInfo     -- ^ The info of the theory to render
             -> TheoryPath     -- ^ Path to render
             -> String         -- ^ the lemma's plaintext
+            -> String         -- ^ the tactic's plaintext
             -> Html
-htmlThyPath renderUrl renderImgUrl info path lPlaintext =   go path
+htmlThyPath renderUrl renderImgUrl info path lPlaintext tPlaintext =   go path
   where
     thy  = tiTheory info
     tidx = tiIndex  info
@@ -1004,7 +1035,7 @@ htmlThyPath renderUrl renderImgUrl info path lPlaintext =   go path
 
     go TheoryRules             = pp $ rulesSnippet thy
     go TheoryMessage           = pp $ messageSnippet thy
-    go TheoryTactic            = pp $ tacticSnippet thy 
+    go TheoryTactic            = pp $ tacticSnippet renderUrl tidx thy
     go (TheorySource kind _ _) = pp $ reqCasesSnippet renderUrl tidx kind thy
 
     go (TheoryProof l p)       = pp $
@@ -1013,7 +1044,7 @@ htmlThyPath renderUrl renderImgUrl info path lPlaintext =   go path
            subProofSnippet renderUrl renderImgUrl tidx info l p (getProofContext lemma thy)
              <$> resolveProofPath thy l p
 
-    go (TheoryEdit name) = do
+    go (TheoryEditLemma name) = do
         let p = "../../edit/edit/"++name
         [hamlet|
              <form method="post" action=#{p}>
@@ -1056,9 +1087,46 @@ htmlThyPath renderUrl renderImgUrl info path lPlaintext =   go path
                   |] renderUrl
         where textHeight = 2 + (length $ filter (=='\n') lPlaintext)
 
+    go (TheoryEditTactic name) = do
+        let p = "../../edit/editTactic/"++name
+        [hamlet|
+             <form method="post" action=#{p}>
+                <div contenteditable="true">
+                    <label for="lemmaTextArea"> Edit Tactic #{name}
+                    <textarea name="tactic-text" id="lemmaTextArea" rows=#{textHeight}>#{tPlaintext}
+                <button type="submit">Submit
+                <p>
+                <h3> Introduction to Tactic Edit:
+                <noscript>
+                  <div class="warning">
+                    Warning: JavaScript must be enabled for the
+                    <span class="tamarin">Tamarin</span>
+                    prover GUI to function properly.
+                <p>
+                  <ul .wrap-text>
+                    <li>
+                     Modifying the tactic in the box above and clicking the submit button will attempt to modify the tactic in the current theory.
+                     <br>&zwnj;
+                    <li>
+                     Failures in parsing the tactic, and the tactic will NOT be modified.
+                     However, your changes will be kept on this page until you leave this right panel.
+                     <br>&zwnj;
+                    <li>
+                     Editing a tactic will NOT modify the file it was loaded from, but clicking on the "append tactics to file" button adds all modified lemmas as a comment at the end of the file on disk they were loaded from.
+                     <br>&zwnj;
+                    <li>
+                     Clicking on the "Download" button will download the modified version of the theory (including the modified tactics), but not modify the file on disk.
+                  <style>
+                     .wrap-text li {
+                         white-space: normal;
+                         word-wrap: break-word;
+                     }
+                  |] renderUrl
+        where textHeight = 2 + (length $ filter (=='\n') lPlaintext)
+
     go (TheoryLemma _)         = pp $ text "this is a mistake"
 
-    go (TheoryDelete name)        = do
+    go (TheoryDeleteLemma name)        = do
         let p = "../../edit/delete/" ++ name
         [hamlet|
         <p> Do you want to delete lemma #{name}?
@@ -1091,7 +1159,40 @@ htmlThyPath renderUrl renderImgUrl info path lPlaintext =   go path
                  }
              |] renderUrl
 
-    go (TheoryAdd name)  = do
+    go (TheoryDeleteTactic name)        = do
+        let p = "../../edit/deleteTactic/" ++ name
+        [hamlet|
+        <p> Do you want to delete tactic #{name}?
+        <form method="post" action=#{p}>
+            <button type="submit">Yes
+          <p>
+          <h3> Introduction to Tactic Delete:
+          <noscript>
+            <div class="warning">
+              Warning: JavaScript must be enabled for the
+              <span class="tamarin">Tamarin</span>
+              prover GUI to function properly.
+          <p>
+            <ul .wrap-text>
+              <li>
+               Clicking on the button above will delete the tactic from the loaded theory.
+               <br>&zwnj;
+              <li>
+               Deleting a tactic will NOT modify the file it was loaded from, but clicking on the "Download" button will download the modified version of the theory (so without the deleted tactics).
+               <br>&zwnj;
+              <li>
+               Deleting a reuse tactic will invalidate all subsequent proofs.
+               <br>&zwnj;
+              <li>
+               Deleting a source tactic is not supported and will result in an error.
+             <style>
+                 .wrap-text li {
+                     white-space: normal;
+                     word-wrap: break-word;
+                 }
+             |] renderUrl
+
+    go (TheoryAddLemma name)  = do
         let p = "../../edit/add/" ++ name
         [hamlet|
              <form method="post" action=#{p}>
@@ -1123,6 +1224,37 @@ htmlThyPath renderUrl renderImgUrl info path lPlaintext =   go path
                     }
                 |] renderUrl
 
+    go (TheoryAddTactic name)  = do
+        let p = "../../edit/addTactic/" ++ name
+        [hamlet|
+             <form method="post" action=#{p}>
+                <div contenteditable="true">
+                    <label for="tacticTextArea">TacticText
+                    <textarea name="tactic-text" id="tacticTextArea">#{tPlaintext}
+                <button type="submit">Submit
+              <p>
+              <h3> Introduction to Adding Tactics:
+              <noscript>
+                <div class="warning">
+                  Warning: JavaScript must be enabled for the
+                  <span class="tamarin">Tamarin</span>
+                  prover GUI to function properly.
+              <p>
+                <ul .wrap-text>
+                  <li>
+                   Adds the tactic to the theory, but will throw an error if a tactic with the same name exists, the parsing fails, or the tactic isn't well-formed.
+                   <br>&zwnj;
+                  <li>
+                   Adding a tactic will NOT modify the loaded source file, but clicking on the "Append lemmas to file" button appends all added tactics as a comment at the end of the current theory file.
+                   <br>&zwnj;
+                  <li>
+                   Clicking on the "Download" button will download the modified version of the theory (including the added tactics).
+                <style>
+                    .wrap-text li {
+                        white-space: normal;
+                        word-wrap: break-word;
+                    }
+                |] renderUrl
 
     go TheoryHelp              = do
       [hamlet|
@@ -1390,13 +1522,13 @@ imgThyPath :: ImageFormat                  -- ^ The preferred image output forma
            -> ClosedTheory                 -- ^ Theory from which to extract the 'System'.
            -> TheoryPath                   -- ^ Path of the 'System' in the theory.
            -> IO (Maybe FilePath)          -- ^ Path to the generated file.
-imgThyPath imageFormat outputCommand cacheDir_ toDot toJSON thy thyPath = 
+imgThyPath imageFormat outputCommand cacheDir_ toDot toJSON thy thyPath =
     case thyPathSystem thyPath of
       Nothing -> return Nothing
       Just (jsonLabel, system) -> do
         let code = case ocFormat outputCommand of
                      OutDot -> prefixedShowDot $ toDot system
-                     OutJSON -> toJSON jsonLabel system 
+                     OutJSON -> toJSON jsonLabel system
         renderGraphCode code
   where
     thyPathSystem :: TheoryPath -> Maybe (String, System)
@@ -1412,7 +1544,7 @@ imgThyPath imageFormat outputCommand cacheDir_ toDot toJSON thy thyPath =
 
     -- | Get string serialization for proof path in lemma.
     proofPathSystem lemma proofPath = do
-      let jsonLabel = "Theory: " ++ (get thyName thy) ++ " Lemma: " ++ lemma 
+      let jsonLabel = "Theory: " ++ (get thyName thy) ++ " Lemma: " ++ lemma
       subProof <- resolveProofPath thy lemma proofPath
       sequent <- psInfo $ root subProof
       return (jsonLabel, sequent)
@@ -1619,9 +1751,12 @@ titleThyPath thy path = go path
     go TheoryTactic                     = "Tactics"
     go (TheorySource RawSource _ _)     = "Raw sources"
     go (TheorySource RefinedSource _ _) = "Refined sources"
-    go (TheoryEdit l)                   = "Edit Lemma: " ++ l
-    go (TheoryAdd _)                    = "Add new Lemma"
-    go (TheoryDelete l)                 = "Delete " ++ l
+    go (TheoryEditLemma l)              = "Edit Lemma: " ++ l
+    go (TheoryAddLemma _)               = "Add new Lemma"
+    go (TheoryDeleteLemma l)            = "Delete " ++ l
+    go (TheoryEditTactic t)             = "Edit Tactic: " ++ t
+    go (TheoryAddTactic _)              = "Add new Tactic"
+    go (TheoryDeleteTactic t)           = "Delete tactic: " ++ t
     go (TheoryLemma l)                  = "Lemma: " ++ l
     go (TheoryProof l [])               = "Lemma: " ++ l
     go (TheoryProof l p)
@@ -1712,9 +1847,12 @@ nextThyPath thy = go
     go (TheorySource RawSource _ _)     = TheorySource RefinedSource 0 0
     go (TheorySource RefinedSource _ _) = fromMaybe TheoryHelp firstLemma
     go (TheoryLemma lemma)              = TheoryProof lemma []
-    go (TheoryEdit _)                   = TheoryHelp 
-    go (TheoryAdd _)                    = TheoryHelp
-    go (TheoryDelete _)                 = TheoryHelp
+    go (TheoryEditLemma _)              = TheoryHelp
+    go (TheoryAddLemma _)               = TheoryHelp
+    go (TheoryDeleteLemma _)            = TheoryHelp
+    go (TheoryEditTactic _)             = TheoryHelp
+    go (TheoryAddTactic _)              = TheoryHelp
+    go (TheoryDeleteTactic _)           = TheoryHelp
     go (TheoryProof l p)
       | Just nextPath <- getNextPath l p = TheoryProof l nextPath
       | Just nextLemma <- getNextLemma l = TheoryProof nextLemma []
@@ -1806,9 +1944,12 @@ prevThyPath thy = go
     go TheoryTactic                      = TheoryRules
     go (TheorySource RawSource _ _)      = TheoryTactic
     go (TheorySource RefinedSource _ _)  = TheorySource RawSource 0 0
-    go (TheoryEdit  _ )                  = TheoryHelp 
-    go (TheoryAdd _)                     = TheoryHelp
-    go (TheoryDelete _)                  = TheoryHelp
+    go (TheoryEditLemma  _ )             = TheoryHelp
+    go (TheoryAddLemma _)                = TheoryHelp
+    go (TheoryDeleteLemma _)             = TheoryHelp
+    go (TheoryEditTactic  _ )            = TheoryHelp
+    go (TheoryAddTactic _)               = TheoryHelp
+    go (TheoryDeleteTactic _)            = TheoryHelp
     go (TheoryLemma l)
       | Just prevLemma <- getPrevLemma l = TheoryProof prevLemma (lastPath prevLemma)
       | otherwise                        = TheorySource RefinedSource 0 0
@@ -1925,9 +2066,12 @@ nextSmartThyPath thy = go
     go TheoryTactic                       = TheorySource RawSource 0 0
     go (TheorySource RawSource _ _)       = TheorySource RefinedSource 0 0
     go (TheorySource RefinedSource   _ _) = fromMaybe TheoryHelp firstLemma
-    go (TheoryEdit  _ )                   = TheoryHelp 
-    go (TheoryAdd _ )                     = TheoryHelp
-    go (TheoryDelete _)                   = TheoryHelp
+    go (TheoryEditLemma  _ )              = TheoryHelp
+    go (TheoryAddLemma _ )                = TheoryHelp
+    go (TheoryDeleteLemma _)              = TheoryHelp
+    go (TheoryEditTactic  _ )             = TheoryHelp
+    go (TheoryAddTactic _ )               = TheoryHelp
+    go (TheoryDeleteTactic _)             = TheoryHelp
     go (TheoryLemma lemma)                = TheoryProof lemma []
     go (TheoryProof l p)
       | Just nextPath <- getNextPath l p = TheoryProof l nextPath
@@ -2026,9 +2170,12 @@ prevSmartThyPath thy = go
     go TheoryTactic                        = TheoryRules
     go (TheorySource RawSource _ _)        = TheoryTactic
     go (TheorySource RefinedSource   _ _)  = TheorySource RawSource 0 0
-    go (TheoryEdit  _)                     = TheoryHelp 
-    go (TheoryAdd _ )                      = TheoryHelp
-    go (TheoryDelete _ )                   = TheoryHelp
+    go (TheoryEditLemma  _)                = TheoryHelp
+    go (TheoryAddLemma _ )                 = TheoryHelp
+    go (TheoryDeleteLemma _ )              = TheoryHelp
+    go (TheoryEditTactic  _)                = TheoryHelp
+    go (TheoryAddTactic _ )                 = TheoryHelp
+    go (TheoryDeleteTactic _ )              = TheoryHelp
     go (TheoryLemma l)
       | Just prevLemma <- getPrevLemma l   = TheoryProof prevLemma (lastPath prevLemma)
       | otherwise                          = TheorySource RefinedSource 0 0

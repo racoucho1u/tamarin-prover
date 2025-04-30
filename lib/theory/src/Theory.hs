@@ -61,6 +61,9 @@ module Theory (
   , caseTestToPredicate
   , defineCaseTests
 
+  -- * Tactics
+  , Tactic(..)
+  
   -- * Lemmas
   , LemmaAttribute(..)
   , TraceQuantifier(..)
@@ -137,6 +140,7 @@ module Theory (
   , addRestriction
   , addLemma
   , addLemmaAtIndex
+  , addTacticAtIndex
   , modifyLemma
   , addAccLemma
   , addCaseTest
@@ -148,15 +152,18 @@ module Theory (
   , addDiffTactic
   , removeLemma
   , removeLemmaDiff
+  , removeTactic
   , filterLemma
   , removeDiffLemma
   , lookupLemma
   , lookupLemmaIndex
+  , lookupTacticIndex
   , getLemmaPreItems
   , lookupDiffLemma
   , lookupAccLemma
   , lookupCaseTest
   , lookupLemmaDiff
+  , lookupTactic
   , addComment
   , addDiffComment
   , addStringComment

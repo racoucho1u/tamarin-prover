@@ -495,11 +495,12 @@ instance Binary (Deprio a) where
 
 -- | The object that record a user written tactic. 
 data Tactic a = Tactic{
-      _name :: String,                  -- The name of the tactic
+      _tname :: String,                  -- The name of the tactic
       _presort :: GoalRanking a,        -- The default strategy to order recognized goals in a tactic 
       _prios :: [Prio a],               -- The list of priorities, the higher in the list the priority, the earlier its recognized goals will be treated
-      _deprios :: [Deprio a]            -- The list of depriorities, the higher in the list the priority, the earlier its recognized goals will be treated 
+      _deprios :: [Deprio a],           -- The list of depriorities, the higher in the list the priority, the earlier its recognized goals will be treated 
                                         -- (but still after all the goals recognized by the priorities and not recognized has been treated).
+      _tPlaintext :: String
     }
     deriving (Eq, Ord, Show, Generic, NFData, Binary )
 
@@ -532,7 +533,7 @@ defaultHeuristic :: Bool -> (Heuristic ProofContext)
 defaultHeuristic = Heuristic . defaultRankings
 
 defaultTactic :: Tactic ProofContext
-defaultTactic = Tactic "default" (SmartRanking False) [] []
+defaultTactic = Tactic "default" (SmartRanking False) [] [] ""
 
 usesOracle :: Heuristic a -> Bool
 usesOracle (Heuristic rs) = all isOracleRanking rs
@@ -575,7 +576,7 @@ oraclePath :: Oracle -> FilePath
 oraclePath (Oracle oracleWorkDir_ oracleRelPath_) = fromMaybe "." oracleWorkDir_ </> normalise (fromMaybe "" oracleRelPath_)
 
 maybeSetInternalTacticName :: Maybe String -> Tactic ProofContext -> Tactic ProofContext
-maybeSetInternalTacticName s t = maybe t (\x -> t{ _name = x }) s
+maybeSetInternalTacticName s t = maybe t (\x -> t{ _tname = x }) s
 
 mapInternalTacticRanking :: (Tactic ProofContext -> Tactic ProofContext) -> GoalRanking ProofContext -> GoalRanking ProofContext
 mapInternalTacticRanking f (InternalTacticRanking q t) = InternalTacticRanking q (f t)
@@ -678,7 +679,7 @@ listGoalRankingsDiff noOracle = M.foldMapWithKey
 
 
 filterHeuristic :: Bool -> String -> [GoalRanking ProofContext]
-filterHeuristic diff  ('{':t) = if '}' `elem` t then InternalTacticRanking False (Tactic (takeWhile (/= '}') t) (SmartRanking False) [] []):(filterHeuristic diff $ tail $ dropWhile (/= '}') t) else error "A call to a tactic is supposed to end by '}' "
+filterHeuristic diff  ('{':t) = if '}' `elem` t then InternalTacticRanking False (Tactic (takeWhile (/= '}') t) (SmartRanking False) [] [] ""):(filterHeuristic diff $ tail $ dropWhile (/= '}') t) else error "A call to a tactic is supposed to end by '}' "
 filterHeuristic False (c:t)   = (stringToGoalRanking False [c]):(filterHeuristic False t)
 filterHeuristic True  (c:t)   = (stringToGoalRankingDiff False [c]):(filterHeuristic True t)
 filterHeuristic   _   ("")    = []
@@ -696,7 +697,7 @@ goalRankingName ranking =
         SmartRanking useLoopBreakers  -> "the 'smart' heuristic" ++ loopStatus useLoopBreakers
         SmartDiffRanking              -> "the 'smart' heuristic (for diff proofs)"
         InjRanking useLoopBreakers    -> "heuristics adapted to stateful injective protocols" ++ loopStatus useLoopBreakers
-        InternalTacticRanking _ tactic -> "the tactic written in the theory file: "++ _name tactic
+        InternalTacticRanking _ tactic -> "the tactic written in the theory file: "++ _tname tactic
    where
      loopStatus b = " (loop breakers " ++ (if b then "allowed" else "delayed") ++ ")"
      printOracle o@(Oracle workDir relPath) =
@@ -711,7 +712,7 @@ prettyGoalRanking :: GoalRanking ProofContext -> String
 prettyGoalRanking ranking = case ranking of
     OracleRanking _ oracle          -> findIdentifier ranking ++ " \"" ++ fromMaybe "" (oracleRelPath oracle) ++ "\""
     OracleSmartRanking _ oracle     -> findIdentifier ranking ++ " \"" ++ fromMaybe "" (oracleRelPath oracle) ++ "\""
-    InternalTacticRanking _ tactic  -> '{':_name tactic++"}"
+    InternalTacticRanking _ tactic  -> '{':_tname tactic++"}"
     _                         -> findIdentifier ranking
   where
     findIdentifier r = case find (compareRankings r . snd) combinedIdentifiers of

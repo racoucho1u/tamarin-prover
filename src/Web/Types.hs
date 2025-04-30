@@ -352,9 +352,12 @@ data TheoryPath
   | TheoryRules                         -- ^ Theory rules
   | TheoryMessage                       -- ^ Theory message deduction
   | TheoryTactic                        -- ^ Theory tactic
-  | TheoryEdit  String                  -- ^ edit lemma at runtime
-  | TheoryDelete String                 -- ^ remove lemma at runtime 
-  | TheoryAdd String                    -- ^ add new lemma at index at runtime
+  | TheoryEditLemma  String                  -- ^ edit lemma at runtime
+  | TheoryDeleteLemma String                 -- ^ remove lemma at runtime 
+  | TheoryAddLemma String                    -- ^ add new lemma at index at runtime
+  | TheoryEditTactic  String                  -- ^ edit tactic at runtime
+  | TheoryDeleteTactic String                 -- ^ remove tactic at runtime 
+  | TheoryAddTactic String                    -- ^ add new tactic at index at runtime
   deriving (Eq, Show, Read)
 
 -- | Simple data type for specifying a path to a specific
@@ -388,10 +391,13 @@ renderTheoryPath =
     go (TheorySource k i j) = ["cases", show k, show i, show j]
     go (TheoryProof lemma path) = "proof" : lemma : path
     go (TheoryMethod lemma path idx) = "method" : lemma : show idx : path
-    go TheoryTactic = ["tactic"]
-    go (TheoryEdit name) = ["edit", name]
-    go (TheoryAdd name) = ["add", name]
-    go (TheoryDelete name) = ["delete", name]
+    go TheoryTactic = ["tactics"]
+    go (TheoryEditLemma name) = ["edit", name]
+    go (TheoryAddLemma name) = ["add", name]
+    go (TheoryDeleteLemma name) = ["delete", name]
+    go (TheoryEditTactic name) = ["editTactic", name]
+    go (TheoryAddTactic name) = ["addTactic", name]
+    go (TheoryDeleteTactic name) = ["deleteTactic", name]
 
 -- | Render a theory path to a list of strings. Note that we prefix an
 -- underscore to the empty string and strings starting with an underscore.
@@ -441,14 +447,17 @@ parseTheoryPath =
       "help"    -> Just TheoryHelp
       "rules"   -> Just TheoryRules
       "message" -> Just TheoryMessage
-      "tactic"  -> Just TheoryTactic
+      "tactics"  -> Just TheoryTactic
       "lemma"   -> parseLemma xs
       "cases"   -> parseCases xs
       "proof"   -> parseProof xs
       "method"  -> parseMethod xs
-      "edit"    -> TheoryEdit <$> listToMaybe xs
-      "add"     -> TheoryAdd <$> listToMaybe xs
-      "delete"  -> TheoryDelete <$> listToMaybe xs
+      "edit"    -> TheoryEditLemma <$> listToMaybe xs
+      "add"     -> TheoryAddLemma <$> listToMaybe xs
+      "delete"  -> TheoryDeleteLemma <$> listToMaybe xs
+      "editTactic"    -> TheoryEditTactic <$> listToMaybe xs
+      "addTactic"     -> TheoryAddTactic <$> listToMaybe xs
+      "deleteTactic"  -> TheoryDeleteTactic <$> listToMaybe xs
       _         -> Nothing
 
     safeRead = listToMaybe . map fst . reads

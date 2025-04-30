@@ -20,6 +20,7 @@ module Theory.Text.Parser (
   , diffTheory
   , parseLemma
   , parsePlainLemma
+  , parseTactic
   , parseRestriction
   , parseIntruderRules
   , liftedAddLemma
@@ -89,7 +90,9 @@ parseLemma = parseString [] "<unknown source>" (lemma Nothing)
 parsePlainLemma :: MaudeSig -> String -> Either ParseError (Lemma ProofSkeleton)
 parsePlainLemma msig = parseStringWState (mkStateSig msig) "<unknown source>" (lemmaWithMsig msig Nothing)
 
-
+-- | Parse a tactic, for Tactic editing
+parseTactic :: String -> Either ParseError (Tactic ProofContext)
+parseTactic s = parseString [] "<unknown source>" (tactic False) s
 
 
 ------------------------------------------------------------------------------

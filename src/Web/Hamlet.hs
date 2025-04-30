@@ -292,10 +292,11 @@ overviewTpl :: RenderUrl
             -> TheoryInfo -- ^ Theory information
             -> TheoryPath -- ^ Theory path to load into main
             -> String     -- ^ The lemma plaintext for editing
+            -> String     -- ^ The tactic plaintext for editing
             -> IO Widget
-overviewTpl renderUrl renderImgUrl info path lptxt = do
+overviewTpl renderUrl renderImgUrl info path lptxt tptxt = do
   proofState <- proofStateTpl renderUrl info
-  mainView <- pathTpl renderUrl renderImgUrl info path lptxt
+  mainView <- pathTpl renderUrl renderImgUrl info path lptxt tptxt
   return [whamlet|
     $newline never
     <div .ui-layout-north>
@@ -351,11 +352,12 @@ pathTpl :: RenderUrl
         -> TheoryInfo     -- ^ The theory
         -> TheoryPath     -- ^ Path to display on load
         -> String         -- ^ plaintext of lemma for editing
+        -> String         -- ^ plaintext of tactic for editing
         -> IO Widget
-pathTpl renderUrl renderImgUrl info path lptxt =
+pathTpl renderUrl renderImgUrl info path lptxt tptxt =
     return $ [whamlet|
                 $newline never
-                #{htmlThyPath renderUrl renderImgUrl info path lptxt} |]
+                #{htmlThyPath renderUrl renderImgUrl info path lptxt tptxt} |]
 
 -- | Theory path, displayed when loading main screen for first time.
 pathDiffTpl :: RenderUrl

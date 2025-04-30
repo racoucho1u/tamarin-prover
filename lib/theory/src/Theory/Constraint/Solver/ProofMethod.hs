@@ -495,12 +495,12 @@ rankGoals ctxt ranking tacticsList sys = case ranking of
       chosenTactic   []  t = chooseError tacticsList t
       chosenTactic (h:q) t = if checkName h t then h else chosenTactic q t
 
-      definedHeuristic = intercalate [','] (foldl (\acc x -> (_name x):acc ) [] tacticsList)
+      definedHeuristic = intercalate [','] (foldl (\acc x -> (_tname x):acc ) [] tacticsList)
 
-      checkName t1 t2 = (_name t1) == (_name t2)
+      checkName t1 t2 = (_tname t1) == (_tname t2)
 
       chooseError [] _ = error $ "No tactic has been written in the theory file"
-      chooseError _  t = error $ "The tactic specified ( "++(show $ _name t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
+      chooseError _  t = error $ "The tactic specified ( "++(show $ _tname t)++" ) is not written in the theory file, please chose among the following: "++(show definedHeuristic)
 
 isFinished :: ProofContext -> System -> Maybe Result
 isFinished ctxt sys

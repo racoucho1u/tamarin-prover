@@ -65,8 +65,11 @@ import Theory (
     ,thySignature
     ,diffThyName
     ,removeLemma
+    ,removeTactic
     ,lookupLemmaIndex
+    ,lookupTacticIndex
     ,addLemmaAtIndex
+    ,addTacticAtIndex
     ,modifyLemma
     ,removeLemmaDiff
     ,removeDiffLemma
@@ -87,6 +90,7 @@ import Theory (
     ,diffThySignature
     ,toSignatureWithMaude
     ,lookupLemma
+    ,lookupTactic
     ,theoryLemmas
     ,ProofSkeleton
     ,getProofContext
@@ -96,7 +100,10 @@ import Theory (
     ,sigpMaudeSig
     ,checkAndExtendProver
     ,theoryRestrictions
-    ,Prover (runProver), unproven)
+    ,Prover (runProver), unproven
+    , Tactic (Tactic), ProofContext, thyTactic, _tname
+    )
+
 
 import Theory.Proof (
     AutoProver(..)
@@ -157,7 +164,7 @@ import           Theory.Constraint.System.Graph.Graph
 import           Theory.Constraint.System.Dot (BoringNodeStyle, dotSystemCompact, doNodeStyle)
 import Theory.Tools.Wellformedness  (prettyWfErrorReport)
 import qualified Control.Monad()
-import Theory.Text.Parser           (parsePlainLemma)
+import Theory.Text.Parser           (parsePlainLemma,parseTactic)
 import Lemma
 import GHC.Conc()
 import OpenTheory()
@@ -165,14 +172,15 @@ import Web.Types()
 import Prover                       (mkSystem)
 import Theory.Text.Parser.Token()
 import Language.Haskell.TH()
+import Theory.Constraint.System (Tactic(_tPlaintext))
 
 -- Quasi-quotation syntax changed from GHC 6 to 7,
 -- so we need this switch in order to support both
-#if __GLASGOW_HASKELL__ >= 700
-#define HAMLET hamlet
-#else
-#define HAMLET $hamlet
-#endif
+
+
+
+
+
 
 
 ------------------------------------------------------------------------------
@@ -199,22 +207,33 @@ getTheory idx = do
 
 getLemmaPlaintext :: Int -> TheoryPath -> Handler String
 getLemmaPlaintext nr path = do
-    let lname = case path of 
-            (TheoryEdit n) -> Just n
-            _ -> Nothing 
+    let lname = case path of
+            (TheoryEditLemma n) -> Just n
+            _ -> Nothing
     eitherTheory <- getTheory nr
-    let lemmaItem = case eitherTheory of 
-            (Just (Trace thy)) -> (\n -> lookupLemma n (tiTheory thy)) =<< lname 
+    let lemmaItem = case eitherTheory of
+            (Just (Trace thy)) -> (\n -> lookupLemma n (tiTheory thy)) =<< lname
             _ -> Nothing
     return $ fromMaybe "Enter your new Lemma" $ get lPlaintext <$> lemmaItem
+
+getTacticPlaintext :: Int -> TheoryPath -> Handler String
+getTacticPlaintext nr path = do
+    let lname = case path of
+            (TheoryEditTactic n) -> Just n
+            _ -> Nothing
+    eitherTheory <- getTheory nr
+    let tacticItem = case eitherTheory of
+            (Just (Trace thy)) -> (\n -> lookupTactic n (tiTheory thy)) =<< lname
+            _ -> Nothing
+    return $ maybe "Enter your new Tactic" _tPlaintext tacticItem
 
 
 -- | modifies the proof of a lemma after editing (eg in the case of reuse lemmas)
 editProof :: Int -> String -> Handler (Either String TheoryIdx)
-editProof idx name = withTheory idx $ \ti -> do 
+editProof idx name = withTheory idx $ \ti -> do
     fromMaybe  (return (Left "Lemma not found")) $ editLemmaProof ti <$> lookupLemma name (tiTheory ti)
 
-    where 
+    where
         editLemmaProof ti (Lemma n m pt tq f a olp) = do
             let ctxt     = getProofContext (Lemma n m pt tq f a lp) (tiTheory ti)
                 preItems = getLemmaPreItems n (tiTheory ti)
@@ -225,13 +244,13 @@ editProof idx name = withTheory idx $ \ti -> do
             case maybe_nthy of
                 Nothing -> return $ Left "Lemma editing failed"
                 Just nthy -> do
-                    nidx <- replaceTheory (Just ti) Nothing nthy ("modified" ++ show idx) idx 
+                    nidx <- replaceTheory (Just ti) Nothing nthy ("modified" ++ show idx) idx
                     return $ Right nidx
 
-        newProof olp ctxt gsys = 
+        newProof olp ctxt gsys =
             case olp of
-                (LNode (ProofStep Invalidated _) s ) -> 
-                    let old_lp = fromMaybe olp (M.lookup "" s ) 
+                (LNode (ProofStep Invalidated _) s ) ->
+                    let old_lp = fromMaybe olp (M.lookup "" s )
                     in fromMaybe old_lp $ runProver (checkAndExtendProver (sorryProver Nothing)) ctxt 0 gsys old_lp
                 _ -> fromMaybe olp $ runProver (checkAndExtendProver (sorryProver Nothing)) ctxt 0 gsys olp
 
@@ -252,7 +271,7 @@ deleteLemma idx name = withTheory idx $ \ti -> do
         normalCase ti =
             case removeLemma name (tiTheory ti) of
                 Nothing -> return $ Left "Lemma editing failed"
-                Just nthy -> Right <$> replaceTheory (Just ti) Nothing nthy ("modified" ++ show idx) idx 
+                Just nthy -> Right <$> replaceTheory (Just ti) Nothing nthy ("modified" ++ show idx) idx
 
         reuseCase ti =
             case modifyLemma (lemmaFunc ti) (tiTheory ti) of
@@ -264,12 +283,25 @@ deleteLemma idx name = withTheory idx $ \ti -> do
         lemmaFunc ti (Lemma n pt m tq f a lp) =
             let currIdx = fromMaybe (-1) (lookupLemmaIndex name (tiTheory ti))
                 lIdx = fromMaybe 0 (lookupLemmaIndex n (tiTheory ti))
-            in if lIdx > currIdx 
+            in if lIdx > currIdx
                 then case lp of
                     LNode (ProofStep (Sorry Nothing) _) _ -> Lemma n pt m tq f a lp
                     LNode (ProofStep Invalidated _) _ -> Lemma n pt m tq f a lp
                     LNode (ProofStep _ info) _ -> Lemma n pt m tq f a (LNode (ProofStep Invalidated info) (M.singleton "" lp))
                 else Lemma n pt m tq f a lp
+
+-- | Deletes a Lemma from a theory, used for Theory editing
+-- when deleting a reuse lemma it marks subsequent proofs as invalidated
+deleteTactic :: Int -> String -> Handler (Either String TheoryIdx)
+deleteTactic idx name = withTheory idx $ \ti -> do
+    let maybeTactic = lookupTactic name (tiTheory ti)
+    case maybeTactic of
+        Nothing -> return $ Left "Tactic not found"
+        Just _ -> case removeTactic name (tiTheory ti) of
+                Nothing -> return $ Left ("Tactic editing failed _ deleting "++show name)
+                Just nthy -> Right <$> replaceTheory (Just ti) Nothing nthy ("modified" ++ show idx) idx
+
+
 
 -- | Adds a new Lemma in a theory at an index, used for theory editing
 -- the new lemma is marked as modified to keep track of what whould be appended to the original file 
@@ -281,7 +313,7 @@ addLemma idx maybelemmaIndex (Lemma n pt _ tq f a lp) = withTheory idx $ \ti -> 
         gsys = mkSystem ctxt (theoryRestrictions (tiTheory ti)) preI f
     case formulaToGuarded f of
         Left d -> return $ Left $ render d
-        Right _ -> 
+        Right _ ->
             case maybelemmaIndex of
                 Nothing -> return $ Left "Lemma not found"
                 Just lemmaIndex -> do
@@ -290,9 +322,22 @@ addLemma idx maybelemmaIndex (Lemma n pt _ tq f a lp) = withTheory idx $ \ti -> 
                          Nothing -> return $ Left "lemma editing failed"
                          (Just nthy) -> Right <$> replaceTheory (Just ti) Nothing nthy ("modified" ++ show idx) idx
 
+-- | Adds a new Tactic in a theory at an index, used for theory editing
+-- the new tactic is marked as modified to keep track of what whould be appended to the original file 
+-- when "Append modified lemmas to file" is clicked
+addTactic :: Int -> Maybe Int -> Tactic ProofContext -> Handler (Either String TheoryIdx)
+addTactic idx maybelemmaIndex t = withTheory idx $ \ti -> do
+    case maybelemmaIndex of
+        Nothing -> return $ Left "Lemma not found"
+        Just tacticIndex -> do
+            let newThy = addTacticAtIndex t tacticIndex (tiTheory ti)
+            case newThy of
+                  Nothing -> return $ Left "Tactic editing failed _ adding"
+                  (Just nthy) -> Right <$> replaceTheory (Just ti) Nothing nthy ("modified" ++ show idx) idx
+
 -- | Deletes, adds or modifies a lemma depending on the path
 editLemma :: Int -> TheoryPath -> Lemma ProofSkeleton -> Handler (Either String TheoryIdx)
-editLemma idx (TheoryEdit lemmaName) (Lemma n pt m tq f a lp) = do
+editLemma idx (TheoryEditLemma lemmaName) (Lemma n pt m tq f a lp) = do
     maybelemmaIndex <- withTheory idx $ \ti -> do
                            return $ (\x -> x - 1) <$> lookupLemmaIndex lemmaName (tiTheory ti)
     case formulaToGuarded f of
@@ -304,10 +349,10 @@ editLemma idx (TheoryEdit lemmaName) (Lemma n pt m tq f a lp) = do
                 Right i -> Web.Handler.addLemma i maybelemmaIndex (Lemma n pt m tq f a lp)
 
 
-editLemma idx (TheoryAdd lemmaName) (Lemma n pt m tq f a lp)  = do
+editLemma idx (TheoryAddLemma lemmaName) (Lemma n pt m tq f a lp)  = do
     maybelemmaIndex <- withTheory idx $ \ti -> do
                             return $ case lemmaName of
-                                "<first>" -> do
+                                "<firstLemma>" -> do
                                             let (Lemma n' _ _ _ _ _ _ ) = head $ theoryLemmas $ tiTheory ti
                                             (\x -> x - 1) <$> lookupLemmaIndex n' (tiTheory ti)
                                 _ -> lookupLemmaIndex lemmaName (tiTheory ti)
@@ -317,6 +362,29 @@ editLemma idx (TheoryAdd lemmaName) (Lemma n pt m tq f a lp)  = do
         else Web.Handler.addLemma idx maybelemmaIndex (Lemma n pt m tq f a lp)
 
 editLemma _ _ _ = return $ Left "called editLemma with weird input"
+
+-- | Deletes, adds or modifies a tactic depending on the path
+editTactic :: Int -> TheoryPath -> Tactic ProofContext -> Handler (Either String TheoryIdx)
+editTactic idx (TheoryEditTactic tacticName) t = do
+    maybetacticIndex <- withTheory idx $ \ti -> do
+                           return $ (\x -> x - 1) <$> lookupTacticIndex tacticName (tiTheory ti)
+    idx' <- deleteTactic idx tacticName
+    case idx' of
+        Left e -> return $ Left e
+        Right i -> Web.Handler.addTactic i maybetacticIndex t
+
+
+editTactic idx (TheoryAddTactic tacticName) t  = do
+    maybetacticIndex <- withTheory idx $ \ti -> do
+                            return $ case tacticName of
+                                "<firstTactic>" -> do
+                                            let (Tactic n' _ _ _ _) = head $ L.get thyTactic (tiTheory ti)
+                                            (\x -> x - 1) <$> lookupTacticIndex n' (tiTheory ti) --broken something here
+                                _ -> lookupTacticIndex tacticName (tiTheory ti)
+
+    Web.Handler.addTactic idx maybetacticIndex t
+
+editTactic _ _ _ = return $ Left "called editTactic with weird input"
 
 
 -- | Store a theory, return index.
@@ -722,10 +790,11 @@ getOverviewR idx path = withTheory idx ( \ti -> do
   renderF <- getUrlRender
   renderParamsF <- getUrlRenderParams
   lptxt <- getLemmaPlaintext idx path
+  tptxt <- getTacticPlaintext idx path
   defaultLayout $ do
     getParams <- reqGetParams <$> getRequest
     let renderParamsF' route = renderParamsF route getParams
-    overview <- liftIO $ overviewTpl renderF renderParamsF' ti path lptxt
+    overview <- liftIO $ overviewTpl renderF renderParamsF' ti path lptxt tptxt
     setTitle (toHtml $ "Theory: " ++ get thyName (tiTheory ti))
     overview )
 
@@ -739,28 +808,61 @@ getTheoryVerifyR  idx (TheoryProof l path) = do
 
 getTheoryVerifyR idx _ = do getTheoryPathMR idx TheoryHelp
 
+addOrEditTactic :: TheoryIdx -> TheoryPath -> Handler Html
+addOrEditTactic idx path = do
+    mTacticText <- lookupPostParam "tactic-text"
+    let newTptxt = T.unpack $ fromMaybe "" mTacticText
+    renderParamsF <- getUrlRenderParams
+    idxT' <- case parseTactic newTptxt of
+        Left err -> return $ Left $ show err
+        Right newt -> editTactic idx path newt
+
+    case idxT' of
+        Right i -> do
+                    case mTacticText of
+                        Just _ ->  redirect (OverviewR i path)
+                        Nothing -> defaultLayout $ do
+                            setTitle "Error"
+                            [whamlet|<p>Failed to retrieve tactic-text from form data|]
+        Left e -> withTheory idx $ \ti -> do
+                    renderF <- getUrlRender
+                    let title = titleThyPath (tiTheory ti) path
+                    defaultLayout $ do
+                      getParams <- reqGetParams <$> getRequest
+                      let renderParamsF' route = renderParamsF route getParams
+                      overview <- liftIO $ overviewTpl renderF renderParamsF' ti path newTptxt newTptxt
+                      setTitle $ toHtml title
+                      setMessage $ toHtml e
+                      overview
+
 -- | Handles theory editing requests. 
 -- Theory delete doesn't require parsing the lemma, and is thus handled separatly
 postTheoryEditR :: TheoryIdx -> TheoryPath -> Handler Html
-postTheoryEditR idx (TheoryDelete l) = do
+postTheoryEditR idx (TheoryDeleteLemma l) = do
     idx' <- deleteLemma idx l
     case idx' of
         Right i -> redirect (OverviewR i TheoryHelp)
         Left  e -> do setMessage $ toHtml e
-                      redirect (OverviewR idx (TheoryDelete l))
-
-
+                      redirect (OverviewR idx (TheoryDeleteLemma l))
+postTheoryEditR idx (TheoryDeleteTactic t) = do
+    idx' <- deleteTactic idx t
+    case idx' of
+        Right i -> redirect (OverviewR i TheoryHelp)
+        Left  e -> do setMessage $ toHtml e
+                      redirect (OverviewR idx (TheoryDeleteTactic t))
+postTheoryEditR idx (TheoryAddTactic t) = addOrEditTactic idx (TheoryAddTactic t)
+postTheoryEditR idx (TheoryEditTactic t) = addOrEditTactic idx (TheoryEditTactic t)
 postTheoryEditR idx path = do
     mLemmaText <- lookupPostParam "lemma-text" 
     let newlptxt = T.unpack $ fromMaybe "" mLemmaText
     renderParamsF <- getUrlRenderParams
     maudeSig <- withTheory idx $ \ti -> return $ get sigpMaudeSig . toSignaturePure . get thySignature $ tiTheory ti
-    idx' <- case parsePlainLemma maudeSig newlptxt of
-        Left err -> return $ Left $ show err 
+    idxL' <- case parsePlainLemma maudeSig newlptxt of
+        Left err -> return $ Left $ show err
         Right newl -> editLemma idx path newl
 
-    case idx' of
-        Right i -> do 
+    case idxL' of
+        Right i -> do
                     case mLemmaText of
                         Just _ ->  redirect (OverviewR i path)
                         Nothing -> defaultLayout $ do
@@ -772,7 +874,7 @@ postTheoryEditR idx path = do
                     defaultLayout $ do
                       getParams <- reqGetParams <$> getRequest
                       let renderParamsF' route = renderParamsF route getParams
-                      overview <- liftIO $ overviewTpl renderF renderParamsF' ti path newlptxt
+                      overview <- liftIO $ overviewTpl renderF renderParamsF' ti path newlptxt newlptxt
                       setTitle $ toHtml title
                       setMessage $ toHtml e
                       overview
@@ -857,7 +959,8 @@ getTheoryPathMR idx path = do
         go renderUrl curr_path ti = do
           let title = T.pack $ titleThyPath (tiTheory ti) curr_path
           lptxt <- getLemmaPlaintext (tiIndex ti) curr_path
-          let html = htmlThyPath renderUrl renderUrl ti curr_path lptxt
+          tptxt <- getTacticPlaintext (tiIndex ti) curr_path
+          let html = htmlThyPath renderUrl renderUrl ti curr_path lptxt tptxt
           return $ responseToJson (JsonHtml title $ toContent html)
 
 -- | Show a given path within a diff theory (main view).
@@ -1147,12 +1250,12 @@ getOptions = do
   simpl <- lookupGetParam "simplification"
   showAutosource <- isNothing <$> lookupGetParam "no-auto-sources"
   clustering <- lookupGetParam "clustering"
-  let simplificationLevel = fromMaybe SL2 (simpl >>= readMaybe . T.unpack) 
+  let simplificationLevel = fromMaybe SL2 (simpl >>= readMaybe . T.unpack)
       graphOptions = L.set goSimplificationLevel simplificationLevel $
                      L.set goCompress compress $
                      L.set goShowAutoSource showAutosource $
                      L.set goAbbreviate abbreviate $
-                     L.set goClustering (isJust clustering) $ 
+                     L.set goClustering (isJust clustering) $
                      defaultGraphOptions
   let dotOptions = L.set doNodeStyle nodeStyle defaultDotOptions
   return (graphOptions, dotOptions)
@@ -1475,10 +1578,10 @@ getDownloadTheoryR idx _ = do
 -- | prompt appending of the current theory's lemmas to their source file
 getAppendNewLemmasR :: TheoryIdx -> String -> Handler Value
 getAppendNewLemmasR idx _ = withTheory idx $ \ti -> do
-    let maybePath = case tiOrigin ti of 
-                        Local path -> Just path 
-                        _ ->  Nothing 
-        srcThy = fromMaybe "" maybePath 
+    let maybePath = case tiOrigin ti of
+                        Local path -> Just path
+                        _ ->  Nothing
+        srcThy = fromMaybe "" maybePath
         allptxts = foldl (\ p (Lemma _ pt modified _ _ _ _) -> if modified then p ++ "\n\n" ++ pt else p) "" (getLemmas (tiTheory ti))
 
     liftIO $ when (allptxts /= "" && isJust maybePath) $ appendFile srcThy $ "\n/*" ++ allptxts ++ "\n*/"

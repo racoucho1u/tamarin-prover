@@ -31,6 +31,7 @@ import           Theory.Text.Parser.Token
 
 import           Text.Parsec                hiding ((<|>))
 import           Text.Regex.PCRE
+import           Theory.Text.Parser.Lemma
 
 
 --Tactic
@@ -108,11 +109,14 @@ deprio = do
 
 tactic :: Bool -> Parser (Tactic ProofContext)
 tactic diff = do
+    start <- getInput
     tName <- tacticName
     presort <- if diff then option SmartDiffRanking (selectedPreSort diff) else option (SmartRanking False) (selectedPreSort diff)
     prios <- option [] $ many1 prio
     deprios <- option [] $ many1 deprio
-    return $ Tactic tName presort prios deprios
+    end <- getInput
+    let inputString = removeComments $ take (length start - length end) start
+    return $ Tactic tName presort prios deprios inputString
 
 tacticFunctions :: M.Map String ([String] -> (AnnotatedGoal, ProofContext, System) -> Bool)
 tacticFunctions = M.fromList

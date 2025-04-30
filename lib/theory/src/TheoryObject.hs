@@ -72,6 +72,7 @@ module TheoryObject (
   , addRestriction
   , addLemma
   , addLemmaAtIndex
+  , addTacticAtIndex
   , modifyLemma
   , addProcess
   , findProcess
@@ -89,6 +90,7 @@ module TheoryObject (
   , addDiffMacros
   , removeLemma
   , removeLemmaDiff
+  , removeTactic
   , removeDiffLemma
   , addComment
   , addDiffComment
@@ -102,6 +104,8 @@ module TheoryObject (
   , lookupLemmaDiff
   , lookupLemma
   , lookupLemmaIndex
+  , lookupTacticIndex
+  , lookupTactic
   , getLemmaPreItems
   , lookupProcessDef
   , filterSide
@@ -180,6 +184,9 @@ import Items.ExportInfo
 import qualified Data.Set as S
 import Theory.Syntactic.Predicate
 import Data.ByteString.Char8 (unpack)
+
+
+
 
 -- | A theory contains a single set of rewriting rules modeling a protocol
 -- and the lemmas that
@@ -415,11 +422,11 @@ diffTheoryDiffLemmas =
 
 -- | The configuration block of a theory.
 theoryConfigBlock :: Theory sig c r p s -> ConfigBlock
-theoryConfigBlock = foldTheoryItem (const[]) (const[]) (const[]) (const[]) id (const[]) (const[]) (const []) <=< L.get thyItems
+theoryConfigBlock = foldTheoryItem (const []) (const []) (const []) (const []) id (const []) (const []) (const []) <=< L.get thyItems
 
 -- | The configuration block of a theory.
 diffTheoryConfigBlock :: DiffTheory sig c r r2 p p2 -> ConfigBlock
-diffTheoryConfigBlock = foldDiffTheoryItem (const[]) (const[]) (const[]) (const[]) (const[]) (const[]) (const[]) id <=< L.get diffThyItems
+diffTheoryConfigBlock = foldDiffTheoryItem (const []) (const []) (const []) (const []) (const []) (const []) (const []) id <=< L.get diffThyItems
 
 expandRestriction :: Theory sig c r p s -> ProtoRestriction SyntacticLNFormula
     -> Either FactTag (ProtoRestriction LNFormula)
@@ -450,7 +457,11 @@ addLemmaAtIndex l i thy = do
     guard (isNothing $ lookupLemma (L.get lName l) thy)
     return $ modify thyItems (\ls -> (take i ls) ++ [LemmaItem l] ++ (drop i ls)) thy
 
-
+-- | Add a new lemma at a specific index. Fails, if a lemma with the same name exists.
+addTacticAtIndex :: Tactic ProofContext -> Int -> Theory sig c r p s -> Maybe (Theory sig c r p s)
+addTacticAtIndex t i thy = do
+    guard (isNothing $ lookupTactic (_tname t) thy)
+    return $ modify thyTactic (\ls -> (take i ls) ++ [t] ++ (drop i ls)) thy
 
 -- | apply function on lemmas, temporary test
 modifyLemma :: (Lemma p -> Lemma p) -> Theory sig c r p s -> Maybe (Theory sig c r p s)
@@ -594,6 +605,12 @@ removeLemma lemmaName thy = do
     check l = do guard (L.get lName l /= lemmaName); return (LemmaItem l)
 
 -- | Remove a lemma by name. Fails, if the lemma does not exist.
+removeTactic :: String -> Theory sig c r p s -> Maybe (Theory sig c r p s)
+removeTactic tacticName thy = do
+    _ <- lookupTactic tacticName thy
+    return $ modify thyTactic (filter (\t -> _tname t /= tacticName)) thy
+
+-- | Remove a lemma by name. Fails, if the lemma does not exist.
 removeLemmaDiff :: Side -> String -> DiffTheory sig c r r2 p p2 -> Maybe (DiffTheory sig c r r2 p p2)
 removeLemmaDiff s lemmaName thy = do
     _ <- lookupLemmaDiff s lemmaName thy
@@ -633,8 +650,15 @@ lookupRestriction name = find ((name ==) . L.get rstrName) . theoryRestrictions
 lookupLemma :: String -> Theory sig c r p s -> Maybe (Lemma p)
 lookupLemma name = find ((name ==) . L.get lName) . theoryLemmas
 
+-- | Find the tactic with the given name.
+lookupTactic :: String -> Theory sig c r p s -> Maybe (Tactic ProofContext)
+lookupTactic name = find ((name ==) . _tname) . L.get thyTactic
+
 lookupLemmaIndex :: String -> Theory sig c r p s -> Maybe Int
 lookupLemmaIndex name ti = (+1) <$> findIndex (\i -> case i of (LemmaItem l) -> name == L.get lName l; _ -> False) (L.get thyItems ti)
+
+lookupTacticIndex :: String -> Theory sig c r p s -> Maybe Int
+lookupTacticIndex name ti = (+1) <$> findIndex (\t -> name == _tname t) (L.get thyTactic ti)
 
 getLemmaPreItems :: String -> Theory sig c r p s -> [TheoryItem r p s]
 getLemmaPreItems name ti = fromMaybe [] $ (\li -> [i | (nr, i) <- zip [1..] (L.get thyItems ti), nr < li]) <$> lookupLemmaIndex name ti
@@ -783,13 +807,13 @@ prettyVarList :: Document d => [LVar] -> d
 prettyVarList = fsep . punctuate comma . map prettyLVar
 
 -- | Pretty print all macros
-prettyMacros :: HighlightDocument d => [Macro] -> d 
+prettyMacros :: HighlightDocument d => [Macro] -> d
 prettyMacros m = if m == [] then text empty else vcat (keyword_ "macros:" : map prettyMacro m)
 
 -- | Pretty print a macro.
 prettyMacro :: HighlightDocument d => Macro -> d
-prettyMacro (op, args, out) = vcat [ppNonEmptyList (\ds -> sep (map (nest 4) ds)) 
-                              text ([BC.unpack op ++ "("]) <-> prettyVarList args <-> text (") = " ++ show(out))]
+prettyMacro (op, args, out) = vcat [ppNonEmptyList (\ds -> sep (map (nest 4) ds))
+                              text ([BC.unpack op ++ "("]) <-> prettyVarList args <-> text (") = " ++ show (out))]
     where
         ppNonEmptyList _   _  [] = emptyDoc
         ppNonEmptyList hdr pp xs = hdr $ punctuate comma $ map pp xs
@@ -818,13 +842,13 @@ prettyConfigBlock :: HighlightDocument d => ConfigBlock -> d
 prettyConfigBlock cb = text "configuration: " <> doubleQuotes (text cb)
 
 prettyTactic :: HighlightDocument d => Tactic ProofContext -> d
-prettyTactic tactic = kwTactic <> colon <> space <> (text $ _name tactic) 
+prettyTactic tactic = kwTactic <> colon <> space <> (text $ _tname tactic)
     $-$ kwPresort <> colon <> space <> (char $ goalRankingToChar $ _presort tactic) $-$ sep
         [ ppTabTab  "prio"  (map stringRankingPrio $ _prios tactic) (map stringsPrio $ _prios tactic)
         , ppTabTab "deprio" (map stringRankingDeprio $ _deprios tactic) (map stringsDeprio $ _deprios tactic)
         , char '\n'
         ]
-   where 
+   where
 
         -- pretty print for a prio block
         ppTab "prio" (rankingName,xs) = kwPrio <> colon <> space <> braces (text rankingName) $-$ (nest 2 $ vcat $ map prettify (map words xs))
