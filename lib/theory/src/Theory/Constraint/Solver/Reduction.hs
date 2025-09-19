@@ -25,7 +25,7 @@ module Theory.Constraint.Solver.Reduction (
   , whenChanged
   , applyChangeList
   , whileChanging
-  
+
   -- ** Accessing the 'ProofContext'
   , getProofContext
   , getMaudeHandle
@@ -104,7 +104,6 @@ import           Logic.Connectives
 import           Theory.Constraint.Solver.Contradictions
 import           Theory.Constraint.System
 import           Theory.Model
-import           Utils.Misc
 
 ------------------------------------------------------------------------------
 -- The constraint reduction monad
@@ -134,7 +133,6 @@ execReduction :: Reduction a -> ProofContext -> System -> FreshState
               -> Disj (System, FreshState)
 execReduction m ctxt se fs =
     Disj $ (`runReader` ctxt) . runDisjT . (`runFreshT` fs) $ execStateT m se
-
 
 -- Change management
 --------------------
@@ -235,7 +233,7 @@ labelNodeId = \i rules parent -> do
                                     [kuFactAnn ann m] [inFact m] [kLogFact m] []
 
 
-    mkFreshRuleAC m = Rule (ProtoInfo (ProtoRuleACInstInfo FreshRule [] []))
+    mkFreshRuleAC m = Rule (ProtoInfo (ProtoRuleACInstInfo FreshRule mempty []))
                            [] [freshFact m] [] [m]
 
     exploitPrems i ru = mapM_ (exploitPrem i ru) (enumPrems ru)
@@ -263,7 +261,7 @@ labelNodeId = \i rules parent -> do
           -- corresponding KU-actions before this node.
         _ | isKUFact fa -> do
               j <- freshLVar "vk" LSortNode
-              insertLess j i Adversary
+              insertLess (LessAtom j i Adversary)
               void (insertAction j fa)
 
           -- Store premise goal for later processing using CR-rule *DG2_2*
@@ -319,7 +317,7 @@ insertAction i fa@(Fact _ ann _) = do
                 Just (UpK, viewTerm2 -> FInv m) -> do
                 -- In the diff case, add inv rule instead of goal
                     if isdiff
-                       then do                          
+                       then do
                           -- if the node is already present in the graph, do not insert it again. (This can be caused by substitutions applying and changing a goal.)
                           if not nodePresent
                              then do
@@ -338,7 +336,7 @@ insertAction i fa@(Fact _ ann _) = do
                 Just (UpK, viewTerm2 -> FMult ms) -> do
                 -- In the diff case, add mult rule instead of goal
                     if isdiff
-                       then do           
+                       then do
                           -- if the node is already present in the graph, do not insert it again. (This can be caused by substitutions applying and changing a goal.)
                           if not nodePresent
                              then do
@@ -350,7 +348,7 @@ insertAction i fa@(Fact _ ann _) = do
                                insertGoal goal False
                                markGoalAsSolved "exists" goal
                                return Changed
-                          
+
                        else do
                           insertGoal goal False
                           mapM_ requiresKU ms *> return Changed
@@ -358,7 +356,7 @@ insertAction i fa@(Fact _ ann _) = do
                 Just (UpK, viewTerm2 -> FUnion ms) -> do
                 -- In the diff case, add union (?) rule instead of goal
                     if isdiff
-                       then do                        
+                       then do
                           -- if the node is already present in the graph, do not insert it again. (This can be caused by substitutions applying and changing a goal.)
                           if not nodePresent
                              then do
@@ -370,7 +368,7 @@ insertAction i fa@(Fact _ ann _) = do
                                insertGoal goal False
                                markGoalAsSolved "exists" goal
                                return Changed
-                          
+
                        else do
                           insertGoal goal False
                           mapM_ requiresKU ms *> return Changed
@@ -385,12 +383,12 @@ insertAction i fa@(Fact _ ann _) = do
     requiresKU t = do
       j <- freshLVar "vk" LSortNode
       let faKU = kuFactAnn ann t
-      insertLess j i Adversary
+      insertLess (LessAtom j i Adversary)
       void (insertAction j faKU)
 
 -- | Insert a 'Less' atom. @insertLess i j@ means that *i < j* is added.
-insertLess :: NodeId -> NodeId -> Reason-> Reduction ()
-insertLess i j r = modM sLessAtoms (S.insert (i, j, r))
+insertLess :: LessAtom -> Reduction ()
+insertLess = modM sLessAtoms . S.insert
 
 -- | Insert a 'Subterm' atom. *x ⊏ y* is added to the SubtermStore
 insertSubterm :: LNTerm -> LNTerm -> Reduction ()
@@ -415,7 +413,7 @@ insertAtom ato = case ato of
     EqE x y       -> void $ solveTermEqs SplitNow [Equal x y]
     Subterm x y   -> insertSubterm x y
     Action i fa   -> void $ insertAction (ltermNodeId' i) fa
-    Less i j      -> insertLess (ltermNodeId' i) (ltermNodeId' j) Formula
+    Less i j      -> insertLess (LessAtom (ltermNodeId' i) (ltermNodeId' j) Formula)
     Last i        -> void $ insertLast (ltermNodeId' i)
     Syntactic _   -> return ()
 
@@ -524,29 +522,33 @@ insertGoalStatus goal status = do
 -- | Insert a 'Goal' and store its age.
 insertGoal :: Goal -> Bool -> Reduction ()
 insertGoal goal looping = insertGoalStatus goal (GoalStatus False 0 looping)
- 
+
 -- | Mark the given goal as solved.
 markGoalAsSolved :: String -> Goal -> Reduction ()
 markGoalAsSolved how goal =
     case goal of
       ActionG _ _     -> updateStatus
       PremiseG _ fa
-        | isKDFact fa -> modM sGoals $ M.delete goal
+        | isKDFact fa -> delete
         | otherwise   -> updateStatus
-      ChainG _ _      -> modM sGoals $ M.delete goal
+      ChainG _ _      -> delete
       SplitG _        -> updateStatus
       DisjG disj      -> modM sFormulas       (S.delete $ GDisj disj) >>
                          modM sSolvedFormulas (S.insert $ GDisj disj) >>
                          updateStatus
       SubtermG _      -> updateStatus
   where
+    delete :: Reduction ()
+    delete = modM sGoals $ M.delete goal
+
+    updateStatus :: Reduction ()
     updateStatus = do
         mayStatus <- M.lookup goal <$> getM sGoals
         verbose <- getVerbose
         case mayStatus of
           Just status -> if (verbose) then trace (msg status) $
               modM sGoals $ M.insert goal $ set gsSolved True status else modM sGoals $ M.insert goal $ set gsSolved True status
-          Nothing     -> trace ("markGoalAsSolved: inexistent goal " ++ show goal) $ return ()
+          Nothing     -> trace ("markGoalAsSolved: inexistent constraint " ++ show goal) $ return ()
 
     msg status = render $ nest 2 $ fsep $
         [ text ("solved goal nr. "++ show (get gsNr status))
@@ -675,7 +677,7 @@ conjoinSystem sys = do
     joinSets sLemmas
     joinSets sEdges
     F.mapM_ insertLast                 $ get sLastAtom    sys
-    F.mapM_  (uncurry3 insertLess)     $ get sLessAtoms   sys
+    F.mapM_ insertLess $ get sLessAtoms sys
     -- split-goals are not valid anymore
     mapM_   (uncurry insertGoalStatus) $ filter (not . isSplitGoal . fst) $ M.toList $ get sGoals sys
     F.mapM_ insertFormula $ get sFormulas sys
@@ -781,4 +783,3 @@ solveRuleConstraints (Just eqConstr) = do
     setM sEqStore =<< simp hnd (const (const False)) eqs
     noContradictoryEqStore
 solveRuleConstraints Nothing = return ()
-
