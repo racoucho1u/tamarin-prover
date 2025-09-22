@@ -46,7 +46,7 @@ tacticName = do
     return tName
 
 goalRankingPresort :: Bool -> Parser (GoalRanking ProofContext)
-goalRankingPresort diff = regularRanking <?> "goal ranking"
+goalRankingPresort diff = regularRanking <?> "proof method ranking"
    where
        regularRanking = toGoalRanking <$> many1 letter <* skipMany (char ' ')
 
@@ -113,7 +113,7 @@ deprio = do
 tactic :: Bool -> Parser (Tactic ProofContext)
 tactic diff = do
     tName <- tacticName
-    presort <- option (SmartRanking diff) (selectedPreSort diff)
+    presort <- if diff then option SmartDiffRanking (selectedPreSort diff) else option (SmartRanking False) (selectedPreSort diff)
     prios <- option [] $ many1 prio
     deprios <- option [] $ many1 deprio
     return $ Tactic tName presort prios deprios
@@ -128,6 +128,7 @@ tacticFunctions = M.fromList
                       , ("reasonableNoncesNoise",reasonableNoncesNoise)
                       , ("nonAbsurdGoal", nonAbsurdGoal)
                       , ("ignoreN", ignoreN)
+                      , ("nonAbsurdConstraint", nonAbsurdConstraint)
                       ]
   where
     regex' :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
@@ -148,6 +149,22 @@ tacticFunctions = M.fromList
 
     nonAbsurdGoal :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
     nonAbsurdGoal param (goal,_,sys) = hasSafeNonces && isSubset
+        where
+            pgoal (g,(_nr,_usefulness)) = prettyGoal g
+            pg = concat . lines . render $ pgoal goal
+
+            functionsDetection = "[^A-Za-z0-9][A-Za-z0-9]+\\("
+            functions = retrieveFun pg
+            isSubset = all (`elem` ["Ku","inv"]) functions
+
+            retrieveFun :: String -> [String]
+            retrieveFun pgoal_ = map (init . tail) (getAllTextMatches $ pgoal_ =~ functionsDetection)
+
+            safenoncePattern = "(~n|" ++ intercalate "|" (map show $ concatMap (checkFormula $ head param) (S.toList $ L.get sFormulas sys))++")(?![.0-9a-zA-Z])"
+            hasSafeNonces = not (pg =~ safenoncePattern)
+
+    nonAbsurdConstraint :: [String] -> (AnnotatedGoal, ProofContext,  System) -> Bool
+    nonAbsurdConstraint param (goal,_,sys) = hasSafeNonces && isSubset
         where
             pgoal (g,(_nr,_usefulness)) = prettyGoal g
             pg = concat . lines . render $ pgoal goal
@@ -241,10 +258,10 @@ nameToFunction (s,param) = case M.lookup s tacticFunctions of
   where
     tacticFunctionName :: String -> String
     tacticFunctionName funct = case funct of
-            "regex"                 -> "match between the pretty goal and the given regex"
+            "regex"                 -> "match between the pretty printed proof method and the given regex"
             "isFactName"            -> "match against the fact name"
             "isInFactTerms"         -> "match against the fact terms"
-            "nonAbsurdGoal"         -> "match non absurd goals (vacarme oracle)"
+            "nonAbsurdConstraint"   -> "match non absurd constraints (vacarme oracle)"
             "dhreNoise"             -> "match diffie-hellman (vacarme oracle)"
             "defaultNoise"          -> "match default facts (vacarme oracle)"
             "reasonableNoncesNoise" -> "match reasonable noncesNoise (vacarme oracle)"
