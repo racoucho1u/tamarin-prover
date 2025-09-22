@@ -1502,7 +1502,7 @@ rule Create_Generic_DAA_Key:
     , CertifyOnlyOnce('Create_Generic_DAA_Key')
 	  ]->
 	
-	[vpn.inria.fr/all
+	[
 	 TPM_Created_DAA_Key($PS, $AS,< kID, Qk_SD,Qk_PD, 'createdGenericDAAKey'>)
 	 , TPM_Generic_DAA_SK($PS, Qk_PD)
 	]
@@ -1810,7 +1810,7 @@ lemma auto_restricition_pke_comes_from_tpm:
 
 //we only want one Issuer 'Issuer' to keep the model simple. This should
 //be relaxed in a future model to see whether it makes a difference.
-lemma auto_restriction_single_issuer:vpn.inria.fr/all
+lemma auto_restriction_single_issuer:
 	"All I1 I2 #i #j . (Issuer_Init(I1) @ i & Issuer_Init(I2) @ j) ==> (I1=I2)"
 
 	
