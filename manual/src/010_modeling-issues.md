@@ -82,31 +82,103 @@ detailed error messages.
 	/*
 	WARNING: the following wellformedness checks failed!
 
-	Fact usage
-	==========
+	Fact arity issues
+	=================
 
-  	Possible reasons:
-	1. Fact names are case-sensitive, different capitalizations are considered as different facts, i.e., Fact() is different from FAct(). Check the capitalization of your fact names.
-	2. Same fact is used with different arities, i.e., Fact('A','B') is different from Fact('A'). Check the arguments of your facts.
+	Same fact is used with different arities, i.e., Fact('A','B') is different from 
+	Fact('A'). 
+	Check the arguments of your facts.
+	
+
+	Fact `agst':
+
+		1. Rule `setup', arity 3
+			AgSt( $I, ~k, ~m )
+		
+		2. Rule `setup', arity 2
+			AgSt( $R, ~k )
+		
+		3. Rule `I_1', arity 2
+			AgSt( $I, <~k, ~m> )
+		
+		4. Rule `R_1', arity 2
+			AgSt( $R, ~k )
+	
+	*/
 
 
-  	Fact `agst':
-
-    	1. Rule `setup', capitalization  "AgSt", 2, Linear
-         AgSt( $R, ~k )
-
-    	2. Rule `setup', capitalization  "AgSt", 3, Linear
-        	 AgSt( $I, ~k, ~m )
-  	*/
-
-The problem lists all the fact usages of fact `AgSt`.
-The statement `1. Rule 'setup', capitalization  "AgSt", 2, Linear` means that
-in the rule `setup` the fact `AgSt` is used as a linear fact with 2 arguments.
-This is not consistent with its use in other rules. For example
-`2. Rule 'setup', capitalization  "AgSt", 3, Linear` indicates that it is also
-used with 3 arguments in the `setup` rule.
+The problem lists all the fact usages issues of fact `AgSt`.
+Here, we are told that we are dealing with an `arity` issue and all the usages of fact `AgSt` are displayed under the explanation, along with their locations. For example, ``1.Rule `setup', arity 3`` and ``2. Rule `setup', arity 2`` indicate that `AgSt` is both used with 2 and 3 arguments in the `setup` rule.
 To solve this problem we must ensure that we only use the same fact with
 the same number of arguments.
+
+Same goes if we would have changed the setup rule introducing `capitalization` issues (notice the `AGSt` instead of `AgSt`) :
+
+~~~~ {.tamarin slice="code_ERRORexamples/FirstTimeUser_Error2_Caps.spthy" lower=16 upper=20}
+~~~~
+
+Resulting in the following error message :
+
+	/*
+	WARNING: the following wellformedness checks failed!
+
+	Fact capitalization issues
+	==========================
+
+	Fact names are case-sensitive, different capitalizations are considered as
+	different facts, i.e., Fact() is different from FAct(). 
+	Check the capitalization of your fact names.
+	
+
+	Fact `agst':
+
+		1. Rule `setup', capitalization "AgSt"
+			AgSt( $I, <~k, ~m> )
+		
+		2. Rule `setup', capitalization "AGSt"
+			AGSt( $R, ~k )
+		
+		3. Rule `I_1', capitalization "AgSt"
+			AgSt( $I, <~k, ~m> )
+		
+		4. Rule `R_1', capitalization "AgSt"
+			AgSt( $R, ~k )
+	
+	*/
+
+Or introducing `multiplicity` (i.e. `persistence`) issues (notice the `!AgSt`) :
+
+~~~~ {.tamarin slice="code_ERRORexamples/FirstTimeUser_Error2_Multip.spthy" lower=16 upper=20}
+~~~~
+Resulting in :
+
+	/*
+	WARNING: the following wellformedness checks failed!
+
+	Fact multiplicity issues
+	========================
+
+	Same fact is used with different multiplicities, i.e., !Fact() (Persistent fact) 
+	exists along with Fact() (Linear) in your rules. 
+	Check the multiplicity (persistence) of your facts.
+	
+
+	Fact `agst':
+
+		1. Rule `setup', multiplicity (persistence) Linear
+			AgSt( $I, <~k, ~m> )
+		
+		2. Rule `setup', multiplicity (persistence) Persistent
+			!AgSt( $R, ~k )
+		
+		3. Rule `I_1', multiplicity (persistence) Linear
+			AgSt( $I, <~k, ~m> )
+		
+		4. Rule `R_1', multiplicity (persistence) Linear
+			AgSt( $R, ~k )
+	
+	*/
+
 
 ### Unbound variables ###
 
@@ -245,6 +317,29 @@ This indicates that the sorts of a message were inconsistently used.
 In the rule `setup`, this is the case because we used m once as a fresh value
 `~m` and another time without the `~`.
 
+### Subterm Convergence Warning ###
+
+The equational theory used by Tamarin must always be convergent, meaning that any sequence of rewriting steps must eventually terminate, and have the finite variant property. Tamarin verifies if the equational theory is subterm convergent. If it is subterm convergent, it is guaranteed to be convergent an to have the finite variant property. However, if it is not subterm convergent, it does not necessarily imply non-convergence; it only indicates a potential risk of non-convergence. Non-convergence of an equation can result in infinite loops or incorrect results.
+
+An equation is subterm convergent if the right-hand side is a constant (such as `true` or `false`) or a subterm of the left-hand side. For instance, the equation `f(g(x)) = x` is subterm convergent since the right-hand side is a subterm of the left-hand side. Conversely, the equation `f(x) = g(x)` is not subterm convergent.
+
+Consider the following example from the warning:
+
+	/*
+	Subterm Convergence Warning
+	===========================
+
+  	User-defined equations must be convergent and have the finite variant property. The following equations are not subterm convergent. If you are sure that the set of equations is nevertheless convergent and has the finite variant property, you can ignore this warning and continue 
+
+    unblind(sign(blind(m, r), sk), r) = sign(m, sk)
+   
+ 	For more information, please refer to the manual : https://tamarin-prover.com/manual/master/book/010_modeling-issues.html 
+	*/
+
+If you are sure that your equational theory is convergent and has the finite variant theory you can deactivate the warning using the annotation `convergent` as follows:
+
+	equations [convergent]: ...
+
 ### Message derivation errors
 
 It is good modelling practice to write our rules in such a way that they do not give participants any additional capabilities, and modify the equational theory for the express purpose of modifying capabilities. Using rules for this is ill-advised, as it is easy to unintentionally make a protocol not adhere to an underlying model or make the adversary weaker than intended. Because of this, Tamarin automatically checks if any rules may introduce such capabilities.
@@ -261,7 +356,7 @@ we get the error message
 	Message Derivation Checks
 	=========================
 
-	The variables of the follwing rule(s) are not derivable from their premises, you may be performing unintended pattern matching.
+	The variables of the following rule(s) are not derivable from their premises, you may be performing unintended pattern matching.
 
 	Rule R_1:
 	Failed to derive Variable(s): ~k, m

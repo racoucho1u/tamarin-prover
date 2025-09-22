@@ -24,11 +24,11 @@ import Network.Wai.Handler.Warp (defaultSettings, setHost, setPort)
 import Network.Wai.Handler.Warp qualified as Warp
 import Web.Dispatch
 import Web.Settings qualified
+import Web.Types (OutputCommand(..), OutputFormat(..))
 
 import Main.Console
 import Main.Environment
 import Main.TheoryLoader
-
 
 
 ------------------------------------------------------------------------------
@@ -55,6 +55,7 @@ interactiveMode = tamarinMode
                 "Interface to listen on (use '*4' for all IPv4 interfaces)"
       , flagOpt "" ["image-format"] (updateArg "image-format") "PNG|SVG" "image format used for graphs (default PNG)"
       , flagNone ["debug"] (addEmptyArg "debug") "Show server debugging output"
+      , flagNone ["no-logging"] (addEmptyArg "no-logging") "Suppress web server logs."
       -- , flagNone ["autosave"] (addEmptyArg "autosave") "Automatically save proof state"
       -- , flagNone ["loadstate"] (addEmptyArg "loadstate") "Load proof state if present"
       ] ++
@@ -85,10 +86,9 @@ run thisMode as = case findArg "workDir" as of
       version <- ensureMaudeAndGetVersion as
 
       -- process theories
-      _ <- case fst (graphPath as) of
-          "dot"  -> ensureGraphVizDot as
-          "json" -> ensureGraphCommand as
-          _      -> pure (Just "")
+      _ <- case (readOutputCommand as).ocFormat of
+          OutDot  -> ensureGraphVizDot as
+          OutJSON -> ensureGraphCommand as
 
       port <- readPort
       let webUrl = serverUrl port
@@ -103,14 +103,18 @@ run thisMode as = case findArg "workDir" as of
       withWebUI
         ("Finished loading theories ... server ready at \n\n    " ++ webUrl ++ "\n")
         cacheDir
-        workDir (argExists "loadstate" as) (argExists "autosave" as)
+        workDir
+
+        enableLogging
+        (argExists "loadstate" as)
+        (argExists "autosave" as)
 
         thyLoadOptions
 
         (loadTheory thyLoadOptions)
         (closeTheory version thyLoadOptions)
 
-        (argExists "debug" as) (graphPath as) readImageFormat
+        (argExists "debug" as) (readOutputCommand as) readImageFormat
         (constructAutoProver thyLoadOptions)
         (runWarp port)
 
@@ -118,6 +122,8 @@ run thisMode as = case findArg "workDir" as of
       helpAndExit thisMode
         (Just $ "directory '" ++ workDir ++ "' does not exist.")
   where
+    enableLogging = not $ argExists "no-logging" as
+
     thyLoadOptions = case mkTheoryLoadOptions as of
       Left (ArgumentError e) -> error e
       Right opts             -> opts
