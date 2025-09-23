@@ -314,11 +314,11 @@ execProofMethod ctxt method sys =
                 -- cannot be equal to the original one so there's nothing to check.
                 _ -> return cases
           Induction             -> process sys . induction <$> getInductionCases sys
-          SolveGoal goal        -> checkForLoop goal sys False 0
+          SolveGoal goal        -> checkForLoop goal sys
           Invalidated           -> Nothing
-          InLoop (idx, Just goal) -> checkForLoop goal sys False 0
-          InLoop (idx, Just goal) -> Nothing
-          Backtracked goal        -> checkForLoop goal sys False 0 
+          InLoop (idx, Just goal) -> checkForLoop goal sys
+          InLoop (idx, Nothing) -> Nothing
+          Backtracked goal        -> checkForLoop goal sys
 
   where
     process :: System -> Reduction CaseName -> M.Map CaseName System
@@ -332,35 +332,23 @@ execProofMethod ctxt method sys =
     cleanup :: System -> System
     cleanup s = L.set sSubst emptySubst (Precise.evalFresh (renamePrecise s) Precise.nothingUsed)
 
-    foundAtBl :: Goal -> [Goal] -> Int -> Int
-    foundAtBl _ [] l   = 0 - l
-    foundAtBl g (h:t) l = if g == h then 1 else 1 + foundAtBl g t l
-
     foundAtP :: Goal -> [[Goal]] -> Int -> Int
     foundAtP _ [] l   = 0 - l
     foundAtP g (h:t) l = if g `elem` h then 1 else 1 + foundAtP g t l
 
-    checkForLoop :: Goal -> System -> Bool -> Int -> Maybe (M.Map CaseName System)
-    checkForLoop goal sys foundLoop idx_bl = if index <= 0 then execSolveGoal goal False False index 0 else execSolveGoal goal True False index 0
+    checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
+    checkForLoop goal sys = if index <= 0 then execSolveGoal goal False index else execSolveGoal goal True index
         where
             index = foundAtP (freeme goal) (map (map freeme) (L.get sPathGoals sys)) (length $ L.get sPathGoals sys)
 
-    checkBlackList :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkBlackList goal sys = if index_bl <= 0 then checkForLoop goal sys False index_bl else execSolveGoal goal False True 0 index_bl
-
-        where
-            index_bl = foundAtBl (freeme goal) (map freeme $ L.get sBlackList sys) (length $ L.get sBlackList sys)
-
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
-    execSolveGoal :: Goal -> Bool -> Bool -> Int -> Int -> Maybe (M.Map CaseName System)
-    execSolveGoal goal loop bl index idx_bl = return $ process sys' $ solve goal
+    execSolveGoal :: Goal -> Bool -> Int -> Maybe (M.Map CaseName System)
+    execSolveGoal goal loop index = return $ process sys' $ solve goal
       where
-        sys'   = if bl then L.set sLoopFound False (L.set sNbLoop 0 (L.set sBlackListFound True sys))
-                     else if loop then L.set sBlackListFound False (L.set sBlackList (goal:(L.get sBlackList sys)) (L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys))))
-                     else L.set sLoopFound False (L.set sNbLoop 0 (L.set sBlackListFound False (L.set sLoopFound False (L.set sPathGoals ([freeme goal]:(L.get sPathGoals sys)) sys)))) 
-                     --("List:Goal: "++(show goal)++"List:FreedGoal: "++(show $ freeme goal)++"\nList:InLoopList: "++(show $ map length $ L.get sPathGoals sys)++" "++(show $ (map (map freeme) $ L.get sPathGoals sys)))
-                    
+        sys'   = if loop then L.set sNbLoop index (L.set sLoopFound loop (L.set sPathGoals (drop index (L.get sPathGoals sys)) sys))
+                     else L.set sLoopFound False (L.set sNbLoop 0 (L.set sLoopFound False (L.set sPathGoals ([freeme goal]:(L.get sPathGoals sys)) sys)))
+                                         
     solve :: Goal -> Reduction CaseName
     solve goal =
       let ths = L.get pcSources ctxt
@@ -500,7 +488,7 @@ execDiffProofMethod ctxt method sys =
     startBackwardSearch rulename = M.insert ("LHS") (backwardSearchSystem LHS sys rulename) $ M.insert ("RHS") (backwardSearchSystem RHS sys rulename) $ M.empty
 
     isSolved :: Side -> System -> Bool
-    isSolved s sys' = not (L.get sLoopFound sys')  && not (L.get sBlackListFound sys') && (isJust $ isFinished (eitherProofContext ctxt s) sys' >>= guard . (== Solved))
+    isSolved s sys' = not (L.get sLoopFound sys') && (isJust $ isFinished (eitherProofContext ctxt s) sys' >>= guard . (== Solved))
 
     applyStep :: ProofMethod -> Side -> System -> Maybe (M.Map CaseName DiffSystem)
     applyStep m s dsSys = do
@@ -590,9 +578,8 @@ rankProofMethods ranking tactics ctxt sys =
       case execProofMethod ctxt m sys of
         Just cases -> case M.toList cases of
             []              -> return (m, (cases, expl))
-            ((case1,sys):_) -> if L.get sBlackListFound sys then return (Backtracked $ fromJust $ fromSolveGoal m, (cases, expl))
-                                  else if L.get sLoopFound sys then return (InLoop (L.get sNbLoop sys, fromSolveGoal m) , (cases, "InLoop "++ show (L.get sNbLoop sys)))
-                                      else return (m, (cases, expl))
+            ((case1,sys):_) -> if L.get sLoopFound sys then return (InLoop (L.get sNbLoop sys, fromSolveGoal m) , (cases, "InLoop "++ show (L.get sNbLoop sys)))
+                                  else return (m, (cases, expl))
         Nothing    -> Nothing
 
     sourceRule goal = case goalRule sys goal of

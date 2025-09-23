@@ -1036,16 +1036,16 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases) ignoreGoals
 
         where
-          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Maybe Goal] -> Proof (Maybe System)
-          explore [] (method0, cases0) igG = node method0 cases0 (fmap freeme (extractGoal method0):igG) 
-          explore ((InLoop (n,g), (cases, _expl)):suite) _ igG =
-              if fmap freeme g `elem` igG 
+          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> Proof (Maybe System)
+          explore [] (method0, cases0) igG = node method0 cases0 (depth:igG) 
+          explore ((InLoop (n,g), (cases, _expl)):_) _ igG =
+              if (depth-n) `elem` igG
                 then node (InLoop (n,g)) cases igG 
                 else node (InLoop (n,g)) M.empty igG --else 
           explore ((method, (cases, _expl)):suite) (method0, cases0) igG = case propagatedMethod of --
               InLoop (0,_) -> explore suite (method0,cases0) igG --
               InLoop (n,g) ->
-                  if g `elem` igG 
+                  if (depth-n) `elem` igG
                     then node (InLoop (n,g)) cases igG 
                     else node (InLoop (n,g)) M.empty igG   --
               _            -> node method cases igG
@@ -1062,16 +1062,16 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             where
               propagatingMethod :: ProofMethod -> [(CaseName,System)] -> ProofMethod
               propagatingMethod method [] = method
-              propagatingMethod method ((cn,_sys):t) = case prove (succ depth) ignoreGoals _sys  of
+              propagatingMethod method ((_,_sys):t) = case prove (succ depth) ignoreGoals _sys  of
                   (LNode (ProofStep (InLoop (s,g)) _ ) _) -> InLoop (s,g)
-                  (LNode ps cs)                           -> propagatingMethod method t
+                  (LNode _ _)                           -> propagatingMethod method t
 
           extractGoal method = case method of
             InLoop (_, goal) -> goal
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
-          node :: ProofMethod -> M.Map CaseName System -> [Maybe Goal] -> Proof(Maybe System)
+          node :: ProofMethod -> M.Map CaseName System -> [Int] -> Proof(Maybe System)
           node methodOrigin casesOrigin igG = trace (show nodule)
                       nodule
                   where
