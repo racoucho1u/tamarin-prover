@@ -1070,16 +1070,16 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases) ignoreGoals
 
         where
-          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Maybe Goal] -> Proof ()
-          explore [] (method0, cases0) igG = node method0 cases0 (fmap freeme (extractGoal method0):igG) 
+          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> Proof ()
+          explore [] (method0, cases0) igG = node method0 cases0 (depth:igG) 
           explore ((InLoop (n,g), (cases, _expl)):suite) _ igG =
-              if fmap freeme g `elem` igG 
+              if (depth-n) `elem` igG 
                 then node (InLoop (n,g)) cases igG 
                 else node (InLoop (n,g)) M.empty igG --else 
           explore ((method, (cases, _expl)):suite) (method0, cases0) igG = case propagatedMethod of --
               InLoop (0,_) -> explore suite (method0,cases0) igG --
               InLoop (n,g) ->
-                  if g `elem` igG 
+                  if (depth-n) `elem` igG 
                     then node (InLoop (n,g)) cases igG 
                     else node (InLoop (n,g)) M.empty igG   --
               _            -> node method cases igG
@@ -1105,7 +1105,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
-          node :: ProofMethod -> M.Map CaseName System -> [Maybe Goal] -> Proof()
+          node :: ProofMethod -> M.Map CaseName System -> [Int] -> Proof()
           node methodOrigin casesOrigin igG = trace (show nodule)
                       nodule
                   where
