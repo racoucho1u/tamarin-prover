@@ -1036,28 +1036,28 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases) ignoreGoals blacklist
 
         where
-          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Maybe Goal] -> [Maybe Goal] -> Proof (Maybe System)
-          explore [] (method0, cases0) igG blacklist = node method0 cases0 (fmap freeme (extractGoal method0):igG) blacklist
-          explore ((InLoop (n,g), (cases, _expl)):suite) _ igG blacklist = 
-              if fmap freeme g `elem` igG
-                then node (InLoop (n,g)) cases igG blacklist
-                else node (InLoop (n,g)) M.empty igG (fmap freeme g:blacklist)
-          explore ((method, (cases, _expl)):suite) (method0, cases0) igG blacklist = 
-            if fmap freeme (extractGoal method) `elem` blacklist
+          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> [Maybe Goal] -> Proof (Maybe System)
+          explore [] (method0, cases0) igG _blacklist = node method0 cases0 (depth:igG) _blacklist
+          explore ((InLoop (n,g), (cases, _expl)):_) _ igG _blacklist = 
+              if (depth-n) `elem` igG 
+                then node (InLoop (n,g)) cases igG _blacklist
+                else node (InLoop (n,g)) M.empty igG (fmap freeme g:_blacklist)
+          explore ((method, (cases, _expl)):suite) (method0, cases0) igG _blacklist = 
+            if fmap freeme (extractGoal method) `elem` _blacklist
               then 
-                explore suite (method0,cases0) igG blacklist
+                explore suite (method0,cases0) igG _blacklist
               else 
                 case propagatedMethod of --
                   InLoop (0,_) -> explore suite (method0,cases0) igG newbl
-                  InLoop (n,g) -> if g `elem` igG
+                  InLoop (n,g) -> if (depth-n) `elem` igG 
                                     then node (InLoop (n,g)) cases igG newbl
                                     else node (InLoop (n,g)) M.empty igG newbl --
-                  m            -> node method cases igG newbl
+                  _            -> node method cases igG newbl
                 where
-                    (propagatedMethod, newbl) = propagateMethod cases method igG blacklist
+                    (propagatedMethod, newbl) = propagateMethod cases method igG _blacklist
 
 
-          propagateMethod cases methodOrigin ignore blacklist = case propagatingMethod (Sorry Nothing) (M.toList cases) blacklist of
+          propagateMethod cases methodOrigin ignore _blacklist = case propagatingMethod (Sorry Nothing) (M.toList cases) _blacklist of
               (InLoop (0,_),nbl) -> if not (null ignore)
                                 then propagateMethod cases methodOrigin [] nbl
                                 else (methodOrigin,nbl)                          --  
@@ -1065,21 +1065,21 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
               (_, nbl)           -> (methodOrigin,nbl)                          --
             where
               propagatingMethod :: ProofMethod -> [(CaseName,System)] -> [Maybe Goal] -> (ProofMethod,[Maybe Goal])
-              propagatingMethod method [] blacklist = (method,blacklist)
-              propagatingMethod method ((cn,_sys):t) blacklist = case prove (succ depth) ignoreGoals blacklist _sys  of
+              propagatingMethod method [] _blacklist = (method,_blacklist)
+              propagatingMethod method ((_,_sys):t) _blacklist = case prove (succ depth) ignoreGoals _blacklist _sys  of
                   (LNode (ProofStep (InLoop (s,g)) newbl _ ) _) -> (InLoop (s,g),newbl)
-                  (LNode ps cs)                           -> propagatingMethod method t blacklist
+                  (LNode _ _)                           -> propagatingMethod method t _blacklist
 
           extractGoal method = case method of
             InLoop (_, goal) -> goal
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
-          node :: ProofMethod -> M.Map CaseName System -> [Maybe Goal] -> [Maybe Goal] -> Proof(Maybe System)
-          node methodOrigin casesOrigin igG blacklist =  trace (show nodule) nodule
+          node :: ProofMethod -> M.Map CaseName System -> [Int] -> [Maybe Goal] -> Proof(Maybe System)
+          node methodOrigin casesOrigin igG _blacklist =  trace (show nodule) nodule
             where
-                successors = M.map (prove (succ depth) igG blacklist) casesOrigin
-                nodule = LNode (ProofStep methodOrigin blacklist (Just sys)) successors
+                successors = M.map (prove (succ depth) igG _blacklist) casesOrigin
+                nodule = LNode (ProofStep methodOrigin _blacklist (Just sys)) successors
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
