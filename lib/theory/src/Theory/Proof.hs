@@ -1070,10 +1070,10 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
         ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases) ignoreGoals blacklist
 
         where
-          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Maybe Goal] -> [Maybe Goal] -> Proof ()
-          explore [] (method0, cases0) igG blacklist = node method0 cases0 (fmap freeme (extractGoal method0):igG) blacklist
+          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> [Maybe Goal] -> Proof ()
+          explore [] (method0, cases0) igG blacklist = node method0 cases0 (depth:igG) blacklist
           explore ((InLoop (n,g), (cases, _expl)):suite) _ igG blacklist = 
-              if fmap freeme g `elem` igG
+              if (depth-n) `elem` igG 
                 then node (InLoop (n,g)) cases igG blacklist
                 else node (InLoop (n,g)) M.empty igG (fmap freeme g:blacklist)
           explore ((method, (cases, _expl)):suite) (method0, cases0) igG blacklist = 
@@ -1083,7 +1083,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
               else 
                 case propagatedMethod of --
                   InLoop (0,_) -> explore suite (method0,cases0) igG newbl
-                  InLoop (n,g) -> if g `elem` igG
+                  InLoop (n,g) -> if (depth-n) `elem` igG 
                                     then node (InLoop (n,g)) cases igG newbl
                                     else node (InLoop (n,g)) M.empty igG newbl --
                   m            -> node method cases igG newbl
@@ -1109,7 +1109,7 @@ proveSystemDFS heuristic tactics ctxt d0 sys0 =
             SolveGoal goal     -> Just goal
             _ -> Nothing
 
-          node :: ProofMethod -> M.Map CaseName System -> [Maybe Goal] -> [Maybe Goal] -> Proof()
+          node :: ProofMethod -> M.Map CaseName System -> [Int] -> [Maybe Goal] -> Proof()
           node methodOrigin casesOrigin igG blacklist =  trace (show nodule) nodule
             where
                 successors = M.map (prove (succ depth) igG blacklist) casesOrigin
