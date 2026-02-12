@@ -72,6 +72,7 @@ import Theory.Tools.IntruderRules
 import Theory.Tools.MessageDerivationChecks
 import Theory.Tools.Wellformedness
 import TheoryObject (diffTheoryConfigBlock, theoryConfigBlock)
+import GHC.Base (leInt)
 
 ------------------------------------------------------------------------------
 -- Theory loading: shared between interactive and batch mode
@@ -114,6 +115,12 @@ theoryLoadFlags =
       (updateArg "heuristic")
       ("(" ++ intercalate "|" (keys goalRankingIdentifiers) ++ ")+")
       ("Sequence of proof method rankings to use (default '" ++ prettyGoalRanking (head $ defaultRankings False) ++ "')"),
+    flagOpt
+      ""
+      ["automated-strategy", "a"]
+      (updateArg "automated-strategy")
+      "STRATEGY"
+      ("Automated proof strategy to use: 0: none (default), 1: escape, 2: probabilistic, 3: backtracking, 4: blacklisting, 5: 'smartTamarin'"),
     flagOpt
       "summary"
       ["partial-evaluation"]
@@ -213,7 +220,8 @@ data TheoryLoadOptions = TheoryLoadOptions
     derivationChecks :: Int,
     noReuse :: Bool,
     noRestrictions :: Bool,
-    replicationBound :: Int
+    replicationBound :: Int, 
+    automatedProofStrategy :: Maybe Int
   }
   deriving (Show)
 
@@ -240,7 +248,8 @@ defaultTheoryLoadOptions =
       derivationChecks = 5,
       noReuse = False,
       noRestrictions = False,
-      replicationBound = 3
+      replicationBound = 3, 
+      automatedProofStrategy = Nothing
     }
 
 toParserFlags :: TheoryLoadOptions -> [String]
@@ -277,6 +286,7 @@ mkTheoryLoadOptions as =
     <*> noReuse
     <*> noRestrictions
     <*> replicationBound
+    <*> automatedProofStrategy
   where
     proveMode = pure $ argExists "prove" as
     lemmaNames = pure $ findArg "prove" as ++ findArg "lemma" as
@@ -287,6 +297,12 @@ mkTheoryLoadOptions as =
         Left _ -> throwError $ ArgumentError errMsg
         Right i -> pure $ conv i
     -- FIXME : provide option to handle potential error without crash (ie, take default value and raise error but continue)
+
+    correctStrategyRange :: Int -> Int
+    correctStrategyRange s
+      | s <= 5 = s
+      | otherwise = error "Automated strategy out of bound (valid values 0 to 5)"
+      
 
     proofBound = parseIntArg (findArg "bound" as) Nothing Just "bound: invalid bound given"
 
@@ -343,6 +359,7 @@ mkTheoryLoadOptions as =
     deriv = parseIntArg derivchecks derivDefault id "derivcheck-timeout: invalid bound given"
 
     replicationBound = parseIntArg (findArg "replication-bound" as) defaultTheoryLoadOptions.replicationBound id "replication-bound: invalid bound given"
+    automatedProofStrategy = parseIntArg (findArg "automated-strategy" as) Nothing Just "automated-strategy: invalid strategy given"
 
 stopOnTrace :: (MonadError ArgumentError m) => Arguments -> m (Maybe SolutionExtractor)
 stopOnTrace as = case map toLower <$> findArg "stop-on-trace" as of
@@ -579,7 +596,7 @@ closeTranslatedTheory thyOpts sign srcThy = do
               closedThy
           Nothing -> closedThy
       provedThy =
-        bimap
+         bimap
           (proveTheory selector prover)
           (proveDiffTheory selector prover diffProver)
           partialThy
@@ -692,6 +709,7 @@ constructAutoProver thyOpts =
   AutoProver
     thyOpts.heuristic
     Nothing
+    thyOpts.automatedProofStrategy
     thyOpts.proofBound
     (fromMaybe CutDFS thyOpts.stopOnTrace)
     False

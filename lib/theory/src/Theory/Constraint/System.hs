@@ -88,6 +88,7 @@ module Theory.Constraint.System (
   , pcVerbose
   , pcConstantRHS
   , pcIsSapic
+  , pcAutomatedProofStrat
   , dpcPCLeft
   , dpcPCRight
   , dpcProtoRules
@@ -747,22 +748,23 @@ data InductionHint = UseInduction | AvoidInduction
 -- | A proof context contains the globally fresh facts, classified rewrite
 -- rules and the corresponding precomputed premise source theorems.
 data ProofContext = ProofContext
-       { _pcSignature          :: SignatureWithMaude
-       , _pcRules              :: ClassifiedRules
-       , _pcInjectiveFactInsts :: S.Set (FactTag, [[MonotonicBehaviour]])
-       , _pcSourceKind         :: SourceKind
-       , _pcSources            :: [Source]
-       , _pcUseInduction       :: InductionHint
-       , _pcHeuristic          :: Maybe (Heuristic ProofContext)
-       , _pcTactic             :: Maybe [Tactic ProofContext]
-       , _pcTraceQuantifier    :: SystemTraceQuantifier
-       , _pcLemmaName          :: String
-       , _pcHiddenLemmas       :: [String]
-       , _pcVerbose            :: Bool -- true if we want to show the achieved goal and formula
-       , _pcDiffContext        :: Bool -- true if diff proof
-       , _pcTrueSubterm        :: Bool -- true if in all rules the RHS is a subterm of the LHS
-       , _pcConstantRHS        :: Bool -- true if there are rules with a constant RHS
-       , _pcIsSapic            :: Bool -- true if the model was originally a sapic process
+       { _pcSignature           :: SignatureWithMaude
+       , _pcRules               :: ClassifiedRules
+       , _pcInjectiveFactInsts  :: S.Set (FactTag, [[MonotonicBehaviour]])
+       , _pcSourceKind          :: SourceKind
+       , _pcSources             :: [Source]
+       , _pcUseInduction        :: InductionHint
+       , _pcHeuristic           :: Maybe (Heuristic ProofContext)
+       , _pcTactic              :: Maybe [Tactic ProofContext]
+       , _pcTraceQuantifier     :: SystemTraceQuantifier
+       , _pcLemmaName           :: String
+       , _pcHiddenLemmas        :: [String]
+       , _pcVerbose             :: Bool -- true if we want to show the achieved goal and formula
+       , _pcDiffContext         :: Bool -- true if diff proof
+       , _pcTrueSubterm         :: Bool -- true if in all rules the RHS is a subterm of the LHS
+       , _pcConstantRHS         :: Bool -- true if there are rules with a constant RHS
+       , _pcIsSapic             :: Bool -- true if the model was originally a sapic process
+       , _pcAutomatedProofStrat :: Maybe Int  -- automated proof strategy (Nothing or 0: none, 1: escape, 2: proabilistic, 3: backtrack, 4: blacklist, 5: "smartTamarin")
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 

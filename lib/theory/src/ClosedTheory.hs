@@ -32,6 +32,7 @@ import           Theory.Tools.InjectiveFactInstances
 import           Theory.Text.Pretty
 import OpenTheory
 import Pretty
+import Data.Maybe (Maybe(Nothing))
 
 ------------------------------------------------------------------------------
 -- Closed theory querying / construction / modification
@@ -111,6 +112,7 @@ getProofContext l thy = ProofContext
     (all isSubtermRule  $ filter isDestrRule $ intruderRules $ L.get (crcRules . thyCache) thy)
     (any isConstantRule $ filter isDestrRule $ intruderRules $ L.get (crcRules . thyCache) thy)
     (L.get thyIsSapic thy)
+    (Just $ L.get thyAutomatedProveStrategy thy)
   where
     kind    = lemmaSourceKind l
     cases   = case kind of RawSource     -> crcRawSources
@@ -156,6 +158,7 @@ getProofContextDiff s l thy = case s of
             (all isSubtermRule  $ filter isDestrRule $ intruderRules $ L.get (crcRules . diffThyCacheLeft) thy)
             (any isConstantRule $ filter isDestrRule $ intruderRules $ L.get (crcRules . diffThyCacheLeft) thy)
             (L.get diffThyIsSapic thy)
+            Nothing
   RHS -> ProofContext
             ( L.get diffThySignature                    thy)
             ( L.get (crcRules . diffThyCacheRight)           thy)
@@ -173,6 +176,7 @@ getProofContextDiff s l thy = case s of
             (all isSubtermRule  $ filter isDestrRule $ intruderRules $ L.get (crcRules . diffThyCacheRight) thy)
             (any isConstantRule $ filter isDestrRule $ intruderRules $ L.get (crcRules . diffThyCacheRight) thy)
             (L.get diffThyIsSapic thy)
+            Nothing
   where
     kind    = lemmaSourceKind l
     cases   = case kind of RawSource     -> crcRawSources
@@ -232,6 +236,7 @@ getDiffProofContext l thy = DiffProofContext (proofContext LHS) (proofContext RH
             (all isSubtermRule  $ filter isDestrRule $ intruderRules $ L.get (crcRules . diffThyCacheLeft) thy)
             (any isConstantRule $ filter isDestrRule $ intruderRules $ L.get (crcRules . diffThyCacheLeft) thy)
             (L.get diffThyIsSapic thy)
+            Nothing
         RHS -> ProofContext
             ( L.get diffThySignature                    thy)
             ( L.get (crcRules . diffThyDiffCacheRight)           thy)
@@ -249,6 +254,7 @@ getDiffProofContext l thy = DiffProofContext (proofContext LHS) (proofContext RH
             (all isSubtermRule  $ filter isDestrRule $ intruderRules $ L.get (crcRules . diffThyCacheRight) thy)
             (any isConstantRule $ filter isDestrRule $ intruderRules $ L.get (crcRules . diffThyCacheRight) thy)
             (L.get diffThyIsSapic thy)
+            Nothing
 
     specifiedHeuristic = case lattr of
         Just lh -> Just lh
@@ -408,7 +414,8 @@ prettyClosedTheory thy = if containsManualRuleVariants mergedRules
             ,_thyCache=(L.get thyCache thy)
             ,_thyItems = mergedRules
             ,_thyOptions =(L.get thyOptions thy)
-            ,_thyIsSapic = (L.get thyIsSapic thy)}
+            ,_thyIsSapic = (L.get thyIsSapic thy)
+            ,_thyAutomatedProveStrategy= (L.get thyAutomatedProveStrategy thy)}
     ppInjectiveFactInsts crc =
         case S.toList $ L.get crcInjectiveFactInsts crc of
             []   -> emptyDoc

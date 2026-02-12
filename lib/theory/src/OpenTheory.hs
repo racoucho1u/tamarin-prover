@@ -62,7 +62,8 @@ openTranslatedTheory thy =
       _thyCache = (L.get thyCache thy),
       _thyItems = newThyItems,
       _thyOptions = (L.get thyOptions thy),
-      _thyIsSapic = (L.get thyIsSapic thy)
+      _thyIsSapic = (L.get thyIsSapic thy),
+      _thyAutomatedProveStrategy = (L.get thyAutomatedProveStrategy thy)
     }
   where
     newThyItems = mapMaybe addTranslationElement (L.get thyItems thy)
@@ -548,7 +549,7 @@ defaultOption = Option False False False False False False False False False S.e
 
 -- | Default theory
 defaultOpenTheory :: Bool -> OpenTheory
-defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False
+defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False 0
 
 -- | Default diff theory
 defaultOpenDiffTheory :: Bool -> OpenDiffTheory
