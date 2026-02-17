@@ -104,6 +104,7 @@ import           Logic.Connectives
 import           Theory.Constraint.Solver.Contradictions
 import           Theory.Constraint.System
 import           Theory.Model
+import Control.Monad.Catch (ExitCase(ExitCaseSuccess))
 
 ------------------------------------------------------------------------------
 -- The constraint reduction monad
@@ -579,6 +580,7 @@ substSystem = do
     substSolvedFormulas
     substLemmas
     c2 <- substGoals
+    -- substAutomatedStrategy
     substNextGoalNr
     return (c1 <> c2)
 
@@ -594,6 +596,21 @@ substFormulas       = substPart sFormulas
 substSolvedFormulas = substPart sSolvedFormulas
 substLemmas         = substPart sLemmas
 substNextGoalNr     = return ()
+
+
+substAutomatedStrategy :: Reduction ()
+substAutomatedStrategy = do 
+    subst <- getM sSubst
+    modM sProofStrategy (substStrat subst)
+    where
+        substStrat :: LNSubst -> AutomatedProofStrategy -> AutomatedProofStrategy
+        substStrat _ Original = Original
+        substStrat subst (Escape (EscapeStrat (Just gp) b c)) = Escape (EscapeStrat (Just $ unifyLists subst gp) b c)
+
+        unifyLists :: LNSubst -> [(Int,Int,[Goal])] -> [(Int,Int,[Goal])]
+        unifyLists _ [] = []
+        --unifyLists subst [goal] = [foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)]
+        unifyLists subst ((d,i,goal):t) = (d,i,foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)) : unifyLists subst t
 
 -- | Apply the current substitution of the equation store to a part of the
 -- sequent. This is an internal function.

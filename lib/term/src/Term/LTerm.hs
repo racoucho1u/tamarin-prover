@@ -41,6 +41,7 @@ module Term.LTerm (
   , LTerm
   , LNTerm
 
+  , setLVarIdx
   , freshLVar
   , sortPrefix
   , sortSuffix
@@ -288,6 +289,9 @@ type LTerm c = VTerm c LVar
 -- | Terms used for proving; i.e., variables fixed to logical variables
 --   and constants to Names.
 type LNTerm = VTerm Name LVar
+
+setLVarIdx :: Integer -> LVar -> LVar
+setLVarIdx i (LVar n s _) = LVar n s i
 
 -- | @freshLVar v@ represents a fresh logical variable with name @v@.
 freshLVar :: MonadFresh m => String -> LSort -> m LVar

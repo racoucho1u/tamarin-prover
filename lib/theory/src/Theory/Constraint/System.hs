@@ -98,6 +98,14 @@ module Theory.Constraint.System (
   , dpcReuseLemmas
   , eitherProofContext
 
+  , EscapeStrat(..)
+  , eNbLoop
+  , eLoopFound
+  , ePathGoals
+  , AutomatedProofStrategy(..)
+  , emptyAutoStrategy
+
+
   -- ** Classified rules
   , ClassifiedRules(..)
   , emptyClassifiedRules
@@ -233,6 +241,8 @@ module Theory.Constraint.System (
 
   , sGoals
   , sNextGoalNr
+
+  , sProofStrategy
 
   , isDiffSystem
   , sDiffSystem
@@ -380,6 +390,19 @@ data GoalStatus = GoalStatus
     }
     deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
+data EscapeStrat = EscapeStrat
+  { _ePathGoals    :: Maybe [(Int, Int, [Goal])]         -- (depth, iteration, rewritting of the goal)
+  , _eNbLoop       :: Maybe (Int, Int)                   -- (depth, iteration)
+  , _eLoopFound    :: Maybe Bool
+  }
+  deriving( Eq, Ord, Show, Generic, NFData, Binary )
+
+data AutomatedProofStrategy = Original | Escape EscapeStrat
+  deriving( Eq, Ord, Show, Generic, NFData, Binary )
+
+emptyAutoStrategy :: AutomatedProofStrategy
+emptyAutoStrategy = Original
+
 -- | A constraint system.
 data System = System
     { _sNodes          :: M.Map NodeId RuleACInst
@@ -392,6 +415,7 @@ data System = System
     , _sSolvedFormulas :: S.Set LNGuarded
     , _sLemmas         :: S.Set LNGuarded
     , _sGoals          :: M.Map Goal GoalStatus
+    , _sProofStrategy  :: AutomatedProofStrategy
     , _sNextGoalNr     :: Integer
     , _sSourceKind     :: SourceKind
     , _sDiffSystem     :: Bool
@@ -401,7 +425,7 @@ data System = System
     -- constraint system.
     deriving( Eq, Ord, Generic, NFData, Binary )
 
-$(mkLabels [''System, ''GoalStatus])
+$(mkLabels [''System, ''GoalStatus, ''AutomatedProofStrategy, ''EscapeStrat])
 
 deriving instance Show System
 
@@ -416,6 +440,16 @@ sSubst = eqsSubst . sEqStore
 -- the equation store.
 sConjDisjEqs :: System :-> Conj (SplitId, S.Set (LNSubstVFresh))
 sConjDisjEqs = eqsConj . sEqStore
+
+-- | Label to access the NbLoop and LoopFound fields of the system automated strategy if they exist.
+-- sNbLoop :: System :-> Maybe (Int, Int)
+-- sNbLoop = aNbLoop . sProofStrategy
+
+-- sLoopFound :: System :-> Maybe Bool
+-- sLoopFound = aLoopFound . sProofStrategy
+
+-- sPathGoals :: System :-> Maybe [(Int, Int, [Goal])]
+-- sPathGoals = aPathGoals . sProofStrategy
 
 ------------------------------------------------------------------------------
 -- Oracles
@@ -764,7 +798,7 @@ data ProofContext = ProofContext
        , _pcTrueSubterm         :: Bool -- true if in all rules the RHS is a subterm of the LHS
        , _pcConstantRHS         :: Bool -- true if there are rules with a constant RHS
        , _pcIsSapic             :: Bool -- true if the model was originally a sapic process
-       , _pcAutomatedProofStrat :: Maybe Int  -- automated proof strategy (Nothing or 0: none, 1: escape, 2: proabilistic, 3: backtrack, 4: blacklist, 5: "smartTamarin")
+       , _pcAutomatedProofStrat :: AutomatedProofStrategy
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
@@ -824,7 +858,7 @@ emptySystem :: SourceKind -> Bool -> System
 emptySystem d isdiff = System
     M.empty S.empty S.empty Nothing emptySubtermStore emptyEqStore
     S.empty S.empty S.empty
-    M.empty 0 d isdiff
+    M.empty emptyAutoStrategy 0 d isdiff
 
 -- TODO: I do not like the second conjunct; this should be done cleaner
 isInitialSystem :: System -> Bool
@@ -1813,14 +1847,18 @@ deriving instance Show DiffSystem
 instance Apply LNSubst SourceKind where
     apply = const id
 
+instance Apply LNSubst AutomatedProofStrategy where
+    apply subst Original = Original
+    apply subst (Escape (EscapeStrat a b c)) = Escape (EscapeStrat (apply subst a) (apply subst b) (apply subst c))
+
 instance Apply LNSubst System where
-    apply subst (System a b c d e f g h i j k l m) =
+    apply subst (System a b c d e f g h i j k l m n) =
         System (apply subst a)
         -- we do not apply substitutions to node variables, so we do not apply them to the edges either
         b
         (apply subst c) (apply subst d)
         (apply subst e) (apply subst f) (apply subst g) (apply subst h) (apply subst i)
-        j k (apply subst l) (apply subst m)
+        j (apply subst k) l (apply subst m) (apply subst n)
 
 instance HasFrees SourceKind where
     foldFrees = const mempty
@@ -1832,8 +1870,16 @@ instance HasFrees GoalStatus where
     foldFreesOcc  _ _ = const mempty
     mapFrees  = const pure
 
+
+instance HasFrees AutomatedProofStrategy where
+    foldFrees fun Original = mempty
+    foldFrees fun (Escape (EscapeStrat a b c)) =
+        foldFrees fun a `mappend`
+        foldFrees fun b `mappend`
+        foldFrees fun c
+
 instance HasFrees System where
-    foldFrees fun (System a b c d e f g h i j k l m) =
+    foldFrees fun (System a b c d e f g h i j k l m n) =
         foldFrees fun a `mappend`
         foldFrees fun b `mappend`
         foldFrees fun c `mappend`
@@ -1846,9 +1892,10 @@ instance HasFrees System where
         foldFrees fun j `mappend`
         foldFrees fun k `mappend`
         foldFrees fun l `mappend`
-        foldFrees fun m
+        foldFrees fun m `mappend`
+        foldFrees fun n
 
-    foldFreesOcc fun ctx (System a _b _c _d _e _f _g _h _i _j _k _l _m) =
+    foldFreesOcc fun ctx (System a _b _c _d _e _f _g _h _i _j _k _l _m _n) =
         foldFreesOcc fun ("a":ctx') a {- `mappend`
         foldFreesCtx fun ("b":ctx') b `mappend`
         foldFreesCtx fun ("c":ctx') c `mappend`
@@ -1862,7 +1909,7 @@ instance HasFrees System where
         foldFreesCtx fun ("k":ctx') k -}
       where ctx' = "system":ctx
 
-    mapFrees fun (System a b c d e f g h i j k l m) =
+    mapFrees fun (System a b c d e f g h i j k l m n) =
         System <$> mapFrees fun a
                <*> mapFrees fun b
                <*> mapFrees fun c
@@ -1876,6 +1923,7 @@ instance HasFrees System where
                <*> mapFrees fun k
                <*> mapFrees fun l
                <*> mapFrees fun m
+               <*> mapFrees fun n
 
 instance HasFrees Source where
     foldFrees f th =
@@ -1908,11 +1956,11 @@ compareNodesUpToNewVars n1 n2 = compareListsUpToNewVars (M.toAscList n1) (M.toAs
 compareSystemsUpToNewVars :: System -> System -> Ordering
 -- when we have trace systems, we can ignore new variable instantiations
 compareSystemsUpToNewVars
-   (System a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 False)
-   (System a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 False)
+   (System a1 b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 False)
+   (System a2 b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 False)
        = if compareNodes == EQ then
-            compare (System M.empty b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 False)
-                (System M.empty b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 False)
+            compare (System M.empty b1 c1 d1 e1 f1 g1 h1 i1 j1 k1 l1 m1 False)
+                (System M.empty b2 c2 d2 e2 f2 g2 h2 i2 j2 k2 l2 m2 False)
          else
             compareNodes
         where

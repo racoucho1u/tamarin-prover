@@ -45,7 +45,7 @@ import qualified Data.Label                                as L
 import           Data.List                                 (partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate, uncons)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map                                  as M
-import           Data.Maybe                                (catMaybes, fromMaybe, mapMaybe, isNothing, isJust)
+import           Data.Maybe                                (catMaybes, fromMaybe, fromJust, mapMaybe, isNothing, isJust)
 -- import           Data.Monoid
 import           Data.Ord                                  (comparing)
 import qualified Data.Set                                  as S
@@ -76,6 +76,7 @@ import qualified Extension.Data.Label as L
 import Control.Monad.Disj (disjunctionOfList)
 import Data.Bool (bool)
 
+import           Utils.Misc (snd3, fst3, thd3)
 
 
 ------------------------------------------------------------------------------
@@ -206,6 +207,7 @@ data Result =
 data ProofMethod =
     Sorry (Maybe String)                 -- ^ Proof was not completed
   | Simplify                             -- ^ A simplification step.
+  | InLoop (Int, Int, Goal)              -- ^ A goal that has been detected as part as a loop (depth, iteration, goal)
   | SolveGoal Goal                       -- ^ A goal that was solved.
   | Induction                            -- ^ Use inductive strengthening on
                                          -- the single formula constraint in
@@ -249,6 +251,19 @@ instance HasFrees DiffProofMethod where
 -- Proof method execution
 -------------------------
 
+cleanGoal :: Goal -> Goal
+cleanGoal (ActionG v f) = ActionG (setLVarIdx 0 v) (Fact (factTag f) (factAnnotations f) (map insideJobDeep $ factTerms f))
+cleanGoal (ChainG (ni1, cidx) (ni2, pidx)) = ChainG (LVar (lvarName ni1) (lvarSort ni1) 0, cidx) (LVar (lvarName ni2) (lvarSort ni2) 0, pidx)
+cleanGoal (PremiseG (ni, pidx) f) = PremiseG (LVar (lvarName ni) (lvarSort ni) 0, pidx) (Fact (factTag f) (factAnnotations f) (map insideJobDeep $ factTerms f))
+cleanGoal (SplitG s) = SplitG s
+cleanGoal (DisjG (Disj g)) = DisjG (Disj (map removeCpt g))
+cleanGoal (SubtermG a) = SubtermG a --MOUAI
+
+foundAt :: Goal -> [[Goal]] -> Int
+foundAt _ []    = -1
+foundAt g (h:t) = if g `elem` h then 1 else foundAt g t
+
+
 -- @checkAndExecMethod rules method se@ checks first if the @method@ is
 -- applicable to the sequent @se@ and, if so, applies it.
 checkAndExecProofMethod :: ProofContext -> ProofMethod -> System -> Maybe (M.Map CaseName System)
@@ -287,7 +302,7 @@ execProofMethod ctxt method sys =
       Sorry _               -> return M.empty
       Finished _            -> return M.empty
       Simplify              ->
-        let cases = process (return "") -- @process@ simplifies
+        let cases = process sys (return "") -- @process@ simplifies
         in case M.toList cases of
           -- Check whether simplified system is equal to previous one; if so,
           -- fail in applying this method.
@@ -295,20 +310,38 @@ execProofMethod ctxt method sys =
           -- If simplifying resulted in multiple cases, the resulting ones
           -- cannot be equal to the original one so there's nothing to check.
           _ -> return cases
-      Induction             -> process . induction <$> getInductionCases sys
-      SolveGoal goal        -> return $ process $ solve goal
+      Induction             -> process sys . induction <$> getInductionCases sys
+      --Removeme: the check is correct iff pcAutomatedProofStrat is Nothing when default strategy!
+      SolveGoal goal        -> checkForLoop goal sys -- return $ process sys $ solve goal
+      InLoop (_,_, goal)    -> checkForLoop goal sys
       Invalidated           -> Nothing
   where
-    process :: Reduction CaseName -> M.Map CaseName System
-    process m =
+    process :: System -> Reduction CaseName -> M.Map CaseName System
+    process s m =
       let cases =   removeRedundantCases ctxt [] snd
                   . map (fmap cleanup . fst)
-                  . getDisj $ runReduction (m <* simplifySystem) ctxt sys (avoid sys)
+                  . getDisj $ runReduction (m <* simplifySystem) ctxt s (avoid s)
       in  M.fromListWith (error "case names not unique")
             $ uniqueListBy (comparing fst) id distinguish cases
 
     cleanup :: System -> System
     cleanup s = L.set sSubst emptySubst (Precise.evalFresh (renamePrecise s) Precise.nothingUsed)
+
+    checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
+    checkForLoop goal s = executedProofMethod
+        where
+            index = foundAt (cleanGoal goal) (map (map cleanGoal . thd3 ) (L.get sPathGoals s))
+            fatherGoal = L.get sPathGoals s `at` (index-1)
+            (iteration, depth, l) = if 0 < index then (snd3 fatherGoal+1, index, True) else (0,0,False) --snd3 fatherGoal+index
+
+            executedProofMethod = execSolveGoal goal l depth iteration
+    
+    -- solve the given goal
+    -- PRE: Goal must be valid in this system.
+    execSolveGoal :: Goal -> Bool -> Int -> Int-> Maybe (M.Map CaseName System)
+    execSolveGoal goal loop depth iteration = return $ process sys' $ solve goal
+      where
+        sys'   = L.set sNbLoop (depth,iteration) (L.set sLoopFound loop (L.set sPathGoals ((depth,iteration,[cleanGoal goal]):(L.get sPathGoals sys)) sys))
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
@@ -531,8 +564,11 @@ rankProofMethods ranking tactics ctxt sys =
   where
     execMethods = mapMaybe execMethod
     execMethod (m, expl) = do
-      cases <- execProofMethod ctxt m sys
-      return (m, (cases, expl))
+      case execProofMethod ctxt m sys of
+        Just cases -> case M.toList cases of
+            []               -> return (m, (cases, expl))
+            ((case1,sys'):_) -> if fst (L.get sNbLoop sys') > 0 then return (InLoop (fst $ L.get sNbLoop sys', snd $ L.get sNbLoop sys', fromJust $ fromSolveGoal m), (cases, expl)) else return (m, (cases, expl))
+        Nothing    -> Nothing
 
     sourceRule goal = case goalRule sys goal of
         Just ru -> " (from rule " ++ getRuleName ru ++ ")"
@@ -546,6 +582,10 @@ rankProofMethods ranking tactics ctxt sys =
                                ProbablyConstructible -> " (probably constructible)"
                                CurrentlyDeducible    -> " (currently deducible)"
       )
+
+    fromSolveGoal :: ProofMethod -> Maybe Goal
+    fromSolveGoal (SolveGoal goal) = Just goal
+    fromSolveGoal _ = Nothing
 
 -- | Use a 'GoalRanking' to generate the ranked, list of possible
 -- 'ProofMethod's and their corresponding results in this 'DiffProofContext' and
@@ -1180,6 +1220,7 @@ prettyProofMethod method = case method of
     Sorry reason ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
     SolveGoal goal -> keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")"
+    InLoop (d, i, goal)     -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "in loop (dpth: "++show d++", it: "++show i++")")]
     Simplify -> keyword_ "simplify"
     Finished (Contradictory reason) ->
         sep [ keyword_ "contradiction"

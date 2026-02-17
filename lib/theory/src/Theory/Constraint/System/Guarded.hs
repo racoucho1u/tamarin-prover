@@ -83,6 +83,8 @@ module Theory.Constraint.System.Guarded (
   -- ** Pretty-printing
   , prettyGuarded
 
+  -- ** Cleaning goals for loop detection
+  , removeCpt
   ) where
 
 import           Control.Arrow
@@ -148,6 +150,11 @@ isAllGuarded :: Guarded s c v -> Bool
 isAllGuarded (GGuarded All _ _ _) = True
 isAllGuarded _                    = False
 
+removeCpt :: LNGuarded -> LNGuarded
+removeCpt (GAto atom) = GAto (changeBVarAtom atom)
+removeCpt (GDisj (Disj g)) = (GDisj (Disj (map removeCpt g)))
+removeCpt (GConj (Conj g)) = (GConj (Conj (map removeCpt g)))
+removeCpt (GGuarded qua vs as g) = (GGuarded qua vs (map changeBVarAtom as) (removeCpt g))
 
 -- | Check whether the guarded formula is closed and does not contain an
 -- existential quantifier. This under-approximates the question whether the

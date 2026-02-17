@@ -1015,10 +1015,12 @@ cutAfterFirstSorryDiff = snd . go False
       in (abort, LNode r cs')
 
 proveSystemDFS :: Int -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-proveSystemDFS proofStrategy heuristic tactics ctxt = 
-  case proofStrategy of 
-    0 -> proveSystemDFSOg heuristic tactics ctxt 
-    _ -> error "Theory.Constraint.proveSystemDFS: unsupported proof strategy"
+proveSystemDFS proofStrategy heuristic tactics ctxt = proveSystemDFS' $ proofStrategy heuristic tactics (L.set pcAutomatedProofStrat proofStrategy ctxt)
+  where
+    case proofStrategy of 
+      0 -> proveSystemDFSOg 
+      1 -> escapeProveSystemDFS 
+      _ -> error "Theory.Constraint.proveSystemDFS: unsupported proof strategy"
 
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
@@ -1038,24 +1040,24 @@ proveSystemDFSOg heuristic tactics ctxt =
         node method cases =
           LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
 
--- escapeProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
--- escapeProveSystemDFS heuristic tactics ctxt =
---     prove
---   where
---     prove !depth sys =
---         case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
---           [] | finishedSubterms ctxt sys  -> node (Finished Solved) M.empty
---           []                              -> node (Finished Unfinishable) M.empty
---           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
---       where
+escapeProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+escapeProveSystemDFS heuristic tactics ctxt =
+    prove
+  where
+    prove !depth sys =
+        case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          [] | finishedSubterms ctxt sys  -> node (Finished Solved) M.empty
+          []                              -> node (Finished Unfinishable) M.empty
+          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
+      where
 
---         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)
---         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0--exportTactic generatedTactic method0 cases0
---         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
---             InLoop (_,_,g) -> checkForLoop suite (method0, (cases0, _expl0))
---             _ -> node method cases
+        checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0--exportTactic generatedTactic method0 cases0
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
+            InLoop (_,_,g) -> checkForLoop suite (method0, (cases0, _expl0))
+            _ -> node method cases
 
---         node method cases = LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
+        node method cases = LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
