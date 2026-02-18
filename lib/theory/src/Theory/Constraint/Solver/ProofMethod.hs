@@ -312,8 +312,8 @@ execProofMethod ctxt method sys =
           _ -> return cases
       Induction             -> process sys . induction <$> getInductionCases sys
       --Removeme: the check is correct iff pcAutomatedProofStrat is Nothing when default strategy!
-      SolveGoal goal        -> checkForLoop goal sys -- return $ process sys $ solve goal
-      InLoop (_,_, goal)    -> checkForLoop goal sys
+      SolveGoal goal        -> goalSolvingMethod goal sys -- return $ process sys $ solve goal
+      InLoop (_,_, goal)    -> goalSolvingMethod goal sys
       Invalidated           -> Nothing
   where
     process :: System -> Reduction CaseName -> M.Map CaseName System
@@ -327,21 +327,27 @@ execProofMethod ctxt method sys =
     cleanup :: System -> System
     cleanup s = L.set sSubst emptySubst (Precise.evalFresh (renamePrecise s) Precise.nothingUsed)
 
-    checkForLoop :: Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goal s = executedProofMethod
+    goalSolvingMethod :: Goal -> System -> Maybe (M.Map CaseName System)
+    goalSolvingMethod goal s = case L.get sProofStrategy s of
+      Original -> return $ process s $ solve goal 
+      Escape (EscapeStrat goalPath _ _) -> checkForLoop goalPath goal s
+
+    checkForLoop :: [(Int, Int, [Goal])] -> Goal -> System -> Maybe (M.Map CaseName System)
+    checkForLoop goalPath goal s = executedProofMethod
         where
-            index = foundAt (cleanGoal goal) (map (map cleanGoal . thd3 ) (L.get sPathGoals s))
-            fatherGoal = L.get sPathGoals s `at` (index-1)
+            index = foundAt (cleanGoal goal) (map (map cleanGoal . thd3 ) goalPath)
+            fatherGoal = goalPath `at` (index-1)
             (iteration, depth, l) = if 0 < index then (snd3 fatherGoal+1, index, True) else (0,0,False) --snd3 fatherGoal+index
 
-            executedProofMethod = execSolveGoal goal l depth iteration
+            executedProofMethod = execSolveGoal goal l depth iteration goalPath
     
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
-    execSolveGoal :: Goal -> Bool -> Int -> Int-> Maybe (M.Map CaseName System)
-    execSolveGoal goal loop depth iteration = return $ process sys' $ solve goal
+    execSolveGoal :: Goal -> Bool -> Int -> Int -> [(Int, Int, [Goal])] -> Maybe (M.Map CaseName System)
+    execSolveGoal goal loop depth iteration goalPath = return $ process sys' $ solve goal
       where
-        sys'   = L.set sNbLoop (depth,iteration) (L.set sLoopFound loop (L.set sPathGoals ((depth,iteration,[cleanGoal goal]):(L.get sPathGoals sys)) sys))
+        strat = Escape (EscapeStrat ((depth,iteration,[cleanGoal goal]):goalPath) (depth, iteration) loop)
+        sys'  = L.set sProofStrategy strat sys
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
@@ -563,11 +569,22 @@ rankProofMethods ranking tactics ctxt sys =
   in execMethods $ maybe proofMethods ((:[]) . (,"")) stoppingMethod
   where
     execMethods = mapMaybe execMethod
-    execMethod (m, expl) = do
+
+    execMethod = case L.get sProofStrategy sys of
+      Original -> execMethodOg
+      Escape (EscapeStrat goalPath nbLoop found) -> execMethodEscape goalPath nbLoop found
+
+    execMethodOg (m, expl) = do
+      cases <- execProofMethod ctxt m sys
+      return (m, (cases, expl))
+
+    execMethodEscape goalPath nbLoop found (m, expl) = do
       case execProofMethod ctxt m sys of
         Just cases -> case M.toList cases of
             []               -> return (m, (cases, expl))
-            ((case1,sys'):_) -> if fst (L.get sNbLoop sys') > 0 then return (InLoop (fst $ L.get sNbLoop sys', snd $ L.get sNbLoop sys', fromJust $ fromSolveGoal m), (cases, expl)) else return (m, (cases, expl))
+            ((case1,sys'):_) -> if fst nbLoop > 0 
+                                  then return (InLoop (fst nbLoop, snd nbLoop, fromJust $ fromSolveGoal m), (cases, expl)) 
+                                  else return (m, (cases, expl))
         Nothing    -> Nothing
 
     sourceRule goal = case goalRule sys goal of

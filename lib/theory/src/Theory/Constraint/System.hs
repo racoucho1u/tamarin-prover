@@ -391,9 +391,9 @@ data GoalStatus = GoalStatus
     deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
 data EscapeStrat = EscapeStrat
-  { _ePathGoals    :: Maybe [(Int, Int, [Goal])]         -- (depth, iteration, rewritting of the goal)
-  , _eNbLoop       :: Maybe (Int, Int)                   -- (depth, iteration)
-  , _eLoopFound    :: Maybe Bool
+  { _ePathGoals    :: [(Int, Int, [Goal])]         -- (depth, iteration, rewritting of the goal)
+  , _eNbLoop       :: (Int, Int)                   -- (depth, iteration)
+  , _eLoopFound    :: Bool
   }
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
@@ -798,7 +798,7 @@ data ProofContext = ProofContext
        , _pcTrueSubterm         :: Bool -- true if in all rules the RHS is a subterm of the LHS
        , _pcConstantRHS         :: Bool -- true if there are rules with a constant RHS
        , _pcIsSapic             :: Bool -- true if the model was originally a sapic process
-       , _pcAutomatedProofStrat :: AutomatedProofStrategy
+       , _pcAutomatedProofStrat :: Maybe AutomatedProofStrategy
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
@@ -1877,6 +1877,10 @@ instance HasFrees AutomatedProofStrategy where
         foldFrees fun a `mappend`
         foldFrees fun b `mappend`
         foldFrees fun c
+
+    mapFrees fun Original = pure Original
+    mapFrees fun (Escape (EscapeStrat a b c)) =
+        Escape <$> (EscapeStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c)
 
 instance HasFrees System where
     foldFrees fun (System a b c d e f g h i j k l m n) =

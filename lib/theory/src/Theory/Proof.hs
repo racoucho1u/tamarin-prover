@@ -696,7 +696,7 @@ data SolutionExtractor = CutDFS | CutBFS | CutSingleThreadDFS | CutNothing | Cut
 data AutoProver = AutoProver
     { apDefaultHeuristic :: Maybe (Heuristic ProofContext)
     , apDefaultTactic   :: Maybe [Tactic ProofContext]
-    , apDefaultStrategy :: Maybe Int
+    , apDefaultStrategy :: Maybe AutomatedProofStrategy
     , apBound            :: Maybe Int
     , apCut              :: SolutionExtractor
     , quitOnEmptyOracle  :: Bool
@@ -728,8 +728,8 @@ selectDiffTactic :: AutoProver -> DiffProofContext -> [Tactic ProofContext]
 selectDiffTactic prover ctx = fromMaybe [defaultTactic]
                                  (apDefaultTactic prover <|> L.get pcTactic (L.get dpcPCLeft ctx))
 
-selectProofStrategy :: AutoProver -> ProofContext -> Int 
-selectProofStrategy prover ctxt = fromMaybe 0
+selectProofStrategy :: AutoProver -> ProofContext -> AutomatedProofStrategy 
+selectProofStrategy prover ctxt = fromMaybe Original
                                     (apDefaultStrategy prover <|> L.get pcAutomatedProofStrat ctxt)
 
 runAutoProver :: AutoProver -> Prover
@@ -1014,13 +1014,12 @@ cutAfterFirstSorryDiff = snd . go False
       let (abort, cs') = M.mapAccum go False cs
       in (abort, LNode r cs')
 
-proveSystemDFS :: Int -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-proveSystemDFS proofStrategy heuristic tactics ctxt = proveSystemDFS' $ proofStrategy heuristic tactics (L.set pcAutomatedProofStrat proofStrategy ctxt)
+proveSystemDFS :: AutomatedProofStrategy -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+proveSystemDFS proofStrategy heuristic tactics ctxt d sys = proveSystemDFS' heuristic tactics ctxt d (L.set sProofStrategy proofStrategy sys)
   where
-    case proofStrategy of 
-      0 -> proveSystemDFSOg 
-      1 -> escapeProveSystemDFS 
-      _ -> error "Theory.Constraint.proveSystemDFS: unsupported proof strategy"
+    proveSystemDFS' = case proofStrategy of 
+      Original -> trace ("Removeme: Original strategy") proveSystemDFSOg 
+      Escape _ -> trace ("Removeme: Escape strategy") escapeProveSystemDFS 
 
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
@@ -1057,7 +1056,7 @@ escapeProveSystemDFS heuristic tactics ctxt =
             InLoop (_,_,g) -> checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
 
-        node method cases = LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
+        node method cases = trace ("Removeme node: " ++ show method) LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the

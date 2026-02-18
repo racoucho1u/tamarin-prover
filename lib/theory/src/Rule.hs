@@ -128,7 +128,7 @@ closeRuleCache :: IntegerParameters  -- ^ Parameters for open chains and saturat
                -> Bool               -- ^ Verbose option
                -> Bool               -- ^ Diff or not
                -> Bool               -- ^ isSapic or not
-               -> Maybe Int          -- ^ Automated proof strategy
+               -> Maybe AutomatedProofStrategy          -- ^ Automated proof strategy
                -> ClosedRuleCache    -- ^ Cached rules and case distinctions.
 closeRuleCache parameters restrictions typAsms forcedInjFacts sig protoRules intrRules verbose isdiff isSapic aps = -- trace ("closeRuleCache: " ++ show classifiedRules) $
     ClosedRuleCache

@@ -186,7 +186,7 @@ data Theory sig c r p s = Theory
     _thyItems :: [TheoryItem r p s],
     _thyOptions :: Option,
     _thyIsSapic :: Bool,
-    _thyAutomatedProveStrategy :: Int
+    _thyAutomatedProveStrategy :: AutomatedProofStrategy
   }
   deriving (Eq, Ord, Show, Generic, NFData, Binary)
 

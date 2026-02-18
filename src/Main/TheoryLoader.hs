@@ -221,7 +221,7 @@ data TheoryLoadOptions = TheoryLoadOptions
     noReuse :: Bool,
     noRestrictions :: Bool,
     replicationBound :: Int, 
-    automatedProofStrategy :: Maybe Int
+    automatedProofStrategy :: Maybe AutomatedProofStrategy
   }
   deriving (Show)
 
@@ -249,7 +249,7 @@ defaultTheoryLoadOptions =
       noReuse = False,
       noRestrictions = False,
       replicationBound = 3, 
-      automatedProofStrategy = Nothing
+      automatedProofStrategy = Just Original
     }
 
 toParserFlags :: TheoryLoadOptions -> [String]
@@ -328,6 +328,12 @@ mkTheoryLoadOptions as =
       Just _ -> throwError $ ArgumentError "partial-evaluation: unknown option"
       Nothing -> pure Nothing
 
+    automatedProofStrategy = case findArg "automated-strategy" as of
+      Just "0" -> pure $ Just Original
+      Just "1" -> pure $ Just (Escape (EscapeStrat [] (0,0) False))
+      Just _ -> throwError $ ArgumentError "automated-strategy: invalid strategy given"
+      Nothing -> pure Nothing
+
     defines = pure $ findArg "defines" as
     diffMode = pure $ argExists "diff" as
     verboseMode = pure $ argExists "verbose" as
@@ -359,7 +365,6 @@ mkTheoryLoadOptions as =
     deriv = parseIntArg derivchecks derivDefault id "derivcheck-timeout: invalid bound given"
 
     replicationBound = parseIntArg (findArg "replication-bound" as) defaultTheoryLoadOptions.replicationBound id "replication-bound: invalid bound given"
-    automatedProofStrategy = parseIntArg (findArg "automated-strategy" as) Nothing Just "automated-strategy: invalid strategy given"
 
 stopOnTrace :: (MonadError ArgumentError m) => Arguments -> m (Maybe SolutionExtractor)
 stopOnTrace as = case map toLower <$> findArg "stop-on-trace" as of

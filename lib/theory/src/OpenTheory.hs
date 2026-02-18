@@ -549,7 +549,7 @@ defaultOption = Option False False False False False False False False False S.e
 
 -- | Default theory
 defaultOpenTheory :: Bool -> OpenTheory
-defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False 0
+defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False Original
 
 -- | Default diff theory
 defaultOpenDiffTheory :: Bool -> OpenDiffTheory

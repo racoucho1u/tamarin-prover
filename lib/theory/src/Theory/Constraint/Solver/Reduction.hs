@@ -605,7 +605,7 @@ substAutomatedStrategy = do
     where
         substStrat :: LNSubst -> AutomatedProofStrategy -> AutomatedProofStrategy
         substStrat _ Original = Original
-        substStrat subst (Escape (EscapeStrat (Just gp) b c)) = Escape (EscapeStrat (Just $ unifyLists subst gp) b c)
+        substStrat subst (Escape (EscapeStrat gp b c)) = Escape (EscapeStrat (unifyLists subst gp) b c)
 
         unifyLists :: LNSubst -> [(Int,Int,[Goal])] -> [(Int,Int,[Goal])]
         unifyLists _ [] = []
