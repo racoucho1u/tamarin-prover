@@ -331,6 +331,7 @@ mkTheoryLoadOptions as =
     automatedProofStrategy = case findArg "automated-strategy" as of
       Just "0" -> pure $ Just Original
       Just "1" -> pure $ Just (Escape (EscapeStrat [] (0,0) False))
+      Just "2" -> pure $ Just (Proba (ProbaStrat [] (0,0) False))
       Just _ -> throwError $ ArgumentError "automated-strategy: invalid strategy given"
       Nothing -> pure Nothing
 

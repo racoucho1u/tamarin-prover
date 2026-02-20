@@ -102,6 +102,10 @@ module Theory.Constraint.System (
   , eNbLoop
   , eLoopFound
   , ePathGoals
+  , ProbaStrat(..)
+  , pNbLoop
+  , pLoopFound
+  , pPathGoals
   , AutomatedProofStrategy(..)
   , emptyAutoStrategy
 
@@ -243,6 +247,9 @@ module Theory.Constraint.System (
   , sNextGoalNr
 
   , sProofStrategy
+  , sNbLoop
+  , sLoopFound
+  , sPathGoals
 
   , isDiffSystem
   , sDiffSystem
@@ -397,7 +404,14 @@ data EscapeStrat = EscapeStrat
   }
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
-data AutomatedProofStrategy = Original | Escape EscapeStrat
+data ProbaStrat = ProbaStrat
+  { _pPathGoals    :: [(Int, Int, [Goal])]         -- (depth, iteration, rewritting of the goal)
+  , _pNbLoop       :: (Int, Int)                   -- (depth, iteration)
+  , _pLoopFound    :: Bool
+  }
+  deriving( Eq, Ord, Show, Generic, NFData, Binary )
+
+data AutomatedProofStrategy = Original | Escape EscapeStrat | Proba ProbaStrat
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
 emptyAutoStrategy :: AutomatedProofStrategy
@@ -425,7 +439,7 @@ data System = System
     -- constraint system.
     deriving( Eq, Ord, Generic, NFData, Binary )
 
-$(mkLabels [''System, ''GoalStatus, ''AutomatedProofStrategy, ''EscapeStrat])
+$(mkLabels [''System, ''GoalStatus, ''AutomatedProofStrategy, ''EscapeStrat, ''ProbaStrat])
 
 deriving instance Show System
 
@@ -441,15 +455,25 @@ sSubst = eqsSubst . sEqStore
 sConjDisjEqs :: System :-> Conj (SplitId, S.Set (LNSubstVFresh))
 sConjDisjEqs = eqsConj . sEqStore
 
--- | Label to access the NbLoop and LoopFound fields of the system automated strategy if they exist.
--- sNbLoop :: System :-> Maybe (Int, Int)
--- sNbLoop = aNbLoop . sProofStrategy
 
--- sLoopFound :: System :-> Maybe Bool
--- sLoopFound = aLoopFound . sProofStrategy
+-- | Functions to access the PathGoals, NbLoop and LoopFound fields of the system automated strategy if they exist.
+sPathGoals :: System -> [(Int, Int, [Goal])]
+sPathGoals sys = case L.get sProofStrategy sys of
+  Escape (EscapeStrat pathgoals _ _) -> pathgoals
+  Proba (ProbaStrat pathgoals _ _) -> pathgoals
+  _ -> [] -- If not defined in the strategy, can be considered as empty list
 
--- sPathGoals :: System :-> Maybe [(Int, Int, [Goal])]
--- sPathGoals = aPathGoals . sProofStrategy
+sNbLoop :: System -> (Int, Int)
+sNbLoop sys = case L.get sProofStrategy sys of
+  Escape (EscapeStrat _ nbLoop _) -> nbLoop
+  Proba (ProbaStrat _ nbLoop _) -> nbLoop
+  _ -> (0, 0) -- If not defined in the strategy, can be considered as 0
+
+sLoopFound :: System -> Bool
+sLoopFound sys = case L.get sProofStrategy sys of
+  Escape (EscapeStrat _ _ loopFound) -> loopFound
+  Proba (ProbaStrat _ _ loopFound) -> loopFound
+  _ -> False -- If not defined in the strategy, can be considered as False
 
 ------------------------------------------------------------------------------
 -- Oracles
@@ -1848,8 +1872,9 @@ instance Apply LNSubst SourceKind where
     apply = const id
 
 instance Apply LNSubst AutomatedProofStrategy where
-    apply subst Original = Original
+    apply _ Original = Original
     apply subst (Escape (EscapeStrat a b c)) = Escape (EscapeStrat (apply subst a) (apply subst b) (apply subst c))
+    apply subst (Proba (ProbaStrat a b c)) = Proba (ProbaStrat (apply subst a) (apply subst b) (apply subst c))
 
 instance Apply LNSubst System where
     apply subst (System a b c d e f g h i j k l m n) =
@@ -1870,17 +1895,24 @@ instance HasFrees GoalStatus where
     foldFreesOcc  _ _ = const mempty
     mapFrees  = const pure
 
-
 instance HasFrees AutomatedProofStrategy where
-    foldFrees fun Original = mempty
+    foldFrees _ Original = mempty
     foldFrees fun (Escape (EscapeStrat a b c)) =
         foldFrees fun a `mappend`
         foldFrees fun b `mappend`
         foldFrees fun c
+    foldFrees fun (Proba (ProbaStrat a b c)) =
+        foldFrees fun a `mappend`
+        foldFrees fun b `mappend`
+        foldFrees fun c
 
-    mapFrees fun Original = pure Original
+    foldFreesOcc  _ _ = const mempty
+
+    mapFrees _ Original = pure Original
     mapFrees fun (Escape (EscapeStrat a b c)) =
         Escape <$> (EscapeStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c)
+    mapFrees fun (Proba (ProbaStrat a b c)) =
+        Proba <$> (ProbaStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c)
 
 instance HasFrees System where
     foldFrees fun (System a b c d e f g h i j k l m n) =

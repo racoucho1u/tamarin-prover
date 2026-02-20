@@ -52,7 +52,11 @@ module Theory.Model.Atom(
   , prettySyntacticNAtom
 
   , changeBVarAtom
+  , goalVars
+  , goalConsts
   , insideJobDeep
+  , functionSymbol
+  , firstFunctionSymbol
   )
 where
 
@@ -63,6 +67,7 @@ import           GHC.Generics (Generic)
 import           Data.Binary
 -- import           Data.Foldable      (Foldable, foldMap)
 import           Data.Data
+import qualified Data.MultiSet as M
 -- import           Data.Monoid        (mappend, mempty)
 -- import           Data.Traversable
 
@@ -205,6 +210,23 @@ toAtom (EqE t t')     = EqE t t'
 toAtom (Subterm t t') = Subterm t t'
 toAtom (Less t t')    = Less t t'
 toAtom (Last t)       = Last t
+
+functionSymbol :: VTerm Name LVar -> M.MultiSet FunSym
+--functionSymbol (FAPP sym [ts]) = M.insert sym $ M.insert ts $ M.empty
+functionSymbol (FAPP sym ts)= M.insert sym $ M.unions (map functionSymbol ts)
+functionSymbol _ = M.empty
+
+firstFunctionSymbol ::  VTerm Name LVar -> Maybe FunSym
+firstFunctionSymbol (FAPP sym _)= Just sym
+firstFunctionSymbol _ = Nothing
+
+goalVars :: VTerm Name LVar -> M.MultiSet LVar
+goalVars (FAPP _ (ts:t)) =  M.union (M.unions $ map M.singleton $ varsVTerm $ insideJobDeep ts) $ M.unions (map goalVars t)
+goalVars _ = M.empty
+
+goalConsts :: VTerm Name LVar -> M.MultiSet Name
+goalConsts (FAPP _ (ts:t)) =  M.union (M.unions $ map M.singleton $ constsVTerm $ insideJobDeep ts) $ M.unions (map goalConsts t)
+goalConsts _ = M.empty
 
 insideJobDeep :: VTerm Name LVar -> VTerm Name LVar
 insideJobDeep (FAPP sym ts) = (FAPP sym (map insideJobDeep ts))

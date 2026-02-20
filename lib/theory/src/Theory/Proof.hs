@@ -123,6 +123,9 @@ import           Theory.Constraint.Solver
 import           Theory.Model
 import           Theory.Text.Pretty
 
+import           System.Random
+import           System.IO.Unsafe
+import GHC.Float (int2Double, float2Int, int2Float, double2Int)
 
 
 ------------------------------------------------------------------------------
@@ -1020,6 +1023,7 @@ proveSystemDFS proofStrategy heuristic tactics ctxt d sys = proveSystemDFS' heur
     proveSystemDFS' = case proofStrategy of 
       Original -> proveSystemDFSOg 
       Escape _ -> escapeProveSystemDFS 
+      Proba _  -> probabilisticProveSystemDFS
 
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
@@ -1057,6 +1061,59 @@ escapeProveSystemDFS heuristic tactics ctxt =
             _ -> node method cases
 
         node method cases = LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
+
+probabilisticProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 = 
+  prove d0 sys0
+  where
+
+    -- probabilistic
+    -- Randomly choosing whether to go in a loop or not, 
+    -- loops are not deprioritized
+
+    prove !depth sys = 
+      case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+          [] | finishedSubterms ctxt sys  -> node (Finished Solved) M.empty sys
+          []                              -> node (Finished Unfinishable) M.empty sys
+          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, cases)
+      where
+        checkForLoop :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> Proof (Maybe System)
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop [] (method0, cases0) = node method0 cases0 sys
+        checkForLoop ((method, (cases, _expl)):suite) (method0, cases0) = case method of
+            InLoop (d,iteration,goal) -> if chooseLoop d iteration (length $ sPathGoals sys) 
+              then node (InLoop (d,iteration,goal)) (M.map (applyIteration d) cases) sys 
+              else checkForLoop suite (method0, cases0)
+            _ -> node method cases sys
+
+        drawRand :: Int -> Int
+        drawRand sup = unsafePerformIO $ do
+            g <- newStdGen
+            let (result, _) = randomR (0, sup) g
+            return result
+
+        chooseLoop :: Int -> Int -> Int -> Bool
+        chooseLoop _depth iteration maxd = rand <= threshold
+            where
+                it = int2Double iteration
+                d = int2Double _depth
+                md = int2Double maxd
+                rand = int2Double (drawRand _depth) / d 
+                threshold = 1.0/(2**(it+(md - d)))
+
+        incrementIteration :: Int -> [(Int,Int,[Goal])] -> Int -> [(Int,Int,[Goal])] -> [(Int,Int,[Goal])]
+        incrementIteration 0 ((d,it,g):t) _ _ = (d,it+1,g):t
+        incrementIteration _ [] removeint removelist = error (show removeint++" "++show (length removelist)++"\n"++show removelist)
+        incrementIteration _depth (h:t) removeint removelist = h:incrementIteration (_depth-1) t removeint removelist
+
+        applyIteration :: Int -> System -> System
+        applyIteration idx _sys = L.set sProofStrategy strat _sys
+          where
+            strat = Proba (ProbaStrat (incrementIteration idx (sPathGoals _sys) idx (sPathGoals _sys)) (sNbLoop _sys) (sLoopFound _sys))
+
+
+        node method cases _sys = LNode (ProofStep method (Just _sys)) (M.map (prove (succ depth)) cases)
+
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the

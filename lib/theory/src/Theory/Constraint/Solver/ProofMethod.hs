@@ -45,7 +45,8 @@ import qualified Data.Label                                as L
 import           Data.List                                 (partition,groupBy,sortBy,isPrefixOf,findIndex,intercalate, uncons)
 import qualified Data.List.NonEmpty as NE
 import qualified Data.Map                                  as M
-import           Data.Maybe                                (catMaybes, fromMaybe, fromJust, mapMaybe, isNothing, isJust)
+import qualified Data.MultiSet                             as MS
+import           Data.Maybe                                (catMaybes, fromMaybe, fromJust, mapMaybe, isNothing, isJust, listToMaybe, mapMaybe)
 -- import           Data.Monoid
 import           Data.Ord                                  (comparing)
 import qualified Data.Set                                  as S
@@ -251,18 +252,74 @@ instance HasFrees DiffProofMethod where
 -- Proof method execution
 -------------------------
 
+
+-- Loop detection with complecated loops (eg: repetitive application of the same function or functions)
 cleanGoal :: Goal -> Goal
 cleanGoal (ActionG v f) = ActionG (setLVarIdx 0 v) (Fact (factTag f) (factAnnotations f) (map insideJobDeep $ factTerms f))
 cleanGoal (ChainG (ni1, cidx) (ni2, pidx)) = ChainG (LVar (lvarName ni1) (lvarSort ni1) 0, cidx) (LVar (lvarName ni2) (lvarSort ni2) 0, pidx)
 cleanGoal (PremiseG (ni, pidx) f) = PremiseG (LVar (lvarName ni) (lvarSort ni) 0, pidx) (Fact (factTag f) (factAnnotations f) (map insideJobDeep $ factTerms f))
 cleanGoal (SplitG s) = SplitG s
 cleanGoal (DisjG (Disj g)) = DisjG (Disj (map removeCpt g))
-cleanGoal (SubtermG a) = SubtermG a --MOUAI
+cleanGoal (SubtermG a) = SubtermG a
 
 foundAt :: Goal -> [[Goal]] -> Int
 foundAt _ []    = -1
 foundAt g (h:t) = if g `elem` h then 1 else foundAt g t
 
+foundAtMaybe :: Goal -> [[Goal]] -> Maybe Int
+foundAtMaybe _ []    = Nothing
+foundAtMaybe g (h:t) = if g `elem` h then Just 1 else (1 +) <$> foundAtMaybe g t
+
+functionSymGoal :: Goal -> MS.MultiSet FunSym
+functionSymGoal (ActionG _ f) = MS.unions $ map functionSymbol (getFactTerms f)
+functionSymGoal (PremiseG _ f) =  MS.unions $ map functionSymbol (getFactTerms f)
+functionSymGoal _ = MS.empty
+
+varGoal :: Goal -> MS.MultiSet LVar
+varGoal (ActionG _ f) = MS.unions $ map goalVars (getFactTerms f)
+varGoal (PremiseG _ f) =  MS.unions $ map goalVars (getFactTerms f)
+varGoal _ = MS.empty
+
+foundAtMultiSet :: Goal -> [[Goal]] -> Maybe (Int, Int)
+foundAtMultiSet _  []       = Nothing
+foundAtMultiSet goal ([]:t) = foundAtMultiSet goal t
+foundAtMultiSet goal (h:t)
+      | sameFirstTerm goal (head h) && sameName goal (head h) = if any (customSubset mst) msL && any (customSubset varG) varH
+                then Just (2, 1)
+                else second (1 +) <$> foundAtMultiSet goal t 
+      | sameName goal (head h) = if any (customSubset mst) msL && any (customSubset varG) varH
+                then Just (3,1)
+                else second (1 +) <$> foundAtMultiSet goal t
+      | otherwise = second (1 +) <$> foundAtMultiSet goal t 
+  where
+    mst = functionSymGoal goal
+    msL = map functionSymGoal h
+
+    varG = varGoal goal
+    varH = map varGoal h
+
+    customSubset refMST refMS = refMS `MS.isSubsetOf` refMST
+
+    sameName :: Goal -> Goal -> Bool
+    sameName (ActionG _ f1) (ActionG _ f2) =  factTag f1 == factTag f2 
+    sameName (PremiseG _ f1) (PremiseG _ f2) = factTag f1 == factTag f2
+    sameName _ _ = False
+
+    firstTerm :: Goal -> Maybe FunSym --Maybe LNTerm
+    firstTerm (ActionG _ f)  = fromMaybe Nothing $ listToMaybe $ map firstFunctionSymbol $ factTerms f 
+    firstTerm (PremiseG _ f) = fromMaybe Nothing $ listToMaybe $ map firstFunctionSymbol $ factTerms f
+    firstTerm _ = Nothing
+
+    sameFirstTerm :: Goal -> Goal -> Bool
+    sameFirstTerm g b = case (firstTerm g, firstTerm b) of
+      (Nothing, _) -> False
+      (_, Nothing) -> False
+      (fstG, fstB) -> fstG == fstB
+
+customComparison :: Maybe Int -> Maybe (Int,Int) -> (Int, Int)
+customComparison Nothing Nothing   = (0,0)
+customComparison Nothing (Just (s,n))  = (s,n)
+customComparison (Just n) _  = (1,n)
 
 -- @checkAndExecMethod rules method se@ checks first if the @method@ is
 -- applicable to the sequent @se@ and, if so, applies it.
@@ -330,24 +387,57 @@ execProofMethod ctxt method sys =
     goalSolvingMethod :: Goal -> System -> Maybe (M.Map CaseName System)
     goalSolvingMethod goal s = case L.get sProofStrategy s of
       Original -> return $ process s $ solve goal 
-      Escape (EscapeStrat goalPath _ _) -> checkForLoop goalPath goal s
+      Escape (EscapeStrat goalPath _ _) -> escapeCheckForLoop goalPath goal s
+      Proba (ProbaStrat goalPath _ _) -> probaCheckForLoop goalPath goal s
 
-    checkForLoop :: [(Int, Int, [Goal])] -> Goal -> System -> Maybe (M.Map CaseName System)
-    checkForLoop goalPath goal s = executedProofMethod
+    escapeCheckForLoop :: [(Int, Int, [Goal])] -> Goal -> System -> Maybe (M.Map CaseName System)
+    escapeCheckForLoop goalPath goal s = executedProofMethod
         where
             index = foundAt (cleanGoal goal) (map (map cleanGoal . thd3 ) goalPath)
             fatherGoal = goalPath `at` (index-1)
             (iteration, depth, l) = if 0 < index then (snd3 fatherGoal+1, index, True) else (0,0,False) --snd3 fatherGoal+index
 
-            executedProofMethod = execSolveGoal goal l depth iteration goalPath
+            executedProofMethod = escapeExecSolveGoal goal l depth iteration goalPath
     
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
-    execSolveGoal :: Goal -> Bool -> Int -> Int -> [(Int, Int, [Goal])] -> Maybe (M.Map CaseName System)
-    execSolveGoal goal loop depth iteration goalPath = return $ process sys' $ solve goal
+    escapeExecSolveGoal :: Goal -> Bool -> Int -> Int -> [(Int, Int, [Goal])] -> Maybe (M.Map CaseName System)
+    escapeExecSolveGoal goal loop depth iteration goalPath = return $ process sys' $ solve goal
       where
         strat = Escape (EscapeStrat ((depth,iteration,[cleanGoal goal]):goalPath) (depth, iteration) loop)
         sys'  = L.set sProofStrategy strat sys
+
+    probaCheckForLoop :: [(Int, Int, [Goal])] -> Goal -> System -> Maybe (M.Map CaseName System)
+    probaCheckForLoop goalPath goal s = executedProofMethod 
+        where
+            indexId = foundAtMaybe (cleanGoal goal) (map (map cleanGoal . thd3 ) goalPath)
+            resMult = foundAtMultiSet goal (map thd3 goalPath)
+            (score, index) = customComparison indexId resMult
+            fatherGoal = goalPath `at` (index-1)
+            (iteration, depth, l) = if index > 0 then (snd3 fatherGoal+1, index, True) else (0,0,False) --snd3 fatherGoal+index
+
+            executedProofMethod = probaExecSolveGoal goal l depth  iteration goalPath
+
+    -- solve the given goal
+    -- PRE: Goal must be valid in this system.
+    probaExecSolveGoal :: Goal -> Bool -> Int -> Int -> [(Int, Int, [Goal])] -> Maybe (M.Map CaseName System)
+    probaExecSolveGoal goal _loop depth iteration goalPath = return $ process sys' $ solve goal
+      where
+        strat = if _loop
+                  then Proba (ProbaStrat ((depth,iteration,[cleanGoal goal]):goalPath) (depth,iteration) _loop)
+                  else Proba (ProbaStrat ((0,0,[cleanGoal goal]):goalPath) (depth,iteration) _loop)
+        sys'  = L.set sProofStrategy strat sys
+
+        makeCaseNames =
+            M.fromListWith (error "case names not unique")
+          . uniqueListBy (comparing fst) id distinguish
+          where
+            distinguish n =
+                [ (\(x,y) -> (x ++ "_case_" ++ pad (show i), y))
+                | i <- [(1::Int)..] ]
+              where
+                l      = length (show n)
+                pad cs = replicate (l - length cs) '0' ++ cs
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
@@ -573,6 +663,7 @@ rankProofMethods ranking tactics ctxt sys =
     execMethod = case L.get sProofStrategy sys of
       Original -> execMethodOg
       Escape _ -> execMethodEscape
+      Proba _ -> execMethodProba
 
     execMethodOg (m, expl) = do
       cases <- execProofMethod ctxt m sys
@@ -582,13 +673,18 @@ rankProofMethods ranking tactics ctxt sys =
       case execProofMethod ctxt m sys of
         Just cases -> case M.toList cases of
             []               -> return (m, (cases, expl))
-            ((case1,sys'):_) -> if depth > 0 
-                                  then return (InLoop (depth, iteration, fromJust $ fromSolveGoal m), (cases, expl)) 
-                                  else return (m, (cases, expl))
-                  where
-                    (depth,iteration) = case L.get sProofStrategy sys' of
-                      Escape (EscapeStrat _ (d,i) _)  -> (d,i)
-                      _ -> (0,0) --this case should not happen as the proof strategy is set and should not change during execution of the proof 
+            ((case1,sys'):_) -> if (fst $ sNbLoop sys') > 0 
+                                  then return (InLoop (fst $ sNbLoop sys', snd $ sNbLoop sys', fromJust $ fromSolveGoal m), (cases, expl)) 
+                                  else return (m, (cases, expl)) 
+        Nothing    -> Nothing
+
+    execMethodProba (m, expl) = do
+      case execProofMethod ctxt m sys of
+        Just cases -> case M.toList cases of
+            []               -> return (m, (cases, expl))
+            ((case1,sys'):_) -> if (fst $ sNbLoop sys') > 0 
+                                  then return (InLoop (fst $ sNbLoop sys', snd $ sNbLoop sys', fromJust $ fromSolveGoal m), (cases, expl)) 
+                                  else return (m, (cases, expl)) 
         Nothing    -> Nothing
 
 
