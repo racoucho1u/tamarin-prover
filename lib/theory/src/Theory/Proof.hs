@@ -1018,8 +1018,8 @@ proveSystemDFS :: AutomatedProofStrategy -> Heuristic ProofContext -> [Tactic Pr
 proveSystemDFS proofStrategy heuristic tactics ctxt d sys = proveSystemDFS' heuristic tactics ctxt d (L.set sProofStrategy proofStrategy sys)
   where
     proveSystemDFS' = case proofStrategy of 
-      Original -> trace ("Removeme: Original strategy") proveSystemDFSOg 
-      Escape _ -> trace ("Removeme: Escape strategy") escapeProveSystemDFS 
+      Original -> proveSystemDFSOg 
+      Escape _ -> escapeProveSystemDFS 
 
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
@@ -1051,12 +1051,12 @@ escapeProveSystemDFS heuristic tactics ctxt =
       where
 
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)
-        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0--exportTactic generatedTactic method0 cases0
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 --exportTactic generatedTactic method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
             InLoop (_,_,g) -> checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
 
-        node method cases = trace ("Removeme node: " ++ show method) LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
+        node method cases = LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the

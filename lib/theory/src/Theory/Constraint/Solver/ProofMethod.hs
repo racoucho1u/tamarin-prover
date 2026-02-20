@@ -572,20 +572,25 @@ rankProofMethods ranking tactics ctxt sys =
 
     execMethod = case L.get sProofStrategy sys of
       Original -> execMethodOg
-      Escape (EscapeStrat goalPath nbLoop found) -> execMethodEscape goalPath nbLoop found
+      Escape _ -> execMethodEscape
 
     execMethodOg (m, expl) = do
       cases <- execProofMethod ctxt m sys
       return (m, (cases, expl))
 
-    execMethodEscape goalPath nbLoop found (m, expl) = do
+    execMethodEscape (m, expl) = do
       case execProofMethod ctxt m sys of
         Just cases -> case M.toList cases of
             []               -> return (m, (cases, expl))
-            ((case1,sys'):_) -> if fst nbLoop > 0 
-                                  then return (InLoop (fst nbLoop, snd nbLoop, fromJust $ fromSolveGoal m), (cases, expl)) 
+            ((case1,sys'):_) -> if depth > 0 
+                                  then return (InLoop (depth, iteration, fromJust $ fromSolveGoal m), (cases, expl)) 
                                   else return (m, (cases, expl))
+                  where
+                    (depth,iteration) = case L.get sProofStrategy sys' of
+                      Escape (EscapeStrat _ (d,i) _)  -> (d,i)
+                      _ -> (0,0) --this case should not happen as the proof strategy is set and should not change during execution of the proof 
         Nothing    -> Nothing
+
 
     sourceRule goal = case goalRule sys goal of
         Just ru -> " (from rule " ++ getRuleName ru ++ ")"
