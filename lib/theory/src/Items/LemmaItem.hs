@@ -15,7 +15,7 @@ import GHC.Records
 import GHC.Generics (Generic)
 import Control.DeepSeq (NFData)
 import Data.Binary (Binary)
-import Theory.Constraint.Solver (GoalRanking, ProofContext)
+import Theory.Constraint.Solver (GoalRanking, ProofContext, AutomatedProofStrategy)
 import Theory.Model
 import Data.Label as L
 import Theory.Module
@@ -36,6 +36,7 @@ data LemmaAttribute =
        | LemmaHeuristic [GoalRanking ProofContext]
        | LemmaTactic String
        | LemmaModule [ModuleType]
+       | LemmaStrategy AutomatedProofStrategy
 --        | BothLemma
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 

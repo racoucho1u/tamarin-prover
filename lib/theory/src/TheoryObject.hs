@@ -25,6 +25,7 @@ module TheoryObject
     thyOptions,
     thyIsSapic,
     thyAutomatedProveStrategy,
+    thySeed,
     diffThyName,
     diffThyInFile,
     diffThyItems,
@@ -173,6 +174,7 @@ import Theory.Sapic.Print
 import Theory.Syntactic.Predicate
 import Theory.Text.Pretty
 import Prelude hiding (id, (.))
+import System.Random (StdGen)
 
 -- | A theory contains a single set of rewriting rules modeling a protocol
 -- and the lemmas that
@@ -186,7 +188,8 @@ data Theory sig c r p s = Theory
     _thyItems :: [TheoryItem r p s],
     _thyOptions :: Option,
     _thyIsSapic :: Bool,
-    _thyAutomatedProveStrategy :: AutomatedProofStrategy
+    _thyAutomatedProveStrategy :: AutomatedProofStrategy,
+    _thySeed :: Maybe (StdGen,Int)
   }
   deriving (Eq, Ord, Show, Generic, NFData, Binary)
 
@@ -577,7 +580,7 @@ addDiffLemma l thy = do
 
 -- | Add a new default heuristic. Fails if a heuristic is already defined.
 addHeuristic :: [GoalRanking ProofContext] -> Theory sig c r p s -> Maybe (Theory sig c r p s)
-addHeuristic h (Theory n f [] t sig c i o sapic aps) = Just (Theory n f h t sig c i o sapic aps)
+addHeuristic h (Theory n f [] t sig c i o sapic aps seed) = Just (Theory n f h t sig c i o sapic aps seed)
 addHeuristic _ _ = Nothing
 
 addDiffHeuristic :: [GoalRanking ProofContext] -> DiffTheory sig c r r2 p p2 -> Maybe (DiffTheory sig c r r2 p p2)
@@ -585,8 +588,8 @@ addDiffHeuristic h (DiffTheory n f [] t sig cl cr dcl dcr i opt sapic) = Just (D
 addDiffHeuristic _ _ = Nothing
 
 addTactic :: Tactic ProofContext -> Theory sig c r p s -> Maybe (Theory sig c r p s)
-addTactic t (Theory n f h [] sig c i o sapic aps) = Just (Theory n f h [t] sig c i o sapic aps)
-addTactic t (Theory n f h l sig c i o sapic aps) = Just (Theory n f h (l ++ [t]) sig c i o sapic aps)
+addTactic t (Theory n f h [] sig c i o sapic aps seed) = Just (Theory n f h [t] sig c i o sapic aps seed)
+addTactic t (Theory n f h l sig c i o sapic aps seed) = Just (Theory n f h (l ++ [t]) sig c i o sapic aps seed)
 
 -- addTactic _ _ = Nothing
 
@@ -741,6 +744,7 @@ prettyTheory ppSig ppCache ppRule ppPrf ppSap thy =
       ppSig $ L.get thySignature thy,
       if thyT == [] then text "" else vcat $ map prettyTactic thyT,
       if null thyH then text "" else text "heuristic: " <> text (prettyGoalRankings thyH),
+      if isNothing thyS then text "" else text "Seed: " <> text (show $ fromMaybe 0 thyS),
       ppCache $ L.get thyCache thy
     ]
       ++ parMap rdeepseq ppItem (L.get thyItems thy)
@@ -758,6 +762,7 @@ prettyTheory ppSig ppCache ppRule ppPrf ppSap thy =
         ppSap
     thyH = L.get thyHeuristic thy
     thyT = L.get thyTactic thy
+    thyS = fmap snd $ L.get thySeed thy
 
 prettyTranslationElement :: (HighlightDocument d) => TranslationElement -> d
 prettyTranslationElement (ProcessItem p) = text "process" <> colon $-$ (nest 2 $ prettyProcess p)

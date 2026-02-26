@@ -89,6 +89,7 @@ module Theory.Constraint.System (
   , pcConstantRHS
   , pcIsSapic
   , pcAutomatedProofStrat
+  , pcSeed
   , dpcPCLeft
   , dpcPCRight
   , dpcProtoRules
@@ -106,8 +107,10 @@ module Theory.Constraint.System (
   , pNbLoop
   , pLoopFound
   , pPathGoals
+  , pSeed
   , AutomatedProofStrategy(..)
   , emptyAutoStrategy
+  , setSeedAutoStrategy
 
 
   -- ** Classified rules
@@ -250,6 +253,7 @@ module Theory.Constraint.System (
   , sNbLoop
   , sLoopFound
   , sPathGoals
+  , sSeed
 
   , isDiffSystem
   , sDiffSystem
@@ -310,6 +314,7 @@ import           Theory.Tools.InjectiveFactInstances
 
 import           System.Directory                     (doesFileExist)
 import           System.FilePath
+import           System.Random (StdGen, mkStdGen)
 import           Text.Show.Functions()
 import           Utils.Misc
 
@@ -404,10 +409,19 @@ data EscapeStrat = EscapeStrat
   }
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
+instance Binary StdGen where
+    put s = put $ show s
+    get = return (mkStdGen 0)
+
+instance Ord StdGen where
+    compare _ _ = EQ
+    (<=) _ _ = True
+
 data ProbaStrat = ProbaStrat
   { _pPathGoals    :: [(Int, Int, [Goal])]         -- (depth, iteration, rewritting of the goal)
   , _pNbLoop       :: (Int, Int)                   -- (depth, iteration)
   , _pLoopFound    :: Bool
+  , _pSeed         :: StdGen
   }
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
@@ -416,6 +430,10 @@ data AutomatedProofStrategy = Original | Escape EscapeStrat | Proba ProbaStrat
 
 emptyAutoStrategy :: AutomatedProofStrategy
 emptyAutoStrategy = Original
+
+setSeedAutoStrategy :: StdGen -> AutomatedProofStrategy -> AutomatedProofStrategy
+setSeedAutoStrategy seed (Proba (ProbaStrat a b c _)) = Proba (ProbaStrat a b c seed)
+setSeedAutoStrategy _ strat = strat
 
 -- | A constraint system.
 data System = System
@@ -460,20 +478,25 @@ sConjDisjEqs = eqsConj . sEqStore
 sPathGoals :: System -> [(Int, Int, [Goal])]
 sPathGoals sys = case L.get sProofStrategy sys of
   Escape (EscapeStrat pathgoals _ _) -> pathgoals
-  Proba (ProbaStrat pathgoals _ _) -> pathgoals
+  Proba (ProbaStrat pathgoals _ _ _) -> pathgoals
   _ -> [] -- If not defined in the strategy, can be considered as empty list
 
 sNbLoop :: System -> (Int, Int)
 sNbLoop sys = case L.get sProofStrategy sys of
   Escape (EscapeStrat _ nbLoop _) -> nbLoop
-  Proba (ProbaStrat _ nbLoop _) -> nbLoop
+  Proba (ProbaStrat _ nbLoop _ _) -> nbLoop
   _ -> (0, 0) -- If not defined in the strategy, can be considered as 0
 
 sLoopFound :: System -> Bool
 sLoopFound sys = case L.get sProofStrategy sys of
   Escape (EscapeStrat _ _ loopFound) -> loopFound
-  Proba (ProbaStrat _ _ loopFound) -> loopFound
+  Proba (ProbaStrat _ _ loopFound _) -> loopFound
   _ -> False -- If not defined in the strategy, can be considered as False
+
+sSeed :: System -> StdGen
+sSeed sys = case L.get sProofStrategy sys of
+  Proba (ProbaStrat _ _ _ seed) -> seed
+  _ -> mkStdGen 0 -- If not defined in the strategy, can be considered as 0
 
 ------------------------------------------------------------------------------
 -- Oracles
@@ -823,6 +846,7 @@ data ProofContext = ProofContext
        , _pcConstantRHS         :: Bool -- true if there are rules with a constant RHS
        , _pcIsSapic             :: Bool -- true if the model was originally a sapic process
        , _pcAutomatedProofStrat :: Maybe AutomatedProofStrategy
+       , _pcSeed                :: Maybe StdGen
        }
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
@@ -1871,10 +1895,13 @@ deriving instance Show DiffSystem
 instance Apply LNSubst SourceKind where
     apply = const id
 
+instance Apply LNSubst StdGen where
+    apply = const id
+
 instance Apply LNSubst AutomatedProofStrategy where
     apply _ Original = Original
     apply subst (Escape (EscapeStrat a b c)) = Escape (EscapeStrat (apply subst a) (apply subst b) (apply subst c))
-    apply subst (Proba (ProbaStrat a b c)) = Proba (ProbaStrat (apply subst a) (apply subst b) (apply subst c))
+    apply subst (Proba (ProbaStrat a b c d)) = Proba (ProbaStrat (apply subst a) (apply subst b) (apply subst c) (apply subst d)) 
 
 instance Apply LNSubst System where
     apply subst (System a b c d e f g h i j k l m n) =
@@ -1895,24 +1922,30 @@ instance HasFrees GoalStatus where
     foldFreesOcc  _ _ = const mempty
     mapFrees  = const pure
 
+instance HasFrees StdGen where
+    foldFrees = const mempty
+    foldFreesOcc  _ _ = const mempty
+    mapFrees  = const pure
+
 instance HasFrees AutomatedProofStrategy where
     foldFrees _ Original = mempty
     foldFrees fun (Escape (EscapeStrat a b c)) =
         foldFrees fun a `mappend`
         foldFrees fun b `mappend`
         foldFrees fun c
-    foldFrees fun (Proba (ProbaStrat a b c)) =
+    foldFrees fun (Proba (ProbaStrat a b c d)) =
         foldFrees fun a `mappend`
         foldFrees fun b `mappend`
-        foldFrees fun c
+        foldFrees fun c `mappend`
+        foldFrees fun d
 
     foldFreesOcc  _ _ = const mempty
 
     mapFrees _ Original = pure Original
     mapFrees fun (Escape (EscapeStrat a b c)) =
         Escape <$> (EscapeStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c)
-    mapFrees fun (Proba (ProbaStrat a b c)) =
-        Proba <$> (ProbaStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c)
+    mapFrees fun (Proba (ProbaStrat a b c d)) =
+        Proba <$> (ProbaStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c <*> mapFrees fun d)
 
 instance HasFrees System where
     foldFrees fun (System a b c d e f g h i j k l m n) =

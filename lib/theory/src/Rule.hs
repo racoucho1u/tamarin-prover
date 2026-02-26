@@ -18,6 +18,8 @@ import           Control.Basics
 import           Control.Category
 import           Control.Monad.Reader
 
+import System.Random (StdGen)
+
 import qualified Extension.Data.Label                as L
 
 import           Theory.Model
@@ -129,8 +131,9 @@ closeRuleCache :: IntegerParameters  -- ^ Parameters for open chains and saturat
                -> Bool               -- ^ Diff or not
                -> Bool               -- ^ isSapic or not
                -> Maybe AutomatedProofStrategy          -- ^ Automated proof strategy
+               -> Maybe StdGen       -- ^ Seed for the probabilistic strategy
                -> ClosedRuleCache    -- ^ Cached rules and case distinctions.
-closeRuleCache parameters restrictions typAsms forcedInjFacts sig protoRules intrRules verbose isdiff isSapic aps = -- trace ("closeRuleCache: " ++ show classifiedRules) $
+closeRuleCache parameters restrictions typAsms forcedInjFacts sig protoRules intrRules verbose isdiff isSapic aps seed = -- trace ("closeRuleCache: " ++ show classifiedRules) $
     ClosedRuleCache
         classifiedRules rawSources refinedSources injFactInstances
   where
@@ -139,7 +142,7 @@ closeRuleCache parameters restrictions typAsms forcedInjFacts sig protoRules int
         (error "closeRuleCache: trace quantifier should not matter here")
         (error "closeRuleCache: lemma name should not matter here") [] verbose isdiff
         (all isSubtermRule {-- $ trace (show destr ++ " - " ++ show (map isSubtermRule destr))-} destr) (any isConstantRule destr)
-        isSapic aps
+        isSapic aps seed
 
     -- Maude handle
     hnd = L.get sigmMaudeHandle sig

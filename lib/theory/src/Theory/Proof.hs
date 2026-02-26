@@ -123,7 +123,7 @@ import           Theory.Constraint.Solver
 import           Theory.Model
 import           Theory.Text.Pretty
 
-import           System.Random
+import System.Random (StdGen,mkStdGen,randomR,split)
 import           System.IO.Unsafe
 import GHC.Float (int2Double, float2Int, int2Float, double2Int)
 
@@ -700,6 +700,7 @@ data AutoProver = AutoProver
     { apDefaultHeuristic :: Maybe (Heuristic ProofContext)
     , apDefaultTactic   :: Maybe [Tactic ProofContext]
     , apDefaultStrategy :: Maybe AutomatedProofStrategy
+    , apSeed            :: Maybe StdGen
     , apBound            :: Maybe Int
     , apCut              :: SolutionExtractor
     , quitOnEmptyOracle  :: Bool
@@ -731,12 +732,18 @@ selectDiffTactic :: AutoProver -> DiffProofContext -> [Tactic ProofContext]
 selectDiffTactic prover ctx = fromMaybe [defaultTactic]
                                  (apDefaultTactic prover <|> L.get pcTactic (L.get dpcPCLeft ctx))
 
-selectProofStrategy :: AutoProver -> ProofContext -> AutomatedProofStrategy 
-selectProofStrategy prover ctxt = fromMaybe Original
-                                    (apDefaultStrategy prover <|> L.get pcAutomatedProofStrat ctxt)
+selectProofStrategy :: AutoProver -> ProofContext -> AutomatedProofStrategy
+selectProofStrategy prover ctxt = setSeedAutoStrategy (selectSeed prover ctxt) strat
+            where 
+              strat = fromMaybe Original
+                                      (apDefaultStrategy prover <|> L.get pcAutomatedProofStrat ctxt)
+
+selectSeed :: AutoProver -> ProofContext -> StdGen
+selectSeed prover ctx = fromMaybe (mkStdGen 0)
+                             (apSeed prover <|> L.get pcSeed ctx)
 
 runAutoProver :: AutoProver -> Prover
-runAutoProver aut@(AutoProver _ _ _ bound cut _) =
+runAutoProver aut@(AutoProver _ _ _ _ bound cut _) =
     mapProverProof cutSolved $ maybe id boundProver bound autoProver
   where
     cutSolved = case cut of
@@ -758,7 +765,7 @@ runAutoProver aut@(AutoProver _ _ _ bound cut _) =
         boundProofDepth b <$> runProver p ctxt d se prf
 
 runAutoDiffProver :: AutoProver -> DiffProver
-runAutoDiffProver aut@(AutoProver _ _ _ bound cut _) =
+runAutoDiffProver aut@(AutoProver _ _ _ _ bound cut _) =
     mapDiffProverDiffProof cutSolved $ maybe id boundProver bound autoProver
   where
     cutSolved = case cut of
@@ -1020,9 +1027,9 @@ cutAfterFirstSorryDiff = snd . go False
 proveSystemDFS :: AutomatedProofStrategy -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
 proveSystemDFS proofStrategy heuristic tactics ctxt d sys = proveSystemDFS' heuristic tactics ctxt d (L.set sProofStrategy proofStrategy sys)
   where
-    proveSystemDFS' = case proofStrategy of 
-      Original -> proveSystemDFSOg 
-      Escape _ -> escapeProveSystemDFS 
+    proveSystemDFS' = case proofStrategy of
+      Original -> proveSystemDFSOg
+      Escape _ -> escapeProveSystemDFS
       Proba _  -> probabilisticProveSystemDFS
 
 
@@ -1056,14 +1063,14 @@ escapeProveSystemDFS heuristic tactics ctxt =
 
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 --exportTactic generatedTactic method0 cases0
-        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of 
+        checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
             InLoop (_,_,g) -> checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
 
         node method cases = LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
 
 probabilisticProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 = 
+probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 =
   prove d0 sys0
   where
 
@@ -1071,34 +1078,40 @@ probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 =
     -- Randomly choosing whether to go in a loop or not, 
     -- loops are not deprioritized
 
-    prove !depth sys = 
+    prove !depth sys =
       case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           [] | finishedSubterms ctxt sys  -> node (Finished Solved) M.empty sys
           []                              -> node (Finished Unfinishable) M.empty sys
-          ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, cases)
+          ((method, (cases, _expl)):suite) -> checkForLoop (sSeed sys) ((method, (cases, _expl)):suite) (method, cases)
       where
-        checkForLoop :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> Proof (Maybe System)
+        checkForLoop :: StdGen ->[(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> Proof (Maybe System)
         --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
-        checkForLoop [] (method0, cases0) = node method0 cases0 sys
-        checkForLoop ((method, (cases, _expl)):suite) (method0, cases0) = case method of
-            InLoop (d,iteration,goal) -> if chooseLoop d iteration (length $ sPathGoals sys) 
-              then node (InLoop (d,iteration,goal)) (M.map (applyIteration d) cases) sys 
-              else checkForLoop suite (method0, cases0)
-            _ -> node method cases sys
+        checkForLoop seed [] (method0, cases0) = node method0 (M.map (changeSeed seed) cases0) sys
+        checkForLoop seed ((method, (cases, _expl)):suite) (method0, cases0) = 
+            case method of
+            InLoop (d,iteration,goal) -> 
+              let (chosenLoop,newSeed) = chooseLoop seed d iteration (length $ sPathGoals sys) in
+                if chosenLoop
+                  then node (InLoop (d,iteration,goal)) (M.map (applyIteration d newSeed) cases) sys
+                  else checkForLoop newSeed suite (method0, cases0)
+            _ -> node method (snd $ M.mapAccum (\g sys -> let (g1,g2) = split g in  (g1, changeSeed g2 sys)) seed cases) sys
 
-        drawRand :: Int -> Int
-        drawRand sup = unsafePerformIO $ do
-            g <- newStdGen
-            let (result, _) = randomR (0, sup) g
-            return result
+        -- let ( _g', cases') = M.mapAccum
+        --                       (\g sys ->
+        --                           let (g1,g2) = split g     -- g1 for the next element,
+        --                           in  (g1, changeSeed g2 sys))
+        --                       seed
+        --                       cases
+        --                     in node method cases' _sys
 
-        chooseLoop :: Int -> Int -> Int -> Bool
-        chooseLoop _depth iteration maxd = rand <= threshold
+        chooseLoop :: StdGen -> Int -> Int -> Int -> (Bool,StdGen)
+        chooseLoop seed _depth iteration maxd = (rand <= threshold, newSeed)
             where
                 it = int2Double iteration
                 d = int2Double _depth
                 md = int2Double maxd
-                rand = int2Double (drawRand _depth) / d 
+                (pickedRand,newSeed) = randomR (0, _depth) seed
+                rand = int2Double pickedRand / d
                 threshold = 1.0/(2**(it+(md - d)))
 
         incrementIteration :: Int -> [(Int,Int,[Goal])] -> Int -> [(Int,Int,[Goal])] -> [(Int,Int,[Goal])]
@@ -1106,11 +1119,15 @@ probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 =
         incrementIteration _ [] removeint removelist = error (show removeint++" "++show (length removelist)++"\n"++show removelist)
         incrementIteration _depth (h:t) removeint removelist = h:incrementIteration (_depth-1) t removeint removelist
 
-        applyIteration :: Int -> System -> System
-        applyIteration idx _sys = L.set sProofStrategy strat _sys
+        applyIteration :: Int -> StdGen -> System -> System
+        applyIteration idx seed _sys = L.set sProofStrategy strat _sys
           where
-            strat = Proba (ProbaStrat (incrementIteration idx (sPathGoals _sys) idx (sPathGoals _sys)) (sNbLoop _sys) (sLoopFound _sys))
+            strat = Proba (ProbaStrat (incrementIteration idx (sPathGoals _sys) idx (sPathGoals _sys)) (sNbLoop _sys) (sLoopFound _sys) seed)
 
+        changeSeed :: StdGen -> System -> System
+        changeSeed seed _sys = L.set sProofStrategy strat _sys
+          where
+            strat = Proba (ProbaStrat (sPathGoals _sys) (sNbLoop _sys) (sLoopFound _sys) seed)
 
         node method cases _sys = LNode (ProofStep method (Just _sys)) (M.map (prove (succ depth)) cases)
 
@@ -1206,7 +1223,7 @@ showDiffProofStatus CompleteProof     = "verified"
 showDiffProofStatus UnfinishableProof = "analysis cannot be finished (reducible operators in subterms)"
 showDiffProofStatus IncompleteProof   = "analysis incomplete"
 showDiffProofStatus UndeterminedProof = "analysis undetermined"
-showDiffProofStatus InvalidatedProof  = "proof has been invalidated" 
+showDiffProofStatus InvalidatedProof  = "proof has been invalidated"
 
 -- Instances
 --------------------

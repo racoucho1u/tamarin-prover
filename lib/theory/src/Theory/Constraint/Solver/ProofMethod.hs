@@ -62,6 +62,7 @@ import           Debug.Trace
 import           Safe
 import           System.IO.Unsafe
 import           System.Process
+import           System.Random (StdGen)
 
 import           Theory.Constraint.Solver.Sources
 import           Theory.Constraint.Solver.Contradictions
@@ -388,7 +389,7 @@ execProofMethod ctxt method sys =
     goalSolvingMethod goal s = case L.get sProofStrategy s of
       Original -> return $ process s $ solve goal 
       Escape (EscapeStrat goalPath _ _) -> escapeCheckForLoop goalPath goal s
-      Proba (ProbaStrat goalPath _ _) -> probaCheckForLoop goalPath goal s
+      Proba (ProbaStrat goalPath _ _ _) -> probaCheckForLoop goalPath goal s
 
     escapeCheckForLoop :: [(Int, Int, [Goal])] -> Goal -> System -> Maybe (M.Map CaseName System)
     escapeCheckForLoop goalPath goal s = executedProofMethod
@@ -416,16 +417,16 @@ execProofMethod ctxt method sys =
             fatherGoal = goalPath `at` (index-1)
             (iteration, depth, l) = if index > 0 then (snd3 fatherGoal+1, index, True) else (0,0,False) --snd3 fatherGoal+index
 
-            executedProofMethod = probaExecSolveGoal goal l depth  iteration goalPath
+            executedProofMethod = probaExecSolveGoal goal l depth iteration (sSeed s) goalPath
 
     -- solve the given goal
     -- PRE: Goal must be valid in this system.
-    probaExecSolveGoal :: Goal -> Bool -> Int -> Int -> [(Int, Int, [Goal])] -> Maybe (M.Map CaseName System)
-    probaExecSolveGoal goal _loop depth iteration goalPath = return $ process sys' $ solve goal
+    probaExecSolveGoal :: Goal -> Bool -> Int -> Int -> StdGen -> [(Int, Int, [Goal])] -> Maybe (M.Map CaseName System)
+    probaExecSolveGoal goal _loop depth iteration seed goalPath = return $ process sys' $ solve goal
       where
         strat = if _loop
-                  then Proba (ProbaStrat ((depth,iteration,[cleanGoal goal]):goalPath) (depth,iteration) _loop)
-                  else Proba (ProbaStrat ((0,0,[cleanGoal goal]):goalPath) (depth,iteration) _loop)
+                  then Proba (ProbaStrat ((depth,iteration,[cleanGoal goal]):goalPath) (depth,iteration) _loop seed)
+                  else Proba (ProbaStrat ((0,0,[cleanGoal goal]):goalPath) (depth,iteration) _loop seed)
         sys'  = L.set sProofStrategy strat sys
 
         makeCaseNames =

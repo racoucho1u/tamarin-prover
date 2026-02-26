@@ -53,6 +53,7 @@ import Main.Console
 import Safe
 import Sapic qualified
 import System.Console.CmdArgs.Explicit
+import System.Random (StdGen, mkStdGen)
 import System.Timeout (timeout)
 import Text.Parsec (ParseError)
 import Text.Read (readEither)
@@ -121,6 +122,12 @@ theoryLoadFlags =
       (updateArg "automated-strategy")
       "STRATEGY"
       ("Automated proof strategy to use: 0: none (default), 1: escape, 2: probabilistic, 3: backtracking, 4: blacklisting, 5: 'smartTamarin'"),
+    flagOpt
+      ""
+      ["seed"]
+      (updateArg "seed")
+      "Int"
+      ("Seed for the probabilistic strategy randomness"),
     flagOpt
       "summary"
       ["partial-evaluation"]
@@ -221,7 +228,8 @@ data TheoryLoadOptions = TheoryLoadOptions
     noReuse :: Bool,
     noRestrictions :: Bool,
     replicationBound :: Int, 
-    automatedProofStrategy :: Maybe AutomatedProofStrategy
+    automatedProofStrategy :: Maybe AutomatedProofStrategy,
+    seed :: Maybe (StdGen,Int)
   }
   deriving (Show)
 
@@ -249,7 +257,8 @@ defaultTheoryLoadOptions =
       noReuse = False,
       noRestrictions = False,
       replicationBound = 3, 
-      automatedProofStrategy = Just Original
+      automatedProofStrategy = Just Original,
+      seed = Nothing
     }
 
 toParserFlags :: TheoryLoadOptions -> [String]
@@ -287,6 +296,7 @@ mkTheoryLoadOptions as =
     <*> noRestrictions
     <*> replicationBound
     <*> automatedProofStrategy
+    <*> seed
   where
     proveMode = pure $ argExists "prove" as
     lemmaNames = pure $ findArg "prove" as ++ findArg "lemma" as
@@ -331,9 +341,13 @@ mkTheoryLoadOptions as =
     automatedProofStrategy = case findArg "automated-strategy" as of
       Just "0" -> pure $ Just Original
       Just "1" -> pure $ Just (Escape (EscapeStrat [] (0,0) False))
-      Just "2" -> pure $ Just (Proba (ProbaStrat [] (0,0) False))
+      Just "2" -> pure $ Just (Proba (ProbaStrat [] (0,0) False (mkStdGen 0)))
       Just _ -> throwError $ ArgumentError "automated-strategy: invalid strategy given"
       Nothing -> pure Nothing
+
+    seedCheck = findArg "seed" as
+    seedDefault = defaultTheoryLoadOptions.seed
+    seed = parseIntArg seedCheck seedDefault (\i -> Just (mkStdGen i, i)) "seed: invalid value, expecting an Int"
 
     defines = pure $ findArg "defines" as
     diffMode = pure $ argExists "diff" as
@@ -716,6 +730,7 @@ constructAutoProver thyOpts =
     thyOpts.heuristic
     Nothing
     thyOpts.automatedProofStrategy
+    (fmap fst thyOpts.seed)
     thyOpts.proofBound
     (fromMaybe CutDFS thyOpts.stopOnTrace)
     False

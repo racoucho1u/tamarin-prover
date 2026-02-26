@@ -142,6 +142,7 @@ executable tamarin-prover
       , mtl
       , parsec
       , process
+      , random
       , resourcet
       , safe
       , shakespeare

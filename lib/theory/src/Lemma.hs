@@ -89,10 +89,11 @@ prettyLemmaAttribute ReuseLemma         = text "reuse"
 prettyLemmaAttribute ReuseDiffLemma     = text "diff_reuse"
 prettyLemmaAttribute InvariantLemma     = text "use_induction"
 prettyLemmaAttribute (HideLemma s)      = text ("hide_lemma=" ++ s)
-prettyLemmaAttribute (LemmaHeuristic h) = text ("heuristic=" ++ (prettyGoalRankings h))
+prettyLemmaAttribute (LemmaHeuristic h) = text ("heuristic=" ++ prettyGoalRankings h)
 prettyLemmaAttribute (LemmaModule h)    = text ("output=[" ++ intercalate "," (map show h)  ++ "]")
 prettyLemmaAttribute LHSLemma           = text "left"
 prettyLemmaAttribute RHSLemma           = text "right"
+--prettyLemmaAttribute (LemmaStrategy s)  = text ("strategy=" ++ prettyAutomatedStrategy s)
 prettyLemmaAttribute _                  = emptyDoc
 --     prettyLemmaAttribute BothLemma      = text "both"
 
