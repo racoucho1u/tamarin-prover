@@ -91,6 +91,7 @@ prettyLemmaAttribute InvariantLemma     = text "use_induction"
 prettyLemmaAttribute (HideLemma s)      = text ("hide_lemma=" ++ s)
 prettyLemmaAttribute (LemmaHeuristic h) = text ("heuristic=" ++ prettyGoalRankings h)
 prettyLemmaAttribute (LemmaStrategy s)  = text ("strategy="++ prettyStrategy s)
+prettyLemmaAttribute (LemmaSeed s)      = text ("strategy="++ show (snd s))
 prettyLemmaAttribute (LemmaModule h)    = text ("output=[" ++ intercalate "," (map show h)  ++ "]")
 prettyLemmaAttribute LHSLemma           = text "left"
 prettyLemmaAttribute RHSLemma           = text "right"

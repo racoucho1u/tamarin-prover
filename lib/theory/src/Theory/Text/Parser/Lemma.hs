@@ -47,6 +47,7 @@ lemmaAttribute diff workDir = asum
   , symbol "hide_lemma" *> opEqual *> (HideLemma <$> identifier)
   , symbol "heuristic"  *> opEqual *> (LemmaHeuristic <$> goalRanking diff workDir)
   , symbol "strategy" *> opEqual *> (LemmaStrategy <$> strategy)
+  , symbol "seed" *> opEqual *> (LemmaSeed <$> seed)
   , symbol "output"  *> opEqual *> (LemmaModule <$> list constructorp)
   , symbol "left"          *> pure LHSLemma
   , symbol "right"         *> pure RHSLemma

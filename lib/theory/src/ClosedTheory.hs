@@ -116,7 +116,7 @@ getProofContext l thy = ProofContext
     (any isConstantRule $ filter isDestrRule $ intruderRules $ L.get (crcRules . thyCache) thy)
     (L.get thyIsSapic thy)
     specifiedStrategy
-    (fmap fst (L.get thySeed thy))
+    (fmap fst specifiedSeed)
   where
     kind    = lemmaSourceKind l
     cases   = case kind of RawSource     -> crcRawSources
@@ -139,7 +139,7 @@ getProofContext l thy = ProofContext
     specifiedTactic = case lattr of
         [] -> Nothing
         _  -> Just lattr
-      where 
+      where
         lattr = L.get thyTactic thy
 
     -- TODO
@@ -151,6 +151,11 @@ getProofContext l thy = ProofContext
       where
         lattr = headMay [gs
                    | LemmaStrategy gs <- L.get lAttributes l]
+
+    specifiedSeed = maybe (L.get thySeed thy) Just lattr
+      where
+        lattr = headMay [gs
+                   | LemmaSeed gs <- L.get lAttributes l]
 
 -- | Get the proof context for a lemma of the closed theory.
 getProofContextDiff :: Side -> Lemma a -> ClosedDiffTheory -> ProofContext

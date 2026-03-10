@@ -439,7 +439,6 @@ setSeedAutoStrategy :: StdGen -> AutomatedProofStrategy -> AutomatedProofStrateg
 setSeedAutoStrategy seed (Proba (ProbaStrat a b c _)) = Proba (ProbaStrat a b c seed)
 setSeedAutoStrategy _ strat = strat
 
-
 strategyIdentifiers :: M.Map String AutomatedProofStrategy
 strategyIdentifiers = M.fromList
                         [ ("Original", Original)

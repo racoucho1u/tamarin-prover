@@ -18,6 +18,7 @@ module Theory.Text.Parser.Signature (
     , preddeclaration
     , goalRanking
     , strategy
+    , seed
     , diffbuiltins
     , export
 )
@@ -50,6 +51,7 @@ import Data.Label.Total
 import Data.Label.Mono (Lens)
 import Theory.Sapic
 import qualified Data.Functor
+import           System.Random (StdGen, mkStdGen)
 
 
 
@@ -259,6 +261,10 @@ goalRanking diff workDir = try oracleRanking <|> internalTacticRanking <|> regul
 strategy :: Parser AutomatedProofStrategy
 strategy = stringToStrategy <$> many1 letter <* skipMany (char ' ')
 
+seed :: Parser (StdGen, Int)
+seed = do 
+      intSeed <- read <$> many1 digit
+      return (mkStdGen intSeed, intSeed)
 
 liftedAddPredicate :: Catch.MonadThrow m =>
                       Theory sig c r p TranslationElement
