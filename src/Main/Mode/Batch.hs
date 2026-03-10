@@ -39,6 +39,7 @@ import Theory.Constraint.System.Graph.Graph
 import Theory.Constraint.System.JSON (sequentsToJSONPretty)
 
 import ClosedTheory (prettyPrecomputation,prettyDiffPrecomputation)
+import Debug.Trace --removeme
 
 -- | Batch processing mode.
 batchMode :: TamarinMode
@@ -188,9 +189,9 @@ run thisMode as
     processThy :: String -> FilePath -> IO (Pretty.Doc, Pretty.Doc)
     processThy versionData inFile = either handleError pure <=< runExceptT $ do
       srcThy <- liftIO $ readFile inFile
-      thy    <- loadTheory thyLoadOptions srcThy inFile
+      thy    <- trace ("Removeme batch: "++show thyLoadOptions) loadTheory thyLoadOptions srcThy inFile
 
-      let sig = either (._thySignature) (._diffThySignature) thy
+      let sig =  either (._thySignature) (._diffThySignature) thy
       sig'   <- liftIO $ toSignatureWithMaude thyLoadOptions.maudePath sig
 
       -- | Pretty print the theory as is without performing any checks.

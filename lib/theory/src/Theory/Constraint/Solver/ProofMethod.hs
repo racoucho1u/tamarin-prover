@@ -330,6 +330,7 @@ checkAndExecProofMethod ctxt method sys = do
       Finished r -> isFinished ctxt sys >>= guard . equalReason r
       Induction -> canApplyInduction
       SolveGoal goal -> guard (goal `M.member` L.get sGoals sys)
+      InLoop (_,_,goal) -> guard (goal `M.member` L.get sGoals sys)
       Simplify -> Just ()
       Sorry _ -> Just ()
     execProofMethod ctxt method sys

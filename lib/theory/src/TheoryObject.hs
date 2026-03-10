@@ -24,7 +24,7 @@ module TheoryObject
     thyItems,
     thyOptions,
     thyIsSapic,
-    thyAutomatedProveStrategy,
+    thyAutomatedProofStrategy,
     thySeed,
     diffThyName,
     diffThyInFile,
@@ -175,6 +175,7 @@ import Theory.Syntactic.Predicate
 import Theory.Text.Pretty
 import Prelude hiding (id, (.))
 import System.Random (StdGen)
+import Debug.Trace --removeme
 
 -- | A theory contains a single set of rewriting rules modeling a protocol
 -- and the lemmas that
@@ -188,7 +189,7 @@ data Theory sig c r p s = Theory
     _thyItems :: [TheoryItem r p s],
     _thyOptions :: Option,
     _thyIsSapic :: Bool,
-    _thyAutomatedProveStrategy :: AutomatedProofStrategy,
+    _thyAutomatedProofStrategy :: Maybe AutomatedProofStrategy,
     _thySeed :: Maybe (StdGen,Int)
   }
   deriving (Eq, Ord, Show, Generic, NFData, Binary)
@@ -737,14 +738,14 @@ prettyTheory ::
   (s -> d) ->
   Theory sig c r p s ->
   d
-prettyTheory ppSig ppCache ppRule ppPrf ppSap thy =
+prettyTheory ppSig ppCache ppRule ppPrf ppSap thy = trace ("Removeme prettyTh: "++show (L.get thySeed thy))
   vsep $
     [ kwTheoryHeader $ text $ L.get thyName thy,
       lineComment_ "Function signature and definition of the equational theory E",
       ppSig $ L.get thySignature thy,
       if thyT == [] then text "" else vcat $ map prettyTactic thyT,
       if null thyH then text "" else text "heuristic: " <> text (prettyGoalRankings thyH),
-      if isNothing thyS then text "" else text "Seed: " <> text (show $ fromMaybe 0 thyS),
+      if isNothing thyS then text "" else text "seed: " <> text (show $ fromMaybe 0 thyS),
       ppCache $ L.get thyCache thy
     ]
       ++ parMap rdeepseq ppItem (L.get thyItems thy)
@@ -762,7 +763,7 @@ prettyTheory ppSig ppCache ppRule ppPrf ppSap thy =
         ppSap
     thyH = L.get thyHeuristic thy
     thyT = L.get thyTactic thy
-    thyS = fmap snd $ L.get thySeed thy
+    thyS = snd <$> L.get thySeed thy
 
 prettyTranslationElement :: (HighlightDocument d) => TranslationElement -> d
 prettyTranslationElement (ProcessItem p) = text "process" <> colon $-$ (nest 2 $ prettyProcess p)

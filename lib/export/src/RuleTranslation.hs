@@ -445,6 +445,7 @@ reservedWords =
     "suchthat",
     "sync",
     "table",
+    "tactic",
     "then",
     "type",
     "weaksecret",

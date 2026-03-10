@@ -32,6 +32,8 @@ import TheoryObject
 import Utils.Misc
 import Prelude hiding (id, (.))
 
+import Debug.Trace --removeme
+
 -- | map TranslationItems to () and keep other items as is
 removeTranslationElement :: TheoryItem r p TranslationElement -> TheoryItem r p ()
 removeTranslationElement (TranslationItem _) = TranslationItem ()
@@ -63,8 +65,8 @@ openTranslatedTheory thy =
       _thyItems = newThyItems,
       _thyOptions = (L.get thyOptions thy),
       _thyIsSapic = (L.get thyIsSapic thy),
-      _thyAutomatedProveStrategy = (L.get thyAutomatedProveStrategy thy),
-      _thySeed = (L.get thySeed thy)
+      _thyAutomatedProofStrategy = (L.get thyAutomatedProofStrategy thy),
+      _thySeed = L.get thySeed thy
     }
   where
     newThyItems = mapMaybe addTranslationElement (L.get thyItems thy)
@@ -550,7 +552,7 @@ defaultOption = Option False False False False False False False False False S.e
 
 -- | Default theory
 defaultOpenTheory :: Bool -> OpenTheory
-defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False Original Nothing
+defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False Nothing Nothing
 
 -- | Default diff theory
 defaultOpenDiffTheory :: Bool -> OpenDiffTheory
@@ -870,7 +872,7 @@ prettyEitherRule (_, p) = prettyProtoRuleE $ L.get oprRuleE p
 
 -- | Pretty print an open theory.
 prettyOpenTheory :: (HighlightDocument d) => OpenTheory -> d
-prettyOpenTheory thy =
+prettyOpenTheory thy = 
   prettyTheory
     prettySignaturePure
     (const emptyDoc)

@@ -19,7 +19,7 @@ import Text.PrettyPrint.Highlight
 import Term.Macro
 
 
-import           Prelude                             hiding (id, (.))                 
+import           Prelude                             hiding (id, (.))
 
 
 -- import           Data.Typeable
@@ -32,8 +32,10 @@ import           Theory.Tools.InjectiveFactInstances
 import           Theory.Text.Pretty
 import OpenTheory
 import Pretty
-import Data.Maybe (Maybe(Nothing))
+import Data.Maybe (Maybe(Nothing), fromMaybe)
 import System.Random (mkStdGen)
+
+import Debug.Trace --Removeme
 
 ------------------------------------------------------------------------------
 -- Closed theory querying / construction / modification
@@ -113,7 +115,7 @@ getProofContext l thy = ProofContext
     (all isSubtermRule  $ filter isDestrRule $ intruderRules $ L.get (crcRules . thyCache) thy)
     (any isConstantRule $ filter isDestrRule $ intruderRules $ L.get (crcRules . thyCache) thy)
     (L.get thyIsSapic thy)
-    (Just $ L.get thyAutomatedProveStrategy thy)
+    specifiedStrategy
     (fmap fst (L.get thySeed thy))
   where
     kind    = lemmaSourceKind l
@@ -137,8 +139,18 @@ getProofContext l thy = ProofContext
     specifiedTactic = case lattr of
         [] -> Nothing
         _  -> Just lattr
-      where
+      where 
         lattr = L.get thyTactic thy
+
+    -- TODO
+    specifiedStrategy = case lattr of
+        Just ls -> Just ls
+        Nothing  -> case L.get thyAutomatedProofStrategy thy of
+                    Nothing -> Nothing
+                    Just gs -> Just gs
+      where
+        lattr = headMay [gs
+                   | LemmaStrategy gs <- L.get lAttributes l]
 
 -- | Get the proof context for a lemma of the closed theory.
 getProofContextDiff :: Side -> Lemma a -> ClosedDiffTheory -> ProofContext
@@ -421,8 +433,8 @@ prettyClosedTheory thy = if containsManualRuleVariants mergedRules
             ,_thyItems = mergedRules
             ,_thyOptions =(L.get thyOptions thy)
             ,_thyIsSapic = (L.get thyIsSapic thy)
-            ,_thyAutomatedProveStrategy= (L.get thyAutomatedProveStrategy thy)
-            ,_thySeed = (L.get thySeed thy)}
+            ,_thyAutomatedProofStrategy= (L.get thyAutomatedProofStrategy thy)
+            ,_thySeed = L.get thySeed thy}
     ppInjectiveFactInsts crc =
         case S.toList $ L.get crcInjectiveFactInsts crc of
             []   -> emptyDoc
@@ -474,9 +486,13 @@ prettyClosedDiffTheory thy = if containsManualRuleVariantsDiff mergedRules
                       , nest 2 $ fsepList (text . showFactTagArity) (map fst tags) ]
 
 prettyClosedSummary :: Document d => ClosedTheory -> d
-prettyClosedSummary thy =
+prettyClosedSummary thy = trace ("Removeme thyseed: "++ show (L.get thySeed thy)) $
     vcat lemmaSummaries
   where
+    prettySeed = case L.get thySeed thy of
+        Just (_,seedValue) -> text ", seed" <-> colon <-> text (show seedValue)
+        Nothing -> emptyDoc
+
     lemmaSummaries = do
         LemmaItem lem  <- L.get thyItems thy
         -- Note that here we are relying on the invariant that all proof steps
@@ -497,9 +513,10 @@ prettyClosedSummary thy =
         let (status, Sum siz) = foldProof proofStepSummary $ L.get lProof lem
             quantifier = (toSystemTraceQuantifier $ L.get lTraceQuantifier lem)
             analysisType = parens $ prettyTraceQuantifier $ L.get lTraceQuantifier lem
+
         return $ text (L.get lName lem) <-> analysisType <> colon <->
                  text (showProofStatus quantifier status) <->
-                 parens (integer siz <-> text "steps")
+                 parens (integer siz <-> text "steps" <-> prettySeed)
 
     proofStepSummary = proofStepStatus &&& const (Sum (1::Integer))
 
@@ -560,7 +577,7 @@ prettyClosedDiffSummary thy =
 -- | Render the results of the precomputations, for --precompute-only
 prettyPrecomputation ::  Document d => ClosedTheory -> d
 prettyPrecomputation thy = foldr1 ($-$)
-    [ 
+    [
       ruleLink
     , reqCasesLink "Raw sources:" RawSource
     , reqCasesLink "Refined sources:" RefinedSource
@@ -578,7 +595,7 @@ prettyPrecomputation thy = foldr1 ($-$)
 
     overview n p   = n <-> p
     ruleLinkMsg         = text $ "Multiset rewriting rules" ++
-                          (if null(theoryRestrictions thy) then "" else " and restrictions") ++ ":"
+                          (if null (theoryRestrictions thy) then "" else " and restrictions") ++ ":"
     ruleLink            = overview ruleLinkMsg rulesInfo
     reqCasesLink name k = overview (text name) (casesInfo k)
 
@@ -614,6 +631,6 @@ prettyDiffPrecomputation thy = foldr1 ($-$)
     overview n p   = n <-> p
     ruleLink s isdiff    = overview (ruleLinkMsg s isdiff) (rulesInfo s isdiff)
     ruleLinkMsg s isdiff = text $ show s ++ ": Multiset rewriting rules" ++
-                           (if null(diffTheorySideRestrictions s thy) then "" else " and restrictions") ++ (if isdiff then " [Diff]" else "") ++ ":"
+                           (if null (diffTheorySideRestrictions s thy) then "" else " and restrictions") ++ (if isdiff then " [Diff]" else "") ++ ":"
 
     reqCasesLink s name k isdiff = overview (text name) (casesInfo s k isdiff)

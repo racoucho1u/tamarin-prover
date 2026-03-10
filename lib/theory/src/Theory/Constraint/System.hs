@@ -111,6 +111,10 @@ module Theory.Constraint.System (
   , AutomatedProofStrategy(..)
   , emptyAutoStrategy
   , setSeedAutoStrategy
+  , strategyIdentifiers
+  , prettyStrategy
+  , listStrategies
+  , stringToStrategy
 
 
   -- ** Classified rules
@@ -434,6 +438,36 @@ emptyAutoStrategy = Original
 setSeedAutoStrategy :: StdGen -> AutomatedProofStrategy -> AutomatedProofStrategy
 setSeedAutoStrategy seed (Proba (ProbaStrat a b c _)) = Proba (ProbaStrat a b c seed)
 setSeedAutoStrategy _ strat = strat
+
+
+strategyIdentifiers :: M.Map String AutomatedProofStrategy
+strategyIdentifiers = M.fromList
+                        [ ("Original", Original)
+                        , ("Escape", Escape (EscapeStrat [] (0,0) False))
+                        , ("Proba", Proba (ProbaStrat [] (0,0) False (mkStdGen 0)))
+                        ]
+
+-- | The name/explanation of a 'Strategy'.
+strategyName :: AutomatedProofStrategy -> String
+strategyName strat = case strat of
+        Original -> "traditional walk through the tree, by default, DFS"
+        Escape _ -> "loop detection, if a goal is recognized, it will be deprioritized"
+        Proba _ -> "loop detection, if a goal is recognized n times, the probability of treating it is decreased by 1/2^n" 
+
+listStrategies :: String
+listStrategies = M.foldMapWithKey
+    (\k v -> "'"++k++"': " ++ strategyName v ++ "\n") strategyIdentifiers
+ 
+stringToStrategy :: String -> AutomatedProofStrategy
+stringToStrategy s = fromMaybe
+    (error $ render $ sep $ map text $ lines $ "Unknown strategy '" ++ s
+        ++ "'. Use one of the following:\n" ++ listStrategies)
+    $ M.lookup s strategyIdentifiers
+
+prettyStrategy :: AutomatedProofStrategy -> String
+prettyStrategy Original = "Original"
+prettyStrategy (Escape {}) = "Escape"
+prettyStrategy (Proba {}) = "Proba"
 
 -- | A constraint system.
 data System = System
@@ -1901,7 +1935,7 @@ instance Apply LNSubst StdGen where
 instance Apply LNSubst AutomatedProofStrategy where
     apply _ Original = Original
     apply subst (Escape (EscapeStrat a b c)) = Escape (EscapeStrat (apply subst a) (apply subst b) (apply subst c))
-    apply subst (Proba (ProbaStrat a b c d)) = Proba (ProbaStrat (apply subst a) (apply subst b) (apply subst c) (apply subst d)) 
+    apply subst (Proba (ProbaStrat a b c d)) = Proba (ProbaStrat (apply subst a) (apply subst b) (apply subst c) (apply subst d))
 
 instance Apply LNSubst System where
     apply subst (System a b c d e f g h i j k l m n) =

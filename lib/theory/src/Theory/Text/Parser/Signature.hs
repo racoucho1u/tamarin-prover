@@ -17,6 +17,7 @@ module Theory.Text.Parser.Signature (
     , liftedAddPredicate
     , preddeclaration
     , goalRanking
+    , strategy
     , diffbuiltins
     , export
 )
@@ -29,7 +30,7 @@ import           Data.Either
 -- import           Data.Monoid                hiding (Last)
 import qualified Data.Set                   as S
 --import           Data.Char
---import qualified Data.Map                   as M
+import qualified Data.Map                   as M
 import           Control.Applicative        hiding (empty, many, optional)
 import           Control.Monad
 import qualified Control.Monad.Catch        as Catch
@@ -254,6 +255,10 @@ goalRanking diff workDir = try oracleRanking <|> internalTacticRanking <|> regul
            return $ [mapOracleRanking (maybeSetOracleRelPath relPath . maybeSetOracleWorkDir workDir) goal]
 
        toGoalRanking = if diff then stringToGoalRankingDiff False else stringToGoalRanking False
+
+strategy :: Parser AutomatedProofStrategy
+strategy = stringToStrategy <$> many1 letter <* skipMany (char ' ')
+
 
 liftedAddPredicate :: Catch.MonadThrow m =>
                       Theory sig c r p TranslationElement

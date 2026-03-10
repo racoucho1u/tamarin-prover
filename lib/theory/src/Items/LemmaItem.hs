@@ -35,8 +35,8 @@ data LemmaAttribute =
        | RHSLemma
        | LemmaHeuristic [GoalRanking ProofContext]
        | LemmaTactic String
-       | LemmaModule [ModuleType]
        | LemmaStrategy AutomatedProofStrategy
+       | LemmaModule [ModuleType]
 --        | BothLemma
        deriving( Eq, Ord, Show, Generic, NFData, Binary )
 

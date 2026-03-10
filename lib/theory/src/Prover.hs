@@ -175,16 +175,16 @@ closeTheoryWithMaude sig thy0 autoSources showSaturation =
   if autoSources && containsPartialDeconstructions (cache items)
     then
         proveTheory (const True) checkProof
-      $ Theory (L.get thyName thy0) (L.get thyInFile thy0) h t sig (cache items') items' (L.get thyOptions thy0) (L.get thyIsSapic thy0) (L.get thyAutomatedProveStrategy thy0) (L.get thySeed thy0)
+      $ Theory (L.get thyName thy0) (L.get thyInFile thy0) h t sig (cache items') items' (L.get thyOptions thy0) (L.get thyIsSapic thy0) (L.get thyAutomatedProofStrategy thy0) (L.get thySeed thy0)
     else
         proveTheory (const True) checkProof
-      $ Theory (L.get thyName thy0) (L.get thyInFile thy0) h t sig (cache items) items (L.get thyOptions thy0) (L.get thyIsSapic thy0) (L.get thyAutomatedProveStrategy thy0) (L.get thySeed thy0)
+      $ Theory (L.get thyName thy0) (L.get thyInFile thy0) h t sig (cache items) items (L.get thyOptions thy0) (L.get thyIsSapic thy0) (L.get thyAutomatedProofStrategy thy0) (L.get thySeed thy0)
   where
     parameters = Sources.IntegerParameters (L.get (openChainsLimit . thyOptions) thy0) (L.get (saturationLimit . thyOptions) thy0) showSaturation
     h          = L.get thyHeuristic thy0
     t          = L.get thyTactic thy0
     forcedInjFacts = L.get forcedInjectiveFacts $ L.get thyOptions thy0
-    cache its = closeRuleCache parameters restrictions (typAsms its) forcedInjFacts sig (rules its) (L.get thyCache thy0) (L.get (verboseOption . thyOptions) thy0) False (L.get thyIsSapic thy0) (Just $ L.get thyAutomatedProveStrategy thy0) (fmap fst $ L.get thySeed thy0)
+    cache its = closeRuleCache parameters restrictions (typAsms its) forcedInjFacts sig (rules its) (L.get thyCache thy0) (L.get (verboseOption . thyOptions) thy0) False (L.get thyIsSapic thy0) (L.get thyAutomatedProofStrategy thy0) (fmap fst $ L.get thySeed thy0)
     checkProof = checkAndExtendProver (sorryProver Nothing)
 
     -- Maude / Signature handle

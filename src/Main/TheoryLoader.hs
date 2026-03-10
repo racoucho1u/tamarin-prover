@@ -75,6 +75,9 @@ import Theory.Tools.Wellformedness
 import TheoryObject (diffTheoryConfigBlock, theoryConfigBlock)
 import GHC.Base (leInt)
 
+import TheoryObject (thySeed, thyAutomatedProofStrategy) --removeme
+import qualified Extension.Data.Label as L --removeme
+
 ------------------------------------------------------------------------------
 -- Theory loading: shared between interactive and batch mode
 ------------------------------------------------------------------------------
@@ -257,7 +260,7 @@ defaultTheoryLoadOptions =
       noReuse = False,
       noRestrictions = False,
       replicationBound = 3, 
-      automatedProofStrategy = Just Original,
+      automatedProofStrategy = Nothing,
       seed = Nothing
     }
 
@@ -306,13 +309,7 @@ mkTheoryLoadOptions as =
       (x : _) -> case (readEither x :: Either String Int) of
         Left _ -> throwError $ ArgumentError errMsg
         Right i -> pure $ conv i
-    -- FIXME : provide option to handle potential error without crash (ie, take default value and raise error but continue)
-
-    correctStrategyRange :: Int -> Int
-    correctStrategyRange s
-      | s <= 5 = s
-      | otherwise = error "Automated strategy out of bound (valid values 0 to 5)"
-      
+    -- FIXME : provide option to handle potential error without crash (ie, take default value and raise error but continue)   
 
     proofBound = parseIntArg (findArg "bound" as) Nothing Just "bound: invalid bound given"
 
@@ -339,15 +336,13 @@ mkTheoryLoadOptions as =
       Nothing -> pure Nothing
 
     automatedProofStrategy = case findArg "automated-strategy" as of
-      Just "0" -> pure $ Just Original
-      Just "1" -> pure $ Just (Escape (EscapeStrat [] (0,0) False))
-      Just "2" -> pure $ Just (Proba (ProbaStrat [] (0,0) False (mkStdGen 0)))
+      Just "Original" -> pure $ Just Original
+      Just "Escape" -> pure $ Just (Escape (EscapeStrat [] (0,0) False))
+      Just "Proba" -> pure $ Just (Proba (ProbaStrat [] (0,0) False (mkStdGen 0)))
       Just _ -> throwError $ ArgumentError "automated-strategy: invalid strategy given"
       Nothing -> pure Nothing
 
-    seedCheck = findArg "seed" as
-    seedDefault = defaultTheoryLoadOptions.seed
-    seed = parseIntArg seedCheck seedDefault (\i -> Just (mkStdGen i, i)) "seed: invalid value, expecting an Int"
+    seed = parseIntArg (findArg "seed" as) (defaultTheoryLoadOptions.seed) (\i -> Just (mkStdGen i, i)) "seed: invalid value, expecting an Int"
 
     defines = pure $ findArg "defines" as
     diffMode = pure $ argExists "diff" as
@@ -657,11 +652,14 @@ closeTheory version loadedThyOpts sign srcThy = do
   closedThy <- closeTranslatedTheory thyOpts sign checkedThy
   finalThy <- withVersionAndReport version thyOpts (preReport ++ postReport) closedThy
 
-  pure (preReport ++ postReport, finalThy)
+  trace ("Removeme close: "++show (maybeSeed srcThy)) pure (preReport ++ postReport, finalThy)
   where
+    maybeSeed = either (L.get thyAutomatedProofStrategy) (const Nothing)
+
     loadedAutoSources = loadedThyOpts.autoSources
     loadedStopOnTrace = loadedThyOpts.stopOnTrace
     loadedHeuristic = loadedThyOpts.heuristic
+    loadedSeed = loadedThyOpts.seed
 
     srcThyInFileName = either (._thyInFile) (._diffThyInFile) srcThy
 
@@ -672,6 +670,7 @@ closeTheory version loadedThyOpts sign srcThy = do
     -- Set the oraclename to theory_filename.oracle (if none was supplied).
     thyHeurDefOracle opts =
       opts { heuristic = (\(Heuristic grl) -> Heuristic $ defaultOracleNames srcThyInFileName grl) <$> loadedHeuristic }
+
 
     -- Read and process the arguments from the theory's config block.
     srcThyConfigBlockArgs = argsConfigString $ either theoryConfigBlock diffTheoryConfigBlock srcThy
