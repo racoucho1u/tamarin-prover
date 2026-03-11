@@ -1028,9 +1028,10 @@ proveSystemDFS :: AutomatedProofStrategy -> Heuristic ProofContext -> [Tactic Pr
 proveSystemDFS proofStrategy heuristic tactics ctxt d sys = proveSystemDFS' heuristic tactics ctxt d (L.set sProofStrategy proofStrategy sys)
   where
     proveSystemDFS' = case proofStrategy of
-      Original -> proveSystemDFSOg
-      Escape _ -> escapeProveSystemDFS
-      Proba _  -> probabilisticProveSystemDFS
+      Original    -> proveSystemDFSOg
+      Escape _    -> escapeProveSystemDFS
+      Proba _     -> probabilisticProveSystemDFS
+      Backtrack _ -> backtrackProveSystemDFS
 
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
@@ -1060,7 +1061,6 @@ escapeProveSystemDFS heuristic tactics ctxt =
           []                              -> node (Finished Unfinishable) M.empty
           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
-
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 --exportTactic generatedTactic method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
@@ -1096,14 +1096,6 @@ probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 =
                   else checkForLoop newSeed suite (method0, cases0)
             _ -> node method (snd $ M.mapAccum (\g sys -> let (g1,g2) = split g in  (g1, changeSeed g2 sys)) seed cases) sys
 
-        -- let ( _g', cases') = M.mapAccum
-        --                       (\g sys ->
-        --                           let (g1,g2) = split g     -- g1 for the next element,
-        --                           in  (g1, changeSeed g2 sys))
-        --                       seed
-        --                       cases
-        --                     in node method cases' _sys
-
         chooseLoop :: StdGen -> Int -> Int -> Int -> (Bool,StdGen)
         chooseLoop seed _depth iteration maxd = (rand <= threshold, newSeed)
             where
@@ -1130,6 +1122,57 @@ probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 =
             strat = Proba (ProbaStrat (sPathGoals _sys) (sNbLoop _sys) (sLoopFound _sys) seed)
 
         node method cases _sys = LNode (ProofStep method (Just _sys)) (M.map (prove (succ depth)) cases)
+
+backtrackProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+backtrackProveSystemDFS heuristic tactics ctxt d0 sys0 =
+      prove d0 [] sys0 
+  where
+      prove !depth ignoreGoals sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+        [] | finishedSubterms ctxt sys  -> node (Finished Solved) M.empty ignoreGoals
+        []                              -> node (Finished Unfinishable) M.empty ignoreGoals
+        ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases) ignoreGoals
+
+        where
+          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> Proof (Maybe System)
+          explore [] (method0, cases0) igG = node method0 cases0 (depth:igG) 
+          explore ((InLoop (n,i,g), (cases, _expl)):_) _ igG =
+              if (depth-n) `elem` igG
+                then node (InLoop (n,i,g)) cases igG 
+                else node (InLoop (n,i,g)) M.empty igG --else 
+          explore ((method, (cases, _expl)):suite) (method0, cases0) igG = case propagatedMethod of --
+              InLoop (0,_,_) -> explore suite (method0,cases0) igG --
+              InLoop (n,i,g) ->
+                  if (depth-n) `elem` igG
+                    then node (InLoop (n,i,g)) cases igG 
+                    else node (InLoop (n,i,g)) M.empty igG   --
+              _            -> node method cases igG
+            where
+                propagatedMethod = propagateMethod cases method igG
+
+
+          propagateMethod cases methodOrigin ignore = case propagatingMethod (Sorry Nothing) (M.toList cases) of
+              InLoop (0,_,_) -> if not (null ignore)
+                                then propagateMethod cases methodOrigin []
+                                else methodOrigin                          --  
+              InLoop (s,i,_) -> InLoop (s-1,i,extractGoal methodOrigin) --
+              _            -> methodOrigin                          --
+            where
+              propagatingMethod :: ProofMethod -> [(CaseName,System)] -> ProofMethod
+              propagatingMethod method [] = method
+              propagatingMethod method ((_,_sys):t) = case prove (succ depth) ignoreGoals _sys  of
+                  (LNode (ProofStep (InLoop (s,i,g)) _ ) _) -> InLoop (s,i,g)
+                  (LNode _ _)                           -> propagatingMethod method t
+
+          extractGoal method = case method of
+            InLoop (_,_, goal) -> goal
+            SolveGoal goal     -> Just goal
+            _ -> Nothing
+
+          node :: ProofMethod -> M.Map CaseName System -> [Int] -> Proof(Maybe System)
+          node methodOrigin casesOrigin igG = nodule
+                  where
+                    successors = M.map (prove (succ depth) igG) casesOrigin
+                    nodule = LNode (ProofStep methodOrigin (Just sys)) successors
 
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial

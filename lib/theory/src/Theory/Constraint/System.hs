@@ -108,6 +108,10 @@ module Theory.Constraint.System (
   , pLoopFound
   , pPathGoals
   , pSeed
+  , BacktrackStrat(..)
+  , bNbLoop
+  , bLoopFound
+  , bPathGoals
   , AutomatedProofStrategy(..)
   , emptyAutoStrategy
   , setSeedAutoStrategy
@@ -429,7 +433,14 @@ data ProbaStrat = ProbaStrat
   }
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
-data AutomatedProofStrategy = Original | Escape EscapeStrat | Proba ProbaStrat
+data BacktrackStrat = BacktrackStrat
+  { _bPathGoals    :: [[Goal]]         -- rewritting of the goal
+  , _bNbLoop       :: Int              -- depth
+  , _bLoopFound    :: Bool
+  }
+  deriving( Eq, Ord, Show, Generic, NFData, Binary )
+
+data AutomatedProofStrategy = Original | Escape EscapeStrat | Proba ProbaStrat | Backtrack BacktrackStrat
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
 emptyAutoStrategy :: AutomatedProofStrategy
@@ -444,14 +455,16 @@ strategyIdentifiers = M.fromList
                         [ ("Original", Original)
                         , ("Escape", Escape (EscapeStrat [] (0,0) False))
                         , ("Proba", Proba (ProbaStrat [] (0,0) False (mkStdGen 0)))
+                        , ("Backtrack", Backtrack (BacktrackStrat [] 0 False))
                         ]
 
 -- | The name/explanation of a 'Strategy'.
 strategyName :: AutomatedProofStrategy -> String
 strategyName strat = case strat of
-        Original -> "traditional walk through the tree, by default, DFS"
-        Escape _ -> "loop detection, if a goal is recognized, it will be deprioritized"
-        Proba _ -> "loop detection, if a goal is recognized n times, the probability of treating it is decreased by 1/2^n" 
+        Original    -> "traditional walk through the tree, by default, DFS"
+        Escape _    -> "loop detection, if a goal is recognized, it will be deprioritized"
+        Proba _     -> "loop detection, if a goal is recognized n times, the probability of treating it is decreased by 1/2^n" 
+        Backtrack _ -> "loop detection, if a goal is recognized, backtrack to the root of the loop (first occurence of the goal)"
 
 listStrategies :: String
 listStrategies = M.foldMapWithKey
@@ -464,9 +477,10 @@ stringToStrategy s = fromMaybe
     $ M.lookup s strategyIdentifiers
 
 prettyStrategy :: AutomatedProofStrategy -> String
-prettyStrategy Original = "Original"
-prettyStrategy (Escape {}) = "Escape"
-prettyStrategy (Proba {}) = "Proba"
+prettyStrategy Original       = "Original"
+prettyStrategy (Escape {})    = "Escape"
+prettyStrategy (Proba {})     = "Proba"
+prettyStrategy (Backtrack {}) = "Backtrack"
 
 -- | A constraint system.
 data System = System
@@ -490,7 +504,7 @@ data System = System
     -- constraint system.
     deriving( Eq, Ord, Generic, NFData, Binary )
 
-$(mkLabels [''System, ''GoalStatus, ''AutomatedProofStrategy, ''EscapeStrat, ''ProbaStrat])
+$(mkLabels [''System, ''GoalStatus, ''AutomatedProofStrategy, ''EscapeStrat, ''ProbaStrat, ''BacktrackStrat])
 
 deriving instance Show System
 
@@ -510,20 +524,23 @@ sConjDisjEqs = eqsConj . sEqStore
 -- | Functions to access the PathGoals, NbLoop and LoopFound fields of the system automated strategy if they exist.
 sPathGoals :: System -> [(Int, Int, [Goal])]
 sPathGoals sys = case L.get sProofStrategy sys of
-  Escape (EscapeStrat pathgoals _ _) -> pathgoals
-  Proba (ProbaStrat pathgoals _ _ _) -> pathgoals
+  Escape (EscapeStrat pathgoals _ _)      -> pathgoals
+  Proba (ProbaStrat pathgoals _ _ _)      -> pathgoals
+  Backtrack (BacktrackStrat pathgoals _ _) -> map (\g -> (0,0,g)) pathgoals --add 0s for iteration for InLoop type consistency, never used by backTrack
   _ -> [] -- If not defined in the strategy, can be considered as empty list
 
 sNbLoop :: System -> (Int, Int)
 sNbLoop sys = case L.get sProofStrategy sys of
   Escape (EscapeStrat _ nbLoop _) -> nbLoop
   Proba (ProbaStrat _ nbLoop _ _) -> nbLoop
-  _ -> (0, 0) -- If not defined in the strategy, can be considered as 0
+  Backtrack (BacktrackStrat _ nbLoop _) -> (nbLoop,0) --add a 0 for iteration for InLoop type consistency, never used by backTrack
+  _ -> (0,0) -- If not defined in the strategy, can be considered as 0
 
 sLoopFound :: System -> Bool
 sLoopFound sys = case L.get sProofStrategy sys of
   Escape (EscapeStrat _ _ loopFound) -> loopFound
   Proba (ProbaStrat _ _ loopFound _) -> loopFound
+  Backtrack (BacktrackStrat _ _ loopFound) -> loopFound
   _ -> False -- If not defined in the strategy, can be considered as False
 
 sSeed :: System -> StdGen
@@ -1971,6 +1988,10 @@ instance HasFrees AutomatedProofStrategy where
         foldFrees fun b `mappend`
         foldFrees fun c `mappend`
         foldFrees fun d
+    foldFrees fun (Backtrack (BacktrackStrat a b c)) =
+        foldFrees fun a `mappend`
+        foldFrees fun b `mappend`
+        foldFrees fun c
 
     foldFreesOcc  _ _ = const mempty
 
@@ -1979,6 +2000,8 @@ instance HasFrees AutomatedProofStrategy where
         Escape <$> (EscapeStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c)
     mapFrees fun (Proba (ProbaStrat a b c d)) =
         Proba <$> (ProbaStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c <*> mapFrees fun d)
+    mapFrees fun (Backtrack (BacktrackStrat a b c)) =
+        Backtrack <$> (BacktrackStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c)
 
 instance HasFrees System where
     foldFrees fun (System a b c d e f g h i j k l m n) =

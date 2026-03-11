@@ -209,7 +209,8 @@ data Result =
 data ProofMethod =
     Sorry (Maybe String)                 -- ^ Proof was not completed
   | Simplify                             -- ^ A simplification step.
-  | InLoop (Int, Int, Goal)              -- ^ A goal that has been detected as part as a loop (depth, iteration, goal)
+  | InLoop (Int, Int, Maybe Goal)        -- ^ A goal that has been detected as part as a loop (depth, iteration, goal)
+  | Backtracked Goal                     -- ^ A goal that has been detected by the blacklist
   | SolveGoal Goal                       -- ^ A goal that was solved.
   | Induction                            -- ^ Use inductive strengthening on
                                          -- the single formula constraint in
@@ -330,7 +331,9 @@ checkAndExecProofMethod ctxt method sys = do
       Finished r -> isFinished ctxt sys >>= guard . equalReason r
       Induction -> canApplyInduction
       SolveGoal goal -> guard (goal `M.member` L.get sGoals sys)
-      InLoop (_,_,goal) -> guard (goal `M.member` L.get sGoals sys)
+      InLoop (_,_,Just goal) -> guard (goal `M.member` L.get sGoals sys)
+      InLoop _ -> Just ()
+      Backtracked goal -> guard (goal `M.member` L.get sGoals sys)
       Simplify -> Just ()
       Sorry _ -> Just ()
     execProofMethod ctxt method sys
@@ -372,7 +375,9 @@ execProofMethod ctxt method sys =
       Induction             -> process sys . induction <$> getInductionCases sys
       --Removeme: the check is correct iff pcAutomatedProofStrat is Nothing when default strategy!
       SolveGoal goal        -> goalSolvingMethod goal sys -- return $ process sys $ solve goal
-      InLoop (_,_, goal)    -> goalSolvingMethod goal sys
+      InLoop (_,_, Just goal)    -> goalSolvingMethod goal sys
+      InLoop _ -> Nothing
+      Backtracked goal        -> goalSolvingMethod goal sys
       Invalidated           -> Nothing
   where
     process :: System -> Reduction CaseName -> M.Map CaseName System
@@ -391,6 +396,7 @@ execProofMethod ctxt method sys =
       Original -> return $ process s $ solve goal 
       Escape (EscapeStrat goalPath _ _) -> escapeCheckForLoop goalPath goal s
       Proba (ProbaStrat goalPath _ _ _) -> probaCheckForLoop goalPath goal s
+      Backtrack (BacktrackStrat goalPath _ _) -> backtrackCheckForLoop goalPath goal s
 
     escapeCheckForLoop :: [(Int, Int, [Goal])] -> Goal -> System -> Maybe (M.Map CaseName System)
     escapeCheckForLoop goalPath goal s = executedProofMethod
@@ -430,7 +436,29 @@ execProofMethod ctxt method sys =
                   else Proba (ProbaStrat ((0,0,[cleanGoal goal]):goalPath) (depth,iteration) _loop seed)
         sys'  = L.set sProofStrategy strat sys
 
-        makeCaseNames =
+    backtrackCheckForLoop :: [[Goal]] -> Goal -> System -> Maybe (M.Map CaseName System)
+    backtrackCheckForLoop goalPath goal sys = 
+        if index <= 0 
+          then backtrackExecSolveGoal goal False index goalPath 
+          else backtrackExecSolveGoal goal True index goalPath
+        where
+            foundAtP :: Goal -> [[Goal]] -> Int -> Int
+            foundAtP _ [] l   = 0 - l
+            foundAtP g (h:t) l = if g `elem` h then 1 else 1 + foundAtP g t l
+
+            index = foundAtP (cleanGoal goal) (map (map cleanGoal) (map thd3 $ sPathGoals sys)) (length $ sPathGoals sys)
+
+    -- solve the given goal
+    -- PRE: Goal must be valid in this system.
+    backtrackExecSolveGoal :: Goal -> Bool -> Int -> [[Goal]] -> Maybe (M.Map CaseName System)
+    backtrackExecSolveGoal goal loop index goalPath = return $ process sys' $ solve goal
+      where
+        strat = if loop 
+                    then Backtrack (BacktrackStrat goalPath index loop)
+                    else Backtrack (BacktrackStrat ([cleanGoal goal]:goalPath) 0 False)
+        sys'  = L.set sProofStrategy strat sys
+
+    makeCaseNames =
             M.fromListWith (error "case names not unique")
           . uniqueListBy (comparing fst) id distinguish
           where
@@ -666,6 +694,7 @@ rankProofMethods ranking tactics ctxt sys =
       Original -> execMethodOg
       Escape _ -> execMethodEscape
       Proba _ -> execMethodProba
+      Backtrack _ -> execMethodBacktrack
 
     execMethodOg (m, expl) = do
       cases <- execProofMethod ctxt m sys
@@ -676,7 +705,7 @@ rankProofMethods ranking tactics ctxt sys =
         Just cases -> case M.toList cases of
             []               -> return (m, (cases, expl))
             ((case1,sys'):_) -> if (fst $ sNbLoop sys') > 0 
-                                  then return (InLoop (fst $ sNbLoop sys', snd $ sNbLoop sys', fromJust $ fromSolveGoal m), (cases, expl)) 
+                                  then return (InLoop (fst $ sNbLoop sys', snd $ sNbLoop sys', fromSolveGoal m), (cases, "InLoop "++ show (sNbLoop sys'))) 
                                   else return (m, (cases, expl)) 
         Nothing    -> Nothing
 
@@ -685,9 +714,19 @@ rankProofMethods ranking tactics ctxt sys =
         Just cases -> case M.toList cases of
             []               -> return (m, (cases, expl))
             ((case1,sys'):_) -> if (fst $ sNbLoop sys') > 0 
-                                  then return (InLoop (fst $ sNbLoop sys', snd $ sNbLoop sys', fromJust $ fromSolveGoal m), (cases, expl)) 
+                                  then return (InLoop (fst $ sNbLoop sys', snd $ sNbLoop sys', fromSolveGoal m), (cases, "InLoop "++ show (sNbLoop sys'))) 
                                   else return (m, (cases, expl)) 
         Nothing    -> Nothing
+
+    execMethodBacktrack (m, expl) = do
+      case execProofMethod ctxt m sys of
+        Just cases -> case M.toList cases of
+            []              -> return (m, (cases, expl))
+            ((case1,sys'):_) -> if sLoopFound sys'
+                                  then return (InLoop (fst $ sNbLoop sys', snd $ sNbLoop sys', fromSolveGoal m) , (cases, "InLoop "++ show (sNbLoop sys')))
+                                  else return (m, (cases, expl))
+        Nothing    -> Nothing
+
 
 
     sourceRule goal = case goalRule sys goal of
@@ -1340,7 +1379,9 @@ prettyProofMethod method = case method of
     Sorry reason ->
         fsep [keyword_ "sorry", maybe emptyDoc closedComment_ reason]
     SolveGoal goal -> keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")"
-    InLoop (d, i, goal)     -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "in loop (dpth: "++show d++", it: "++show i++")")]
+    InLoop (d, i, Just goal)     -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just $ "in loop (dpth: "++show d++", it: "++show i++")")]
+    InLoop (d, i, Nothing)     -> fsep [keyword_ "sorry", maybe emptyDoc closedComment_ (Just $ "inLoop "++show d)]
+    Backtracked goal     -> fsep [keyword_ "solve(" <-> prettyGoal goal <-> keyword_ ")", maybe emptyDoc closedComment_ (Just "backtracked goal")]
     Simplify -> keyword_ "simplify"
     Finished (Contradictory reason) ->
         sep [ keyword_ "contradiction"

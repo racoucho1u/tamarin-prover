@@ -607,6 +607,7 @@ substAutomatedStrategy = do
         substStrat _ Original = Original
         substStrat subst (Escape (EscapeStrat gp b c)) = Escape (EscapeStrat (unifyLists subst gp) b c)
         substStrat subst (Proba (ProbaStrat gp b c d)) = Proba (ProbaStrat (unifyLists subst gp) b c d)
+        substStrat subst (Backtrack (BacktrackStrat gp b c)) = Backtrack (BacktrackStrat gp b c) --Backtrack (BacktrackStrat (apply subst gp) b c)
 
         unifyLists :: LNSubst -> [(Int,Int,[Goal])] -> [(Int,Int,[Goal])]
         unifyLists _ [] = []
