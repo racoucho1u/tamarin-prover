@@ -204,10 +204,10 @@ editProof idx name = withTheory idx $ \ti -> do
 
         newProof olp ctxt gsys =
             case olp of
-                (LNode (ProofStep Invalidated _) s ) ->
+                (LNode (ProofStep Invalidated _ _) s ) ->
                     let old_lp = fromMaybe olp (M.lookup "" s )
-                    in fromMaybe old_lp $ runProver (checkAndExtendProver (sorryProver Nothing)) ctxt 0 gsys old_lp
-                _ -> fromMaybe olp $ runProver (checkAndExtendProver (sorryProver Nothing)) ctxt 0 gsys olp
+                    in fromMaybe old_lp $ runProver (checkAndExtendProver (sorryProver Nothing [])) ctxt 0 gsys old_lp
+                _ -> fromMaybe olp $ runProver (checkAndExtendProver (sorryProver Nothing [])) ctxt 0 gsys olp
 
 
 -- | Deletes a Lemma from a theory, used for Theory editing
@@ -240,9 +240,9 @@ deleteLemma idx name = withTheory idx $ \ti -> do
                 lIdx = fromMaybe 0 (lookupLemmaIndex n ti.theory)
             in if lIdx > currIdx
                 then case lp of
-                    LNode (ProofStep (Sorry Nothing) _) _ -> Lemma n pt m tq f a lp
-                    LNode (ProofStep Invalidated _) _ -> Lemma n pt m tq f a lp
-                    LNode (ProofStep _ info) _ -> Lemma n pt m tq f a (LNode (ProofStep Invalidated info) (M.singleton "" lp))
+                    LNode (ProofStep (Sorry Nothing) _ _) _ -> Lemma n pt m tq f a lp
+                    LNode (ProofStep Invalidated _ _) _ -> Lemma n pt m tq f a lp
+                    LNode (ProofStep _ bl info) _ -> Lemma n pt m tq f a (LNode (ProofStep Invalidated bl info) (M.singleton "" lp))
                 else Lemma n pt m tq f a lp
 
 -- | Adds a new Lemma in a theory at an index, used for theory editing
@@ -1475,7 +1475,7 @@ getDeleteStepR idx path = do
 
     go (TheoryProof lemma proofPath) ti = modifyTheory ti
       (\thy -> pure $
-          applyProverAtPath thy lemma proofPath (sorryProver (Just "removed")))
+          applyProverAtPath thy lemma proofPath (sorryProver (Just "removed") []))
       (const path)
       (JsonAlert "Sorry, but removing the selected proof step failed!")
 
@@ -1495,7 +1495,7 @@ getDeleteStepDiffR idx path = do
 
     goDiff (DiffTheoryProof s lemma proofPath) ti = modifyDiffTheory ti
       (\thy -> pure $
-          applyProverAtPathDiff thy s lemma proofPath (sorryProver (Just "removed")))
+          applyProverAtPathDiff thy s lemma proofPath (sorryProver (Just "removed") []))
       (const path)
       (JsonAlert "Sorry, but removing the selected proof step failed!")
 

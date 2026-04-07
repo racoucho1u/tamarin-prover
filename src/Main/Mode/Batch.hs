@@ -189,7 +189,7 @@ run thisMode as
     processThy :: String -> FilePath -> IO (Pretty.Doc, Pretty.Doc)
     processThy versionData inFile = either handleError pure <=< runExceptT $ do
       srcThy <- liftIO $ readFile inFile
-      thy    <- trace ("Removeme batch: "++show thyLoadOptions) loadTheory thyLoadOptions srcThy inFile
+      thy    <- loadTheory thyLoadOptions srcThy inFile
 
       let sig =  either (._thySignature) (._diffThySignature) thy
       sig'   <- liftIO $ toSignatureWithMaude thyLoadOptions.maudePath sig
@@ -282,8 +282,8 @@ run thisMode as
             -- | Collect all solved (i.e. a trace was found) systems of the theory along with their
             -- path in the proof.
             proofSystems :: IncrementalProof -> [(ProofPath, System)]
-            proofSystems (LNode (ProofStep (Finished Solved) (Just rootSystem)) _) =  [([], rootSystem)]
-            proofSystems (LNode (ProofStep _ _) children) =  
+            proofSystems (LNode (ProofStep (Finished Solved) _ (Just rootSystem)) _) =  [([], rootSystem)]
+            proofSystems (LNode (ProofStep _ _ _) children) =  
               [(l : ls, system) | (l, subProof) <- M.toList children 
                                 , (ls, system) <- proofSystems subProof ]
 

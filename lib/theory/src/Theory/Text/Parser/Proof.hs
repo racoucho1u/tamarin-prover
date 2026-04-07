@@ -100,17 +100,17 @@ proofSkeleton =
     solvedProof <|> finalProof <|> interProof
   where
     solvedProof =
-        symbol "SOLVED" *> pure (LNode (ProofStep (Finished Solved) ()) M.empty)
+        symbol "SOLVED" *> pure (LNode (ProofStep (Finished Solved) [] ()) M.empty)
 
     finalProof = do
         method <- symbol "by" *> proofMethod
-        return (LNode (ProofStep method ()) M.empty)
+        return (LNode (ProofStep method [] ()) M.empty)
 
     interProof = do
         method <- proofMethod
         cases  <- (sepBy oneCase (symbol "next") <* symbol "qed") <|>
                   ((return . (,) "") <$> proofSkeleton          )
-        return (LNode (ProofStep method ()) (M.fromList cases))
+        return (LNode (ProofStep method [] ()) (M.fromList cases))
 
     oneCase = (,) <$> (symbol "case" *> identifier) <*> proofSkeleton
 

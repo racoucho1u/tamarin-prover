@@ -806,13 +806,14 @@ normalizeTheory =
   where
     stripProofAnnotations :: ProofSkeleton -> ProofSkeleton
     stripProofAnnotations = fmap stripProofStepAnnotations
-    stripProofStepAnnotations (ProofStep method ()) =
+    stripProofStepAnnotations (ProofStep method bl ()) =
       ProofStep
         ( case method of
             Sorry _ -> Sorry Nothing
             Finished (Contradictory _) -> Finished (Contradictory Nothing)
             _ -> method
         )
+        bl
         ()
 
 -- | Pretty print an open rule together with its assertion soundness proof.

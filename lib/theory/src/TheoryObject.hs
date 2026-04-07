@@ -738,7 +738,7 @@ prettyTheory ::
   (s -> d) ->
   Theory sig c r p s ->
   d
-prettyTheory ppSig ppCache ppRule ppPrf ppSap thy = trace ("Removeme prettyTh: "++show (L.get thySeed thy))
+prettyTheory ppSig ppCache ppRule ppPrf ppSap thy =
   vsep $
     [ kwTheoryHeader $ text $ L.get thyName thy,
       lineComment_ "Function signature and definition of the equational theory E",

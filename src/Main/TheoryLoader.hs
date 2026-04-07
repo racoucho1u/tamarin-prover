@@ -124,7 +124,7 @@ theoryLoadFlags =
       ["automated-strategy", "a"]
       (updateArg "automated-strategy")
       "STRATEGY"
-      ("Automated proof strategy to use: 0: none (default), 1: escape, 2: probabilistic, 3: backtracking, 4: blacklisting, 5: 'smartTamarin'"),
+      ("Automated proof strategy to use: 0: none (default), 1: escape, 2: probabilistic, 3: backAndAvoid, 4: blacklisting, 5: 'smartTamarin'"),
     flagOpt
       ""
       ["seed"]
@@ -340,6 +340,8 @@ mkTheoryLoadOptions as =
       Just "Escape"    -> pure $ Just (Escape (EscapeStrat [] (0,0) False))
       Just "Proba"     -> pure $ Just (Proba (ProbaStrat [] (0,0) False (mkStdGen 0)))
       Just "Backtrack" -> pure $ Just (Backtrack (BacktrackStrat [] 0 False))
+      Just "BackAndAvoid" -> pure $ Just (BackAndAvoid (BackAndAvoidStrat [] 0 False [] False))
+      Just "CollectAndRestart" -> pure $ Just (CollectAndRestart (CollectAndRestartStrat [] (0,0) False))
       Just _ -> throwError $ ArgumentError "automated-strategy: invalid strategy given"
       Nothing -> pure Nothing
 
@@ -653,7 +655,7 @@ closeTheory version loadedThyOpts sign srcThy = do
   closedThy <- closeTranslatedTheory thyOpts sign checkedThy
   finalThy <- withVersionAndReport version thyOpts (preReport ++ postReport) closedThy
 
-  trace ("Removeme close: "++show (maybeSeed srcThy)) pure (preReport ++ postReport, finalThy)
+  pure (preReport ++ postReport, finalThy)
   where
     maybeSeed = either (L.get thyAutomatedProofStrategy) (const Nothing)
 

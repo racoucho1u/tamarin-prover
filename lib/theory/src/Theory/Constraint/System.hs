@@ -112,6 +112,15 @@ module Theory.Constraint.System (
   , bNbLoop
   , bLoopFound
   , bPathGoals
+  , BackAndAvoidStrat(..)
+  , baNbLoop
+  , baLoopFound
+  , baPathGoals
+  , baAvoidList
+  , CollectAndRestartStrat(..)
+  , crCurrentLoop
+  , crLoopFound
+  , crPathGoals
   , AutomatedProofStrategy(..)
   , emptyAutoStrategy
   , setSeedAutoStrategy
@@ -262,6 +271,8 @@ module Theory.Constraint.System (
   , sLoopFound
   , sPathGoals
   , sSeed
+  , sAvoidList
+  , sAvoidListFound
 
   , isDiffSystem
   , sDiffSystem
@@ -440,7 +451,23 @@ data BacktrackStrat = BacktrackStrat
   }
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
-data AutomatedProofStrategy = Original | Escape EscapeStrat | Proba ProbaStrat | Backtrack BacktrackStrat
+data BackAndAvoidStrat = BackAndAvoidStrat
+  { _baPathGoals    :: [[Goal]]         -- (depth, iteration, rewritting of the goal)
+  , _baNbLoop       :: Int                   -- (depth, iteration)
+  , _baLoopFound    :: Bool
+  , _baAvoidList    :: [Goal]                       -- list of goals to avoid
+  , _baAvoidListFound :: Bool
+  }
+  deriving( Eq, Ord, Show, Generic, NFData, Binary )
+
+data CollectAndRestartStrat = CollectAndRestartStrat
+  { _crPathGoals    :: [(Int, Int, [Goal])]         -- (depth, iteration, rewritting of the goal)
+  , _crCurrentLoop  :: (Int, Int)                   -- (depth, iteration)
+  , _crLoopFound    :: Bool
+  }
+  deriving( Eq, Ord, Show, Generic, NFData, Binary )
+
+data AutomatedProofStrategy = Original | Escape EscapeStrat | Proba ProbaStrat | Backtrack BacktrackStrat | BackAndAvoid BackAndAvoidStrat | CollectAndRestart CollectAndRestartStrat
   deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
 emptyAutoStrategy :: AutomatedProofStrategy
@@ -456,6 +483,8 @@ strategyIdentifiers = M.fromList
                         , ("Escape", Escape (EscapeStrat [] (0,0) False))
                         , ("Proba", Proba (ProbaStrat [] (0,0) False (mkStdGen 0)))
                         , ("Backtrack", Backtrack (BacktrackStrat [] 0 False))
+                        , ("BackAndAvoid", BackAndAvoid (BackAndAvoidStrat [] 0 False [] False))
+                        , ("CollectAndRestart", CollectAndRestart (CollectAndRestartStrat [] (0,0) False))
                         ]
 
 -- | The name/explanation of a 'Strategy'.
@@ -465,6 +494,8 @@ strategyName strat = case strat of
         Escape _    -> "loop detection, if a goal is recognized, it will be deprioritized"
         Proba _     -> "loop detection, if a goal is recognized n times, the probability of treating it is decreased by 1/2^n" 
         Backtrack _ -> "loop detection, if a goal is recognized, backtrack to the root of the loop (first occurence of the goal)"
+        BackAndAvoid _ -> "loop detection, if a goal is recognized, backtrack to the root of the loop and add the goal to an avoid list to avoid going back to it"
+        CollectAndRestart _ -> "loop detection, if a branch deeper than 10 goals contains more that 2 loops, the branch is marked as bad and the proof starts again with this added information"
 
 listStrategies :: String
 listStrategies = M.foldMapWithKey
@@ -481,6 +512,8 @@ prettyStrategy Original       = "Original"
 prettyStrategy (Escape {})    = "Escape"
 prettyStrategy (Proba {})     = "Proba"
 prettyStrategy (Backtrack {}) = "Backtrack"
+prettyStrategy (BackAndAvoid {}) = "BackAndAvoid"
+prettyStrategy (CollectAndRestart {}) = "CollectAndRestart"
 
 -- | A constraint system.
 data System = System
@@ -504,7 +537,7 @@ data System = System
     -- constraint system.
     deriving( Eq, Ord, Generic, NFData, Binary )
 
-$(mkLabels [''System, ''GoalStatus, ''AutomatedProofStrategy, ''EscapeStrat, ''ProbaStrat, ''BacktrackStrat])
+$(mkLabels [''System, ''GoalStatus, ''AutomatedProofStrategy, ''EscapeStrat, ''ProbaStrat, ''BacktrackStrat, ''BackAndAvoidStrat, ''CollectAndRestartStrat])
 
 deriving instance Show System
 
@@ -527,6 +560,8 @@ sPathGoals sys = case L.get sProofStrategy sys of
   Escape (EscapeStrat pathgoals _ _)      -> pathgoals
   Proba (ProbaStrat pathgoals _ _ _)      -> pathgoals
   Backtrack (BacktrackStrat pathgoals _ _) -> map (\g -> (0,0,g)) pathgoals --add 0s for iteration for InLoop type consistency, never used by backTrack
+  BackAndAvoid (BackAndAvoidStrat pathgoals _ _ _ _) -> map (\g -> (0,0,g)) pathgoals --add 0s for iteration for InLoop type consistency, never used by backAndAvoid
+  CollectAndRestart (CollectAndRestartStrat pathgoals _ _) -> pathgoals
   _ -> [] -- If not defined in the strategy, can be considered as empty list
 
 sNbLoop :: System -> (Int, Int)
@@ -534,6 +569,8 @@ sNbLoop sys = case L.get sProofStrategy sys of
   Escape (EscapeStrat _ nbLoop _) -> nbLoop
   Proba (ProbaStrat _ nbLoop _ _) -> nbLoop
   Backtrack (BacktrackStrat _ nbLoop _) -> (nbLoop,0) --add a 0 for iteration for InLoop type consistency, never used by backTrack
+  BackAndAvoid (BackAndAvoidStrat _ nbLoop _ _ _) -> (nbLoop,0)
+  CollectAndRestart (CollectAndRestartStrat _ currentLoop _) -> currentLoop
   _ -> (0,0) -- If not defined in the strategy, can be considered as 0
 
 sLoopFound :: System -> Bool
@@ -541,12 +578,24 @@ sLoopFound sys = case L.get sProofStrategy sys of
   Escape (EscapeStrat _ _ loopFound) -> loopFound
   Proba (ProbaStrat _ _ loopFound _) -> loopFound
   Backtrack (BacktrackStrat _ _ loopFound) -> loopFound
+  BackAndAvoid (BackAndAvoidStrat _ _ loopFound _ _) -> loopFound
+  CollectAndRestart (CollectAndRestartStrat _ _ loopFound) -> loopFound
   _ -> False -- If not defined in the strategy, can be considered as False
 
 sSeed :: System -> StdGen
 sSeed sys = case L.get sProofStrategy sys of
   Proba (ProbaStrat _ _ _ seed) -> seed
   _ -> mkStdGen 0 -- If not defined in the strategy, can be considered as 0
+
+sAvoidList :: System -> [Goal]
+sAvoidList sys = case L.get sProofStrategy sys of
+  BackAndAvoid (BackAndAvoidStrat _ _ _ avoidList _) -> avoidList
+  _ -> [] -- If not defined in the strategy, can be considered as empty list
+
+sAvoidListFound :: System -> Bool
+sAvoidListFound sys = case L.get sProofStrategy sys of
+  BackAndAvoid (BackAndAvoidStrat _ _ _ _ avoidListFound) -> avoidListFound
+  _ -> False -- If not defined in the strategy, can be considered as False
 
 ------------------------------------------------------------------------------
 -- Oracles
@@ -1952,6 +2001,9 @@ instance Apply LNSubst AutomatedProofStrategy where
     apply _ Original = Original
     apply subst (Escape (EscapeStrat a b c)) = Escape (EscapeStrat (apply subst a) (apply subst b) (apply subst c))
     apply subst (Proba (ProbaStrat a b c d)) = Proba (ProbaStrat (apply subst a) (apply subst b) (apply subst c) (apply subst d))
+    apply subst (Backtrack (BacktrackStrat a b c)) = Backtrack (BacktrackStrat (apply subst a) (apply subst b) (apply subst c))
+    apply subst (BackAndAvoid (BackAndAvoidStrat a b c d e)) = BackAndAvoid (BackAndAvoidStrat (apply subst a) (apply subst b) (apply subst c) (apply subst d) (apply subst e))
+    apply subst (CollectAndRestart (CollectAndRestartStrat a b c)) = CollectAndRestart (CollectAndRestartStrat (apply subst a) (apply subst b) (apply subst c))
 
 instance Apply LNSubst System where
     apply subst (System a b c d e f g h i j k l m n) =
@@ -1992,6 +2044,16 @@ instance HasFrees AutomatedProofStrategy where
         foldFrees fun a `mappend`
         foldFrees fun b `mappend`
         foldFrees fun c
+    foldFrees fun (BackAndAvoid (BackAndAvoidStrat a b c d e)) =
+        foldFrees fun a `mappend`
+        foldFrees fun b `mappend`
+        foldFrees fun c `mappend`
+        foldFrees fun d `mappend`
+        foldFrees fun e
+    foldFrees fun (CollectAndRestart (CollectAndRestartStrat a b c)) =
+        foldFrees fun a `mappend`
+        foldFrees fun b `mappend`
+        foldFrees fun c
 
     foldFreesOcc  _ _ = const mempty
 
@@ -2002,6 +2064,10 @@ instance HasFrees AutomatedProofStrategy where
         Proba <$> (ProbaStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c <*> mapFrees fun d)
     mapFrees fun (Backtrack (BacktrackStrat a b c)) =
         Backtrack <$> (BacktrackStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c)
+    mapFrees fun (BackAndAvoid (BackAndAvoidStrat a b c d e)) =
+        BackAndAvoid <$> (BackAndAvoidStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c <*> mapFrees fun d <*> mapFrees fun e)
+    mapFrees fun (CollectAndRestart (CollectAndRestartStrat a b c)) =
+        CollectAndRestart <$> (CollectAndRestartStrat <$> mapFrees fun a <*> mapFrees fun b <*> mapFrees fun c)
 
 instance HasFrees System where
     foldFrees fun (System a b c d e f g h i j k l m n) =

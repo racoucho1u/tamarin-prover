@@ -95,7 +95,7 @@ solve pathIdx methodIdx prf =
   (path, methods) <- maybeREPL "illegal path index" mPath
   method <- maybeREPL "illegal method index" (methods !?! methodIdx)
   sys <- maybeREPL "illegal path" (iPrf `atPath` path >>= psInfo . root)
-  iPrf' <- maybeREPL "applying method failed" $ modifyAtPath (runProver (oneStepProver method) ctxt (length path) sys) path iPrf
+  iPrf' <- maybeREPL "applying method failed" $ modifyAtPath (runProver (oneStepProver [] method) ctxt (length path) sys) path iPrf
   return (REPLProof iPrf' ctxt (collectPaths ctxt iPrf'))
   where
     (!?!) :: [a] -> Int -> Maybe a

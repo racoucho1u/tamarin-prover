@@ -87,7 +87,7 @@ closeDiffTheoryWithMaude sig thy0 autoSources =
     cacheLeft  its = closeRuleCache parameters restrictionsLeft  (typAsms its) S.empty sig (leftClosedRules its)  (L.get diffThyCacheLeft  thy0) (L.get (verboseOption . diffThyOptions) thy0) False (L.get diffThyIsSapic thy0) Nothing Nothing
     cacheRight its = closeRuleCache parameters restrictionsRight (typAsms its) S.empty sig (rightClosedRules its) (L.get diffThyCacheRight thy0) (L.get (verboseOption . diffThyOptions) thy0) False (L.get diffThyIsSapic thy0) Nothing Nothing
 
-    checkProof = checkAndExtendProver (sorryProver Nothing)
+    checkProof = checkAndExtendProver (sorryProver Nothing [])
     checkDiffProof = checkAndExtendDiffProver (sorryDiffProver Nothing)
     diffRules  = map (applyMacroInDiffProtoRule (diffTheoryMacros thy0)) $ diffTheoryDiffRules thy0
     leftOpenRules  = map (addProtoRuleLabel . getLeftProtoRule)  diffRules
@@ -185,7 +185,7 @@ closeTheoryWithMaude sig thy0 autoSources showSaturation =
     t          = L.get thyTactic thy0
     forcedInjFacts = L.get forcedInjectiveFacts $ L.get thyOptions thy0
     cache its = closeRuleCache parameters restrictions (typAsms its) forcedInjFacts sig (rules its) (L.get thyCache thy0) (L.get (verboseOption . thyOptions) thy0) False (L.get thyIsSapic thy0) (L.get thyAutomatedProofStrategy thy0) (fmap fst $ L.get thySeed thy0)
-    checkProof = checkAndExtendProver (sorryProver Nothing)
+    checkProof = checkAndExtendProver (sorryProver Nothing [])
 
     -- Maude / Signature handle
     hnd = L.get sigmMaudeHandle sig

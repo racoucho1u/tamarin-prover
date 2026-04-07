@@ -189,23 +189,24 @@ mergeMapsWith leftOnly rightOnly combine l r =
 -- information.
 data ProofStep a = ProofStep
      { psMethod :: ProofMethod
+     , psBlackList :: [Maybe Goal]
      , psInfo   :: a
      }
      deriving( Eq, Ord, Show, Generic, NFData, Binary )
 
 instance Functor ProofStep where
-    fmap f (ProofStep m i) = ProofStep m (f i)
+    fmap f (ProofStep m bl i) = ProofStep m bl (f i)
 
 instance Foldable ProofStep where
     foldMap f = f . psInfo
 
 instance Traversable ProofStep where
-    traverse f (ProofStep m i) = ProofStep m <$> f i
+    traverse f (ProofStep m bl i) = ProofStep m bl <$> f i
 
 instance HasFrees a => HasFrees (ProofStep a) where
-    foldFrees f (ProofStep m i) = foldFrees f m `mappend` foldFrees f i
+    foldFrees f (ProofStep m bl i) = foldFrees f m `mappend` foldFrees f bl `mappend` foldFrees f i
     foldFreesOcc  _ _ = const mempty
-    mapFrees f (ProofStep m i)  = ProofStep <$> mapFrees f m <*> mapFrees f i
+    mapFrees f (ProofStep m bl i)  = ProofStep <$> mapFrees f m  <*> mapFrees f bl <*> mapFrees f i
 
 -- | A diff proof steps is a proof method together with additional context-dependent
 -- information.
@@ -247,8 +248,8 @@ type DiffProof a = LTree CaseName (DiffProofStep a)
 --------------------
 
 -- | A proof using the 'sorry' proof method.
-sorry :: Maybe String -> a -> Proof a
-sorry reason ann = LNode (ProofStep (Sorry reason) ann) M.empty
+sorry :: Maybe String -> [Maybe Goal] -> a -> Proof a
+sorry reason bl ann = LNode (ProofStep (Sorry reason) bl ann) M.empty
 
 -- | A proof using the 'sorry' proof method.
 diffSorry :: Maybe String -> a -> DiffProof a
@@ -256,14 +257,14 @@ diffSorry reason ann = LNode (DiffProofStep (DiffSorry reason) ann) M.empty
 
 -- | A proof denoting an unproven part of the proof.
 unproven :: a -> Proof a
-unproven = sorry Nothing
+unproven = sorry Nothing []
 
 -- | A proof denoting an unproven part of the proof.
-unprovenLookAhead :: ProofContext -> System -> IncrementalProof
-unprovenLookAhead ctxt sys = maybe (sorry Nothing (Just sys)) toNode (isFinished ctxt sys)
+unprovenLookAhead :: ProofContext -> [Maybe Goal] -> System -> IncrementalProof
+unprovenLookAhead ctxt blacklist sys = maybe (sorry Nothing blacklist (Just sys)) toNode (isFinished ctxt sys)
   where
     toNode :: Result -> IncrementalProof
-    toNode r = LNode (ProofStep (Finished r) (Just sys)) M.empty
+    toNode r = LNode (ProofStep (Finished r) blacklist (Just sys)) M.empty
 
 -- | A proof denoting an unproven part of the proof.
 diffUnproven :: a -> DiffProof a
@@ -342,9 +343,9 @@ boundProofDepth :: Int -> Proof a -> Proof a
 boundProofDepth bound =
     go bound
   where
-    go n (LNode ps@(ProofStep _ info) cs)
+    go n (LNode ps@(ProofStep _ bl info) cs)
       | 0 < n     = LNode ps                     $ M.map (go (pred n)) cs
-      | otherwise = sorry (Just $ "bound " ++ show bound ++ " hit") info
+      | otherwise = sorry (Just $ "bound " ++ show bound ++ " hit") bl info
 
 -- | @boundProofDepth bound prf@ bounds the depth of the proof @prf@ using
 -- 'Sorry' steps to replace the cut sub-proofs.
@@ -376,8 +377,8 @@ annotateProof :: (ProofStep a -> [b] -> b) -> Proof a -> Proof b
 annotateProof f =
     go
   where
-    go (LNode step@(ProofStep method _) cs) =
-        LNode (ProofStep method info') cs'
+    go (LNode step@(ProofStep method bl _) cs) =
+        LNode (ProofStep method bl info') cs'
       where
         cs' = M.map go cs
         info' = f step (map (psInfo . root . snd) (M.toList cs'))
@@ -428,12 +429,13 @@ instance Monoid ProofStatus where
 
 -- | The status of a 'ProofStep'.
 proofStepStatus :: ProofStep (Maybe a) -> ProofStatus
-proofStepStatus (ProofStep _            Nothing ) = UndeterminedProof
-proofStepStatus (ProofStep (Finished Solved) (Just _)) = TraceFound
-proofStepStatus (ProofStep (Finished Unfinishable) (Just _)) = UnfinishableProof
-proofStepStatus (ProofStep (Sorry _)    (Just _)) = IncompleteProof
-proofStepStatus (ProofStep Invalidated  (Just _)) = InvalidatedProof
-proofStepStatus (ProofStep _            (Just _)) = CompleteProof
+proofStepStatus (ProofStep _ _           Nothing ) = UndeterminedProof
+proofStepStatus (ProofStep (Finished Solved) _ (Just _)) = TraceFound
+proofStepStatus (ProofStep (Finished Unfinishable) _ (Just _)) = UnfinishableProof
+proofStepStatus (ProofStep (Finished Stopped) _ (Just _)) = IncompleteProof
+proofStepStatus (ProofStep (Sorry _)  _  (Just _)) = IncompleteProof
+proofStepStatus (ProofStep Invalidated _ (Just _)) = InvalidatedProof
+proofStepStatus (ProofStep _ _           (Just _)) = CompleteProof
 
 -- | The status of a 'DiffProofStep'.
 diffProofStepStatus :: DiffProofStep (Maybe a) -> ProofStatus
@@ -456,17 +458,17 @@ checkProof :: ProofContext
 checkProof ctxt prover =
     go
   where
-    go d sys prf@(LNode (ProofStep method info) cs) = case (method, checkAndExecProofMethod ctxt method sys) of
-      (Sorry reason, _         ) -> sorryNode reason cs
-      (_           , Just cases) -> node method $ checkChildren cases
-      (_           , Nothing   ) -> sorryNode (Just "invalid proof step encountered")
+    go d sys prf@(LNode (ProofStep method bl info) cs) = case (method, checkAndExecProofMethod ctxt method sys) of
+      (Sorry reason, _         ) -> sorryNode reason bl cs
+      (_           , Just cases) -> node method bl $ checkChildren cases
+      (_           , Nothing   ) -> sorryNode (Just "invalid proof step encountered") bl
                                       (M.singleton "" prf)
       where
         unhandledCase = mapProofInfo (Nothing,) . prover d
         checkChildren cases = mergeMapsWith unhandledCase noSystemPrf (go (d + 1)) cases cs
 
-        node m                 = LNode (ProofStep m (Just info, Just sys))
-        sorryNode reason cases = node (Sorry reason) (M.map noSystemPrf cases)
+        node m bl              = LNode (ProofStep m bl (Just info, Just sys))
+        sorryNode reason bl cases = node (Sorry reason) bl (M.map noSystemPrf cases)
         noSystemPrf            = mapProofInfo (\i -> (Just i, Nothing))
 
 -- | @checkDiffProof rules se prf@ replays the proof @prf@ against the start
@@ -582,10 +584,10 @@ tryProver :: Prover -> Prover
 tryProver =  (`orelse` mempty)
 
 -- | Try to execute one proof step using the given proof method.
-oneStepProver :: ProofMethod -> Prover
-oneStepProver method = Prover $ \ctxt _ se _ -> do
+oneStepProver :: [Maybe Goal] -> ProofMethod -> Prover
+oneStepProver blacklist method = Prover $ \ctxt _ se _ -> do
     cases <- execProofMethod ctxt method se
-    return $ LNode (ProofStep method (Just se)) (M.map (unprovenLookAhead ctxt) cases)
+    return $ LNode (ProofStep method blacklist (Just se)) (M.map (unprovenLookAhead ctxt blacklist) cases)
 
 -- | Try to execute one proof step using the given proof method.
 oneStepDiffProver :: DiffProofMethod -> DiffProver
@@ -594,8 +596,8 @@ oneStepDiffProver method = DiffProver $ \ctxt _ se _ -> do
     return $ LNode (DiffProofStep method (Just se)) (M.map (diffUnproven . Just) cases)
 
 -- | Replace the current proof with a sorry step and the given reason.
-sorryProver :: Maybe String -> Prover
-sorryProver reason = Prover $ \_ _ se _ -> return $ sorry reason (Just se)
+sorryProver :: Maybe String -> [Maybe Goal] -> Prover
+sorryProver reason bl = Prover $ \_ _ se _ -> return $ sorry reason bl (Just se)
 
 -- | Replace the current proof with a sorry step and the given reason.
 sorryDiffProver :: Maybe String -> DiffProver
@@ -628,7 +630,7 @@ checkAndExtendProver :: Prover -> Prover
 checkAndExtendProver prover0 = Prover $ \ctxt d se prf ->
     return $ mapProofInfo snd $ checkProof ctxt (prover ctxt) d se prf
   where
-    unhandledCase   = sorry (Just "unhandled case") Nothing
+    unhandledCase   = sorry (Just "unhandled case") [] Nothing
     prover ctxt d se =
         fromMaybe unhandledCase $ runProver prover0 ctxt d se unhandledCase
 
@@ -647,7 +649,7 @@ replaceSorryProver prover0 = Prover prover
   where
     prover ctxt d _ = return . replace
       where
-        replace prf@(LNode (ProofStep (Sorry _) (Just se)) _) =
+        replace prf@(LNode (ProofStep (Sorry _) _ (Just se)) _) =
             fromMaybe prf $ runProver prover0 ctxt d se prf
         replace (LNode ps cases) =
             LNode ps $ M.map replace cases
@@ -671,7 +673,7 @@ firstProver = foldr orelse failProver
 contradictionProver :: Prover
 contradictionProver = Prover $ \ctxt d sys prf ->
     runProver
-        (firstProver $ map oneStepProver
+        (firstProver $ map (oneStepProver [])
             (Finished . Contradictory . Just <$> contradictions ctxt sys))
         ctxt d sys prf
 
@@ -816,9 +818,9 @@ cutOnSolvedSingleThreadDFS prf0 =
       where
         findSolved node = case node of
               -- do not search in nodes that are not annotated
-              LNode (ProofStep _      (Nothing, _   )) _  -> NoSolution
-              LNode (ProofStep (Finished Solved) (Just _ , path)) _  -> Solution path
-              LNode (ProofStep _      (Just _ , _   )) cs ->
+              LNode (ProofStep _ _     (Nothing, _   )) _  -> NoSolution
+              LNode (ProofStep (Finished Solved) _ (Just _ , path)) _  -> Solution path
+              LNode (ProofStep _ _     (Just _ , _   )) cs ->
                   foldMap findSolved cs
 
     extractSolved []         p               = p
@@ -879,9 +881,9 @@ cutOnSolvedDFS prf0 =
           | d >= dMax = MaybeNoSolution
           | otherwise = case node of
               -- do not search in nodes that are not annotated
-              LNode (ProofStep _      (Nothing, _   )) _  -> NoSolution
-              LNode (ProofStep (Finished Solved) (Just _ , path)) _  -> Solution path
-              LNode (ProofStep _      (Just _ , _   )) cs ->
+              LNode (ProofStep _ _     (Nothing, _   )) _  -> NoSolution
+              LNode (ProofStep (Finished Solved) _ (Just _ , path)) _  -> Solution path
+              LNode (ProofStep _ _     (Just _ , _   )) cs ->
                   foldMap (findSolved (succ d))
                       (cs `using` parTraversable nfProofMethod)
 
@@ -955,16 +957,16 @@ cutOnSolvedBFS =
           (prf', TraceFound)     ->
               trace ("attack found at depth: " ++ show l) prf'
 
-    checkLevel 0 (LNode  step@(ProofStep (Finished Solved) (Just _)) _) =
+    checkLevel 0 (LNode  step@(ProofStep (Finished Solved) _ (Just _)) _) =
         S.put TraceFound >> return (LNode step M.empty)
-    checkLevel 0 prf@(LNode (ProofStep _ x) cs)
+    checkLevel 0 prf@(LNode (ProofStep _ blacklist x) cs)
       | M.null cs = return prf
       | otherwise = do
           st <- S.get
           msg <- case st of
               TraceFound -> return $ "ignored (attack exists)"
               _           -> S.put IncompleteProof >> return "bound reached"
-          return $ LNode (ProofStep (Sorry (Just msg)) x) M.empty
+          return $ LNode (ProofStep (Sorry (Just msg)) blacklist x) M.empty
     checkLevel l prf@(LNode step cs)
       | isNothing (psInfo step) = return prf
       | otherwise               = LNode step <$> traverse (checkLevel (l-1)) cs
@@ -1003,9 +1005,9 @@ cutAfterFirstSorry :: Proof (Maybe a) -> Proof (Maybe a)
 cutAfterFirstSorry = snd . go False
   where
     go :: Bool -> Proof (Maybe a) -> (Bool, Proof (Maybe a))
-    go _      n@(LNode (ProofStep (Sorry _) _) _)     = (True, n)
-    go abort  n@(LNode (ProofStep (Finished _) _) _)  = (abort, n)
-    go True     (LNode (ProofStep _ ann) _)           = (True, LNode (ProofStep (Sorry Nothing) ann) M.empty)
+    go _      n@(LNode (ProofStep (Sorry _) _ _) _)     = (True, n)
+    go abort  n@(LNode (ProofStep (Finished _) _ _) _)  = (abort, n)
+    go True     (LNode (ProofStep _ _ ann) _)           = (True, LNode (ProofStep (Sorry Nothing) [] ann) M.empty)
     go False    (LNode r cs) =
       let (abort, cs') = M.mapAccum go False cs
       in (abort, LNode r cs')
@@ -1032,6 +1034,8 @@ proveSystemDFS proofStrategy heuristic tactics ctxt d sys = proveSystemDFS' heur
       Escape _    -> escapeProveSystemDFS
       Proba _     -> probabilisticProveSystemDFS
       Backtrack _ -> backtrackProveSystemDFS
+      BackAndAvoid _ -> backAndAvoidProveSystemDFS
+      CollectAndRestart _ -> collectAndRestartProveSystemDFS []
 
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
@@ -1049,7 +1053,7 @@ proveSystemDFSOg heuristic tactics ctxt =
           (method, (cases, _expl)):_      -> node method cases
       where
         node method cases =
-          LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
+          LNode (ProofStep method [] (Just sys)) (M.map (prove (succ depth)) cases)
 
 escapeProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
 escapeProveSystemDFS heuristic tactics ctxt =
@@ -1067,7 +1071,7 @@ escapeProveSystemDFS heuristic tactics ctxt =
             InLoop (_,_,g) -> checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
 
-        node method cases = LNode (ProofStep method (Just sys)) (M.map (prove (succ depth)) cases)
+        node method cases = LNode (ProofStep method [](Just sys)) (M.map (prove (succ depth)) cases)
 
 probabilisticProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
 probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 =
@@ -1121,7 +1125,7 @@ probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 =
           where
             strat = Proba (ProbaStrat (sPathGoals _sys) (sNbLoop _sys) (sLoopFound _sys) seed)
 
-        node method cases _sys = LNode (ProofStep method (Just _sys)) (M.map (prove (succ depth)) cases)
+        node method cases _sys = LNode (ProofStep method [] (Just _sys)) (M.map (prove (succ depth)) cases)
 
 backtrackProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
 backtrackProveSystemDFS heuristic tactics ctxt d0 sys0 =
@@ -1160,7 +1164,7 @@ backtrackProveSystemDFS heuristic tactics ctxt d0 sys0 =
               propagatingMethod :: ProofMethod -> [(CaseName,System)] -> ProofMethod
               propagatingMethod method [] = method
               propagatingMethod method ((_,_sys):t) = case prove (succ depth) ignoreGoals _sys  of
-                  (LNode (ProofStep (InLoop (s,i,g)) _ ) _) -> InLoop (s,i,g)
+                  (LNode (ProofStep (InLoop (s,i,g)) _ _ ) _) -> InLoop (s,i,g)
                   (LNode _ _)                           -> propagatingMethod method t
 
           extractGoal method = case method of
@@ -1172,8 +1176,138 @@ backtrackProveSystemDFS heuristic tactics ctxt d0 sys0 =
           node methodOrigin casesOrigin igG = nodule
                   where
                     successors = M.map (prove (succ depth) igG) casesOrigin
-                    nodule = LNode (ProofStep methodOrigin (Just sys)) successors
+                    nodule = LNode (ProofStep methodOrigin [](Just sys)) successors
 
+backAndAvoidProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+backAndAvoidProveSystemDFS heuristic tactics ctxt d0 sys0 =
+      prove d0 [] [] sys0
+  where
+      prove !depth ignoreGoals blacklist sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
+        [] | finishedSubterms ctxt sys  -> node (Finished Solved) M.empty ignoreGoals blacklist
+        []                              -> node (Finished Unfinishable) M.empty ignoreGoals blacklist
+        ((method, (cases, _expl)):suite) -> explore ((method, (cases, _expl)):suite) (method,cases) ignoreGoals blacklist
+
+        where
+          explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> [Maybe Goal] -> Proof (Maybe System)
+          explore [] (method0, cases0) igG _blacklist = node method0 cases0 (depth:igG) _blacklist
+          explore ((InLoop (n,it,g), (cases, _expl)):_) _ igG _blacklist = 
+              if (depth-n) `elem` igG 
+                then node (InLoop (n,it,g)) cases igG _blacklist
+                else node (InLoop (n,it,g)) M.empty igG (fmap cleanGoal g:_blacklist)
+          explore ((method, (cases, _expl)):suite) (method0, cases0) igG _blacklist = 
+            if fmap cleanGoal (extractGoal method) `elem` _blacklist
+              then 
+                explore suite (method0,cases0) igG _blacklist
+              else 
+                case propagatedMethod of --
+                  InLoop (0,_,_) -> explore suite (method0,cases0) igG newbl
+                  InLoop (n,it,g) -> if (depth-n) `elem` igG 
+                                    then node (InLoop (n,it,g)) cases igG newbl
+                                    else node (InLoop (n,it,g)) M.empty igG newbl --
+                  _            -> node method cases igG newbl
+                where
+                    (propagatedMethod, newbl) = propagateMethod cases method igG _blacklist
+
+
+          propagateMethod cases methodOrigin ignore _blacklist = case propagatingMethod (Sorry Nothing) (M.toList cases) _blacklist of
+              (InLoop (0,_,_),nbl) -> if not (null ignore)
+                                then propagateMethod cases methodOrigin [] nbl
+                                else (methodOrigin,nbl)                          --  
+              (InLoop (s,it,_),nbl) -> (InLoop (s-1,it,extractGoal methodOrigin),nbl) --
+              (_, nbl)           -> (methodOrigin,nbl)                          --
+            where
+              propagatingMethod :: ProofMethod -> [(CaseName,System)] -> [Maybe Goal] -> (ProofMethod,[Maybe Goal])
+              propagatingMethod method [] _blacklist = (method,_blacklist)
+              propagatingMethod method ((_,_sys):t) _blacklist = case prove (succ depth) ignoreGoals _blacklist _sys  of
+                  (LNode (ProofStep (InLoop (s,it,g)) newbl _ ) _) -> (InLoop (s,it,g),newbl)
+                  (LNode _ _)                           -> propagatingMethod method t _blacklist
+
+          extractGoal method = case method of
+            InLoop (_, _, goal) -> goal
+            SolveGoal goal     -> Just goal
+            _ -> Nothing
+
+          node :: ProofMethod -> M.Map CaseName System -> [Int] -> [Maybe Goal] -> Proof(Maybe System)
+          node methodOrigin casesOrigin igG _blacklist =  trace (show nodule) nodule
+            where
+                successors = M.map (prove (succ depth) igG _blacklist) casesOrigin
+                nodule = LNode (ProofStep methodOrigin _blacklist (Just sys)) successors
+
+collectAndRestartProveSystemDFS :: [Maybe Goal] -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+collectAndRestartProveSystemDFS skipList0 heuristic tactics ctxt d0 sys0  =
+    prove d0 skipList0 sys0
+  where
+    
+    prove !depth skip sys = case ranked of 
+          [] | finishedSubterms ctxt sys  -> node skip (Finished Solved) M.empty
+          []                              -> node [] (Finished Unfinishable) M.empty
+          ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || isNothing (extractGoal method)
+                                                then 
+                                                      checkForLoop skip ((method, (cases, _expl)):suite) (method, (cases, _expl))
+                                                else
+                                                      node skip (Incorrect (incorrectnessScore method+1,depth, extractGoal method,skip)) M.empty --we are going to backtrack so this node will disappear
+      where
+        ranked = rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys 
+
+        checkBacktracking :: Int -> System -> Bool
+        -- alpha = 20 and delta = 3 lifted from SmartVerif paper
+        checkBacktracking _depth _system = _depth > 10 && countLoop (sPathGoals sys) > 1
+
+        checkForLoop :: [Maybe Goal] ->  [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)
+        --Change in the case no more option, instead of leaving, pushing through the last option: needs to be tested independently
+        checkForLoop s [] (method0, (cases0, _expl0)) = node skipL propagMethod cs 
+          where
+              (propagMethod, cs, skipL) = propagatedMethod cases0 method0 
+        checkForLoop s ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) =
+            if (cleanGoal <$> extractGoal method) `elem` s
+              then checkForLoop s suite (method0, (cases0, _expl0))  
+              else node skipL propagMethod cs 
+            where
+              (propagMethod, cs, skipL) = propagatedMethod cases method 
+
+        node skipList methodOrigin cases = if cases == M.empty  
+          then LNode (ProofStep methodOrigin [] (Just sys)) M.empty 
+          else LNode (ProofStep  methodOrigin [] (Just sys)) (M.map (prove (succ depth) skipList) cases)
+
+        propagatedMethod cases methodOrigin = case propagatingMethod skip (Sorry Nothing,"",M.empty) (M.toList cases) of
+                (Incorrect (_,1, g, skl),_,_)  -> (Finished Stopped, M.empty,skl++[cleanGoal <$> g])
+                (Incorrect (scr, d, g, skl),_,pf) ->
+                      (Incorrect (scr, d-1, extractGoal methodOrigin,skl++[cleanGoal<$> g]),
+                      M.empty,skl++[cleanGoal <$> g])
+                (_,_,pf)                  -> (methodOrigin, cases, skip)
+           where
+                propagatingMethod :: [Maybe Goal] -> (ProofMethod,CaseName,M.Map CaseName (LTree CaseName (ProofStep (Maybe System)))) -> [(CaseName,System)]
+                                    -> (ProofMethod,CaseName,M.Map CaseName (LTree CaseName (ProofStep (Maybe System))))
+                propagatingMethod _ (m,cn,proof) [] = (m,cn,proof) 
+                propagatingMethod updateSkipList (m0,cn0,proof) ((cn,_sys):t) = case prove (succ depth) updateSkipList _sys of
+                  (LNode (ProofStep (Incorrect (_s,d,g,skl)) _ _ ) _) -> if extractBadDepth m0 > d then error "Inconsistent depth" else (Incorrect (_s,d,g,skl),cn,proof) --(m0,cn0,proof)
+                  (LNode ps cs) -> propagatingMethod updateSkipList (m0,cn0,M.insert cn (LNode ps cs) proof) t 
+
+        extractGoal :: ProofMethod -> Maybe Goal
+        extractGoal method = case method of
+            InLoop (_, _, goal)   -> goal
+            Incorrect (_,_,goal,_)  -> goal
+            SolveGoal goal        -> Just goal
+            _ -> Nothing
+        
+        extractBadDepth :: ProofMethod -> Int
+        extractBadDepth method = case method of
+            Incorrect (_,d,_,_)  -> d
+            _ -> 0
+
+        incorrectnessScore :: ProofMethod -> Int
+        incorrectnessScore (Incorrect (s,_,_,_)) = s
+        incorrectnessScore _ = 0
+
+        countLoop :: [(Int,Int,[Goal])] -> Int
+        countLoop []          = 0
+        countLoop ((_,0,_):t) = countLoop t
+        countLoop ((_,_,_):t) = 1 + countLoop t
+        
+        isIncorrect :: ProofMethod -> Bool
+        isIncorrect method = case method of
+            Incorrect _ -> True
+            _ -> False
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
@@ -1209,7 +1343,7 @@ prettyProofWith prettyStep prettyCase =
   where
     ppPrf (LNode ps cs) = ppCases ps (M.toList cs)
 
-    ppCases ps@(ProofStep (Finished Solved) _) [] = prettyStep ps
+    ppCases ps@(ProofStep (Finished Solved) _ _) [] = prettyStep ps
     ppCases ps []                      = prettyCase ps (kwBy <> text " ")
                                            <> prettyStep ps
     ppCases ps [("", prf)]             = prettyStep ps $-$ ppPrf prf

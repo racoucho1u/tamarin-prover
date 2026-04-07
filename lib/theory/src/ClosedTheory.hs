@@ -35,7 +35,6 @@ import Pretty
 import Data.Maybe (Maybe(Nothing), fromMaybe)
 import System.Random (mkStdGen)
 
-import Debug.Trace --Removeme
 
 ------------------------------------------------------------------------------
 -- Closed theory querying / construction / modification
@@ -491,7 +490,7 @@ prettyClosedDiffTheory thy = if containsManualRuleVariantsDiff mergedRules
                       , nest 2 $ fsepList (text . showFactTagArity) (map fst tags) ]
 
 prettyClosedSummary :: Document d => ClosedTheory -> d
-prettyClosedSummary thy = trace ("Removeme thyseed: "++ show (L.get thySeed thy)) $
+prettyClosedSummary thy =
     vcat lemmaSummaries
   where
     prettySeed = case L.get thySeed thy of

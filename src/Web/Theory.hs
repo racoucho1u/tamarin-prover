@@ -88,7 +88,7 @@ applyMethodAtPath thy lemmaName proofPath prover i = do
         tactic = selectTactic prover ctxt
     methods <- map fst . rankProofMethods ranking tactic ctxt <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
-    applyProverAtPath thy lemmaName proofPath (oneStepProver method)
+    applyProverAtPath thy lemmaName proofPath (oneStepProver [] method)
 
 applyMethodAtPathDiff :: ClosedDiffTheory -> Side -> String -> ProofPath
                       -> AutoProver             -- ^ How to extract/order the proof methods.
@@ -105,11 +105,11 @@ applyMethodAtPathDiff thy s lemmaName proofPath prover i = do
     methods <- map fst . rankProofMethods ranking tactic ctxt <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyProverAtPathDiff thy s lemmaName proofPath
-      (oneStepProver method                                       `mappend`
-       replaceSorryProver (oneStepProver Simplify)                `mappend`
-       replaceSorryProver contradictionProver                     `mappend`
-       replaceSorryProver (oneStepProver (Finished Unfinishable)) `mappend`
-       replaceSorryProver (oneStepProver (Finished Solved))
+      (oneStepProver [] method                                       `mappend`
+       replaceSorryProver (oneStepProver [] Simplify)                `mappend`
+       replaceSorryProver contradictionProver                        `mappend`
+       replaceSorryProver (oneStepProver [] (Finished Unfinishable)) `mappend`
+       replaceSorryProver (oneStepProver [] (Finished Solved))
       )
 
 applyDiffMethodAtPath :: ClosedDiffTheory -> String -> ProofPath
@@ -2162,8 +2162,8 @@ annotateLemmaProof lem =
     prf = annotateProof annotate lem._lProof
     annotate step cs  =
         case lem._lProof of
-           LNode (ProofStep  Invalidated _) _ -> (psInfo step, InvalidatedProof)
-           _                                  -> (psInfo step, mconcat $ proofStepStatus step : incomplete ++ map snd cs)
+           LNode (ProofStep  Invalidated _ _) _ -> (psInfo step, InvalidatedProof)
+           _                                    -> (psInfo step, mconcat $ proofStepStatus step : incomplete ++ map snd cs)
       where
         incomplete = if isNothing (psInfo step) then [IncompleteProof] else []
 
