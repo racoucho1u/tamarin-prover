@@ -121,8 +121,8 @@ theoryLoadFlags =
       ("Sequence of proof method rankings to use (default '" ++ prettyGoalRanking (head $ defaultRankings False) ++ "')"),
     flagOpt
       ""
-      ["automated-strategy", "a"]
-      (updateArg "automated-strategy")
+      ["strategy"]
+      (updateArg "strategy")
       "STRATEGY"
       ("Automated proof strategy to use: 0: none (default), 1: Escape, 2: Probabilistic, 3: Backtrack, 4: BackAndAvoid, 5: CollectAndRestart"),
     flagOpt
