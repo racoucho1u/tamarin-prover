@@ -124,7 +124,7 @@ theoryLoadFlags =
       ["automated-strategy", "a"]
       (updateArg "automated-strategy")
       "STRATEGY"
-      ("Automated proof strategy to use: 0: none (default), 1: escape, 2: probabilistic, 3: backAndAvoid, 4: blacklisting, 5: 'smartTamarin'"),
+      ("Automated proof strategy to use: 0: none (default), 1: Escape, 2: Probabilistic, 3: Backtrack, 4: BackAndAvoid, 5: CollectAndRestart"),
     flagOpt
       ""
       ["seed"]

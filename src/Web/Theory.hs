@@ -105,10 +105,10 @@ applyMethodAtPathDiff thy s lemmaName proofPath prover i = do
     methods <- map fst . rankProofMethods ranking tactic ctxt <$> sys
     method <- if length methods >= i then Just (methods !! (i-1)) else Nothing
     applyProverAtPathDiff thy s lemmaName proofPath
-      (oneStepProver [] method                                       `mappend`
-       replaceSorryProver (oneStepProver [] Simplify)                `mappend`
-       replaceSorryProver contradictionProver                        `mappend`
-       replaceSorryProver (oneStepProver [] (Finished Unfinishable)) `mappend`
+      (oneStepProver [] method                                           `mappend`
+       replaceSorryProver (oneStepProver [] Simplify)                    `mappend`
+       replaceSorryProver contradictionProver                            `mappend`
+       replaceSorryProver (oneStepProver [] (Finished (Unfinishable []))) `mappend`
        replaceSorryProver (oneStepProver [] (Finished Solved))
       )
 
@@ -1861,7 +1861,7 @@ prevDiffThyPath thy = \case
 isInterestingMethod :: ProofMethod -> Bool
 isInterestingMethod (Sorry _) = True
 isInterestingMethod (Finished Solved) = True
-isInterestingMethod (Finished Unfinishable) = True
+isInterestingMethod (Finished (Unfinishable _)) = True
 isInterestingMethod _ = False
 
 -- | Interesting diff proof methods that are not skipped by next/prev-smart.
