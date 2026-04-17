@@ -50,8 +50,20 @@ def run_tamarin(cmd, timeout, silent, log):
     try:
         output, errors = process.communicate(timeout=timeout)
         if "Maude returned warning" in str(output):
+            with open ("debugFile",'a') as df:
+                df.write("maude error\n")
+                df.write(str(time.localtime()))
+                df.write(cmd+"\n")
+                df.write(str(output)+"\n")
+                df.write(str(proof_results)+"\n")
             return "AssociativeFailure", ''
         elif "CallStack" in str(output) or "internal error" in str(output):
+            with open ("debugFile",'a') as df:
+                df.write("Other error\n")
+                df.write(str(time.localtime()))
+                df.write(cmd+"\n")
+                df.write(str(output)+"\n")
+                df.write(str(proof_results)+"\n")
             return "TamarinError", ''
 
         proof_tactics = [line for line in str(
@@ -66,10 +78,11 @@ def run_tamarin(cmd, timeout, silent, log):
                     return line, False
         with open ("debugFile",'a') as df:
             df.write("Scripting error\n")
+            df.write(str(time.localtime()))
             df.write(cmd+"\n")
             df.write(str(output)+"\n")
             df.write(str(proof_results)+"\n")
-        raise ValueError
+        return "killed?", proof_tactics
 
     except subprocess.TimeoutExpired as timeErr:
         os.killpg(os.getpgid(process.pid), signal.SIGTERM)
@@ -194,7 +207,7 @@ def execute_model(model, commands, log, silent, timeout):
         start = time.time()
         res, status = run_tamarin(command, timeout, silent, log)
         finaltime = time.time() - start
-        if res in ["TamarinError", "timeout", "AssociativeFailure"]:
+        if res in ["TamarinError", "timeout","killed?", "AssociativeFailure"]:
             steps = -1
             tactic = te.extractTacticsParams(status)
             status = res

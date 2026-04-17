@@ -26,17 +26,26 @@ def prettyPrintPrioTactic(sortedDic):
 
 def extractTacticsFile(filename):
 	goals = []
-	with open(filename) as f:
-		lines = f.readlines()
-		for l in lines:
-			lsplit = l.split("---")
-			if len(lsplit) > 1:
-				goals.append(lsplit[2])
+	try:
+		with open(filename, 'r') as f:
+			lines = f.readlines()
+			for l in lines:
+				lsplit = l.split("---")
+				if len(lsplit) > 1:
+					goals.append(lsplit[2])
+	except Exception:
+		with open ("debugFile",'a') as df:
+			df.write(f"Tactic generation error: {filename}\n")
+		return "Error", []
+			
 	iterationDic = Counter(goals)
 	sortedT = {k: v for k, v in sorted(iterationDic.items(), key=lambda item: item[1])}
-	print(sortedT)
-	tactic = prettyPrintDeprioTactic(sortedT)
-	print(tactic)
+	# print(sortedT)
+	tactic = ""
+	if sortedT:
+		tactic = prettyPrintDeprioTactic(sortedT)
+	# print(tactic)
+	return(tactic)
 
 def extractTacticsParams(lines):
 	goals = []
