@@ -323,6 +323,7 @@ mkTheoryLoadOptions as =
                 (filterHeuristic (argExists "diff" as) rawRankings)
       Just [] -> throwError $ ArgumentError "heuristic: at least one ranking must be given"
       _ -> pure Nothing
+
     oraclename = case findArg "oraclename" as of
       Just "" -> Nothing
       name -> name
@@ -335,7 +336,7 @@ mkTheoryLoadOptions as =
       Just _ -> throwError $ ArgumentError "partial-evaluation: unknown option"
       Nothing -> pure Nothing
 
-    automatedProofStrategy = case findArg "automated-strategy" as of
+    automatedProofStrategy = case findArg "strategy" as of
       Just "Original"  -> pure $ Just Original
       Just "Escape"    -> pure $ Just (Escape (EscapeStrat [] (0,0) False))
       Just "Proba"     -> pure $ Just (Proba (ProbaStrat [] (0,0) False (mkStdGen 0)))
