@@ -1,0 +1,14 @@
+Cannot prove lemma oracle_auth_non_injective_agreement_host_issuer (file:../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy) after 4 attempts (timeout=600s): attempts bound reached (4).
+
+Cannot prove lemma oracle_auth_weak_agreement_host (file:../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy) after 4 attempts (timeout=600s): attempts bound reached (4).
+
+Cannot prove lemma oracle_auth_injective_agreement_host_issuer (file:../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy) after 4 attempts (timeout=600s): attempts bound reached (4).
+
+Cannot prove lemma oracle_auth_secrecy_cre (file:../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy) after 4 attempts (timeout=600s): attempts bound reached (4).
+
+Cannot prove lemma oracle_correctness_two_valid_unlinked_certs (file:../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy) after 4 attempts (timeout=1200s): attempts bound reached (4).
+
+Cannot prove lemma oracle_correctness_two_certs_different_credentials_different_bsn (file:../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy) after 4 attempts (timeout=1200s): attempts bound reached (4).
+
+Cannot prove lemma oracle_correctness_two_certs_different_credentials_same_bsn (file:../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy) after 4 attempts (timeout=1200s): attempts bound reached (4).
+

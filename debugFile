@@ -1,0 +1,158 @@
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=11, tm_min=33, tm_sec=35, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_non_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_non_injective_agreement_host_issuer_0}  --diff --output=results/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=11, tm_min=33, tm_sec=41, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_weak_agreement_host +RTS -N4 -RTS --heuristic={oracle_auth_weak_agreement_host_0}  --diff --output=results/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=11, tm_min=41, tm_sec=27, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_secrecy_cre +RTS -N4 -RTS --heuristic={oracle_auth_secrecy_cre_0}  --diff --output=results/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=11, tm_min=48, tm_sec=47, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_injective_agreement_host_issuer_1}  --diff --output=results/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=11, tm_min=53, tm_sec=59, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_noBSN.spthy --prove=oracle_auth_weak_agreement_host +RTS -N4 -RTS --heuristic={oracle_auth_weak_agreement_host_0}  --diff --output=results/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_noBSN.spthy  2>> tacticBatch/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_noBSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=11, tm_min=59, tm_sec=7, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_noBSN.spthy --prove=oracle_auth_non_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_non_injective_agreement_host_issuer_0}  --diff --output=results/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_noBSN.spthy  2>> tacticBatch/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_noBSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=3, tm_sec=45, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_correctness_two_certs_different_credentials_same_bsn +RTS -N4 -RTS --heuristic={oracle_correctness_two_certs_different_credentials_same_bsn_2}  --diff --output=results/oracle_correctness_two_certs_different_credentials_same_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_correctness_two_certs_different_credentials_same_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=3, tm_sec=45, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_correctness_two_certs_different_credentials_different_bsn +RTS -N4 -RTS --heuristic={oracle_correctness_two_certs_different_credentials_different_bsn_2}  --diff --output=results/oracle_correctness_two_certs_different_credentials_different_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_correctness_two_certs_different_credentials_different_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=3, tm_sec=45, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_correctness_two_valid_unlinked_certs +RTS -N4 -RTS --heuristic={oracle_correctness_two_valid_unlinked_certs_2}  --diff --output=results/oracle_correctness_two_valid_unlinked_certs_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_correctness_two_valid_unlinked_certs_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=4, tm_sec=16, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_noBSN.spthy --prove=oracle_auth_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_injective_agreement_host_issuer_0}  --diff --output=results/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_noBSN.spthy  2>> tacticBatch/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_noBSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=11, tm_sec=31, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_noBSN.spthy --prove=oracle_auth_secrecy_cre +RTS -N4 -RTS --heuristic={oracle_auth_secrecy_cre_0}  --diff --output=results/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_noBSN.spthy  2>> tacticBatch/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_noBSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=11, tm_sec=42, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_noBSN.spthy --prove=oracle_SP3_Unforgeability +RTS -N4 -RTS --heuristic={oracle_SP3_Unforgeability_0}  --diff --output=results/oracle_SP3_Unforgeability_TPM_DAA_JoinCertify_with_fix_noBSN.spthy  2>> tacticBatch/oracle_SP3_Unforgeability_TPM_DAA_JoinCertify_with_fix_noBSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=16, tm_sec=43, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_noBSN.spthy --prove=oracle_correctness_two_certs_different_credentials +RTS -N4 -RTS --heuristic={oracle_correctness_two_certs_different_credentials_2}  --diff --output=results/oracle_correctness_two_certs_different_credentials_TPM_DAA_JoinCertify_with_fix_noBSN.spthy  2>> tacticBatch/oracle_correctness_two_certs_different_credentials_TPM_DAA_JoinCertify_with_fix_noBSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=16, tm_sec=58, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy --prove=oracle_auth_weak_agreement_host +RTS -N4 -RTS --heuristic={oracle_auth_weak_agreement_host_0}  --diff --output=results/oracle_auth_weak_agreement_host_TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_weak_agreement_host_TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=21, tm_sec=51, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy --prove=oracle_auth_non_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_non_injective_agreement_host_issuer_0}  --diff --output=results/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=22, tm_sec=7, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy --prove=oracle_auth_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_injective_agreement_host_issuer_0}  --diff --output=results/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=29, tm_sec=54, tm_wday=0, tm_yday=90, tm_isdst=1)tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy --prove=oracle_SP3_Unforgeability +RTS -N4 -RTS --heuristic={oracle_SP3_Unforgeability_0}  --diff --output=results/oracle_SP3_Unforgeability_TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy  2>> tacticBatch/oracle_SP3_Unforgeability_TPM_DAA_JoinQuotePCR_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=48, tm_sec=56, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_non_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_non_injective_agreement_host_issuer_0}  --diff --output=results/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=49, tm_sec=2, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_weak_agreement_host +RTS -N4 -RTS --heuristic={oracle_auth_weak_agreement_host_0}  --diff --output=results/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=49, tm_sec=3, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_non_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_non_injective_agreement_host_issuer_1}  --diff --output=results/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=49, tm_sec=10, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_non_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_non_injective_agreement_host_issuer_2}  --diff --output=results/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_non_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=49, tm_sec=16, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_weak_agreement_host +RTS -N4 -RTS --heuristic={oracle_auth_weak_agreement_host_1}  --diff --output=results/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=49, tm_sec=30, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_weak_agreement_host +RTS -N4 -RTS --heuristic={oracle_auth_weak_agreement_host_2}  --diff --output=results/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_weak_agreement_host_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=59, tm_sec=19, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_injective_agreement_host_issuer_0}  --diff --output=results/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=59, tm_sec=26, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_injective_agreement_host_issuer_1}  --diff --output=results/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=12, tm_min=59, tm_sec=33, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_injective_agreement_host_issuer +RTS -N4 -RTS --heuristic={oracle_auth_injective_agreement_host_issuer_2}  --diff --output=results/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_injective_agreement_host_issuer_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=13, tm_min=2, tm_sec=15, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_secrecy_cre +RTS -N4 -RTS --heuristic={oracle_auth_secrecy_cre_0}  --diff --output=results/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=13, tm_min=5, tm_sec=6, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_secrecy_cre +RTS -N4 -RTS --heuristic={oracle_auth_secrecy_cre_1}  --diff --output=results/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=13, tm_min=7, tm_sec=51, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_auth_secrecy_cre +RTS -N4 -RTS --heuristic={oracle_auth_secrecy_cre_2}  --diff --output=results/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_auth_secrecy_cre_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=13, tm_min=9, tm_sec=4, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_correctness_two_valid_unlinked_certs +RTS -N4 -RTS --heuristic={oracle_correctness_two_valid_unlinked_certs_1}  --diff --output=results/oracle_correctness_two_valid_unlinked_certs_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_correctness_two_valid_unlinked_certs_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=13, tm_min=9, tm_sec=4, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_correctness_two_certs_different_credentials_different_bsn +RTS -N4 -RTS --heuristic={oracle_correctness_two_certs_different_credentials_different_bsn_1}  --diff --output=results/oracle_correctness_two_certs_different_credentials_different_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_correctness_two_certs_different_credentials_different_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=13, tm_min=9, tm_sec=4, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_correctness_two_certs_different_credentials_same_bsn +RTS -N4 -RTS --heuristic={oracle_correctness_two_certs_different_credentials_same_bsn_1}  --diff --output=results/oracle_correctness_two_certs_different_credentials_same_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_correctness_two_certs_different_credentials_same_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=13, tm_min=9, tm_sec=17, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_correctness_two_valid_unlinked_certs +RTS -N4 -RTS --heuristic={oracle_correctness_two_valid_unlinked_certs_2}  --diff --output=results/oracle_correctness_two_valid_unlinked_certs_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_correctness_two_valid_unlinked_certs_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=13, tm_min=9, tm_sec=17, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_correctness_two_certs_different_credentials_different_bsn +RTS -N4 -RTS --heuristic={oracle_correctness_two_certs_different_credentials_different_bsn_2}  --diff --output=results/oracle_correctness_two_certs_different_credentials_different_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_correctness_two_certs_different_credentials_different_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2025, tm_mon=3, tm_mday=31, tm_hour=13, tm_min=9, tm_sec=17, tm_wday=0, tm_yday=90, tm_isdst=1)
+tamarin-prover ../../files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinCertify_with_fix_BSN.spthy --prove=oracle_correctness_two_certs_different_credentials_same_bsn +RTS -N4 -RTS --heuristic={oracle_correctness_two_certs_different_credentials_same_bsn_2}  --diff --output=results/oracle_correctness_two_certs_different_credentials_same_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy  2>> tacticBatch/oracle_correctness_two_certs_different_credentials_same_bsn_TPM_DAA_JoinCertify_with_fix_BSN.spthy
+b''
+[]
