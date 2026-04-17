@@ -128,6 +128,7 @@ import           System.IO.Unsafe
 import GHC.Float (int2Double, float2Int, int2Float, double2Int)
 
 
+
 ------------------------------------------------------------------------------
 -- Utility: Trees with uniquely labelled edges.
 ------------------------------------------------------------------------------
@@ -737,7 +738,7 @@ selectDiffTactic prover ctx = fromMaybe [defaultTactic]
 selectProofStrategy :: AutoProver -> ProofContext -> AutomatedProofStrategy
 selectProofStrategy prover ctxt = setSeedAutoStrategy (selectSeed prover ctxt) strat
             where 
-              strat = fromMaybe Original
+              strat = trace ("Removeme: possible strategies: " ++ show (apDefaultStrategy prover) ++ " " ++ show (L.get pcAutomatedProofStrat ctxt)) $ fromMaybe Original
                                       (apDefaultStrategy prover <|> L.get pcAutomatedProofStrat ctxt)
 
 selectSeed :: AutoProver -> ProofContext -> StdGen
@@ -760,7 +761,7 @@ runAutoProver aut@(AutoProver _ _ _ _ bound cut _) =
     autoProver :: Prover
     autoProver = Prover $ \ctxt depth sysPath _ -> return $ proof ctxt depth sysPath []
       where 
-        proof cx d s skL = case proveSystemDFS (selectProofStrategy aut cx) (selectHeuristic aut cx) (selectTactic aut cx) cx d s skL of
+        proof cx d s skL = trace ("Removeme: using strategy "++show (selectProofStrategy aut cx)) $ case proveSystemDFS (selectProofStrategy aut cx) (selectHeuristic aut cx) (selectTactic aut cx) cx d s skL of
             LNode (ProofStep (Finished (Unfinishable [])) _ info) c -> LNode (ProofStep (Finished (Unfinishable [])) [] info) c
             LNode (ProofStep (Finished (Unfinishable sL)) _ _) _ -> proof cx d s sL
             node -> node
@@ -1033,15 +1034,16 @@ cutAfterFirstSorryDiff = snd . go False
       in (abort, LNode r cs')
 
 proveSystemDFS :: AutomatedProofStrategy -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> [Maybe Goal] -> Proof (Maybe System)
-proveSystemDFS proofStrategy heuristic tactics ctxt d sys skipList = proveSystemDFS' heuristic tactics ctxt d (L.set sProofStrategy proofStrategy sys)
+proveSystemDFS proofStrategy heuristic tactics ctxt d sys skipList = proveSystemDFS' heuristic tactics ctxt d sys'
   where
+    sys' = L.set sProofStrategy proofStrategy sys
     proveSystemDFS' = case proofStrategy of
       Original    -> proveSystemDFSOg
       Escape _    -> escapeProveSystemDFS
       Proba _     -> probabilisticProveSystemDFS
       Backtrack _ -> backtrackProveSystemDFS
       BackAndAvoid _ -> backAndAvoidProveSystemDFS
-      CollectAndRestart _ -> collectAndRestartProveSystemDFS []
+      CollectAndRestart _ -> collectAndRestartProveSystemDFS skipList
 
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
@@ -1049,10 +1051,9 @@ proveSystemDFS proofStrategy heuristic tactics ctxt d sys skipList = proveSystem
 -- non-determinism wrt. what goal to solve next.  This proof can be of
 -- infinite depth, if the proof strategy loops.
 proveSystemDFSOg :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-proveSystemDFSOg heuristic tactics ctxt =
-    prove
+proveSystemDFSOg heuristic tactics ctxt = prove
   where
-    prove !depth sys =
+    prove !depth sys = trace ("Removeme: running proveSystemDFSOg") $
         case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           [] | finishedSubterms ctxt sys  -> node (Finished Solved) M.empty
           []                              -> node (Finished $ Unfinishable []) M.empty
@@ -1062,10 +1063,10 @@ proveSystemDFSOg heuristic tactics ctxt =
           LNode (ProofStep method [] (Just sys)) (M.map (prove (succ depth)) cases)
 
 escapeProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-escapeProveSystemDFS heuristic tactics ctxt =
+escapeProveSystemDFS heuristic tactics ctxt = --error "escapeProveSystemDFS: not implemented yet"
     prove
   where
-    prove !depth sys =
+    prove !depth sys = trace ("Removeme: running escapeProveSystemDFS") $
         case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
           [] | finishedSubterms ctxt sys  -> node (Finished Solved) M.empty
           []                              -> node (Finished $ Unfinishable []) M.empty
@@ -1240,11 +1241,10 @@ backAndAvoidProveSystemDFS heuristic tactics ctxt d0 sys0 =
                 nodule = LNode (ProofStep methodOrigin _blacklist (Just sys)) successors
 
 collectAndRestartProveSystemDFS :: [Maybe Goal] -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-collectAndRestartProveSystemDFS skipList0 heuristic tactics ctxt d0 sys0  =
-    prove d0 skipList0 sys0
+collectAndRestartProveSystemDFS skipList0 heuristic tactics ctxt d0 sys0  = trace ("REMOVEME: using collectAndRestartProveSystemDFS") prove d0 skipList0 sys0
   where
     
-    prove !depth skip sys = case ranked of 
+    prove !depth skip sys = trace ("REMOVEME: using collectAndRestartProveSystemDFS") $ case ranked of 
           [] | finishedSubterms ctxt sys  -> node skip (Finished Solved) M.empty
           []                              -> node [] (Finished $ Unfinishable []) M.empty
           ((method, (cases, _expl)):suite) -> if not (checkBacktracking depth sys) || isNothing (extractGoal method)
@@ -1278,7 +1278,7 @@ collectAndRestartProveSystemDFS skipList0 heuristic tactics ctxt d0 sys0  =
         propagatedMethod cases methodOrigin = case propagatingMethod skip (Sorry Nothing,"",M.empty) (M.toList cases) of
                 (Incorrect (_,1, g, skl),_,_)  -> (Finished $ Unfinishable skl, M.empty,skl++[cleanGoal <$> g])
                 (Incorrect (scr, d, g, skl),_,pf) ->
-                      (Incorrect (scr, d-1, extractGoal methodOrigin,skl++[cleanGoal<$> g]),
+                      trace ("REMOVEME|"++show d) (Incorrect (scr, d-1, extractGoal methodOrigin,skl++[cleanGoal<$> g]),
                       M.empty,skl++[cleanGoal <$> g])
                 (_,_,pf)                  -> (methodOrigin, cases, skip)
            where
