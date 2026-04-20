@@ -343,7 +343,7 @@ mkTheoryLoadOptions as =
       Just "Backtrack" -> pure $ Just (Backtrack (BacktrackStrat [] 0 False))
       Just "BackAndAvoid" -> pure $ Just (BackAndAvoid (BackAndAvoidStrat [] 0 False [] False))
       Just "CollectAndRestart" -> pure $ Just (CollectAndRestart (CollectAndRestartStrat [] (0,0) False))
-      Just _ -> throwError $ ArgumentError "automated-strategy: invalid strategy given"
+      Just _ -> throwError $ ArgumentError "strategy: invalid strategy given"
       Nothing -> pure Nothing
 
     seed = parseIntArg (findArg "seed" as) (defaultTheoryLoadOptions.seed) (\i -> Just (mkStdGen i, i)) "seed: invalid value, expecting an Int"
