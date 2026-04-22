@@ -32,7 +32,6 @@ import TheoryObject
 import Utils.Misc
 import Prelude hiding (id, (.))
 
-import Debug.Trace --removeme
 
 -- | map TranslationItems to () and keep other items as is
 removeTranslationElement :: TheoryItem r p TranslationElement -> TheoryItem r p ()

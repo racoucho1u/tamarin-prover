@@ -175,7 +175,6 @@ import Theory.Syntactic.Predicate
 import Theory.Text.Pretty
 import Prelude hiding (id, (.))
 import System.Random (StdGen)
-import Debug.Trace --removeme
 
 -- | A theory contains a single set of rewriting rules modeling a protocol
 -- and the lemmas that

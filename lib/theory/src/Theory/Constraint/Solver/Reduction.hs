@@ -607,14 +607,19 @@ substAutomatedStrategy = do
         substStrat _ Original = Original
         substStrat subst (Escape (EscapeStrat gp b c)) = Escape (EscapeStrat (unifyLists subst gp) b c)
         substStrat subst (Proba (ProbaStrat gp b c d)) = Proba (ProbaStrat (unifyLists subst gp) b c d)
-        substStrat subst (Backtrack (BacktrackStrat gp b c)) = Backtrack (BacktrackStrat gp b c) --Backtrack (BacktrackStrat (apply subst gp) b c)
-        substStrat subst (BackAndAvoid (BackAndAvoidStrat gp b c d e)) = BackAndAvoid (BackAndAvoidStrat gp b c d e)
-        substStrat subst (CollectAndRestart (CollectAndRestartStrat gp currentLoop loopFound)) = CollectAndRestart (CollectAndRestartStrat gp currentLoop loopFound)
+        substStrat subst (Backtrack (BacktrackStrat gp b c)) = Backtrack (BacktrackStrat (unifyListsB subst gp) b c) --Backtrack (BacktrackStrat (apply subst gp) b c)
+        substStrat subst (BackAndAvoid (BackAndAvoidStrat gp b c d e)) = BackAndAvoid (BackAndAvoidStrat (unifyListsB subst gp) b c d e)
+        substStrat subst (CollectAndRestart (CollectAndRestartStrat gp currentLoop loopFound)) = CollectAndRestart (CollectAndRestartStrat (unifyLists subst gp) currentLoop loopFound)
 
         unifyLists :: LNSubst -> [(Int,Int,[Goal])] -> [(Int,Int,[Goal])]
         unifyLists _ [] = []
         --unifyLists subst [goal] = [foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)]
         unifyLists subst ((d,i,goal):t) = (d,i,foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)) : unifyLists subst t
+
+        unifyListsB :: LNSubst -> [[Goal]] -> [[Goal]]
+        unifyListsB _ [] = []
+        --unifyLists subst [goal] = [foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal)]
+        unifyListsB subst (goal:t) = foldl  (\li x -> if x `elem` li then li else x:li) goal (apply subst goal) : unifyListsB subst t
 
 -- | Apply the current substitution of the equation store to a part of the
 -- sequent. This is an internal function.

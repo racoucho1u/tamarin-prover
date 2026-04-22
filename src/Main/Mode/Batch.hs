@@ -39,7 +39,6 @@ import Theory.Constraint.System.Graph.Graph
 import Theory.Constraint.System.JSON (sequentsToJSONPretty)
 
 import ClosedTheory (prettyPrecomputation,prettyDiffPrecomputation)
-import Debug.Trace --removeme
 
 -- | Batch processing mode.
 batchMode :: TamarinMode
