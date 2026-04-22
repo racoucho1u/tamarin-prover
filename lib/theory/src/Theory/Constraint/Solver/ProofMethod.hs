@@ -426,9 +426,10 @@ execProofMethod ctxt method sys =
     probaCheckForLoop :: [(Int, Int, [Goal])] -> Goal -> System -> Maybe (M.Map CaseName System)
     probaCheckForLoop goalPath goal s = executedProofMethod
         where
-            indexId = foundAtMaybe (cleanGoal goal) (map (map cleanGoal . thd3 ) goalPath)
-            resMult = foundAtMultiSet goal (map thd3 goalPath)
-            (score, index) = customComparison indexId resMult
+            -- indexId = foundAtMaybe (cleanGoal goal) (map (map cleanGoal . thd3 ) goalPath)
+            -- resMult = foundAtMultiSet goal (map thd3 goalPath)
+            -- (score, index) = customComparison indexId resMult
+            index = foundAt (cleanGoal goal) (map (map cleanGoal . thd3 ) goalPath)
             fatherGoal = goalPath `at` (index-1)
             (iteration, depth, l) = if index > 0 then (snd3 fatherGoal+1, index, True) else (0,0,False) --snd3 fatherGoal+index
 
