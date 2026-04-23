@@ -40,6 +40,7 @@ import Theory.Constraint.System.JSON (sequentsToJSONPretty)
 
 import ClosedTheory (prettyPrecomputation,prettyDiffPrecomputation)
 
+
 -- | Batch processing mode.
 batchMode :: TamarinMode
 batchMode = tamarinMode

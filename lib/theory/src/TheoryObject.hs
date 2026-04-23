@@ -24,8 +24,10 @@ module TheoryObject
     thyItems,
     thyOptions,
     thyIsSapic,
+    thyExportGoals,
     thyAutomatedProofStrategy,
     thySeed,
+    thyExportGoals,
     diffThyName,
     diffThyInFile,
     diffThyItems,
@@ -88,6 +90,8 @@ module TheoryObject
     addHeuristic,
     addDiffHeuristic,
     addTactic,
+    addSeed,
+    addExportGoals,
     addDiffTactic,
     addMacros,
     addDiffMacros,
@@ -176,6 +180,7 @@ import Theory.Text.Pretty
 import Prelude hiding (id, (.))
 import System.Random (StdGen)
 
+
 -- | A theory contains a single set of rewriting rules modeling a protocol
 -- and the lemmas that
 data Theory sig c r p s = Theory
@@ -188,6 +193,7 @@ data Theory sig c r p s = Theory
     _thyItems :: [TheoryItem r p s],
     _thyOptions :: Option,
     _thyIsSapic :: Bool,
+    _thyExportGoals :: Bool,
     _thyAutomatedProofStrategy :: Maybe AutomatedProofStrategy,
     _thySeed :: Maybe (StdGen,Int)
   }
@@ -580,7 +586,7 @@ addDiffLemma l thy = do
 
 -- | Add a new default heuristic. Fails if a heuristic is already defined.
 addHeuristic :: [GoalRanking ProofContext] -> Theory sig c r p s -> Maybe (Theory sig c r p s)
-addHeuristic h (Theory n f [] t sig c i o sapic aps seed) = Just (Theory n f h t sig c i o sapic aps seed)
+addHeuristic h (Theory n f [] t sig c i o sapic expT aps seed) = Just (Theory n f h t sig c i o sapic expT aps seed)
 addHeuristic _ _ = Nothing
 
 addDiffHeuristic :: [GoalRanking ProofContext] -> DiffTheory sig c r r2 p p2 -> Maybe (DiffTheory sig c r r2 p p2)
@@ -588,14 +594,21 @@ addDiffHeuristic h (DiffTheory n f [] t sig cl cr dcl dcr i opt sapic) = Just (D
 addDiffHeuristic _ _ = Nothing
 
 addTactic :: Tactic ProofContext -> Theory sig c r p s -> Maybe (Theory sig c r p s)
-addTactic t (Theory n f h [] sig c i o sapic aps seed) = Just (Theory n f h [t] sig c i o sapic aps seed)
-addTactic t (Theory n f h l sig c i o sapic aps seed) = Just (Theory n f h (l ++ [t]) sig c i o sapic aps seed)
+addTactic t (Theory n f h [] sig c i o sapic expT aps seed) = Just (Theory n f h [t] sig c i o sapic expT aps seed)
+addTactic t (Theory n f h l sig c i o sapic expT aps seed) = Just (Theory n f h (l ++ [t]) sig c i o sapic expT aps seed)
 
 -- addTactic _ _ = Nothing
 
 addDiffTactic :: Tactic ProofContext -> DiffTheory sig c r r2 p p2 -> Maybe (DiffTheory sig c r r2 p p2)
 addDiffTactic t (DiffTheory n f h [] sig cl cr dcl dcr i o sapic) = Just (DiffTheory n f h [t] sig cl cr dcl dcr i o sapic)
 addDiffTactic t (DiffTheory n f h l sig cl cr dcl dcr i o sapic) = Just (DiffTheory n f h (l ++ [t]) sig cl cr dcl dcr i o sapic)
+
+addSeed :: (StdGen, Int) -> Theory sig c r p s -> Maybe (Theory sig c r p s)
+addSeed seed (Theory n f h t sig c i o sapic expT aps Nothing) = Just (Theory n f h t sig c i o sapic expT aps (Just seed))
+addSeed _ _ = Nothing
+
+addExportGoals :: Bool -> Theory sig c r p s -> Maybe (Theory sig c r p s)
+addExportGoals expG (Theory n f h t sig c i o sapic _ aps seed) = Just (Theory n f h t sig c i o sapic expG aps seed)
 
 -- | Remove a lemma by name. Fails, if the lemma does not exist.
 removeLemma :: String -> Theory sig c r p s -> Maybe (Theory sig c r p s)

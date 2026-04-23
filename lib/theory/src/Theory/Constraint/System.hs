@@ -88,6 +88,7 @@ module Theory.Constraint.System (
   , pcVerbose
   , pcConstantRHS
   , pcIsSapic
+  , pcExportGoals 
   , pcAutomatedProofStrat
   , pcSeed
   , dpcPCLeft
@@ -944,6 +945,7 @@ data ProofContext = ProofContext
        , _pcTrueSubterm         :: Bool -- true if in all rules the RHS is a subterm of the LHS
        , _pcConstantRHS         :: Bool -- true if there are rules with a constant RHS
        , _pcIsSapic             :: Bool -- true if the model was originally a sapic process
+       , _pcExportGoals         :: Bool -- true if we want to export goals to be able to generate tactics from them
        , _pcAutomatedProofStrat :: Maybe AutomatedProofStrategy
        , _pcSeed                :: Maybe StdGen
        }

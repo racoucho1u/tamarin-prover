@@ -707,6 +707,7 @@ data AutoProver = AutoProver
     , apBound            :: Maybe Int
     , apCut              :: SolutionExtractor
     , quitOnEmptyOracle  :: Bool
+    , apExportGoals       :: Bool
     }
     deriving ( Generic, NFData, Binary )
 
@@ -741,12 +742,15 @@ selectProofStrategy prover ctxt = setSeedAutoStrategy (selectSeed prover ctxt) s
               strat = fromMaybe Original
                                       (apDefaultStrategy prover <|> L.get pcAutomatedProofStrat ctxt)
 
+selectExportGoals :: AutoProver -> ProofContext -> Bool
+selectExportGoals prover ctx = apExportGoals prover || L.get pcExportGoals ctx
+
 selectSeed :: AutoProver -> ProofContext -> StdGen
 selectSeed prover ctx = fromMaybe (mkStdGen 0)
                              (apSeed prover <|> L.get pcSeed ctx)
 
 runAutoProver :: AutoProver -> Prover
-runAutoProver aut@(AutoProver _ _ _ _ bound cut _) =
+runAutoProver aut@(AutoProver _ _ _ _ bound cut _ _) =
     mapProverProof cutSolved $ maybe id boundProver bound autoProver
   where
     cutSolved = case cut of
@@ -761,7 +765,7 @@ runAutoProver aut@(AutoProver _ _ _ _ bound cut _) =
     autoProver :: Prover
     autoProver = Prover $ \ctxt depth sysPath _ -> return $ proof ctxt depth sysPath []
       where 
-        proof cx d s skL = case proveSystemDFS (selectProofStrategy aut cx) (selectHeuristic aut cx) (selectTactic aut cx) cx d s skL of
+        proof cx d s skL = case proveSystemDFS (selectExportGoals aut cx) (selectProofStrategy aut cx) (selectHeuristic aut cx) (selectTactic aut cx) cx d s skL of
             LNode (ProofStep (Finished (Unfinishable [])) _ info) c -> LNode (ProofStep (Finished (Unfinishable [])) [] info) c
             LNode (ProofStep (Finished (Unfinishable sL)) _ _) _ -> proof cx d s sL
             node -> node
@@ -774,7 +778,7 @@ runAutoProver aut@(AutoProver _ _ _ _ bound cut _) =
         boundProofDepth b <$> runProver p ctxt d se prf
 
 runAutoDiffProver :: AutoProver -> DiffProver
-runAutoDiffProver aut@(AutoProver _ _ _ _ bound cut _) =
+runAutoDiffProver aut@(AutoProver _ _ _ _ bound cut _ _) =
     mapDiffProverDiffProof cutSolved $ maybe id boundProver bound autoProver
   where
     cutSolved = case cut of
@@ -1033,18 +1037,25 @@ cutAfterFirstSorryDiff = snd . go False
       let (abort, cs') = M.mapAccum go False cs
       in (abort, LNode r cs')
 
-proveSystemDFS :: AutomatedProofStrategy -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> [Maybe Goal] -> Proof (Maybe System)
-proveSystemDFS proofStrategy heuristic tactics ctxt d sys skipList = proveSystemDFS' heuristic tactics ctxt d sys'
+proveSystemDFS :: Bool -> AutomatedProofStrategy -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> [Maybe Goal] -> Proof (Maybe System)
+proveSystemDFS exportGoals proofStrategy heuristic tactics ctxt d sys skipList = proveSystemDFS' heuristic tactics ctxt d sys'
   where
     sys' = L.set sProofStrategy proofStrategy sys
     proveSystemDFS' = case proofStrategy of
       Original    -> proveSystemDFSOg
-      Escape _    -> escapeProveSystemDFS
-      Proba _     -> probabilisticProveSystemDFS
-      Backtrack _ -> backtrackProveSystemDFS
-      BackAndAvoid _ -> backAndAvoidProveSystemDFS
-      CollectAndRestart _ -> collectAndRestartProveSystemDFS skipList
+      Escape _    -> escapeProveSystemDFS exportGoals
+      Proba _     -> probabilisticProveSystemDFS exportGoals
+      Backtrack _ -> backtrackProveSystemDFS exportGoals
+      BackAndAvoid _ -> backAndAvoidProveSystemDFS exportGoals
+      CollectAndRestart _ -> collectAndRestartProveSystemDFS exportGoals skipList
 
+
+exportGoalsForTactic :: Bool -> Int -> Maybe Goal -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)) -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System))
+exportGoalsForTactic exportGoals depth g checkForLoop = case g of
+    Nothing -> checkForLoop
+    Just goal -> if exportGoals
+      then trace ("---"++show depth++"---"++show (cleanGoal goal)) checkForLoop
+      else checkForLoop
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
@@ -1061,8 +1072,8 @@ proveSystemDFSOg heuristic tactics ctxt = prove
         node method cases =
           LNode (ProofStep method [] (Just sys)) (M.map (prove (succ depth)) cases)
 
-escapeProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-escapeProveSystemDFS heuristic tactics ctxt = --error "escapeProveSystemDFS: not implemented yet"
+escapeProveSystemDFS :: Bool -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+escapeProveSystemDFS exportGoals heuristic tactics ctxt = --error "escapeProveSystemDFS: not implemented yet"
     prove
   where
     prove !depth sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
@@ -1071,15 +1082,15 @@ escapeProveSystemDFS heuristic tactics ctxt = --error "escapeProveSystemDFS: not
           ((method, (cases, _expl)):suite) -> checkForLoop ((method, (cases, _expl)):suite) (method, (cases, _expl))
       where
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)
-        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 --exportTactic generatedTactic method0 cases0
+        checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 --exportGoals generatedTactic method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            InLoop (_,_,g) -> trace ("---"++show depth++"---"++show (fmap cleanGoal g)) checkForLoop suite (method0, (cases0, _expl0))
+            InLoop (_,_,g) -> (exportGoalsForTactic exportGoals depth g checkForLoop) suite (method0, (cases0, _expl0))
             _ -> node method cases
 
         node method cases = LNode (ProofStep method [](Just sys)) (M.map (prove (succ depth)) cases)
 
-probabilisticProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 =
+probabilisticProveSystemDFS :: Bool -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+probabilisticProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
   prove d0 sys0
   where
 
@@ -1132,8 +1143,8 @@ probabilisticProveSystemDFS heuristic tactics ctxt d0 sys0 =
 
         node method cases _sys = LNode (ProofStep method [] (Just _sys)) (M.map (prove (succ depth)) cases)
 
-backtrackProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-backtrackProveSystemDFS heuristic tactics ctxt d0 sys0 =
+backtrackProveSystemDFS :: Bool -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+backtrackProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
       prove d0 [] sys0 
   where
       prove !depth ignoreGoals sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
@@ -1183,8 +1194,8 @@ backtrackProveSystemDFS heuristic tactics ctxt d0 sys0 =
                     successors = M.map (prove (succ depth) igG) casesOrigin
                     nodule = LNode (ProofStep methodOrigin [](Just sys)) successors
 
-backAndAvoidProveSystemDFS :: Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-backAndAvoidProveSystemDFS heuristic tactics ctxt d0 sys0 =
+backAndAvoidProveSystemDFS :: Bool -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+backAndAvoidProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
       prove d0 [] [] sys0
   where
       prove !depth ignoreGoals blacklist sys = case rankProofMethods (useHeuristic heuristic depth) tactics ctxt sys of
@@ -1238,8 +1249,8 @@ backAndAvoidProveSystemDFS heuristic tactics ctxt d0 sys0 =
                 successors = M.map (prove (succ depth) igG _blacklist) casesOrigin
                 nodule = LNode (ProofStep methodOrigin _blacklist (Just sys)) successors
 
-collectAndRestartProveSystemDFS :: [Maybe Goal] -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
-collectAndRestartProveSystemDFS skipList0 heuristic tactics ctxt d0 sys0  = prove d0 skipList0 sys0
+collectAndRestartProveSystemDFS :: Bool -> [Maybe Goal] -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
+collectAndRestartProveSystemDFS exportGoals skipList0 heuristic tactics ctxt d0 sys0  = prove d0 skipList0 sys0
   where
     
     prove !depth skip sys = case ranked of 

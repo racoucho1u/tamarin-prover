@@ -132,6 +132,12 @@ theoryLoadFlags =
       "Int"
       ("Seed for the probabilistic strategy randomness"),
     flagOpt
+      ""
+      ["exportGoals"]
+      (updateArg "exportGoals")
+      "Bool"
+      ("Set this option to export goals to be able to generate tactics from them (default False)"),
+    flagOpt
       "summary"
       ["partial-evaluation"]
       (updateArg "partial-evaluation")
@@ -232,7 +238,8 @@ data TheoryLoadOptions = TheoryLoadOptions
     noRestrictions :: Bool,
     replicationBound :: Int, 
     automatedProofStrategy :: Maybe AutomatedProofStrategy,
-    seed :: Maybe (StdGen,Int)
+    seed :: Maybe (StdGen,Int),
+    exportGoals :: Bool
   }
   deriving (Show)
 
@@ -261,7 +268,8 @@ defaultTheoryLoadOptions =
       noRestrictions = False,
       replicationBound = 3, 
       automatedProofStrategy = Nothing,
-      seed = Nothing
+      seed = Nothing,
+      exportGoals = False
     }
 
 toParserFlags :: TheoryLoadOptions -> [String]
@@ -300,6 +308,7 @@ mkTheoryLoadOptions as =
     <*> replicationBound
     <*> automatedProofStrategy
     <*> seed
+    <*> exportGoals
   where
     proveMode = pure $ argExists "prove" as
     lemmaNames = pure $ findArg "prove" as ++ findArg "lemma" as
@@ -355,6 +364,7 @@ mkTheoryLoadOptions as =
     autoSources = pure $ argExists "auto-sources" as
     noReuse = pure $ argExists "no-reuse" as
     noRestrictions = pure $ argExists "no-restrictions" as
+    exportGoals = pure $ argExists "exportGoals" as
 
     outputModule = case findArg "outModule" as of
       Just str -> case find ((str ==) . show) [minBound ..] of
@@ -664,6 +674,7 @@ closeTheory version loadedThyOpts sign srcThy = do
     loadedStopOnTrace = loadedThyOpts.stopOnTrace
     loadedHeuristic = loadedThyOpts.heuristic
     loadedSeed = loadedThyOpts.seed
+    loadedExportGoals = loadedThyOpts.exportGoals
 
     srcThyInFileName = either (._thyInFile) (._diffThyInFile) srcThy
 
@@ -728,7 +739,7 @@ prettyOpenTheoryByModule thyOpts = case  thyOpts.outputModule of
 
 -- | Construct an 'AutoProver' from the given arguments (--bound, --stop-on-trace).
 constructAutoProver :: TheoryLoadOptions -> AutoProver
-constructAutoProver thyOpts =
+constructAutoProver thyOpts = 
   AutoProver
     thyOpts.heuristic
     Nothing
@@ -737,6 +748,7 @@ constructAutoProver thyOpts =
     thyOpts.proofBound
     (fromMaybe CutDFS thyOpts.stopOnTrace)
     False
+    (thyOpts.exportGoals)
 
 -----------------------------------------------
 -- Add Options parameters in an OpenTheory

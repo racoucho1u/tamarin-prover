@@ -130,10 +130,11 @@ closeRuleCache :: IntegerParameters  -- ^ Parameters for open chains and saturat
                -> Bool               -- ^ Verbose option
                -> Bool               -- ^ Diff or not
                -> Bool               -- ^ isSapic or not
+               -> Bool               -- ^ Whether to export goals to be able to generate tactics from them
                -> Maybe AutomatedProofStrategy          -- ^ Automated proof strategy
                -> Maybe StdGen       -- ^ Seed for the probabilistic strategy
                -> ClosedRuleCache    -- ^ Cached rules and case distinctions.
-closeRuleCache parameters restrictions typAsms forcedInjFacts sig protoRules intrRules verbose isdiff isSapic aps seed = -- trace ("closeRuleCache: " ++ show classifiedRules) $
+closeRuleCache parameters restrictions typAsms forcedInjFacts sig protoRules intrRules verbose isdiff isSapic exportGoals aps seed = 
     ClosedRuleCache
         classifiedRules rawSources refinedSources injFactInstances
   where
@@ -142,7 +143,7 @@ closeRuleCache parameters restrictions typAsms forcedInjFacts sig protoRules int
         (error "closeRuleCache: trace quantifier should not matter here")
         (error "closeRuleCache: lemma name should not matter here") [] verbose isdiff
         (all isSubtermRule {-- $ trace (show destr ++ " - " ++ show (map isSubtermRule destr))-} destr) (any isConstantRule destr)
-        isSapic aps seed
+        isSapic exportGoals aps seed
 
     -- Maude handle
     hnd = L.get sigmMaudeHandle sig

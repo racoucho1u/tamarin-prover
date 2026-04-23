@@ -64,6 +64,7 @@ openTranslatedTheory thy =
       _thyItems = newThyItems,
       _thyOptions = (L.get thyOptions thy),
       _thyIsSapic = (L.get thyIsSapic thy),
+      _thyExportGoals = (L.get thyExportGoals thy),
       _thyAutomatedProofStrategy = (L.get thyAutomatedProofStrategy thy),
       _thySeed = L.get thySeed thy
     }
@@ -551,7 +552,7 @@ defaultOption = Option False False False False False False False False False S.e
 
 -- | Default theory
 defaultOpenTheory :: Bool -> OpenTheory
-defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False Nothing Nothing
+defaultOpenTheory flag = Theory "default" "default" [] [] (emptySignaturePure flag) [] [] defaultOption False False Nothing Nothing
 
 -- | Default diff theory
 defaultOpenDiffTheory :: Bool -> OpenDiffTheory

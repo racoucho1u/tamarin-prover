@@ -41,6 +41,7 @@ module Theory (
   , setforcedInjectiveFacts
   , thyOptions
   , thyIsSapic
+  , thyExportGoals
   , setOption
   , Option
   -- * Predicates
@@ -134,6 +135,8 @@ module Theory (
   , diffTheorySideRestrictions
   , diffTheoryFormalComments
   , addTactic
+  , addSeed
+  , addExportGoals
   , addRestriction
   , addLemma
   , addLemmaAtIndex
