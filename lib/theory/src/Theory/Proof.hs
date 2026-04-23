@@ -1073,7 +1073,7 @@ escapeProveSystemDFS heuristic tactics ctxt = --error "escapeProveSystemDFS: not
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 --exportTactic generatedTactic method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            InLoop (_,_,g) -> checkForLoop suite (method0, (cases0, _expl0))
+            InLoop (_,_,g) -> trace ("---"++show depth++"---"++show (fmap cleanGoal g)) checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
 
         node method cases = LNode (ProofStep method [](Just sys)) (M.map (prove (succ depth)) cases)
