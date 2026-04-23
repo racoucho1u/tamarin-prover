@@ -1308,6 +1308,86 @@ lemma injectiveagreement_seaf_ue_kseaf_keyConf_noKeyRev_noChanRev [heuristic={in
                             | (Ex X #r. Rev(X, 'secureChannel')@r & Honest(X)@i) "
 
 
+
+
+
+
+tactic: sqn_ue_nodecrease_0
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [Xor(f5(~k,RAND),Union(SqnUE,dif))]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(SqnHSS,RAND))]}"
+
+
+
+tactic: sqn_ue_nodecrease_1
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(Union(SqnUE,dif),RAND))]}"
+
+
+
+tactic: sqn_ue_nodecrease_2
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f5(~k,RAND)]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(SqnHSS,RAND))]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [Xor(f5(~k,RAND),Union(SqnUE,dif))]}"
+
+
+
+tactic: sqn_ue_nodecrease_0
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(Union(SqnUE,dif),RAND))]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(SqnHSS,RAND))]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [Xor(f5(~k,RAND),Union(SqnUE,dif))]}"
+
+
+
+tactic: sqn_ue_nodecrease_1
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(Union(SqnUE,dif),RAND))]}"
+
+
+
+tactic: sqn_ue_nodecrease_2
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f5(~k,RAND)]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(SqnHSS,RAND))]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [Xor(f5(~k,RAND),Union(SqnUE,dif))]}"
+
+
+
+tactic: sqn_ue_nodecrease_0
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(Union(SqnUE,dif),RAND))]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(SqnHSS,RAND))]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [Xor(f5(~k,RAND),Union(SqnUE,dif))]}"
+
+
+
+tactic: sqn_ue_nodecrease_1
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(Union(SqnUE,dif),RAND))]}"
+
+
+
+tactic: sqn_ue_nodecrease_2
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f5(~k,RAND)]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [f1(~k,pair(SqnHSS,RAND))]}"
+deprio: 
+allGoal "ActionG #vk (Fact {factTag = KUFact, factAnnotations = fromList [], factTerms = [Xor(f5(~k,RAND),Union(SqnUE,dif))]}"
+
+
+
 end
 
 

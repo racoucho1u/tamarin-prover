@@ -47,8 +47,6 @@ import           Text.PrettyPrint.Class     -- for Doc and the pretty printing f
 import           Theory.Constraint.System   
 import           Theory.Model
 
---Removeme
-import Debug.Trace
 
 -------------------------------------------------------------------------------------------------
 -- Data structure for JSON graphs                                                              --
