@@ -1050,12 +1050,12 @@ proveSystemDFS exportGoals proofStrategy heuristic tactics ctxt d sys skipList =
       CollectAndRestart _ -> collectAndRestartProveSystemDFS exportGoals skipList
 
 
-exportGoalsForTactic :: Bool -> Int -> Maybe Goal -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)) -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System))
-exportGoalsForTactic exportGoals depth g checkForLoop = case g of
-    Nothing -> checkForLoop
+exportGoalsForTactic :: Bool -> Int -> Maybe Goal -> Proof (Maybe System) -> Proof (Maybe System)-- -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)) -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System))
+exportGoalsForTactic exportGoals depth g proof = case g of
+    Nothing -> proof -- checkForLoop
     Just goal -> if exportGoals
-      then trace ("---"++show depth++"---"++show (cleanGoal goal)) checkForLoop
-      else checkForLoop
+      then trace ("---"++show depth++"---"++show (cleanGoal goal)) proof
+      else proof
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
@@ -1084,7 +1084,7 @@ escapeProveSystemDFS exportGoals heuristic tactics ctxt = --error "escapeProveSy
         checkForLoop :: [(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)
         checkForLoop [] (method0, (cases0, _expl0)) = node method0 cases0 --exportGoals generatedTactic method0 cases0
         checkForLoop ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) = case method of
-            InLoop (_,_,g) -> (exportGoalsForTactic exportGoals depth g checkForLoop) suite (method0, (cases0, _expl0))
+            InLoop (_,_,g) -> exportGoalsForTactic exportGoals depth g $ checkForLoop suite (method0, (cases0, _expl0))
             _ -> node method cases
 
         node method cases = LNode (ProofStep method [](Just sys)) (M.map (prove (succ depth)) cases)
@@ -1112,8 +1112,8 @@ probabilisticProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
             InLoop (d,iteration,goal) -> 
               let (chosenLoop,newSeed) = chooseLoop seed d iteration (length $ sPathGoals sys) in
                 if chosenLoop
-                  then node (InLoop (d,iteration,goal)) (M.map (applyIteration d newSeed) cases) sys
-                  else checkForLoop newSeed suite (method0, cases0)
+                  then exportGoalsForTactic exportGoals depth goal $ node (InLoop (d,iteration,goal)) (M.map (applyIteration d newSeed) cases) sys
+                  else exportGoalsForTactic exportGoals depth goal (checkForLoop newSeed suite (method0, cases0))
             _ -> node method (snd $ M.mapAccum (\g sys -> let (g1,g2) = split g in  (g1, changeSeed g2 sys)) seed cases) sys
 
         chooseLoop :: StdGen -> Int -> Int -> Int -> (Bool,StdGen)
@@ -1155,7 +1155,7 @@ backtrackProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
         where
           explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> Proof (Maybe System)
           explore [] (method0, cases0) igG = node method0 cases0 (depth:igG) 
-          explore ((InLoop (n,i,g), (cases, _expl)):_) _ igG =
+          explore ((InLoop (n,i,g), (cases, _expl)):_) _ igG = exportGoalsForTactic exportGoals depth g $
               if (depth-n) `elem` igG
                 then node (InLoop (n,i,g)) cases igG 
                 else node (InLoop (n,i,g)) M.empty igG --else 
@@ -1206,7 +1206,7 @@ backAndAvoidProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
         where
           explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> [Maybe Goal] -> Proof (Maybe System)
           explore [] (method0, cases0) igG _blacklist = node method0 cases0 (depth:igG) _blacklist
-          explore ((InLoop (n,it,g), (cases, _expl)):_) _ igG _blacklist = 
+          explore ((InLoop (n,it,g), (cases, _expl)):_) _ igG _blacklist = exportGoalsForTactic exportGoals depth g $
               if (depth-n) `elem` igG 
                 then node (InLoop (n,it,g)) cases igG _blacklist
                 else node (InLoop (n,it,g)) M.empty igG (fmap cleanGoal g:_blacklist)
@@ -1274,10 +1274,13 @@ collectAndRestartProveSystemDFS exportGoals skipList0 heuristic tactics ctxt d0 
           where
               (propagMethod, cs, skipL) = propagatedMethod cases0 method0 
         checkForLoop s ((method, (cases, _expl)):suite) (method0, (cases0, _expl0)) =
-            if (cleanGoal <$> extractGoal method) `elem` s
-              then checkForLoop s suite (method0, (cases0, _expl0))  
+            if goal `elem` s
+              then case method of
+                InLoop _ -> exportGoalsForTactic exportGoals depth goal $ checkForLoop s suite (method0, (cases0, _expl0))
+                _              ->  checkForLoop s suite (method0, (cases0, _expl0))
               else node skipL propagMethod cs 
             where
+              goal = cleanGoal <$> extractGoal method
               (propagMethod, cs, skipL) = propagatedMethod cases method 
 
         node skipList methodOrigin cases = if cases == M.empty  
@@ -1300,9 +1303,9 @@ collectAndRestartProveSystemDFS exportGoals skipList0 heuristic tactics ctxt d0 
 
         extractGoal :: ProofMethod -> Maybe Goal
         extractGoal method = case method of
-            InLoop (_, _, goal)   -> goal
-            Incorrect (_,_,goal,_)  -> goal
-            SolveGoal goal        -> Just goal
+            InLoop (_, _, goal)    -> goal
+            Incorrect (_,_,goal,_) -> goal
+            SolveGoal goal         -> Just goal
             _ -> Nothing
         
         extractBadDepth :: ProofMethod -> Int
