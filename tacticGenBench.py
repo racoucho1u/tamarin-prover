@@ -5,7 +5,7 @@ def generateInputFile(filename, diff, lemmaFile, diir, benchmarkcase, constructe
 	inputs = []
 	lemmas = []
 
-	fi = f"../../files_to_benchmark/input_lemmas_tacticGen/{lemmaFile}"
+	fi = f"files_to_benchmark/input_lemmas_tacticGen/{lemmaFile}"
 	# fi = f"files_to_benchmark/input_lemmas_tacticGen/{lemmaFile}"
 
 	with open(fi) as f:
@@ -24,12 +24,12 @@ def generateInputFile(filename, diff, lemmaFile, diir, benchmarkcase, constructe
 if __name__ == "__main__":
 
     benchmarkCase = "tacticGeneration/tamarin-prover"
-    file = "../../files_to_benchmark/input_lemmas_tacticGen.txt"
-    constructedInput = "../../files_to_benchmark/currentLemmaInput"
-    log = "../../files_to_benchmark/log"
     # file = "files_to_benchmark/input_lemmas_tacticGen.txt"
     # constructedInput = "files_to_benchmark/currentLemmaInput"
     # log = "files_to_benchmark/log"
+    file = "files_to_benchmark/input_lemmas_tacticGen.txt"
+    constructedInput = "files_to_benchmark/currentLemmaInput"
+    log = "files_to_benchmark/log"
 
     parallel_input=[]
     with open(file) as f:
@@ -47,11 +47,10 @@ if __name__ == "__main__":
                 for i in inputs:
                     diff = False
                     filename,setDiff,lemma,caseStudy,benchmarkCase,log = i
-                    theoryfile = f"../../files_to_benchmark/{caseStudy}/{filename}"
+                    theoryfile = f"files_to_benchmark/{caseStudy}/{filename}"
                     # theoryfile = f"files_to_benchmark/{caseStudy}/{filename}"
                     if setDiff == "TRUE":
                         diff = True
-                    print(diff)
                     parallel_input.append([theoryfile,lemma,f"diff={diff}"])
                     # print(theoryfile,lemma,bool(setDiff))
     mf.parallelProving(parallel_input,6)
