@@ -1050,12 +1050,12 @@ proveSystemDFS exportGoals proofStrategy heuristic tactics ctxt d sys skipList =
       CollectAndRestart _ -> collectAndRestartProveSystemDFS exportGoals skipList
 
 
-exportGoalsForTactic :: Bool -> Int -> Maybe Goal -> Proof (Maybe System) -> Proof (Maybe System)-- -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)) -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System))
-exportGoalsForTactic exportGoals depth g proof = case g of
-    Nothing -> proof -- checkForLoop
-    Just goal -> if exportGoals
-      then trace ("---"++show depth++"---"++show (cleanGoal goal)) proof
-      else proof
+exportGoalsForTactic :: Bool -> Int -> Maybe Goal -> a -> a-- -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System)) -> ([(ProofMethod, (M.Map CaseName System, String))] -> (ProofMethod, (M.Map CaseName System, String)) -> Proof (Maybe System))
+exportGoalsForTactic exportGoals depth g returnValue = if not exportGoals 
+    then returnValue 
+    else case g of
+    Nothing -> returnValue -- checkForLoop
+    Just goal -> trace ("---"++show depth++"---"++show (cleanGoal goal)) returnValue
 
 -- | @proveSystemDFS rules se@ explores all solutions of the initial
 -- constraint system using a depth-first-search strategy to resolve the
@@ -1155,7 +1155,7 @@ backtrackProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
         where
           explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> Proof (Maybe System)
           explore [] (method0, cases0) igG = node method0 cases0 (depth:igG) 
-          explore ((InLoop (n,i,g), (cases, _expl)):_) _ igG = exportGoalsForTactic exportGoals depth g $
+          explore ((InLoop (n,i,g), (cases, _expl)):_) _ igG = 
               if (depth-n) `elem` igG
                 then node (InLoop (n,i,g)) cases igG 
                 else node (InLoop (n,i,g)) M.empty igG --else 
@@ -1180,8 +1180,8 @@ backtrackProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
               propagatingMethod :: ProofMethod -> [(CaseName,System)] -> ProofMethod
               propagatingMethod method [] = method
               propagatingMethod method ((_,_sys):t) = case prove (succ depth) ignoreGoals _sys  of
-                  (LNode (ProofStep (InLoop (s,i,g)) _ _ ) _) -> InLoop (s,i,g)
-                  (LNode _ _)                           -> propagatingMethod method t
+                  (LNode (ProofStep (InLoop (s,i,g)) _ _ ) _) -> exportGoalsForTactic exportGoals depth g $ InLoop (s,i,g)
+                  (LNode ps _)                           -> propagatingMethod method t
 
           extractGoal method = case method of
             InLoop (_,_, goal) -> goal
@@ -1192,7 +1192,7 @@ backtrackProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
           node methodOrigin casesOrigin igG = nodule
                   where
                     successors = M.map (prove (succ depth) igG) casesOrigin
-                    nodule = LNode (ProofStep methodOrigin [](Just sys)) successors
+                    nodule = LNode (ProofStep methodOrigin [] (Just sys)) successors
 
 backAndAvoidProveSystemDFS :: Bool -> Heuristic ProofContext -> [Tactic ProofContext] -> ProofContext -> Int -> System -> Proof (Maybe System)
 backAndAvoidProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
