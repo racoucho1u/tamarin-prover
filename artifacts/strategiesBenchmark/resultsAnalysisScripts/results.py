@@ -232,7 +232,7 @@ def compareN(dirname,onlyTarget,noExists,consType,label,indexes):
         # print(f"{strt[k]} total time: {round(totTime[k],2)}")
         rtotTime.append(str(round(totTime[k],2)))
 
-    with open(f"tables/{dirname}/table3_timecomp",'a') as f:
+    with open(f"results/{dirname}/table3_timecomp",'a') as f:
         f.write(f"{label}\n")
         f.write("\\textbf{Only} & "+" & ".join(list(map(str,only)))+"\\\\\n")
         f.write("\\textbf{Faster} & "+" & ".join(list(map(str,timeComp)))+"\\\\\n")

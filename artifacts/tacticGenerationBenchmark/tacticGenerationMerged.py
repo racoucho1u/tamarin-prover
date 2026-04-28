@@ -52,6 +52,7 @@ def prove_with_tactic(q,filename,fileUpdated,lemma_name,macro,strategy,heuristic
     if diff != False:
         diffFlag = "--diff"
     out, err = tamarin_wrapper_call([fileUpdated, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"],timeout)
+    tacticFile = fileUpdated
     if err:
         print(
             "Sanity check failed for: "
@@ -159,7 +160,7 @@ def parallelInput(inputs,q):
     strategy = inputs[3]
     bound= inputs[4]
     heuristic= inputs[5]
-    timeout= inputs[6]
+    timeout= 10 #inputs[6]
     diff= inputs[7]
 
     splitLemma = lemma.split(" ")
