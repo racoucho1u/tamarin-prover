@@ -1,5 +1,7 @@
 import re
-import manipulateFile as mf
+import tacticGenerationMerged as mf
+import argparse
+import os
 
 def generateInputFile(filename, diff, lemmaFile, diir, benchmarkcase, constructedInput,log):
 	inputs = []
@@ -22,6 +24,13 @@ def generateInputFile(filename, diff, lemmaFile, diir, benchmarkcase, constructe
 	return(inputs)
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(
+        description="Benchmark for tactic generation"
+    )
+    parser.add_argument("--strategy",type=str, default="Escape", help="strategy to use for the proof attempt")
+    args = parser.parse_args()
+    strategy = args.strategy
 
     benchmarkCase = "tacticGeneration/tamarin-prover"
     # file = "files_to_benchmark/input_lemmas_tacticGen.txt"
@@ -51,8 +60,18 @@ if __name__ == "__main__":
                     # theoryfile = f"files_to_benchmark/{caseStudy}/{filename}"
                     if setDiff == "TRUE":
                         diff = True
-                    parallel_input.append([theoryfile,lemma,f"diff={diff}"])
+                    parallel_input.append([theoryfile,lemma,"",strategy,3,"s",6000,diff])
                     # print(theoryfile,lemma,bool(setDiff))
+
+    if not os.path.isdir('tacticGeneration'):
+        os.mkdir('tacticGeneration')
+    if not os.path.isdir('tacticGeneration/results'):
+        os.mkdir('tacticGeneration/results')
+    if not os.path.isdir('tacticGeneration/tacticBatch'):
+        os.mkdir('tacticGeneration/tacticBatch')
+    if not os.path.isdir('tacticGeneration/generatedTactics'):
+        os.mkdir('tacticGeneration/generatedTactics')
+
     mf.parallelProving(parallel_input,6)
                     # mf.proveUntil(theoryfile,lemma,diff=bool(setDiff))
 				

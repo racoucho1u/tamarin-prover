@@ -51,14 +51,6 @@ def prove_with_tactic(q,filename,lemma_name,macro,strategy,heuristic,tactic_nb,d
     diffFlag = ""
     if diff != False:
         diffFlag = "--diff"
-    if not os.path.isdir('tacticGeneration'):
-        os.mkdir('tacticGeneration')
-    if not os.path.isdir('tacticGeneration/results'):
-        os.mkdir('tacticGeneration/results')
-    if not os.path.isdir('tacticGeneration/tacticBatch'):
-        os.mkdir('tacticGeneration/tacticBatch')
-    if not os.path.isdir('tacticGeneration/generatedTactics'):
-        os.mkdir('tacticGeneration/generatedTactics')
     out, err = tamarin_wrapper_call([filename, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"],timeout)
     if err:
         print(
@@ -243,5 +235,14 @@ if __name__ == '__main__':
 
     if macro != "":
         macro = "-D"+macro
+
+    if not os.path.isdir('tacticGeneration'):
+        os.mkdir('tacticGeneration')
+    if not os.path.isdir('tacticGeneration/results'):
+        os.mkdir('tacticGeneration/results')
+    if not os.path.isdir('tacticGeneration/tacticBatch'):
+        os.mkdir('tacticGeneration/tacticBatch')
+    if not os.path.isdir('tacticGeneration/generatedTactics'):
+        os.mkdir('tacticGeneration/generatedTactics')
     
     parallelProving([[file_path, lemma, macro, strategy, bound, heuristic, timeout, diff]])
