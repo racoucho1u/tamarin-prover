@@ -1,0 +1,9 @@
+executable
+bank_accepts
+auth_to_terminal_minimal
+auth_to_terminal
+auth_to_bank_minimal
+auth_to_bank
+secrecy_MK
+secrecy_PIN
+secrecy_PAN

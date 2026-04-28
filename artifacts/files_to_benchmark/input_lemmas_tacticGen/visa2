@@ -1,0 +1,8 @@
+executable
+bank_accepts
+auth_to_terminal_minimal
+auth_to_bank_minimal
+secrecy_MK
+secrecy_privkCard
+secrecy_PIN
+secrecy_PAN
