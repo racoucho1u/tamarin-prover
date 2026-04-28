@@ -1,6 +1,17 @@
 This folder contains the pythons scripts necessary to reproduce the experiences described in the paper "Adaptive Proof Strategies for Protocol Verification in Tamarin". Since the benchmarks are very long to run and the results files are too heavy to be stored on a git, provide a file data.json that contains the data extracted from our results, before analysis.
 
-## Strategies benchmark.
+TODO: installation tamarin and compiler
+TODO: introducing data.json
+
+## Experimenting with the tools
+
+#### Tamarin strategies
+TODO options possibles et commandes associées
+
+#### Tactic generation
+Ou prendre le script + quelles options lui donner
+
+## Strategies benchmark (strategiesBenchmark folder)
 
 #### Running the benchmarks
 Running the strategies benchmark requires the tool `batch-tamarin`. It can be installed with the following command `pip3 install batch-tamarin`.
@@ -18,3 +29,13 @@ To analyse the results of these benchmark (and generate the graph and table pres
 First, run `python3 analyseResultsBatchTamarinMergedVersion.py [path to results folder]\execution_report.json`.
 And then `python3 results.py [path to results folder]\execution_report_extracted.json`
 Results are generated in a strategiesBenchmark/resultsAnalysisScripts/results subfolder.
+
+## Tactic generation benchmark (tacticGenerationBenchmark folder)
+
+#### Running the benchmark
+To run the tactic generation benchmark as presented in the paper, run the command `python3 tacticGenBench.py` in the tacticGenerationBenchmark folder. The results will be stored under the tacticGeneration/results folder. The script results give a textual summary of the lemmas proved (or failed) by the benchmark while the other files store the proofs and attack traces that have been reached for each lemma.
+
+#### Analysing the results
+
+To analyse the results, go in the resultsAnalysis folder and run `python3 results.py`. It will use the data.json file present (discussed above) in the folder to generate the tables and graphs shown in the paper. 
+
