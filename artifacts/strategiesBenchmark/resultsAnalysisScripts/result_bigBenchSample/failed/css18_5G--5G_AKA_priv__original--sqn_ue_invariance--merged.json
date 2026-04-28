@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_priv__original--sqn_ue_invariance--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 4051.480204343796,
+    "avg_memory": 19187.62631362369,
+    "peak_memory": 41177.13671875
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

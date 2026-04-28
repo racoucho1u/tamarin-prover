@@ -1,0 +1,25 @@
+{
+  "task_id": "jcs19_xor--LAK06_state_xor__collectAndRestart--helpingUpdateKey--merged",
+  "warnings": [],
+  "tamarin_timing": 10.29,
+  "wrapper_measures": {
+    "time": 10.434325695037842,
+    "avg_memory": 66.56782670454547,
+    "peak_memory": 85.1328125
+  },
+  "output_spthy": "result_bigBenchSample_28-04-26_09-43-52/proofs/jcs19_xor--LAK06_state_xor__collectAndRestart--helpingUpdateKey--merged.spthy",
+  "verified_lemma": {
+    "helpingUpdateKey": {
+      "steps": 28,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helpingStackHash",
+    "helpingSecrecy",
+    "executable",
+    "noninjectiveagreementTAG",
+    "noninjectiveagreementREADER"
+  ]
+}

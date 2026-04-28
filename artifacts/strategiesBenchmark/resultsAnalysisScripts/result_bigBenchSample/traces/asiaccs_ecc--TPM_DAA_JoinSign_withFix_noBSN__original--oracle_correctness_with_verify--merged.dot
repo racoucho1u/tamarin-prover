@@ -1,0 +1,445 @@
+digraph "trace_TPM_DAA_JoinSign_withFix_NoBSN_SL2-AS0-CL0-A1-C1-NB_oracle_correctness_with_verify-TPM_INIT-Host_Init-Issuer_Init-TPM_INIT-TPM_INIT-Host_Store_EK-Host_Store_DAA_Key-Host_Store_DAA_Key-TPM_INIT-TPM2_CreatePrimary-Issuer_Init-Host_Passthrough_1-Host_ReceiveCurlyK-Host_ReceiveEAndCV-TPM2_Hash-TPM2_Create-TPM2_Commit-ChanIn_S-Host_Receive_P_TPM_TKT-Host_ReceiveCurlyK-Issuer_Check_EK_Send_Challenge-Issuer_Init-Issuer_Init-Host_ReceiveEAndCV-TPM_INIT-TPM2_CreatePrimary-Issuer_Init-Host_Passthrough_2-Host_JoinComplete-Host_Randomise_Credentials-TPM2_Create-Host_Process_Credentials-TPM2_Commit_2-Host_Generate_Message_for_Signing-TPM2_Create-TPM2_Hash_2-ChanIn_S-Host_Receive_C_TPM_TKT-Host_Generate_Message_for_Signing-Issuer_Init-Issuer_Check_EK_Send_Challenge-Host_Receive_Signature_P_TPM-Host_Receive_Signature_P_TPM-Host_Receive_Signature_P_TPM-Issuer_Verify_Challenge_Issue_Credentials-Issuer_Verify_Challenge_Issue_Credentials-ChanIn_S-ChanIn_S-ChanIn_S_case_1-ChanIn_S-ChanIn_S_case_1-Issuer_Check_EK_Send_Challenge-ChanIn_S-ChanIn_S_case_1-ChanIn_S_case_2-ChanIn_S_case_1-ChanIn_S_case_2-ChanIn_S_case_1-ChanIn_S_case_1-Issuer_Verify_Challenge_Issue_Credentials-ChanIn_S-ChanIn_S_case_1-ChanIn_S-ChanIn_S_case_1-ChanIn_S-ChanIn_S_case_1-c_BSN-Host_Store_DAA_Key-Host_Store_DAA_Key-Host_Receive_Signature_P_TPM-Host_Receive_Signature_C_TPM-Host_Receive_Signature_C_TPM-Host_Receive_Signature_C_TPM-Host_Receive_Signature_C_TPM-Host_Receive_Signature_C_TPM-Host_Receive_Signature_C_TPM-Host_Receive_Signature_C_TPM-Host_Receive_Signature_C_TPM-Issuer_Check_EK_Send_Challenge-Issuer_Check_EK_Send_Challenge-Issuer_Verify_Challenge_Issue_Credentials-Issuer_Verify_Challenge_Issue_Credentials" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n7[shape="record",label="{{<n0> Fr( ~x )|<n1> Fr( ~y )}|{<n2> #t01 : Issuer_Init[Issuer_Init( 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Issuer_Init' )]\l}|{<n3> !Ltk( 'Issuer', ~x,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~y\l)\l|<n4> !Pk( 'Issuer', PK2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK3\l)\l|<n5> Out( \<PK2, PK3\> )|<n6> !Issuer_Initialised( 'Issuer'\l)\l}}",fillcolor="#d5d897",style="filled",fontcolor="black",role="Undefined"];
+n10[shape="record",label="{{<n8> #t02 : Host_Init[Host_Init( $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_Init' )]\l}|{<n9> Host_Initialised( $AS )}}",fillcolor="#d4d897",style="filled",fontcolor="black",role="Undefined"];
+n17[shape="record",label="{{<n11> Fr( TP3 )|<n12> Fr( TP2 )}|{<n13> #t03 : TPM_INIT[TPM_Init( $PS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'TPM_INIT' )]\l}|{<n14> !TPM_AES_Key( $PS, KD4 )|<n15> TPM_EK_SEED( $PS, TP2 )|<n16> TPM_Initialised( $PS )}}",fillcolor="#d3d897",style="filled",fontcolor="black",role="Undefined"];
+n25[shape="record",label="{{<n18> TPM_Initialised( $PS )|<n19> Host_Initialised( $AS )|<n20> !Issuer_Initialised( 'Issuer' )}|{<n21> #t04 : Platform_Setup[Bind( $PS, $AS, 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Platform_Setup' )]\l}|{<n22> Out_S( $AS, $PS, CR1 )|<n23> !F_Paired( $AS, $PS )|<n24> !F_Paired( $PS, $AS )}}",fillcolor="#d2d897",style="filled",fontcolor="black",role="Undefined"];
+n32[shape="record",label="{{<n26> In_S( $AS, $PS, CR1 )|<n27> TPM_EK_SEED( $PS, TP2 )}|{<n28> #t05 : TPM2_CreatePrimary[TPM2_EK_Created( $PS, $AS, PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'TPM2_CreatePrimary' )]\l}|{<n29> Out_S( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<\<'EK_public_data', PK1\>, RE3\>\l)\l|<n30> !TPM_ENDORSEMENT_SK( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KD1, PK1\l)\l|<n31> !TPM_ENDORSEMENT_PK( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EK_public_data', PK1\>\l)\l}}",fillcolor="#d2d897",style="filled",fontcolor="black",role="Undefined"];
+n37[shape="record",label="{{<n33> In_S( $PS, $AS, \<\<'EK_public_data', PK1\>, RE3\> )}|{<n34> #t06 : Host_Store_EK[Store_EK( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_Store_EK' )]\l}|{<n35> Out_S( $AS, $PS, \<PK1, CR2\> )|<n36> Host_State_01( $PS, $AS, PK1 )}}",fillcolor="#d1d897",style="filled",fontcolor="black",role="Undefined"];
+n44[shape="record",label="{{<n38> In_S( $AS, $PS, \<PK1, CR2\> )|<n39> !TPM_AES_Key( $PS, KD4 )|<n40> Fr( ~f )}|{<n41> #t07 : TPM2_Create[TPM2_DAA_Created( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DeriveDAAKey( $PS, $AS, PK1, ~f ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'TPM2_Create' )]\l}|{<n42> Out_S( $PS, $AS, \<SE3, \<DA1, MU7\>, 'returnDAAKey'\> )|<n43> !TPM_DAA_SK( $PS, PK1, ~f )}}",fillcolor="#d0d897",style="filled",fontcolor="black",role="Undefined"];
+n51[shape="record",label="{{<n45> In_S( $PS, $AS, \<SE3, \<DA1, MU7\>, 'returnDAAKey'\> )|<n46> Host_State_01( $PS, $AS, PK1\l)\l}|{<n47> #t08 : Host_Store_DAA_Key[Store_DAA( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PlatformSendKeys( $PS, $AS, PK1, \<DA1, MU7\>, 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alive( $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Role( PL4 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( $PS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_Store_DAA_Key' )]\l}|{<n48> !EK_FOR_ISSUER( PK1\l)\l|<n49> Out( \<PK1, \<DA1, MU7\>, JO1\> )|<n50> Host_State_02( $PS, $AS, PK1, \<DA1, MU7\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SE3\l)\l}}",fillcolor="#d0d897",style="filled",fontcolor="black",role="Undefined"];
+n59[shape="record",label="{{<n52> In( \<PK1, \<DA1, MU7\>, JO1\> )|<n53> Fr( ~K_1 )|<n54> Fr( ~s )|<n55> !EK_FOR_ISSUER( PK1 )}|{<n56> #t09 : Issuer_Check_EK_Send_Challenge[Check_Ek( PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check_QPD( \<DA1, MU7\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Associate( CU1, PK1, \<DA1, MU7\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alive( 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IssuerReceivedKeys( 'Issuer', PK1, \<DA1, MU7\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Issuer_Check_EK_Send_Challenge' )]\l}|{<n57> Out( \<MA1, LE2, SE2, AE1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Host_SendChallenge'\>\l)\l|<n58> Issuer_State_01( 'Issuer', CU1, PK1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<DA1, MU7\>\l)\l}}",fillcolor="#cfd897",style="filled",fontcolor="black",role="Undefined"];
+n65[shape="record",label="{{<n60> In( \<MA1, LE2, SE2, AE1, 'Host_SendChallenge'\l&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l|<n61> Host_State_02( $PS, $AS, PK1, \<DA1, MU7\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SE3\l)\l}|{<n62> #t10 : Host_Passthrough_1[Passthrough_ActivateCred( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_Passthrough' )]\l}|{<n63> Out_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA1, LE2, SE2, AE1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'TPM2_ActivateCredentials'\>\l)\l|<n64> Host_State_03( $PS, $AS, PK1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<DA1, MU7\>, SE3\l)\l}}",fillcolor="#ced897",style="filled",fontcolor="black",role="Undefined"];
+n71[shape="record",label="{{<n66> In_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA1, LE2, SE2, AE1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'TPM2_ActivateCredentials'\>\l)\l|<n67> !TPM_AES_Key( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KD4\l)\l|<n68> !TPM_ENDORSEMENT_SK( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KD1, PK1\l)\l}|{<n69> #t11 : TPM2_ActivateCredential[Eq( MA1, MA1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( KD2, KD2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CurlyK_recomputed( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'TPM2_ActivateCredential' )]\l}|{<n70> Out_S( $PS, $AS, \<CU1, RE2\> )}}",fillcolor="#ced997",style="filled",fontcolor="black",role="Undefined"];
+n79[shape="record",label="{{<n72> In_S( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<CU1, RE2\>\l)\l|<n73> !Pk( 'Issuer', PK2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK3\l)\l|<n74> Host_State_03( $PS, $AS, PK1, \<DA1, MU7\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SE3\l)\l}|{<n75> #t12 : Host_ReceiveCurlyK[Received_CurlyK( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_ReceiveCurlyK' )]\l}|{<n76> Out_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<BS1, BS1, BS1, 'TPM2_Commit'\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l|<n77> Host_CurlyK1( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$AS, PK1, CU1\l)\l|<n78> Host_State_04( $PS, $AS, PK1, \<DA1, MU7\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SE3, \<PK2, PK3, CU1, PK1\>\l)\l}}",fillcolor="#cdd998",style="filled",fontcolor="black",role="Undefined"];
+n86[shape="record",label="{{<n80> In_S( $AS, $PS, \<BS1, BS1, BS1, 'TPM2_Commit'\> )|<n81> Fr( ~cv )|<n82> Fr( ~r_cv )}|{<n83> #t13 : TPM2_Commit[TPM2_Commited( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'TPM2_Commit' )]\l}|{<n84> Out_S( $PS, $AS, \<E1, NO4, 'retTPM2_commit'\> )|<n85> TPM_CV_E( $PS, NO4, ~r_cv )}}",fillcolor="#ccd998",style="filled",fontcolor="black",role="Undefined"];
+n93[shape="record",label="{{<n87> In_S( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<E1, NO4, 'retTPM2_commit'\>\l)\l|<n88> Host_State_04( $PS, $AS, PK1, \<DA1, MU7\>, SE3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<PK2, PK3, CU1, PK1\>\l)\l}|{<n89> #t14 : Host_ReceiveEAndCV[Host_Created_p( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_ReceiveEAndCV' )]\l}|{<n90> Out_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<HK4, TP1\>\l)\l|<n91> Host_cv( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO4\l)\l|<n92> Host_State_05( $PS, $AS, PK1, \<DA1, MU7\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SE3\l)\l}}",fillcolor="#ccd998",style="filled",fontcolor="black",role="Undefined"];
+n99[shape="record",label="{{<n94> In_S( $AS, $PS, \<HK4, TP1\> )|<n95> Fr( ~tkt )}|{<n96> #t15 : TPM2_Hash[TPM2_Created_P_TPM( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( TP1 )]\l}|{<n97> Out_S( $PS, $AS, \<HK2, NO6, 'ret_TPM2_Hash'\> )|<n98> TPM_tkt( $PS, NO6 )}}",fillcolor="#cbd998",style="filled",fontcolor="black",role="Undefined"];
+n105[shape="record",label="{{<n100> In_S( $PS, $AS, \<HK2, NO6, 'ret_TPM2_Hash'\> )|<n101> Host_cv( $PS, $AS, NO4 )}|{<n102> #t16 : Host_Receive_P_TPM_TKT[Host_Received_P_TPM( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_Receive_P_TPM_TKT' )]\l}|{<n103> Out_S( $AS, $PS, \<HK2, NO6, NO4, 'TPM2_Sign'\> )|<n104> Host_Store_P_TPM( $AS, HK2 )}}",fillcolor="#cad998",style="filled",fontcolor="black",role="Undefined"];
+n113[shape="record",label="{{<n106> In_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<HK2, NO6, NO4, 'TPM2_Sign'\>\l)\l|<n107> TPM_tkt( $PS, NO6 )|<n108> !TPM_DAA_SK( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK1, ~f\l)\l|<n109> TPM_CV_E( $PS, NO4,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~r_cv\l)\l|<n110> Fr( ~n_J )}|{<n111> #t17 : TPM2_Sign[TPM2_Signed_P_TPM( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( NO4, NO4 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( NO6, NO6 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'TPM2_Sign' )]\l}|{<n112> Out_S( $PS, $AS, \<NO2, PL3, 'ret_TPM2_Sign'\> )}}",fillcolor="#c9d998",style="filled",fontcolor="black",role="Undefined"];
+n119[shape="record",label="{{<n114> In_S( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<NO2, PL3, 'ret_TPM2_Sign'\>\l)\l|<n115> Host_Store_P_TPM( $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HK2\l)\l|<n116> Host_CurlyK1( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK1, CU1\l)\l}|{<n117> #t18 : Host_Receive_Signature_P_TPM[Host_Received_Signed_P_TPM( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( PK1, 'Issuer', CU1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alive( $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Role( PL4 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_Receive_Signature_P_TPM' )]\l}|{<n118> Out( \<CU1, NO2, HN1, PL3, IS1\> )}}",fillcolor="#c9d998",style="filled",fontcolor="black",role="Undefined"];
+n130[shape="record",label="{{<n120> In( \<CU1, NO2, HN1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PL3, IS1\>\l)\l|<n121> Issuer_State_01( 'Issuer',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CU1, PK1, \<DA1, MU7\>\l)\l|<n122> !Pk( 'Issuer', PK2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK3\l)\l|<n123> !Ltk( 'Issuer', ~x,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~y\l)\l|<n124> Fr( ~r )|<n125> Fr( ~l )|<n126> Fr( ~s_2 )|<n127> Fr( ~K_2 )}|{<n128> #t19 : Issuer_Verify_Challenge_Issue_Credentials[Eq( CU1, CU1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( HN1, HN1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( 'Issuer', PK1, CU1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( 'Issuer', PK1, \<MU8, MU5, PL1, MU4\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alive( 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Issuer_VerifyChallengeIssueCredentials( 'Issuer', PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Issuer_Verify_Challenge' )]\l}|{<n129> Out( \<MA2, LE1, SE4, AE2, SE1, 'Host_CompleteJoin'\> )}}",fillcolor="#c8d998",style="filled",fontcolor="black",role="Undefined"];
+n136[shape="record",label="{{<n131> In( \<MA2, LE1, SE4, AE2, SE1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'Host_CompleteJoin'\>\l)\l|<n132> Host_State_05( $PS, $AS, PK1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<DA1, MU7\>, SE3\l)\l}|{<n133> #t20 : Host_Passthrough_2[Passthrough_ActivateCred2( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_Passthrough_2' )]\l}|{<n134> Out_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA2, LE1, SE4, AE2, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'TPM2_ActivateCredentials_2'\>\l)\l|<n135> Host_State_06( $PS, $AS, PK1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<DA1, MU7\>, SE1\l)\l}}",fillcolor="#c7d998",style="filled",fontcolor="black",role="Undefined"];
+n142[shape="record",label="{{<n137> In_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA2, LE1, SE4, AE2, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'TPM2_ActivateCredentials_2'\>\l)\l|<n138> !TPM_AES_Key( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KD4\l)\l|<n139> !TPM_ENDORSEMENT_SK( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KD1, PK1\l)\l}|{<n140> #t21 : TPM2_ActivateCredential_2[Eq( MA2, MA2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( KD3, KD3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CurlyK2_recomputed( $PS, $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'TPM2_ActivateCredential_2' )]\l}|{<n141> Out_S( $PS, $AS, \<CU2, RE1\> )}}",fillcolor="#c7d998",style="filled",fontcolor="black",role="Undefined"];
+n150[shape="record",label="{{<n143> In_S( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<CU2, RE1\>\l)\l|<n144> !Pk( 'Issuer', PK2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK3\l)\l|<n145> Host_State_06( $PS, $AS, PK1, \<DA1, MU7\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SE1\l)\l}|{<n146> #t22 : Host_JoinComplete[Eq( CU2, CU2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( HN3, HN3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( accept, accept ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( accept, accept ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;JoinCompleted( $PS, $AS, PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( PK1, 'Issuer', \<MU8, MU5, PL1, MU4\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Role( PL4 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Secret( PK1, 'Issuer', \<MU8, MU5, PL1, MU4\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( $PS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( 'Issuer' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( 'Host_JoinComplete' )]\l}|{<n147> !Host_State_RNDCreds( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK1, MU8, MU5, PL1, MU4\l)\l|<n148> !Host_Join_Complete( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$AS, PK1\l)\l|<n149> Host_Org_Creds( $PS, $AS, PK1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MU8, MU5, PL1, MU4\l)\l}}",fillcolor="#c6d998",style="filled",fontcolor="black",role="Undefined"];
+n155[shape="record",label="{{<n151> !Host_State_RNDCreds( $PS, $AS, PK1, MU8, MU5, PL1, MU4 )|<n152> Fr( ~l.1 )}|{<n153> #t23 : Host_Randomise_Credentials[RandomisedCredentials( $PS, $AS, PK1 )]}|{<n154> !Host_State_07( $PS, $AS, PK1, multp(~l.1, MU8), multp(~l.1, MU5), multp(~l.1, PL1),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;multp(~l.1, MU4)\l)\l}}",fillcolor="#bcdb99",style="filled",fontcolor="black",role="Undefined"];
+n161[shape="record",label="{{<n156> !Host_State_07( $PS, $AS, PK1, MU6, MU3, MU1, MU2 )}|{<n157> #t24 : Host_Process_Credentials[ProcessRandomisedCredentials( $PS, $AS, PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SignOnlyOnce( 'Host_Randomise_Credentials' )]\l}|{<n158> Out_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<BS1, BS1, MU3, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'TPM2_Commit_rand'\>\l)\l|<n159> Host_State_08( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK1, BS1, MU6, MU3, MU1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MU2\l)\l|<n160> Host_Rnd_Creds( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK1, BS1, MU6, MU3, MU1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MU2\l)\l}}",fillcolor="#c5da98",style="filled",fontcolor="black",role="Undefined"];
+n169[shape="record",label="{{<n162> In_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<BS1, BS1, MU3, 'TPM2_Commit_rand'\>\l)\l|<n163> !TPM_DAA_SK( $PS, PK1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~f\l)\l|<n164> Fr( ~cv1 )|<n165> Fr( ~r_cv1 )}|{<n166> #t25 : TPM2_Commit_2[TPMCommitRandomised( $PS, $AS, PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SignOnlyOnce( 'TPM2_Commit_2' )]\l}|{<n167> Out_S( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<ES1, NO3, 'ret_TPM2_Commit_rand'\>\l)\l|<n168> TPM_Commit_RCV1( $PS, $AS, PK1, NO3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~r_cv1\l)\l}}",fillcolor="#c4da98",style="filled",fontcolor="black",role="Undefined"];
+n177[shape="record",label="{{<n170> In_S( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<ES1, NO3, 'ret_TPM2_Commit_rand'\>\l)\l|<n171> Fr( ~m )|<n172> Host_State_08( $PS, $AS, PK1, BS1, MU6,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MU3, MU1, MU2\l)\l}|{<n173> #t26 : Host_Generate_Message_for_Signing[GeneratedMessageForSigning( $PS, $AS, PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SignOnlyOnce( 'Host_Generate_Message_for_Signing' )]\l}|{<n174> Out_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<PK1, HK3, NO3, 'TPM2_Hash_2'\>\l)\l|<n175> Host_cv1( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK1, HK3, NO3\l)\l|<n176> Host_State_09( $PS, $AS, PK1, ME1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BS1, MU6, MU3, MU1, MU2, ES1\l)\l}}",fillcolor="#c3da98",style="filled",fontcolor="black",role="Undefined"];
+n184[shape="record",label="{{<n178> In_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<PK1, HK3, NO3, 'TPM2_Hash_2'\>\l)\l|<n179> Fr( ~c_tkt )|<n180> TPM_Commit_RCV1( $PS, $AS, PK1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO3, ~r_cv1\l)\l}|{<n181> #t27 : TPM2_Hash_2[TPM2_Created_C_TPM( $PS, $AS, PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( NO3, NO3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SignOnlyOnce( 'TPM2_Hash_2' )]\l}|{<n182> Out_S( $PS, $AS, \<HK1, NO5, 'ret_TPM2_Hash_2'\> )|<n183> TPM_c_tkt( $PS, $AS, PK1, NO5, ~r_cv1\l)\l}}",fillcolor="#c3da98",style="filled",fontcolor="black",role="Undefined"];
+n190[shape="record",label="{{<n185> In_S( $PS, $AS, \<HK1, NO5, 'ret_TPM2_Hash_2'\> )|<n186> Host_cv1( $PS, $AS, PK1, HK3, NO3 )}|{<n187> #t28 : Host_Receive_C_TPM_TKT[Host_Received_C_TPM( $PS, $AS, PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( HK1, HK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SignOnlyOnce( 'Host_Receive_C_TPM_TKT' )]\l}|{<n188> Out_S( $AS, $PS, \<HK1, NO5, 'TPM2_Sign_2'\> )|<n189> Host_Store_C_TPM( $PS, $AS, PK1, HK1 )}}",fillcolor="#c2da98",style="filled",fontcolor="black",role="Undefined"];
+n197[shape="record",label="{{<n191> In_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<HK1, NO5, 'TPM2_Sign_2'\>\l)\l|<n192> !TPM_DAA_SK( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK1, ~f\l)\l|<n193> TPM_c_tkt( $PS, $AS, PK1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NO5, ~r_cv1\l)\l|<n194> Fr( ~rnd_n_M )}|{<n195> #t29 : TPM2_Sign_2[TPM2_Signed_C_TPM( $PS, $AS, PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( NO5, NO5 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SignOnlyOnce( 'TPM2_Sign_2' )]\l}|{<n196> Out_S( $PS, $AS, \<NO1, PL2, 'ret_TPM2_Sign_2'\> )}}",fillcolor="#c1da98",style="filled",fontcolor="black",role="Undefined"];
+n203[shape="record",label="{{<n198> In_S( $PS, $AS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<NO1, PL2, 'ret_TPM2_Sign_2'\>\l)\l|<n199> Host_Store_C_TPM( $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$AS, PK1, HK1\l)\l|<n200> Host_State_09( $PS, $AS, PK1, ME1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BS1, MU6, MU3, MU1, MU2, ES1\l)\l}|{<n201> #t30 : Host_Receive_Signature_C_TPM[Host_Received_Signed_C_TPM( $PS, $AS, PK1, ME1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Host_Sends_Sigma( $PS, $AS, PK1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<BS1, MU6, MU3, MU1, MU2, HN2, PL2, NO1, ME1, 'TPM_Signature_Of_m'\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Host_Sends_Sigma_cred( $PS, $AS, PK1, MU6, MU3, MU1, MU2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<BS1, MU6, MU3, MU1, MU2, HN2, PL2, NO1, ME1, 'TPM_Signature_Of_m'\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( $PS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( $AS ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( PK1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SignOnlyOnce( 'Host_Receive_Signature_C_TPM' )]\l}|{<n202> Out( \<BS1, MU6, MU3, MU1, MU2, HN2, PL2, NO1, ME1, 'TPM_Signature_Of_m'\> )}}",fillcolor="#c0da98",style="filled",fontcolor="black",role="Undefined"];
+n207[shape="record",label="{{<n204> In( \<BS1, MU6, MU3, MU1, MU2, HN2, PL2, NO1, ME1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'TPM_Signature_Of_m'\>\l)\l|<n205> !Pk( 'Issuer', PK2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PK3\l)\l}|{<n206> #t31 : Verifier_Check_TPM_Message[Eq( accept, accept ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( accept, accept ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( HN2, HN2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VerifiedSignature( $V,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<BS1, MU6, MU3, MU1, MU2, HN2, PL2, NO1, ME1, 'TPM_Signature_Of_m'\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VerifiedSignatureDeAnonymised( \<BS1, MU6, MU3, MU1, MU2, HN2, PL2, NO1, ME1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'TPM_Signature_Of_m'\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~f\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SignOnlyOnce( 'Verifier_Check_TPM_Signature' )]\l}}",fillcolor="#c0da98",style="filled",fontcolor="black",role="Undefined"];
+n208[label="#vk : coerce[!KU( AE1 )]",shape="ellipse"];
+n209[label="#vl : irecv",shape="ellipse"];
+n213[shape="record",label="{{<n210> Sec( $PS, $AS, \<NO2, PL3, 'ret_TPM2_Sign'\> )}|{<n211> #vr : ChanIn_S[ChanIn_S( $PS, $AS, \<NO2, PL3, 'ret_TPM2_Sign'\> )]}|{<n212> In_S( $PS, $AS, \<NO2, PL3, 'ret_TPM2_Sign'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n214[label="#vk.1 : coerce[!KU( CU1 )]",shape="ellipse"];
+n215[label="#vl.1 : irecv",shape="ellipse"];
+n220[shape="record",label="{{<n216> Out_S( $PS, $AS, \<NO2, PL3, 'ret_TPM2_Sign'\> )|<n217> !F_Paired( $PS, $AS )}|{<n218> #vr.1 : ChanOut_S[ChanOut_S( $PS, $AS, \<NO2, PL3, 'ret_TPM2_Sign'\> )]}|{<n219> Sec( $PS, $AS, \<NO2, PL3, 'ret_TPM2_Sign'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n221[label="#vk.2 : coerce[!KU( HN1 )]",shape="ellipse"];
+n222[label="#vl.2 : irecv",shape="ellipse"];
+n227[shape="record",label="{{<n223> !Host_State_RNDCreds( $PS, $AS, PK1, MU8, MU5, PL1, MU4 )|<n224> Fr( ~l.2 )}|{<n225> #vr.2 : Host_Randomise_Credentials[RandomisedCredentials( $PS, $AS, PK1 )]}|{<n226> !Host_State_07( $PS, $AS, PK1, MU6, MU3, MU1, MU2 )}}",fillcolor="#bcdb99",style="filled",fontcolor="black",role="Undefined"];
+n228[label="#vk.3 : coerce[!KU( PL3 )]",shape="ellipse"];
+n229[label="#vl.3 : irecv",shape="ellipse"];
+n233[shape="record",label="{{<n230> Sec( $PS, $AS, \<NO1, PL2, 'ret_TPM2_Sign_2'\> )}|{<n231> #vr.3 : ChanIn_S[ChanIn_S( $PS, $AS, \<NO1, PL2, 'ret_TPM2_Sign_2'\> )]}|{<n232> In_S( $PS, $AS, \<NO1, PL2, 'ret_TPM2_Sign_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n234[label="#vk.4 : coerce[!KU( AE2 )]",shape="ellipse"];
+n235[label="#vl.4 : irecv",shape="ellipse"];
+n240[shape="record",label="{{<n236> Out_S( $PS, $AS, \<NO1, PL2, 'ret_TPM2_Sign_2'\> )|<n237> !F_Paired( $PS, $AS )}|{<n238> #vr.4 : ChanOut_S[ChanOut_S( $PS, $AS, \<NO1, PL2, 'ret_TPM2_Sign_2'\> )]}|{<n239> Sec( $PS, $AS, \<NO1, PL2, 'ret_TPM2_Sign_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n241[label="#vf.5 : isend",shape="ellipse"];
+n242[label="#vk.5 : coerce[!KU( SE1 )]",shape="ellipse"];
+n243[label="#vr.5 : d_0_snd",shape="ellipse"];
+n244[label="#vk.6 : coerce[!KU( LE2 )]",shape="ellipse"];
+n245[label="#vr.6 : d_0_snd",shape="ellipse"];
+n246[label="#vk.7 : coerce[!KU( LE1 )]",shape="ellipse"];
+n247[label="#vr.7 : d_0_snd",shape="ellipse"];
+n248[label="#vf.8 : isend",shape="ellipse"];
+n249[label="#vk.8 : c_BSN[!KU( BS1 )]",shape="ellipse"];
+n250[label="#vk.9 : coerce[!KU( PK1 )]",shape="ellipse"];
+n251[label="#vr.9 : d_0_fst",shape="ellipse"];
+n252[label="#vk.10 : coerce[!KU( MU7 )]",shape="ellipse"];
+n253[label="#vr.10 : d_0_snd",shape="ellipse"];
+n254[label="#vk.11 : coerce[!KU( NO2 )]",shape="ellipse"];
+n255[label="#vr.11 : d_0_snd",shape="ellipse"];
+n256[label="#vk.12 : coerce[!KU( MU6 )]",shape="ellipse"];
+n257[label="#vr.12 : d_0_fst",shape="ellipse"];
+n258[label="#vf.13 : isend",shape="ellipse"];
+n259[label="#vk.13 : coerce[!KU( MU3 )]",shape="ellipse"];
+n260[label="#vr.13 : d_0_snd",shape="ellipse"];
+n261[label="#vk.14 : coerce[!KU( MU1 )]",shape="ellipse"];
+n262[label="#vr.14 : d_0_fst",shape="ellipse"];
+n263[label="#vk.15 : coerce[!KU( MU2 )]",shape="ellipse"];
+n264[label="#vr.15 : d_0_snd",shape="ellipse"];
+n265[label="#vk.16 : coerce[!KU( HN2 )]",shape="ellipse"];
+n266[label="#vr.16 : d_0_snd",shape="ellipse"];
+n267[label="#vk.17 : coerce[!KU( PL2 )]",shape="ellipse"];
+n268[label="#vr.17 : d_0_snd",shape="ellipse"];
+n269[label="#vf.18 : isend",shape="ellipse"];
+n270[label="#vk.18 : coerce[!KU( NO1 )]",shape="ellipse"];
+n271[label="#vk.19 : coerce[!KU( ME1 )]",shape="ellipse"];
+n272[label="#vr.19 : d_0_snd",shape="ellipse"];
+n273[label="#vk.20 : coerce[!KU( MA1 )]",shape="ellipse"];
+n274[label="#vk.21 : coerce[!KU( SE2 )]",shape="ellipse"];
+n278[shape="record",label="{{<n275> Sec( $AS, $PS, CR1 )}|{<n276> #vr.21 : ChanIn_S[ChanIn_S( $AS, $PS, CR1 )]}|{<n277> In_S( $AS, $PS, CR1 )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n279[label="#vk.22 : coerce[!KU( MA2 )]",shape="ellipse"];
+n284[shape="record",label="{{<n280> Out_S( $AS, $PS, CR1 )|<n281> !F_Paired( $AS, $PS )}|{<n282> #vr.22 : ChanOut_S[ChanOut_S( $AS, $PS, CR1 )]}|{<n283> Sec( $AS, $PS, CR1 )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n285[label="#vk.23 : coerce[!KU( SE4 )]",shape="ellipse"];
+n289[shape="record",label="{{<n286> Sec( $PS, $AS, \<\<'EK_public_data', PK1\>, RE3\> )}|{<n287> #vr.23 : ChanIn_S[ChanIn_S( $PS, $AS, \<\<'EK_public_data', PK1\>, RE3\> )]}|{<n288> In_S( $PS, $AS, \<\<'EK_public_data', PK1\>, RE3\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n294[shape="record",label="{{<n290> Out_S( $PS, $AS, \<\<'EK_public_data', PK1\>, RE3\> )|<n291> !F_Paired( $PS, $AS )}|{<n292> #vr.24 : ChanOut_S[ChanOut_S( $PS, $AS, \<\<'EK_public_data', PK1\>, RE3\> )]}|{<n293> Sec( $PS, $AS, \<\<'EK_public_data', PK1\>, RE3\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n295[label="#vf.25 : isend",shape="ellipse"];
+n299[shape="record",label="{{<n296> Sec( $AS, $PS, \<PK1, CR2\> )}|{<n297> #vr.25 : ChanIn_S[ChanIn_S( $AS, $PS, \<PK1, CR2\> )]}|{<n298> In_S( $AS, $PS, \<PK1, CR2\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n304[shape="record",label="{{<n300> Out_S( $AS, $PS, \<PK1, CR2\> )|<n301> !F_Paired( $AS, $PS )}|{<n302> #vr.26 : ChanOut_S[ChanOut_S( $AS, $PS, \<PK1, CR2\> )]}|{<n303> Sec( $AS, $PS, \<PK1, CR2\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n308[shape="record",label="{{<n305> Sec( $PS, $AS, \<SE3, \<DA1, MU7\>, 'returnDAAKey'\> )}|{<n306> #vr.27 : ChanIn_S[ChanIn_S( $PS, $AS, \<SE3, \<DA1, MU7\>, 'returnDAAKey'\> )]}|{<n307> In_S( $PS, $AS, \<SE3, \<DA1, MU7\>, 'returnDAAKey'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n313[shape="record",label="{{<n309> Out_S( $PS, $AS, \<SE3, \<DA1, MU7\>, 'returnDAAKey'\> )|<n310> !F_Paired( $PS, $AS )}|{<n311> #vr.28 : ChanOut_S[ChanOut_S( $PS, $AS, \<SE3, \<DA1, MU7\>, 'returnDAAKey'\> )]}|{<n312> Sec( $PS, $AS, \<SE3, \<DA1, MU7\>, 'returnDAAKey'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n317[shape="record",label="{{<n314> Sec( $AS, $PS, \<SE3, \<DA1, MU7\>, MA1, LE2, SE2, AE1, 'TPM2_ActivateCredentials'\> )}|{<n315> #vr.29 : ChanIn_S[ChanIn_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA1, LE2, SE2, AE1, 'TPM2_ActivateCredentials'\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)]\l}|{<n316> In_S( $AS, $PS, \<SE3, \<DA1, MU7\>, MA1, LE2, SE2, AE1, 'TPM2_ActivateCredentials'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n322[shape="record",label="{{<n318> Out_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA1, LE2, SE2, AE1, 'TPM2_ActivateCredentials'\>\l)\l|<n319> !F_Paired( $AS, $PS\l)\l}|{<n320> #vr.30 : ChanOut_S[ChanOut_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA1, LE2, SE2, AE1, 'TPM2_ActivateCredentials'\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)]\l}|{<n321> Sec( $AS, $PS, \<SE3, \<DA1, MU7\>, MA1, LE2, SE2, AE1, 'TPM2_ActivateCredentials'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n326[shape="record",label="{{<n323> Sec( $PS, $AS, \<CU1, RE2\> )}|{<n324> #vr.32 : ChanIn_S[ChanIn_S( $PS, $AS, \<CU1, RE2\> )]}|{<n325> In_S( $PS, $AS, \<CU1, RE2\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n331[shape="record",label="{{<n327> Out_S( $PS, $AS, \<CU1, RE2\> )|<n328> !F_Paired( $PS, $AS )}|{<n329> #vr.33 : ChanOut_S[ChanOut_S( $PS, $AS, \<CU1, RE2\> )]}|{<n330> Sec( $PS, $AS, \<CU1, RE2\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n335[shape="record",label="{{<n332> Sec( $AS, $PS, \<BS1, BS1, BS1, 'TPM2_Commit'\> )}|{<n333> #vr.34 : ChanIn_S[ChanIn_S( $AS, $PS, \<BS1, BS1, BS1, 'TPM2_Commit'\> )]}|{<n334> In_S( $AS, $PS, \<BS1, BS1, BS1, 'TPM2_Commit'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n340[shape="record",label="{{<n336> Out_S( $AS, $PS, \<BS1, BS1, BS1, 'TPM2_Commit'\> )|<n337> !F_Paired( $AS, $PS )}|{<n338> #vr.35 : ChanOut_S[ChanOut_S( $AS, $PS, \<BS1, BS1, BS1, 'TPM2_Commit'\> )]}|{<n339> Sec( $AS, $PS, \<BS1, BS1, BS1, 'TPM2_Commit'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n344[shape="record",label="{{<n341> Sec( $PS, $AS, \<E1, NO4, 'retTPM2_commit'\> )}|{<n342> #vr.36 : ChanIn_S[ChanIn_S( $PS, $AS, \<E1, NO4, 'retTPM2_commit'\> )]}|{<n343> In_S( $PS, $AS, \<E1, NO4, 'retTPM2_commit'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n349[shape="record",label="{{<n345> Out_S( $PS, $AS, \<E1, NO4, 'retTPM2_commit'\> )|<n346> !F_Paired( $PS, $AS )}|{<n347> #vr.37 : ChanOut_S[ChanOut_S( $PS, $AS, \<E1, NO4, 'retTPM2_commit'\> )]}|{<n348> Sec( $PS, $AS, \<E1, NO4, 'retTPM2_commit'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n353[shape="record",label="{{<n350> Sec( $AS, $PS, \<HK4, TP1\> )}|{<n351> #vr.38 : ChanIn_S[ChanIn_S( $AS, $PS, \<HK4, TP1\> )]}|{<n352> In_S( $AS, $PS, \<HK4, TP1\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n358[shape="record",label="{{<n354> Out_S( $AS, $PS, \<HK4, TP1\> )|<n355> !F_Paired( $AS, $PS )}|{<n356> #vr.39 : ChanOut_S[ChanOut_S( $AS, $PS, \<HK4, TP1\> )]}|{<n357> Sec( $AS, $PS, \<HK4, TP1\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n362[shape="record",label="{{<n359> Sec( $PS, $AS, \<HK2, NO6, 'ret_TPM2_Hash'\> )}|{<n360> #vr.40 : ChanIn_S[ChanIn_S( $PS, $AS, \<HK2, NO6, 'ret_TPM2_Hash'\> )]}|{<n361> In_S( $PS, $AS, \<HK2, NO6, 'ret_TPM2_Hash'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n367[shape="record",label="{{<n363> Out_S( $PS, $AS, \<HK2, NO6, 'ret_TPM2_Hash'\> )|<n364> !F_Paired( $PS, $AS )}|{<n365> #vr.41 : ChanOut_S[ChanOut_S( $PS, $AS, \<HK2, NO6, 'ret_TPM2_Hash'\> )]}|{<n366> Sec( $PS, $AS, \<HK2, NO6, 'ret_TPM2_Hash'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n371[shape="record",label="{{<n368> Sec( $AS, $PS, \<HK2, NO6, NO4, 'TPM2_Sign'\> )}|{<n369> #vr.42 : ChanIn_S[ChanIn_S( $AS, $PS, \<HK2, NO6, NO4, 'TPM2_Sign'\> )]}|{<n370> In_S( $AS, $PS, \<HK2, NO6, NO4, 'TPM2_Sign'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n376[shape="record",label="{{<n372> Out_S( $AS, $PS, \<HK2, NO6, NO4, 'TPM2_Sign'\> )|<n373> !F_Paired( $AS, $PS )}|{<n374> #vr.43 : ChanOut_S[ChanOut_S( $AS, $PS, \<HK2, NO6, NO4, 'TPM2_Sign'\> )]}|{<n375> Sec( $AS, $PS, \<HK2, NO6, NO4, 'TPM2_Sign'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n380[shape="record",label="{{<n377> Sec( $AS, $PS, \<SE3, \<DA1, MU7\>, MA2, LE1, SE4, AE2, 'TPM2_ActivateCredentials_2'\> )}|{<n378> #vr.44 : ChanIn_S[ChanIn_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA2, LE1, SE4, AE2, 'TPM2_ActivateCredentials_2'\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)]\l}|{<n379> In_S( $AS, $PS, \<SE3, \<DA1, MU7\>, MA2, LE1, SE4, AE2, 'TPM2_ActivateCredentials_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n385[shape="record",label="{{<n381> Out_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA2, LE1, SE4, AE2, 'TPM2_ActivateCredentials_2'\>\l)\l|<n382> !F_Paired( $AS, $PS\l)\l}|{<n383> #vr.45 : ChanOut_S[ChanOut_S( $AS, $PS,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<SE3, \<DA1, MU7\>, MA2, LE1, SE4, AE2, 'TPM2_ActivateCredentials_2'\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)]\l}|{<n384> Sec( $AS, $PS, \<SE3, \<DA1, MU7\>, MA2, LE1, SE4, AE2, 'TPM2_ActivateCredentials_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n389[shape="record",label="{{<n386> Sec( $PS, $AS, \<CU2, RE1\> )}|{<n387> #vr.47 : ChanIn_S[ChanIn_S( $PS, $AS, \<CU2, RE1\> )]}|{<n388> In_S( $PS, $AS, \<CU2, RE1\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n394[shape="record",label="{{<n390> Out_S( $PS, $AS, \<CU2, RE1\> )|<n391> !F_Paired( $PS, $AS )}|{<n392> #vr.48 : ChanOut_S[ChanOut_S( $PS, $AS, \<CU2, RE1\> )]}|{<n393> Sec( $PS, $AS, \<CU2, RE1\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n398[shape="record",label="{{<n395> Sec( $AS, $PS, \<BS1, BS1, MU3, 'TPM2_Commit_rand'\> )}|{<n396> #vr.49 : ChanIn_S[ChanIn_S( $AS, $PS, \<BS1, BS1, MU3, 'TPM2_Commit_rand'\> )]}|{<n397> In_S( $AS, $PS, \<BS1, BS1, MU3, 'TPM2_Commit_rand'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n403[shape="record",label="{{<n399> Out_S( $AS, $PS, \<BS1, BS1, MU3, 'TPM2_Commit_rand'\> )|<n400> !F_Paired( $AS, $PS )}|{<n401> #vr.50 : ChanOut_S[ChanOut_S( $AS, $PS, \<BS1, BS1, MU3, 'TPM2_Commit_rand'\> )]}|{<n402> Sec( $AS, $PS, \<BS1, BS1, MU3, 'TPM2_Commit_rand'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n407[shape="record",label="{{<n404> Sec( $PS, $AS, \<ES1, NO3, 'ret_TPM2_Commit_rand'\> )}|{<n405> #vr.51 : ChanIn_S[ChanIn_S( $PS, $AS, \<ES1, NO3, 'ret_TPM2_Commit_rand'\> )]}|{<n406> In_S( $PS, $AS, \<ES1, NO3, 'ret_TPM2_Commit_rand'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n412[shape="record",label="{{<n408> Out_S( $PS, $AS, \<ES1, NO3, 'ret_TPM2_Commit_rand'\> )|<n409> !F_Paired( $PS, $AS )}|{<n410> #vr.52 : ChanOut_S[ChanOut_S( $PS, $AS, \<ES1, NO3, 'ret_TPM2_Commit_rand'\> )]}|{<n411> Sec( $PS, $AS, \<ES1, NO3, 'ret_TPM2_Commit_rand'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n416[shape="record",label="{{<n413> Sec( $AS, $PS, \<PK1, HK3, NO3, 'TPM2_Hash_2'\> )}|{<n414> #vr.53 : ChanIn_S[ChanIn_S( $AS, $PS, \<PK1, HK3, NO3, 'TPM2_Hash_2'\> )]}|{<n415> In_S( $AS, $PS, \<PK1, HK3, NO3, 'TPM2_Hash_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n421[shape="record",label="{{<n417> Out_S( $AS, $PS, \<PK1, HK3, NO3, 'TPM2_Hash_2'\> )|<n418> !F_Paired( $AS, $PS )}|{<n419> #vr.54 : ChanOut_S[ChanOut_S( $AS, $PS, \<PK1, HK3, NO3, 'TPM2_Hash_2'\> )]}|{<n420> Sec( $AS, $PS, \<PK1, HK3, NO3, 'TPM2_Hash_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n425[shape="record",label="{{<n422> Sec( $PS, $AS, \<HK1, NO5, 'ret_TPM2_Hash_2'\> )}|{<n423> #vr.55 : ChanIn_S[ChanIn_S( $PS, $AS, \<HK1, NO5, 'ret_TPM2_Hash_2'\> )]}|{<n424> In_S( $PS, $AS, \<HK1, NO5, 'ret_TPM2_Hash_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n430[shape="record",label="{{<n426> Out_S( $PS, $AS, \<HK1, NO5, 'ret_TPM2_Hash_2'\> )|<n427> !F_Paired( $PS, $AS )}|{<n428> #vr.56 : ChanOut_S[ChanOut_S( $PS, $AS, \<HK1, NO5, 'ret_TPM2_Hash_2'\> )]}|{<n429> Sec( $PS, $AS, \<HK1, NO5, 'ret_TPM2_Hash_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n434[shape="record",label="{{<n431> Sec( $AS, $PS, \<HK1, NO5, 'TPM2_Sign_2'\> )}|{<n432> #vr.57 : ChanIn_S[ChanIn_S( $AS, $PS, \<HK1, NO5, 'TPM2_Sign_2'\> )]}|{<n433> In_S( $AS, $PS, \<HK1, NO5, 'TPM2_Sign_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n439[shape="record",label="{{<n435> Out_S( $AS, $PS, \<HK1, NO5, 'TPM2_Sign_2'\> )|<n436> !F_Paired( $AS, $PS )}|{<n437> #vr.58 : ChanOut_S[ChanOut_S( $AS, $PS, \<HK1, NO5, 'TPM2_Sign_2'\> )]}|{<n438> Sec( $AS, $PS, \<HK1, NO5, 'TPM2_Sign_2'\> )}}",fillcolor="#ffffff",style="filled",fontcolor="black",role="Undefined"];
+n440[label="#vr.60 : d_0_snd",shape="ellipse"];
+n441[label="#vr.61 : d_0_fst",shape="ellipse"];
+n442[label="#vr.63 : d_0_fst",shape="ellipse"];
+n443[label="#vr.64 : d_0_snd",shape="ellipse"];
+n444[label="#vr.65 : d_0_fst",shape="ellipse"];
+n445[label="#vr.66 : d_0_snd",shape="ellipse"];
+n446[label="#vr.67 : d_0_fst",shape="ellipse"];
+n447[label="#vr.68 : d_0_snd",shape="ellipse"];
+n448[label="#vr.69 : d_0_fst",shape="ellipse"];
+n449[label="#vr.70 : d_0_snd",shape="ellipse"];
+n450[label="#vr.71 : d_0_fst",shape="ellipse"];
+n451[label="#vr.72 : d_0_snd",shape="ellipse"];
+n452[label="#vr.73 : d_0_fst",shape="ellipse"];
+n453[label="#vr.74 : d_0_snd",shape="ellipse"];
+n454[label="#vr.75 : d_0_fst",shape="ellipse"];
+n455[label="#vr.76 : d_0_snd",shape="ellipse"];
+n456[label="#vr.78 : d_0_snd",shape="ellipse"];
+n7:n3 -> n130:n123[style="bold",weight="10.0",color="gray50"];
+n7:n4 -> n79:n73[style="bold",weight="10.0",color="gray50"];
+n7:n4 -> n130:n122[style="bold",weight="10.0",color="gray50"];
+n7:n4 -> n150:n144[style="bold",weight="10.0",color="gray50"];
+n7:n4 -> n207:n205[style="bold",weight="10.0",color="gray50"];
+n7:n6 -> n25:n20[style="bold",weight="10.0",color="gray50"];
+n10:n9 -> n25:n19[style="bold",weight="10.0"];
+n17:n14 -> n44:n39[style="bold",weight="10.0",color="gray50"];
+n17:n14 -> n71:n67[style="bold",weight="10.0",color="gray50"];
+n17:n14 -> n142:n138[style="bold",weight="10.0",color="gray50"];
+n17:n15 -> n32:n27[style="bold",weight="10.0"];
+n17:n16 -> n25:n18[style="bold",weight="10.0"];
+n25:n22 -> n284:n280[style="bold",weight="10.0"];
+n25:n23 -> n284:n281[style="bold",weight="10.0",color="gray50"];
+n25:n23 -> n304:n301[style="bold",weight="10.0",color="gray50"];
+n25:n23 -> n322:n319[style="bold",weight="10.0",color="gray50"];
+n25:n23 -> n340:n337[style="bold",weight="10.0",color="gray50"];
+n25:n23 -> n358:n355[style="bold",weight="10.0",color="gray50"];
+n25:n23 -> n376:n373[style="bold",weight="10.0",color="gray50"];
+n25:n23 -> n385:n382[style="bold",weight="10.0",color="gray50"];
+n25:n23 -> n403:n400[style="bold",weight="10.0",color="gray50"];
+n25:n23 -> n421:n418[style="bold",weight="10.0",color="gray50"];
+n25:n23 -> n439:n436[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n220:n217[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n240:n237[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n294:n291[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n313:n310[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n331:n328[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n349:n346[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n367:n364[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n394:n391[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n412:n409[style="bold",weight="10.0",color="gray50"];
+n25:n24 -> n430:n427[style="bold",weight="10.0",color="gray50"];
+n32:n29 -> n294:n290[style="bold",weight="10.0"];
+n32:n30 -> n71:n68[style="bold",weight="10.0",color="gray50"];
+n32:n30 -> n142:n139[style="bold",weight="10.0",color="gray50"];
+n37:n35 -> n304:n300[style="bold",weight="10.0"];
+n37:n36 -> n51:n46[style="bold",weight="10.0"];
+n44:n42 -> n313:n309[style="bold",weight="10.0"];
+n44:n43 -> n113:n108[style="bold",weight="10.0",color="gray50"];
+n44:n43 -> n169:n163[style="bold",weight="10.0",color="gray50"];
+n44:n43 -> n197:n192[style="bold",weight="10.0",color="gray50"];
+n51:n48 -> n59:n55[style="bold",weight="10.0",color="gray50"];
+n51:n49 -> n229[color="gray30"];
+n51:n50 -> n65:n61[style="bold",weight="10.0"];
+n59:n57 -> n209[color="gray30"];
+n59:n58 -> n130:n121[style="bold",weight="10.0"];
+n65:n63 -> n322:n318[style="bold",weight="10.0"];
+n65:n64 -> n79:n74[style="bold",weight="10.0"];
+n71:n70 -> n331:n327[style="bold",weight="10.0"];
+n79:n76 -> n340:n336[style="bold",weight="10.0"];
+n79:n77 -> n119:n116[style="bold",weight="10.0"];
+n79:n78 -> n93:n88[style="bold",weight="10.0"];
+n86:n84 -> n349:n345[style="bold",weight="10.0"];
+n86:n85 -> n113:n109[style="bold",weight="10.0"];
+n93:n90 -> n358:n354[style="bold",weight="10.0"];
+n93:n91 -> n105:n101[style="bold",weight="10.0"];
+n93:n92 -> n136:n132[style="bold",weight="10.0"];
+n99:n97 -> n367:n363[style="bold",weight="10.0"];
+n99:n98 -> n113:n107[style="bold",weight="10.0"];
+n105:n103 -> n376:n372[style="bold",weight="10.0"];
+n105:n104 -> n119:n115[style="bold",weight="10.0"];
+n113:n112 -> n220:n216[style="bold",weight="10.0"];
+n119:n118 -> n215[color="gray30"];
+n130:n129 -> n222[color="gray30"];
+n136:n134 -> n385:n381[style="bold",weight="10.0"];
+n136:n135 -> n150:n145[style="bold",weight="10.0"];
+n142:n141 -> n394:n390[style="bold",weight="10.0"];
+n150:n147 -> n155:n151[style="bold",weight="10.0",color="gray50"];
+n150:n147 -> n227:n223[style="bold",weight="10.0",color="gray50"];
+n161:n158 -> n403:n399[style="bold",weight="10.0"];
+n161:n159 -> n177:n172[style="bold",weight="10.0"];
+n169:n167 -> n412:n408[style="bold",weight="10.0"];
+n169:n168 -> n184:n180[style="bold",weight="10.0"];
+n177:n174 -> n421:n417[style="bold",weight="10.0"];
+n177:n175 -> n190:n186[style="bold",weight="10.0"];
+n177:n176 -> n203:n200[style="bold",weight="10.0"];
+n184:n182 -> n430:n426[style="bold",weight="10.0"];
+n184:n183 -> n197:n193[style="bold",weight="10.0"];
+n190:n188 -> n439:n435[style="bold",weight="10.0"];
+n190:n189 -> n203:n199[style="bold",weight="10.0"];
+n197:n196 -> n240:n236[style="bold",weight="10.0"];
+n203:n202 -> n235[color="gray30"];
+n209 -> n243[color="orangered2"];
+n209 -> n273[color="orangered2"];
+n213:n212 -> n119:n114[style="bold",weight="10.0"];
+n215 -> n251[color="orangered2"];
+n215 -> n253[color="orangered2"];
+n220:n219 -> n213:n210[style="bold",weight="10.0"];
+n222 -> n264[color="orangered2"];
+n222 -> n279[color="orangered2"];
+n227:n226 -> n161:n156[style="bold",weight="10.0",color="gray50"];
+n229 -> n250[color="orangered2"];
+n229 -> n440[color="orangered2"];
+n233:n232 -> n203:n198[style="bold",weight="10.0"];
+n235 -> n443[color="orangered2"];
+n240:n239 -> n233:n230[style="bold",weight="10.0"];
+n241 -> n59:n52[color="gray30"];
+n243 -> n244[color="orangered2"];
+n243 -> n245[color="orangered2"];
+n245 -> n247[color="orangered2"];
+n245 -> n274[color="orangered2"];
+n247 -> n208[color="orangered2"];
+n248 -> n65:n60[color="gray30"];
+n251 -> n214[color="orangered2"];
+n253 -> n255[color="orangered2"];
+n253 -> n442[color="orangered2"];
+n255 -> n257[color="orangered2"];
+n255 -> n260[color="orangered2"];
+n257 -> n221[color="orangered2"];
+n258 -> n130:n120[color="gray30"];
+n260 -> n262[color="orangered2"];
+n262 -> n228[color="orangered2"];
+n264 -> n246[color="orangered2"];
+n264 -> n266[color="orangered2"];
+n266 -> n268[color="orangered2"];
+n266 -> n285[color="orangered2"];
+n268 -> n234[color="orangered2"];
+n268 -> n272[color="orangered2"];
+n269 -> n136:n131[color="gray30"];
+n272 -> n242[color="orangered2"];
+n278:n277 -> n32:n26[style="bold",weight="10.0"];
+n284:n283 -> n278:n275[style="bold",weight="10.0"];
+n289:n288 -> n37:n33[style="bold",weight="10.0"];
+n294:n293 -> n289:n286[style="bold",weight="10.0"];
+n295 -> n207:n204[color="gray30"];
+n299:n298 -> n44:n38[style="bold",weight="10.0"];
+n304:n303 -> n299:n296[style="bold",weight="10.0"];
+n308:n307 -> n51:n45[style="bold",weight="10.0"];
+n313:n312 -> n308:n305[style="bold",weight="10.0"];
+n317:n316 -> n71:n66[style="bold",weight="10.0"];
+n322:n321 -> n317:n314[style="bold",weight="10.0"];
+n326:n325 -> n79:n72[style="bold",weight="10.0"];
+n331:n330 -> n326:n323[style="bold",weight="10.0"];
+n335:n334 -> n86:n80[style="bold",weight="10.0"];
+n340:n339 -> n335:n332[style="bold",weight="10.0"];
+n344:n343 -> n93:n87[style="bold",weight="10.0"];
+n349:n348 -> n344:n341[style="bold",weight="10.0"];
+n353:n352 -> n99:n94[style="bold",weight="10.0"];
+n358:n357 -> n353:n350[style="bold",weight="10.0"];
+n362:n361 -> n105:n100[style="bold",weight="10.0"];
+n367:n366 -> n362:n359[style="bold",weight="10.0"];
+n371:n370 -> n113:n106[style="bold",weight="10.0"];
+n376:n375 -> n371:n368[style="bold",weight="10.0"];
+n380:n379 -> n142:n137[style="bold",weight="10.0"];
+n385:n384 -> n380:n377[style="bold",weight="10.0"];
+n389:n388 -> n150:n143[style="bold",weight="10.0"];
+n394:n393 -> n389:n386[style="bold",weight="10.0"];
+n398:n397 -> n169:n162[style="bold",weight="10.0"];
+n403:n402 -> n398:n395[style="bold",weight="10.0"];
+n407:n406 -> n177:n170[style="bold",weight="10.0"];
+n412:n411 -> n407:n404[style="bold",weight="10.0"];
+n416:n415 -> n184:n178[style="bold",weight="10.0"];
+n421:n420 -> n416:n413[style="bold",weight="10.0"];
+n425:n424 -> n190:n185[style="bold",weight="10.0"];
+n430:n429 -> n425:n422[style="bold",weight="10.0"];
+n434:n433 -> n197:n191[style="bold",weight="10.0"];
+n439:n438 -> n434:n431[style="bold",weight="10.0"];
+n440 -> n441[color="orangered2"];
+n441 -> n252[color="orangered2"];
+n442 -> n254[color="orangered2"];
+n443 -> n444[color="orangered2"];
+n443 -> n445[color="orangered2"];
+n444 -> n256[color="orangered2"];
+n445 -> n446[color="orangered2"];
+n445 -> n447[color="orangered2"];
+n446 -> n259[color="orangered2"];
+n447 -> n448[color="orangered2"];
+n447 -> n449[color="orangered2"];
+n448 -> n261[color="orangered2"];
+n449 -> n450[color="orangered2"];
+n449 -> n451[color="orangered2"];
+n450 -> n263[color="orangered2"];
+n451 -> n452[color="orangered2"];
+n451 -> n453[color="orangered2"];
+n452 -> n265[color="orangered2"];
+n453 -> n454[color="orangered2"];
+n453 -> n455[color="orangered2"];
+n454 -> n267[color="orangered2"];
+n455 -> n270[color="orangered2"];
+n455 -> n456[color="orangered2"];
+n456 -> n271[color="orangered2"];
+n7:n2 -> n10:n8[color="black",style="dashed"];
+n119:n117 -> n130:n128[color="black",style="dashed"];
+n155:n153 -> n161:n157[color="black",style="dashed"];
+n208 -> n248[color="red",style="dashed"];
+n209 -> n248[color="red",style="dashed"];
+n214 -> n258[color="red",style="dashed"];
+n221 -> n258[color="red",style="dashed"];
+n228 -> n258[color="red",style="dashed"];
+n229 -> n241[color="red",style="dashed"];
+n234 -> n269[color="red",style="dashed"];
+n242 -> n269[color="red",style="dashed"];
+n243 -> n248[color="red",style="dashed"];
+n244 -> n248[color="red",style="dashed"];
+n245 -> n248[color="red",style="dashed"];
+n246 -> n269[color="red",style="dashed"];
+n247 -> n248[color="red",style="dashed"];
+n249 -> n295[color="red",style="dashed"];
+n250 -> n241[color="red",style="dashed"];
+n252 -> n241[color="red",style="dashed"];
+n253 -> n258[color="red",style="dashed"];
+n254 -> n258[color="red",style="dashed"];
+n255 -> n258[color="red",style="dashed"];
+n256 -> n295[color="red",style="dashed"];
+n259 -> n295[color="red",style="dashed"];
+n260 -> n258[color="red",style="dashed"];
+n261 -> n295[color="red",style="dashed"];
+n263 -> n295[color="red",style="dashed"];
+n264 -> n269[color="red",style="dashed"];
+n265 -> n295[color="red",style="dashed"];
+n266 -> n269[color="red",style="dashed"];
+n267 -> n295[color="red",style="dashed"];
+n268 -> n269[color="red",style="dashed"];
+n270 -> n295[color="red",style="dashed"];
+n271 -> n295[color="red",style="dashed"];
+n272 -> n269[color="red",style="dashed"];
+n273 -> n248[color="red",style="dashed"];
+n274 -> n248[color="red",style="dashed"];
+n279 -> n269[color="red",style="dashed"];
+n285 -> n269[color="red",style="dashed"];
+n440 -> n241[color="red",style="dashed"];
+n441 -> n241[color="red",style="dashed"];
+n443 -> n295[color="red",style="dashed"];
+n445 -> n295[color="red",style="dashed"];
+n447 -> n295[color="red",style="dashed"];
+n449 -> n295[color="red",style="dashed"];
+n451 -> n295[color="red",style="dashed"];
+n453 -> n295[color="red",style="dashed"];
+n455 -> n295[color="red",style="dashed"];
+n456 -> n295[color="red",style="dashed"];
+{
+rank="sink";
+n457[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">BS1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">BSN('bottom')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">CR1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'createPrimary'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">CR2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'createDAAKey'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">CU1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">curlyK(~K_1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">CU2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">curlyK(~K_2)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">DA1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'DAA_public_data'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">E1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">E(~r_cv, 'P1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">IS1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'Issuer_SendChallengeResponse'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">JO1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'join_Issuer_1'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">KD5</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">KDF_a(&lt;'1', ~s&gt;, 'INTEGRITY', 'NULL')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">KD6</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">KDF_a(~s_2, 'INTEGRITY', 'NULL')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">ME1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">Message(~m)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU13</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(~r, ~y)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU7</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(~f, 'P1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">KD2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">KDF_a(&lt;'1', ~s&gt;, 'STORAGE', &lt;'1', 'SHA256', H_SHA256(&lt;DA1, MU7&gt;)&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">KD3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">KDF_a(~s_2, 'STORAGE', &lt;'SHA256', H_SHA256(&lt;DA1, MU7&gt;)&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(MU13, MU7)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(~l.2, MU4)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU8</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(~r, 'P1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU10</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(~x, MU8)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU5</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(~y, MU8)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(~l.2, MU5)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">ES1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">E_S(~r_cv1, MU3)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU6</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(~l.2, MU8)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU9</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(multp(multp(~r, ~x), ~y), MU7)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">NO1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">Nonce(~rnd_n_M)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">NO2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">Nonce(~n_J)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">NO3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">Nonce(~cv1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">NO4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">Nonce(~cv)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">NO5</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">Nonce(~c_tkt)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">NO6</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">Nonce(~tkt)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PK2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">PkX(~x, 'P2')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PK3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">PkY(~y, 'P2')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PL1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">plus(MU10, MU9)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HN3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">H_n_8('P1', MU7, RB(~l, 'P1'), RD(~l, MU7), MU8, MU5, PL1, MU4)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(~l.2, PL1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HK3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">H_k_6(ME1, MU6, MU3, MU1, MU2, ES1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HK1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">H_k_1(HK3)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HN2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">H_n_2(NO1, HK1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU12</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(HN2, ~f)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PL2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">plus(~r_cv1, MU12)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PL4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'Platform'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">RE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'ret_TPM2_ActivateCredentials_2'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">RE2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'ret_TPM2_ActivateCredentials'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">RE3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'returnEK'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">senc(&lt;MU8, MU5, PL1, MU4, HN3, plus(~l, multp(multp(~y, ~r), HN3))<BR ALIGN="LEFT"/> &#32;&#32;&#32;&#32;&gt;,<BR ALIGN="LEFT"/> &#32;&#32;&#32;&#32;CU2)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SE2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">senc(&lt;'1', CU1&gt;, KD2)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">LE2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">len16(SE2)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MA1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">MAC(&lt;'1', LE2, SE2, '1', 'SHA256', H_SHA256(&lt;DA1, MU7&gt;)&gt;, KD5)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SE4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">senc(CU2, KD3)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">LE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">len16(SE4)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MA2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">MAC(&lt;LE1, SE4, 'SHA256', H_SHA256(&lt;DA1, MU7&gt;)&gt;, KD6)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">TP1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'TPM2_Hash'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">TP2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~TPM_EK_Seed</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">KD1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">KDF_EK(TP2)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PK1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">pk(KD1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">AE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">aenc(&lt;'1', ~s&gt;, PK1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">AE2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">aenc(~s_2, PK1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HK4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">H_k_4('P1', MU7, E1, &lt;PK2, PK3, CU1, PK1&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HK2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">H_k_1(HK4)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">HN1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">H_n_2(NO2, HK2)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU11</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">multp(HN1, ~f)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PL3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">plus(~r_cv, MU11)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">TP3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">~TPM_AES_Seed</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">KD4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">KDF_AES(TP3)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SE3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">senc(~f, KD4)</TD></TR></TABLE>>];
+
+}
+n207:n206 -> n457[style="invis"];
+
+}

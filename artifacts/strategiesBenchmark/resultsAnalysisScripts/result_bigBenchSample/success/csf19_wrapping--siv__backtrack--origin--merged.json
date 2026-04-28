@@ -1,0 +1,25 @@
+{
+  "task_id": "csf19_wrapping--siv__backtrack--origin--merged",
+  "warnings": [],
+  "tamarin_timing": 1305.51,
+  "wrapper_measures": {
+    "time": 1305.8774886131287,
+    "avg_memory": 509.62440823685233,
+    "peak_memory": 1078.17578125
+  },
+  "output_spthy": "result_bigBenchSample_28-04-26_09-43-52/proofs/csf19_wrapping--siv__backtrack--origin--merged.spthy",
+  "verified_lemma": {
+    "origin": {
+      "steps": 2173,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "Counter_Monotonicity",
+    "IV_Uniqueness",
+    "Key_UsageImpliesInitialization",
+    "Key_IntegrityAndConfidentiality",
+    "Key_UniqueLevelandHandle"
+  ]
+}

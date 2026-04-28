@@ -1,0 +1,13 @@
+{
+  "task_id": "csf19_wrapping--siv__collectAndRestart--Key_IntegrityAndConfidentiality--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.693918704987,
+    "avg_memory": 1053.5083339275552,
+    "peak_memory": 1096.5703125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

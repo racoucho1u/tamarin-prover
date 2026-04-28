@@ -1,0 +1,27 @@
+{
+  "task_id": "wisec--5G_handover_5GS_to_EPS__escape--injectiveagreement_enb_ue_k_enb--merged",
+  "warnings": [],
+  "tamarin_timing": 455.9,
+  "wrapper_measures": {
+    "time": 457.2366895675659,
+    "avg_memory": 3031.9713134765634,
+    "peak_memory": 6761.98828125
+  },
+  "output_spthy": "result_bigBenchSample_28-04-26_09-43-52/proofs/wisec--5G_handover_5GS_to_EPS__escape--injectiveagreement_enb_ue_k_enb--merged.spthy",
+  "verified_lemma": {
+    "injectiveagreement_enb_ue_k_enb": {
+      "steps": 2806,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "NH_SRC",
+    "executability",
+    "injectiveagreement_ue_enb_k_enb",
+    "secret_k_amf",
+    "secret_k_asme",
+    "secret_k_gnb",
+    "secret_k_enb_star"
+  ]
+}

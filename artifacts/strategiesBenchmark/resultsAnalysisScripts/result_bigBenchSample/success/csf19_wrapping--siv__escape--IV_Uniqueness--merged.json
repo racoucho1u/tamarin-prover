@@ -1,0 +1,25 @@
+{
+  "task_id": "csf19_wrapping--siv__escape--IV_Uniqueness--merged",
+  "warnings": [],
+  "tamarin_timing": 51.28,
+  "wrapper_measures": {
+    "time": 51.572946548461914,
+    "avg_memory": 355.30116421568624,
+    "peak_memory": 685.61328125
+  },
+  "output_spthy": "result_bigBenchSample_28-04-26_09-43-52/proofs/csf19_wrapping--siv__escape--IV_Uniqueness--merged.spthy",
+  "verified_lemma": {
+    "IV_Uniqueness": {
+      "steps": 766,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "origin",
+    "Counter_Monotonicity",
+    "Key_UsageImpliesInitialization",
+    "Key_IntegrityAndConfidentiality",
+    "Key_UniqueLevelandHandle"
+  ]
+}

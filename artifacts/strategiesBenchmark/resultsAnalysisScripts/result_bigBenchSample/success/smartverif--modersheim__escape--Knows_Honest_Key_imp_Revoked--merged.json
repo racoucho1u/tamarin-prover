@@ -1,0 +1,21 @@
+{
+  "task_id": "smartverif--modersheim__escape--Knows_Honest_Key_imp_Revoked--merged",
+  "warnings": [
+    "2 wellformedness check failed!"
+  ],
+  "tamarin_timing": 1.87,
+  "wrapper_measures": {
+    "time": 2.014582633972168,
+    "avg_memory": 46.572265625,
+    "peak_memory": 92.4375
+  },
+  "output_spthy": "result_bigBenchSample_28-04-26_09-43-52/proofs/smartverif--modersheim__escape--Knows_Honest_Key_imp_Revoked--merged.spthy",
+  "verified_lemma": {
+    "Knows_Honest_Key_imp_Revoked": {
+      "steps": 41,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

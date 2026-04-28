@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--secure-device__original--secrecy--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 2596.0647008419037,
+    "avg_memory": 21164.01074488839,
+    "peak_memory": 41810.31640625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

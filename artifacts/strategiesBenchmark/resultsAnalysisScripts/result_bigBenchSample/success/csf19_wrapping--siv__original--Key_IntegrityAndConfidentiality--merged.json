@@ -1,0 +1,25 @@
+{
+  "task_id": "csf19_wrapping--siv__original--Key_IntegrityAndConfidentiality--merged",
+  "warnings": [],
+  "tamarin_timing": 77.82,
+  "wrapper_measures": {
+    "time": 78.05101704597473,
+    "avg_memory": 409.2122057629871,
+    "peak_memory": 606.59765625
+  },
+  "output_spthy": "result_bigBenchSample_28-04-26_09-43-52/proofs/csf19_wrapping--siv__original--Key_IntegrityAndConfidentiality--merged.spthy",
+  "verified_lemma": {
+    "Key_IntegrityAndConfidentiality": {
+      "steps": 550,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "origin",
+    "Counter_Monotonicity",
+    "IV_Uniqueness",
+    "Key_UsageImpliesInitialization",
+    "Key_UniqueLevelandHandle"
+  ]
+}

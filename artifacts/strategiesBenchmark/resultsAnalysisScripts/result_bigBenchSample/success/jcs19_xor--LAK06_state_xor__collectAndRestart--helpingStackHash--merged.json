@@ -1,0 +1,25 @@
+{
+  "task_id": "jcs19_xor--LAK06_state_xor__collectAndRestart--helpingStackHash--merged",
+  "warnings": [],
+  "tamarin_timing": 4.91,
+  "wrapper_measures": {
+    "time": 5.0603578090667725,
+    "avg_memory": 48.61796875,
+    "peak_memory": 68.2578125
+  },
+  "output_spthy": "result_bigBenchSample_28-04-26_09-43-52/proofs/jcs19_xor--LAK06_state_xor__collectAndRestart--helpingStackHash--merged.spthy",
+  "verified_lemma": {
+    "helpingStackHash": {
+      "steps": 13,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helpingUpdateKey",
+    "helpingSecrecy",
+    "executable",
+    "noninjectiveagreementTAG",
+    "noninjectiveagreementREADER"
+  ]
+}

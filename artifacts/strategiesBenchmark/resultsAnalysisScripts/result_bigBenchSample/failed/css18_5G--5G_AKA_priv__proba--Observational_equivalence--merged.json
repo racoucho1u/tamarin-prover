@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_priv__proba--Observational_equivalence--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7203.557336807251,
+    "avg_memory": 21837.2628086982,
+    "peak_memory": 36299.1328125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

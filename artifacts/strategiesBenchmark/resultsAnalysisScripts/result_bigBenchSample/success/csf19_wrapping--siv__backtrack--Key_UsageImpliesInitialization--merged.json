@@ -1,0 +1,25 @@
+{
+  "task_id": "csf19_wrapping--siv__backtrack--Key_UsageImpliesInitialization--merged",
+  "warnings": [],
+  "tamarin_timing": 43.06,
+  "wrapper_measures": {
+    "time": 43.28036904335022,
+    "avg_memory": 285.77152979651163,
+    "peak_memory": 392.16015625
+  },
+  "output_spthy": "result_bigBenchSample_28-04-26_09-43-52/proofs/csf19_wrapping--siv__backtrack--Key_UsageImpliesInitialization--merged.spthy",
+  "verified_lemma": {
+    "Key_UsageImpliesInitialization": {
+      "steps": 86,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "origin",
+    "Counter_Monotonicity",
+    "IV_Uniqueness",
+    "Key_IntegrityAndConfidentiality",
+    "Key_UniqueLevelandHandle"
+  ]
+}

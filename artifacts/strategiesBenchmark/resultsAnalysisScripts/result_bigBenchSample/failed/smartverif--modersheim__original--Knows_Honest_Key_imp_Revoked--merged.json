@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--modersheim__original--Knows_Honest_Key_imp_Revoked--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1211.4048154354095,
+    "avg_memory": 21843.75563426905,
+    "peak_memory": 42405.26171875
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

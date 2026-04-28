@@ -1,0 +1,2502 @@
+{
+    "graphs": [
+        {
+            "jgAbbrevs": [
+                {
+                    "jgaAbbrev": {
+                        "jgnConst": "H3"
+                    },
+                    "jgaExpansion": {
+                        "jgnFunct": "h",
+                        "jgnParams": [
+                            {
+                                "jgnFunct": "h",
+                                "jgnParams": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    }
+                                ],
+                                "jgnShow": "h(h(~k))"
+                            }
+                        ],
+                        "jgnShow": "h(h(h(~k)))"
+                    },
+                    "jgaTerm": {
+                        "jgnFunct": "h",
+                        "jgnParams": [
+                            {
+                                "jgnFunct": "h",
+                                "jgnParams": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    }
+                                ],
+                                "jgnShow": "h(h(~k))"
+                            }
+                        ],
+                        "jgnShow": "h(h(h(~k)))"
+                    }
+                },
+                {
+                    "jgaAbbrev": {
+                        "jgnConst": "H1"
+                    },
+                    "jgaExpansion": {
+                        "jgnFunct": "h",
+                        "jgnParams": [
+                            {
+                                "jgnConst": "XO1"
+                            }
+                        ],
+                        "jgnShow": "h(XO1)"
+                    },
+                    "jgaTerm": {
+                        "jgnFunct": "h",
+                        "jgnParams": [
+                            {
+                                "jgnFunct": "Xor",
+                                "jgnParams": [
+                                    {
+                                        "jgnConst": "~r0"
+                                    },
+                                    {
+                                        "jgnConst": "~r1"
+                                    },
+                                    {
+                                        "jgnConst": "x"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    }
+                                ],
+                                "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                            }
+                        ],
+                        "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                    }
+                },
+                {
+                    "jgaAbbrev": {
+                        "jgnConst": "H2"
+                    },
+                    "jgaExpansion": {
+                        "jgnFunct": "h",
+                        "jgnParams": [
+                            {
+                                "jgnConst": "XO2"
+                            }
+                        ],
+                        "jgnShow": "h(XO2)"
+                    },
+                    "jgaTerm": {
+                        "jgnFunct": "h",
+                        "jgnParams": [
+                            {
+                                "jgnFunct": "Xor",
+                                "jgnParams": [
+                                    {
+                                        "jgnConst": "~r0"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r0"
+                                                    },
+                                                    {
+                                                        "jgnConst": "~r1"
+                                                    },
+                                                    {
+                                                        "jgnConst": "x"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~k"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(~k)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(h(~k))"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                            }
+                                        ],
+                                        "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                    }
+                                ],
+                                "jgnShow": "Xor(~r0,h(h(~k)),h(Xor(~r0,~r1,x,h(h(~k)))))"
+                            }
+                        ],
+                        "jgnShow": "h(Xor(~r0,h(h(~k)),h(Xor(~r0,~r1,x,h(h(~k))))))"
+                    }
+                },
+                {
+                    "jgaAbbrev": {
+                        "jgnConst": "XO1"
+                    },
+                    "jgaExpansion": {
+                        "jgnFunct": "Xor",
+                        "jgnParams": [
+                            {
+                                "jgnConst": "~r0"
+                            },
+                            {
+                                "jgnConst": "~r1"
+                            },
+                            {
+                                "jgnConst": "x"
+                            },
+                            {
+                                "jgnFunct": "h",
+                                "jgnParams": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    }
+                                ],
+                                "jgnShow": "h(h(~k))"
+                            }
+                        ],
+                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                    },
+                    "jgaTerm": {
+                        "jgnFunct": "Xor",
+                        "jgnParams": [
+                            {
+                                "jgnConst": "~r0"
+                            },
+                            {
+                                "jgnConst": "~r1"
+                            },
+                            {
+                                "jgnConst": "x"
+                            },
+                            {
+                                "jgnFunct": "h",
+                                "jgnParams": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    }
+                                ],
+                                "jgnShow": "h(h(~k))"
+                            }
+                        ],
+                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                    }
+                },
+                {
+                    "jgaAbbrev": {
+                        "jgnConst": "XO2"
+                    },
+                    "jgaExpansion": {
+                        "jgnFunct": "Xor",
+                        "jgnParams": [
+                            {
+                                "jgnConst": "~r0"
+                            },
+                            {
+                                "jgnFunct": "h",
+                                "jgnParams": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    }
+                                ],
+                                "jgnShow": "h(h(~k))"
+                            },
+                            {
+                                "jgnConst": "H1"
+                            }
+                        ],
+                        "jgnShow": "Xor(~r0,h(h(~k)),H1)"
+                    },
+                    "jgaTerm": {
+                        "jgnFunct": "Xor",
+                        "jgnParams": [
+                            {
+                                "jgnConst": "~r0"
+                            },
+                            {
+                                "jgnFunct": "h",
+                                "jgnParams": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    }
+                                ],
+                                "jgnShow": "h(h(~k))"
+                            },
+                            {
+                                "jgnFunct": "h",
+                                "jgnParams": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r0"
+                                            },
+                                            {
+                                                "jgnConst": "~r1"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            },
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~k"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(~k)"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(h(~k))"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                    }
+                                ],
+                                "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                            }
+                        ],
+                        "jgnShow": "Xor(~r0,h(h(~k)),h(Xor(~r0,~r1,x,h(h(~k)))))"
+                    }
+                }
+            ],
+            "jgClusters": [],
+            "jgDirected": true,
+            "jgEdges": [
+                {
+                    "jgeRelation": "PersistentFact",
+                    "jgeSource": "#j:c0",
+                    "jgeTarget": "#vr:p0"
+                },
+                {
+                    "jgeRelation": "PersistentFact",
+                    "jgeSource": "#j:c1",
+                    "jgeTarget": "#vr.1:p0"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#j:c2",
+                    "jgeTarget": "#i:p2"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#j:c3",
+                    "jgeTarget": "#vr.1:p1"
+                },
+                {
+                    "jgeRelation": "default",
+                    "jgeSource": "#vf:c0",
+                    "jgeTarget": "#i:p1"
+                },
+                {
+                    "jgeRelation": "KFact",
+                    "jgeSource": "#vl:c0",
+                    "jgeTarget": "#vk:p0"
+                },
+                {
+                    "jgeRelation": "KFact",
+                    "jgeSource": "#vl:c0",
+                    "jgeTarget": "#vk.2:p0"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#vr:c0",
+                    "jgeTarget": "#i:p0"
+                },
+                {
+                    "jgeRelation": "KFact",
+                    "jgeSource": "#vr:c1",
+                    "jgeTarget": "#vk.4:p0"
+                },
+                {
+                    "jgeRelation": "default",
+                    "jgeSource": "#vr.1:c1",
+                    "jgeTarget": "#vl:p0"
+                },
+                {
+                    "jgeRelation": "default",
+                    "jgeSource": "#vf.5:c0",
+                    "jgeTarget": "#vr.1:p3"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk",
+                    "jgeTarget": "#vf"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.1",
+                    "jgeTarget": "#vf"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.2",
+                    "jgeTarget": "#vk.1"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.3",
+                    "jgeTarget": "#vf.5"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.4",
+                    "jgeTarget": "#vk.3"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.6",
+                    "jgeTarget": "#vk.1"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.6",
+                    "jgeTarget": "#vk.3"
+                }
+            ],
+            "jgLabel": "trace_LAK06_state_SL2-AS0-CL0-A1-C1-NB_noninjectiveagreementREADERnon_empty_trace-case_1-acceptreaderNew-initiatereader-setup-setup-tag1-setup-split_case_1-split_case_2-c_xor-tag1-setup-c_xor-initiatereader-setup-setup",
+            "jgNodes": [
+                {
+                    "jgnId": "#i",
+                    "jgnLabel": "acceptreaderNew",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Commit",
+                                "jgnFactShow": "Commit( <'R', 'T', h(h(~k)), ~r0, (~r1âx)> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'R'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'T'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~r0"
+                                                                    },
+                                                                    {
+                                                                        "jgnFunct": "Xor",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~r1"
+                                                                            },
+                                                                            {
+                                                                                "jgnConst": "x"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "Xor(~r1,x)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(~r0,Xor(~r1,x))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(h(h(~k)),pair(~r0,Xor(~r1,x)))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('T',pair(h(h(~k)),pair(~r0,Xor(~r1,x))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('R',pair('T',pair(h(h(~k)),pair(~r0,Xor(~r1,x)))))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Running",
+                                "jgnFactShow": "Running( <'T', 'R', h(h(~k)), ~r0, (~r1âx)> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'T'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'R'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~r0"
+                                                                    },
+                                                                    {
+                                                                        "jgnFunct": "Xor",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~r1"
+                                                                            },
+                                                                            {
+                                                                                "jgnConst": "x"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "Xor(~r1,x)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(~r0,Xor(~r1,x))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(h(h(~k)),pair(~r0,Xor(~r1,x)))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('R',pair(h(h(~k)),pair(~r0,Xor(~r1,x))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('T',pair('R',pair(h(h(~k)),pair(~r0,Xor(~r1,x)))))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Key",
+                                "jgnFactShow": "Key( h(~k), 'R1' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    },
+                                    {
+                                        "jgnConst": "'R1'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Key",
+                                "jgnFactShow": "Key( h(h(~k)), 'R2' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    },
+                                    {
+                                        "jgnConst": "'R2'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Update",
+                                "jgnFactShow": "Update( h(h(~k)), 'R1' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    },
+                                    {
+                                        "jgnConst": "'R1'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Update",
+                                "jgnFactShow": "Update( h(h(h(~k))), 'R2' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~k"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(~k)"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(h(~k))"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(h(~k)))"
+                                    },
+                                    {
+                                        "jgnConst": "'R2'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "OutH",
+                                "jgnFactShow": "OutH( h((~r0âh(h(~k))âh((~r0â~r1âxâh(h(~k)))))) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r0"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~k"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(~k)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(h(~k))"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "Xor",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~r0"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "~r1"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "x"
+                                                                    },
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnFunct": "h",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "~k"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "h(~k)"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(h(~k))"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r0,h(h(~k)),h(Xor(~r0,~r1,x,h(h(~k)))))"
+                                            }
+                                        ],
+                                        "jgnShow": "h(Xor(~r0,h(h(~k)),h(Xor(~r0,~r1,x,h(h(~k))))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#i:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Out",
+                                "jgnFactShow": "Out( h((~r0âh(h(~k))âh((~r0â~r1âxâh(h(~k)))))) )",
+                                "jgnFactTag": "OutFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r0"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~k"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(~k)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(h(~k))"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "Xor",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~r0"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "~r1"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "x"
+                                                                    },
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnFunct": "h",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "~k"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "h(~k)"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(h(~k))"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r0,h(h(~k)),h(Xor(~r0,~r1,x,h(h(~k)))))"
+                                            }
+                                        ],
+                                        "jgnShow": "h(Xor(~r0,h(h(~k)),h(Xor(~r0,~r1,x,h(h(~k))))))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#i:c1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "ReaderK",
+                                "jgnFactShow": "ReaderK( ~id, h(h(~k)), h(h(h(~k))) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~k"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(~k)"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(h(~k))"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(h(~k)))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#i:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "ReaderState1",
+                                "jgnFactShow": "ReaderState1( ~id, ~r0 )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    },
+                                    {
+                                        "jgnConst": "~r0"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#i:p1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( <(~r1âx), h((~r0â~r1âxâh(h(~k))))> )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r1"
+                                                    },
+                                                    {
+                                                        "jgnConst": "x"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r1,x)"
+                                            },
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "Xor",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~r0"
+                                                            },
+                                                            {
+                                                                "jgnConst": "~r1"
+                                                            },
+                                                            {
+                                                                "jgnConst": "x"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(Xor(~r1,x),h(Xor(~r0,~r1,x,h(h(~k)))))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#i:p2",
+                                "jgnFactMult": "",
+                                "jgnFactName": "ReaderK",
+                                "jgnFactShow": "ReaderK( ~id, h(~k), h(h(~k)) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#j",
+                    "jgnLabel": "setup",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "OnlyOnce",
+                                "jgnFactShow": "OnlyOnce( '2Users' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "'2Users'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Update",
+                                "jgnFactShow": "Update( h(h(~k)), 'T' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    },
+                                    {
+                                        "jgnConst": "'T'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Update",
+                                "jgnFactShow": "Update( h(~k), 'R1' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    },
+                                    {
+                                        "jgnConst": "'R1'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Update",
+                                "jgnFactShow": "Update( h(h(~k)), 'R2' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    },
+                                    {
+                                        "jgnConst": "'R2'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Setup",
+                                "jgnFactShow": "Setup( )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": []
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#j:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!Reader",
+                                "jgnFactShow": "!Reader( ~id )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#j:c1",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!Tag",
+                                "jgnFactShow": "!Tag( ~id )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#j:c2",
+                                "jgnFactMult": "",
+                                "jgnFactName": "ReaderK",
+                                "jgnFactShow": "ReaderK( ~id, h(~k), h(h(~k)) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~k"
+                                            }
+                                        ],
+                                        "jgnShow": "h(~k)"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#j:c3",
+                                "jgnFactMult": "",
+                                "jgnFactName": "TagK",
+                                "jgnFactShow": "TagK( ~id, h(h(~k)) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#j:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Fr",
+                                "jgnFactShow": "Fr( ~k )",
+                                "jgnFactTag": "FreshFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~k"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#j:p1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Fr",
+                                "jgnFactShow": "Fr( ~id )",
+                                "jgnFactTag": "FreshFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vf",
+                    "jgnLabel": "Send",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "K",
+                                "jgnFactShow": "K( <(~r1âx), h((~r0â~r1âxâh(h(~k))))> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r1"
+                                                    },
+                                                    {
+                                                        "jgnConst": "x"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r1,x)"
+                                            },
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "Xor",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~r0"
+                                                            },
+                                                            {
+                                                                "jgnConst": "~r1"
+                                                            },
+                                                            {
+                                                                "jgnConst": "x"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(Xor(~r1,x),h(Xor(~r0,~r1,x,h(h(~k)))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vf:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( <(~r1âx), h((~r0â~r1âxâh(h(~k))))> )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r1"
+                                                    },
+                                                    {
+                                                        "jgnConst": "x"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r1,x)"
+                                            },
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "Xor",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~r0"
+                                                            },
+                                                            {
+                                                                "jgnConst": "~r1"
+                                                            },
+                                                            {
+                                                                "jgnConst": "x"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(Xor(~r1,x),h(Xor(~r0,~r1,x,h(h(~k)))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vf:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( <(~r1âx), h((~r0â~r1âxâh(h(~k))))> )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r1"
+                                                    },
+                                                    {
+                                                        "jgnConst": "x"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r1,x)"
+                                            },
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "Xor",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~r0"
+                                                            },
+                                                            {
+                                                                "jgnConst": "~r1"
+                                                            },
+                                                            {
+                                                                "jgnConst": "x"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(Xor(~r1,x),h(Xor(~r0,~r1,x,h(h(~k)))))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vk",
+                    "jgnLabel": "Coerce",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( h((~r0â~r1âxâh(h(~k)))) )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r0"
+                                                    },
+                                                    {
+                                                        "jgnConst": "~r1"
+                                                    },
+                                                    {
+                                                        "jgnConst": "x"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~k"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(~k)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(h(~k))"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                            }
+                                        ],
+                                        "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vk:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( h((~r0â~r1âxâh(h(~k)))) )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r0"
+                                                    },
+                                                    {
+                                                        "jgnConst": "~r1"
+                                                    },
+                                                    {
+                                                        "jgnConst": "x"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~k"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(~k)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(h(~k))"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                            }
+                                        ],
+                                        "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vk:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KD",
+                                "jgnFactShow": "!KD( h((~r0â~r1âxâh(h(~k)))) )",
+                                "jgnFactTag": "KDFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r0"
+                                                    },
+                                                    {
+                                                        "jgnConst": "~r1"
+                                                    },
+                                                    {
+                                                        "jgnConst": "x"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~k"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(~k)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(h(~k))"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                            }
+                                        ],
+                                        "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vl",
+                    "jgnLabel": "Recv",
+                    "jgnMetadata": {
+                        "jgnActs": [],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vl:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KD",
+                                "jgnFactShow": "!KD( <~r1, h((~r0â~r1âxâh(h(~k))))> )",
+                                "jgnFactTag": "KDFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r1"
+                                            },
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "Xor",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~r0"
+                                                            },
+                                                            {
+                                                                "jgnConst": "~r1"
+                                                            },
+                                                            {
+                                                                "jgnConst": "x"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(~r1,h(Xor(~r0,~r1,x,h(h(~k)))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vl:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Out",
+                                "jgnFactShow": "Out( <~r1, h((~r0â~r1âxâh(h(~k))))> )",
+                                "jgnFactTag": "OutFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r1"
+                                            },
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "Xor",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~r0"
+                                                            },
+                                                            {
+                                                                "jgnConst": "~r1"
+                                                            },
+                                                            {
+                                                                "jgnConst": "x"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(~r1,h(Xor(~r0,~r1,x,h(h(~k)))))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vr",
+                    "jgnLabel": "initiatereader",
+                    "jgnMetadata": {
+                        "jgnActs": [],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "ReaderState1",
+                                "jgnFactShow": "ReaderState1( ~id, ~r0 )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    },
+                                    {
+                                        "jgnConst": "~r0"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr:c1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Out",
+                                "jgnFactShow": "Out( ~r0 )",
+                                "jgnFactTag": "OutFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r0"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!Reader",
+                                "jgnFactShow": "!Reader( ~id )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr:p1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Fr",
+                                "jgnFactShow": "Fr( ~r0 )",
+                                "jgnFactTag": "FreshFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r0"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vk.1",
+                    "jgnLabel": "Constrc_xor",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( (~r1âx) )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r1"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r1,x)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vk.1:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( (~r1âx) )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r1"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r1,x)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vk.1:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( x )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "x"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vk.1:p1",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~r1 )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r1"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vr.1",
+                    "jgnLabel": "tag1",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Running",
+                                "jgnFactShow": "Running( <'R', 'T', h(h(~k)), (~r0âx), ~r1> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'R'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'T'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "Xor",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~r0"
+                                                                            },
+                                                                            {
+                                                                                "jgnConst": "x"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "Xor(~r0,x)"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "~r1"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(Xor(~r0,x),~r1)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(h(h(~k)),pair(Xor(~r0,x),~r1))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('T',pair(h(h(~k)),pair(Xor(~r0,x),~r1)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('R',pair('T',pair(h(h(~k)),pair(Xor(~r0,x),~r1))))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Key",
+                                "jgnFactShow": "Key( h(h(~k)), 'T' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    },
+                                    {
+                                        "jgnConst": "'T'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "OutH",
+                                "jgnFactShow": "OutH( (~r0â~r1âxâh(h(~k))) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r0"
+                                            },
+                                            {
+                                                "jgnConst": "~r1"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            },
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~k"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(~k)"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(h(~k))"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr.1:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "TagState1",
+                                "jgnFactShow": "TagState1( ~id, h(h(~k)), ~r1, (~r0âx), h((~r0â~r1âxâh(h(~k)))) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    },
+                                    {
+                                        "jgnConst": "~r1"
+                                    },
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r0"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r0,x)"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "Xor",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~r0"
+                                                    },
+                                                    {
+                                                        "jgnConst": "~r1"
+                                                    },
+                                                    {
+                                                        "jgnConst": "x"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "h",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~k"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(~k)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "h(h(~k))"
+                                                    }
+                                                ],
+                                                "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                            }
+                                        ],
+                                        "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.1:c1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Out",
+                                "jgnFactShow": "Out( <~r1, h((~r0â~r1âxâh(h(~k))))> )",
+                                "jgnFactTag": "OutFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r1"
+                                            },
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "Xor",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "~r0"
+                                                            },
+                                                            {
+                                                                "jgnConst": "~r1"
+                                                            },
+                                                            {
+                                                                "jgnConst": "x"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "h",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnFunct": "h",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnConst": "~k"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "h(~k)"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "h(h(~k))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "Xor(~r0,~r1,x,h(h(~k)))"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(Xor(~r0,~r1,x,h(h(~k))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(~r1,h(Xor(~r0,~r1,x,h(h(~k)))))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.1:c2",
+                                "jgnFactMult": "",
+                                "jgnFactName": "TagK",
+                                "jgnFactShow": "TagK( ~id, h(h(~k)) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr.1:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!Tag",
+                                "jgnFactShow": "!Tag( ~id )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.1:p1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "TagK",
+                                "jgnFactShow": "TagK( ~id, h(h(~k)) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~id"
+                                    },
+                                    {
+                                        "jgnFunct": "h",
+                                        "jgnParams": [
+                                            {
+                                                "jgnFunct": "h",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~k"
+                                                    }
+                                                ],
+                                                "jgnShow": "h(~k)"
+                                            }
+                                        ],
+                                        "jgnShow": "h(h(~k))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.1:p2",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Fr",
+                                "jgnFactShow": "Fr( ~r1 )",
+                                "jgnFactTag": "FreshFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r1"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.1:p3",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( (~r0âx) )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r0"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r0,x)"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vk.2",
+                    "jgnLabel": "Coerce",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~r1 )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r1"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vk.2:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~r1 )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r1"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vk.2:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KD",
+                                "jgnFactShow": "!KD( ~r1 )",
+                                "jgnFactTag": "KDFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r1"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vk.3",
+                    "jgnLabel": "Constrc_xor",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( (~r0âx) )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r0"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r0,x)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vk.3:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( (~r0âx) )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r0"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r0,x)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vk.3:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( x )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "x"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vk.3:p1",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~r0 )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r0"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vk.4",
+                    "jgnLabel": "Coerce",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~r0 )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r0"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vk.4:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~r0 )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r0"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vk.4:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KD",
+                                "jgnFactShow": "!KD( ~r0 )",
+                                "jgnFactTag": "KDFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~r0"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vf.5",
+                    "jgnLabel": "Send",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "K",
+                                "jgnFactShow": "K( (~r0âx) )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r0"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r0,x)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vf.5:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( (~r0âx) )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r0"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r0,x)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vf.5:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( (~r0âx) )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "Xor",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~r0"
+                                            },
+                                            {
+                                                "jgnConst": "x"
+                                            }
+                                        ],
+                                        "jgnShow": "Xor(~r0,x)"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vk.6",
+                    "jgnLabel": "!KU( x )",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( x )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "x"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [],
+                        "jgnPrems": []
+                    },
+                    "jgnType": "unsolvedActionAtom"
+                },
+                {
+                    "jgnId": "#i",
+                    "jgnLabel": "#i",
+                    "jgnType": "lastAtom"
+                }
+            ],
+            "jgType": "Tamarin prover constraint system"
+        }
+    ]
+}

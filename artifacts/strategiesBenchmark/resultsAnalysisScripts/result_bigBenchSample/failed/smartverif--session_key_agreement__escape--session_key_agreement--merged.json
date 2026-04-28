@@ -1,0 +1,22 @@
+{
+  "task_id": "smartverif--session_key_agreement__escape--session_key_agreement--merged",
+  "error_description": "An unexpected error occurred, see stderr output below for details.",
+  "wrapper_measures": {
+    "time": 7.670141696929932,
+    "avg_memory": 374.17041015624994,
+    "peak_memory": 707.15625
+  },
+  "return_code": 1,
+  "last_stderr_lines": [
+    "Deprecation Warning: using 'axiom' is retired notation, replace all uses of 'axiom' by 'restriction'.",
+    "[Theory TLS_13_lemmas] Theory loaded",
+    "[Theory TLS_13_lemmas] Theory translated",
+    "[Theory TLS_13_lemmas] Theory closed",
+    "[Open Chains] Too many chain constraints, stopping precomputation. Open Chains limits (can be changed with -c=): 10",
+    "[Saturating Sources] Step 1 (Max 5)",
+    "tamarin-prover: shapeTerm: the term (t.9) does not have enough pairs.",
+    "Occured in fact: (ProtoFact Linear \"F_State_C1\" 29) with behavior [[=],[=],[=],[<],[.],[=],[.],[=,=],[.],[.],[=],[.],[=],[=],[.],[.],[.],[.],[=],[=],[=],[=],[=],[=],[.],[=],[=],[=]]",
+    "CallStack (from HasCallStack):",
+    "  error, called at src/Theory/Constraint/Solver/Simplify.hs:615:33 in tamarin-prover-theory-1.11.0-5GWzvjwXas7L34RyVuQE1i:Theory.Constraint.Solver.Simplify"
+  ]
+}

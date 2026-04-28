@@ -162,7 +162,7 @@ def byCaseStudyAllTactic(onlyTarget,noExists, noBaseLine):
         for lm in lemmaNames:
             provedStrat, proveTactic = False,False
             for s in strat:
-                lmName = lm.replace("original",s)+"--merged"
+                lmName = lm.replace("__original--",f"__{s}--")+"--merged"
                 dir = lemma[s]['lemmas'][lmName]['theory_dir']	
                 if not dir=="emv":
                     ty = lemma[s]['lemmas'][lmName]['lemma_type']
@@ -204,7 +204,7 @@ def compareN(dirname,onlyTarget,noExists,consType,label,indexes):
         status, lemmaTimes = [], []
         if selectLemma(onlyTarget,False,noExists,strt[0],lm):
             for s in strt: 
-                lmName = lm.replace("original",s)+"--merged"
+                lmName = lm.replace("__original--",f"__{s}--")+"--merged"
 
                 status.append(lemma[s]['lemmas'][lmName]['status'])
                 lemmaTimes.append(lemma[s]['lemmas'][lmName]['time'])
@@ -248,7 +248,7 @@ def compare(onlyTarget,noExists,consType,i1,i2):
     #consType = "0"
     for lm in lemmaNames:
         if selectLemma(onlyTarget,False,noExists,strat[0],lm):
-            lm1, lm2 = lm.replace("original",s1)+"--merged", lm.replace("original",s2)+"--merged"
+            lm1, lm2 = lm.replace("__original--",f"__{s1}--")+"--merged", lm.replace("__original--",f"__{s2}--")+"--merged"
             st1, st2 = lemma[s1]['lemmas'][lm1]['status'],lemma[s2]['lemmas'][lm2]['status']
             t = lemma[s1]['lemmas'][lm1]['lemma_type']
             if consType in t:
@@ -302,10 +302,10 @@ def tieBreaker(onlyTarget,noExists,consType,indexes):
         if selectLemma(onlyTarget,False,noExists,strat[0],lm):
             status, lemmaTimes = [], []
             for s in strt:
-                lmName = lm.replace("original",s)+"--merged"
+                lmName = lm.replace("__original--",f"__{s}--")+"--merged"
                 status.append(lemma[s]['lemmas'][lmName]['status'])
                 lemmaTimes.append(lemma[s]['lemmas'][lmName]['time'])
-            lmName = lm.replace("original",strt[0])+"--merged"
+            lmName = lm.replace("__original--",f"__{strt[0]}--")+"--merged"
             t = lemma[strt[0]]['lemmas'][lmName]['lemma_type']
             if consType in t:
                 allFinished = True
@@ -335,7 +335,7 @@ def generalRanking(onlyTarget,noExists,type,stratsIdx):
         if selectLemma(onlyTarget,False,noExists,strat[0],lm):
             for si in range(len(stratsIdx)): 
                 s = strat[stratsIdx[si]]
-                lmName = lm.replace("original",s)
+                lmName = lm.replace("__original--",f"__{s}--")
                 if not "merged" in lmName:
                     lmName = lmName+"--merged"
                 st = lemma[s]['lemmas'][lmName]['status']
@@ -352,14 +352,14 @@ def proveUnique(onlyTarget,noExists,type,stratTested,ref):
     for lm in lemmaNames:
         if selectLemma(onlyTarget,False,noExists,strat[0],lm):
             unique = False
-            lmName = lm.replace("original",strat[stratTested])+"--merged"
+            lmName = lm.replace("__original--",f"__{strat[stratTested]}--")+"--merged"
             st = lemma[strat[stratTested]]['lemmas'][lmName]['status']
             t = lemma[strat[stratTested]]['lemmas'][lmName]['lemma_type']
             if type in t: 
                 if st == "completed":
                     unique = True
                     for s in ref:
-                        lmName = lm.replace("original",strat[s])+"--merged"
+                        lmName = lm.replace("__original--",f"__{strat[s]}--")+"--merged"
                         if (lemma[strat[s]]['lemmas'][lmName]['status'] == "completed"):
                             unique = False
             if unique:
@@ -382,13 +382,13 @@ def workflowEfficience(onlyTarget,noExists,type,ranking):
     for lm in lemmaNames:
         if selectLemma(onlyTarget,False,noExists,strat[0],lm):
             proved = False
-            lmName = lm.replace("original",strat[0])+"--merged"
+            lmName = lm.replace("__original--",f"__{strat[0]}--")+"--merged"
             t = lemma[strat[0]]['lemmas'][lmName]['lemma_type']
             if type in t:
                 casesConsidered += 1
                 for si in ranking:
                     s = strat[si]
-                    lmName = lm.replace("original",s)+"--merged"
+                    lmName = lm.replace("__original--",f"__{s}--")+"--merged"
                     st = lemma[s]['lemmas'][lmName]['status']
                     if (st == "completed"):
                         proved = True
@@ -400,10 +400,10 @@ def resultApproach(onlyTarget,noExists,type,s):
     score = 0
     for lm in lemmaNames:
         if selectLemma(onlyTarget,False,noExists,strat[0],lm):
-            lmName = lm.replace("original",strat[0])+"--merged"
+            lmName = lm.replace("__original--",f"__{strat[0]}--")+"--merged"
             t = lemma[strat[0]]['lemmas'][lmName]['lemma_type']
             if type in t:
-                lmName = lm.replace("original",strat[s])+"--merged"
+                lmName = lm.replace("__original--",f"__{strat[s]}--")+"--merged"
                 if (lemma[strat[s]]['lemmas'][lmName]['status'] == "completed"):
                     score += 1
     return(score)
@@ -486,7 +486,7 @@ def oracled(oracleStatus):
 	return(oracleStatus == "1.0" or oracleStatus == "0.0")
 
 def selectLemma(targetLemma,noBaseLine,noExists,strategy,lem):
-    lmName = lem.replace("original",strategy)
+    lmName = lem.replace("__original--",f"__{strategy}--",1)
     if not "merged" in lmName:
         lmName = lmName+"--merged"
     # print(json.dumps(lemma[strategy]['lemmas'],indent=4))

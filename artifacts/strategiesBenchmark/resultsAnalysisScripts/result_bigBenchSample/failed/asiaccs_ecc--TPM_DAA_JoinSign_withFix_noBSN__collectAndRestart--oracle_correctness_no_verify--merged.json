@@ -1,0 +1,22 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__collectAndRestart--oracle_correctness_no_verify--merged",
+  "error_description": "The task was likely killed by the wrapper, probably by a user action.",
+  "wrapper_measures": {
+    "time": 381.2544758319855,
+    "avg_memory": 1443.3541666666672,
+    "peak_memory": 1554.87890625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    " checking version: 2.7.1. OK.",
+    " checking installation: OK.",
+    "[Theory TPM_DAA_JoinSign_withFix_NoBSN] Theory loaded",
+    "[Theory TPM_DAA_JoinSign_withFix_NoBSN] Theory translated",
+    "[Theory TPM_DAA_JoinSign_withFix_NoBSN] Theory closed",
+    "[Saturating Sources] Step 1 (Max 5)",
+    "[Open Chains] Too many chain constraints, stopping precomputation. Open Chains limits (can be changed with -c=): 10",
+    "[Saturating Sources] Step 2 (Max 5)",
+    "[Saturating Sources] Step 3 (Max 5)",
+    "[Saturating Sources] Done"
+  ]
+}

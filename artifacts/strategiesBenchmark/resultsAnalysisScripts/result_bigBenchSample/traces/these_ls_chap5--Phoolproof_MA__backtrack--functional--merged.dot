@@ -1,0 +1,87 @@
+digraph "trace_Phoolproof_MA_SL2-AS0-CL0-A1-C1-NB_functional-D_1_case_1-S_7-S_3-D_5-H_8-H_receive-H_fresh-S_3-D_5" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n4[shape="record",label="{{<n0> AgSt_D2( $D, 'D_2', \<'Human', $S, ~skD, $idH, pk(~skS), ~m\> )|<n1> In( \<~chall, SI2\> )}|{<n2> #k : D_5[Dfin( )]}|{<n3> Out( \<$idH, ~m, SI1\> )}}",fillcolor="#d5d897",style="filled",fontcolor="black",role="Undefined"];
+n8[shape="record",label="{{<n5> AgSt_S7( $S, 'S_7',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'Human', $D, pk(~skD), ~skS, pw(~pw), $idH, ~chall, ~m\>\l)\l|<n6> In( \<$idH, ~m, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pw(~pw)\>\l)\l}|{<n7> #n : S_9[Commit( $S, 'Human', ~m )]}}",fillcolor="#d2d897",style="filled",fontcolor="black",role="Undefined"];
+n9[label="#vf : isend",shape="ellipse"];
+n10[label="#vk : coerce[!KU( ~chall )]",shape="ellipse"];
+n11[label="#vl : irecv",shape="ellipse"];
+n17[shape="record",label="{{<n12> AgSt_D0( $D, 'D_0',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'Human', $S, ~skD, $idH, pk(~skS)\>\l)\l|<n13> In_S( 'Human', $D, \<'S', 'm'\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<$S, ~m\>\l)\l}|{<n14> #vr : D_1}|{<n15> AgSt_D2( $D, 'D_2', \<'Human', $S, ~skD, $idH, pk(~skS), ~m\> )|<n16> Out( \<'S', $S\> )}}",fillcolor="#ccd998",style="filled",fontcolor="black",role="Undefined"];
+n18[label="#vf.1 : isend",shape="ellipse"];
+n19[label="#vk.1 : coerce[!KU( ~m )]",shape="ellipse"];
+n20[label="#vl.1 : irecv",shape="ellipse"];
+n35[shape="record",label="{{<n21> Fr( ~m.1 )|<n22> !Password( 'Human', $S, ~pw )|<n23> !Ltk( $S, ~skS )|<n24> !Ltk( $D, ~skD )}|{<n25> #vr.1 : Setup[Setup( 'Human' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Roles( 'Human', $D, $P, $S ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Device( 'Human', $D ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User( $idH, 'Human' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitK( 'Human', 'D', $D ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitK( 'Human', 'P', $P ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitK( 'Human', 'S', $S ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitK( 'Human', 'm', ~m.1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitK( 'Human', 'pw', pw(~pw) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InitK( 'Human', 'idH', $idH )]\l}|{<n26> AgSt_D0( $D, 'D_0',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'Human', $S, ~skD, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$idH, pk(~skS)\>\l)\l|<n27> AgSt_S0( $S, 'S_0',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'Human', $D, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pk(~skD), ~skS, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pw(~pw), $idH\>\l)\l|<n28> !HK( 'Human', 'D',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$D\l)\l|<n29> !HK( 'Human', 'P',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$P\l)\l|<n30> !HK( 'Human', 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$S\l)\l|<n31> !HK( 'Human', 'm',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~m.1\l)\l|<n32> !HK( 'Human', 'pw',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pw(~pw)\l)\l|<n33> !HK( 'Human', 'idH',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$idH\l)\l|<n34> AgSt_H0( 'Human',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'H_0',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<$D, $P, $S, ~m.1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pw(~pw), $idH\>\l)\l}}",fillcolor="#c7d998",style="filled",fontcolor="black",role="Undefined"];
+n36[label="#vk.2 : coerce[!KU( pw(~pw) )]",shape="ellipse"];
+n40[shape="record",label="{{<n37> !Sec( 'Human', $D, \<'S', 'm'\>, \<$S, ~m\> )}|{<n38> #vr.2 : ChanIn_S[ChanIn_S( 'Human', $D, \<'S', 'm'\>, \<$S, ~m\> )]}|{<n39> In_S( 'Human', $D, \<'S', 'm'\>, \<$S, ~m\> )}}",fillcolor="#c1da98",style="filled",fontcolor="black",role="Undefined"];
+n41[label="#vk.3 : coerce[!KU( SI2 )]",shape="ellipse"];
+n45[shape="record",label="{{<n42> Fr( ~pw )}|{<n43> #vr.3 : passworddistribution[PasswordHS( 'Human', $S, ~pw )]}|{<n44> !Password( 'Human', $S, ~pw )}}",fillcolor="#beda99",style="filled",fontcolor="black",role="Undefined"];
+n46[label="#vk.4 : coerce[!KU( SI1 )]",shape="ellipse"];
+n52[shape="record",label="{{<n47> Fr( ~skS )}|{<n48> #vr.4 : publickeyinfrastructure[LontermKey( $S, ~skS )]}|{<n49> !Ltk( $S, ~skS )|<n50> !Pk( $S, pk(~skS) )|<n51> Out( pk(~skS) )}}",fillcolor="#b8db99",style="filled",fontcolor="black",role="Undefined"];
+n58[shape="record",label="{{<n53> Fr( ~skD )}|{<n54> #vr.5 : publickeyinfrastructure[LontermKey( $D, ~skD )]}|{<n55> !Ltk( $D, ~skD )|<n56> !Pk( $D, pk(~skD) )|<n57> Out( pk(~skD) )}}",fillcolor="#b8db99",style="filled",fontcolor="black",role="Undefined"];
+n59[label="#vf.6 : isend",shape="ellipse"];
+n63[shape="record",label="{{<n60> Out_S( 'Human', $D, \<'S', 'm'\>, \<$S, ~m\> )}|{<n61> #vr.6 : ChanOut_S[ChanOut_S( 'Human', $D, \<'S', 'm'\>, \<$S, ~m\> )]}|{<n62> !Sec( 'Human', $D, \<'S', 'm'\>, \<$S, ~m\> )}}",fillcolor="#b5db99",style="filled",fontcolor="black",role="Undefined"];
+n64[label="#vf.7 : isend",shape="ellipse"];
+n69[shape="record",label="{{<n65> !HK( 'Human', 'S', $S )|<n66> !HK( 'Human', 'm', ~m )}|{<n67> #vr.7 : H_send_S2[Send( 'Human', 'S', $S ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Send( 'Human', 'm', ~m ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H( 'Human' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To( $D )]\l}|{<n68> Out_S( 'Human', $D, \<'S', 'm'\>, \<$S, ~m\> )}}",fillcolor="#b3db99",style="filled",fontcolor="black",role="Undefined"];
+n74[shape="record",label="{{<n70> AgSt_S4( $S, 'S_4',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'Human', $D, pk(~skD), ~skS, pw(~pw), $idH, ~chall\>\l)\l|<n71> In( \<$idH, ~m, SI1\>\l)\l}|{<n72> #vr.8 : S_7}|{<n73> AgSt_S7( $S, 'S_7', \<'Human', $D, pk(~skD), ~skS, pw(~pw), $idH, ~chall, ~m\> )}}",fillcolor="#b0dc9a",style="filled",fontcolor="black",role="Undefined"];
+n75[label="#vf.9 : isend",shape="ellipse"];
+n82[shape="record",label="{{<n76> AgSt_S0( $S, 'S_0', \<'Human', $D, pk(~skD), ~skS, pw(~pw), $idH\>\l)\l|<n77> In( 'hello' )|<n78> Fr( ~chall )}|{<n79> #vr.9 : S_3}|{<n80> AgSt_S4( $S, 'S_4',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'Human', $D, pk(~skD), ~skS, pw(~pw), $idH, ~chall\>\l)\l|<n81> Out( \<~chall, SI2\> )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n83[label="#vr.11 : d_0_snd",shape="ellipse"];
+n84[label="#vr.12 : d_0_fst",shape="ellipse"];
+n88[shape="record",label="{{<n85> AgSt_H1( 'Human', 'H_1', \<$D, $P, $S, ~m.1, pw(~pw), $idH\> )}|{<n86> #vr.13 : H_8[H_role( 'Human', '5' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Send( 'Human', 'pw', pw(~pw) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Send( 'Human', 'idH', $idH )]\l}|{<n87> Out( \<\<'pw', 'idH'\>, pw(~pw), $idH\> )}}",fillcolor="#aadc9a",style="filled",fontcolor="black",role="Undefined"];
+n93[shape="record",label="{{<n89> AgSt_H0( 'Human', 'H_0', \<$D, $P, $S, ~m.1, pw(~pw), $idH\> )}|{<n90> #vr.16 : H_1[H_role( 'Human', '1' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Send( 'Human', 'S', $S ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Send( 'Human', 'm', ~m.1 )]\l}|{<n91> AgSt_H1( 'Human', 'H_1',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<$D, $P, $S, ~m.1, pw(~pw), $idH\>\l)\l|<n92> Out_S( 'Human', $D, \<'S', 'm'\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<$S, ~m.1\>\l)\l}}",fillcolor="#a7dd9a",style="filled",fontcolor="black",role="Undefined"];
+n97[shape="record",label="{{<n94> In( \<'S', $S\> )}|{<n95> #vr.17 : H_receive[Receive( 'Human', 'S', $S ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!HK( 'Human', 'S', $S ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H( 'Human' )]\l}|{<n96> !HK( 'Human', 'S', $S )}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n101[shape="record",label="{{<n98> Fr( ~m )}|{<n99> #vr.18 : H_fresh[Fresh( 'Human', 'm', ~m ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;!HK( 'Human', 'm', ~m ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;H( 'Human' )]\l}|{<n100> !HK( 'Human', 'm', ~m )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n102[label="#vr.20 : d_0_snd",shape="ellipse"];
+n4:n3 -> n20[color="gray30"];
+n9 -> n4:n1[color="gray30"];
+n11 -> n10[color="orangered2"];
+n11 -> n41[color="orangered2"];
+n17:n15 -> n4:n0[style="bold",weight="10.0"];
+n18 -> n8:n6[color="gray30"];
+n20 -> n83[color="orangered2"];
+n35:n26 -> n17:n12[style="bold",weight="10.0"];
+n35:n27 -> n82:n76[style="bold",weight="10.0"];
+n35:n34 -> n93:n89[style="bold",weight="10.0"];
+n40:n39 -> n17:n13[style="bold",weight="10.0"];
+n45:n44 -> n35:n22[style="bold",weight="10.0",color="gray50"];
+n52:n49 -> n35:n23[style="bold",weight="10.0",color="gray50"];
+n58:n55 -> n35:n24[style="bold",weight="10.0",color="gray50"];
+n59 -> n74:n71[color="gray30"];
+n63:n62 -> n40:n37[style="bold",weight="10.0",color="gray50"];
+n64 -> n82:n77[color="gray30"];
+n69:n68 -> n63:n60[style="bold",weight="10.0"];
+n74:n73 -> n8:n5[style="bold",weight="10.0"];
+n75 -> n97:n94[color="gray30"];
+n82:n80 -> n74:n70[style="bold",weight="10.0"];
+n82:n81 -> n11[color="gray30"];
+n83 -> n84[color="orangered2"];
+n83 -> n102[color="orangered2"];
+n84 -> n19[color="orangered2"];
+n88:n87 -> n36[color="orangered2"];
+n93:n91 -> n88:n85[style="bold",weight="10.0"];
+n97:n96 -> n69:n65[style="bold",weight="10.0",color="gray50"];
+n101:n100 -> n69:n66[style="bold",weight="10.0",color="gray50"];
+n102 -> n46[color="orangered2"];
+n10 -> n9[color="red",style="dashed"];
+n11 -> n9[color="red",style="dashed"];
+n19 -> n18[color="red",style="dashed"];
+n19 -> n59[color="red",style="dashed"];
+n20 -> n59[color="red",style="dashed"];
+n35:n25 -> n69:n67[color="black",style="dashed"];
+n35:n25 -> n97:n95[color="black",style="dashed"];
+n35:n25 -> n101:n99[color="black",style="dashed"];
+n36 -> n18[color="red",style="dashed"];
+n41 -> n9[color="red",style="dashed"];
+n46 -> n59[color="red",style="dashed"];
+n83 -> n59[color="red",style="dashed"];
+{
+rank="sink";
+n103[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign(&lt;$idH, ~chall, ~m&gt;, ~skD)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign(~chall, ~skS)</TD></TR></TABLE>>];
+
+}
+n8:n7 -> n103[style="invis"];
+
+}

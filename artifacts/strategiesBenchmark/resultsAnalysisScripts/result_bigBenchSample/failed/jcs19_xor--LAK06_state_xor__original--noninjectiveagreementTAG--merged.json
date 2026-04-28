@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LAK06_state_xor__original--noninjectiveagreementTAG--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1767.7591338157654,
+    "avg_memory": 18136.040985018844,
+    "peak_memory": 41037.48046875
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

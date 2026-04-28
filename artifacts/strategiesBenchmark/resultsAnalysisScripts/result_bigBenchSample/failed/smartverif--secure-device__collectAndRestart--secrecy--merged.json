@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--secure-device__collectAndRestart--secrecy--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.482877492905,
+    "avg_memory": 171.7896258639726,
+    "peak_memory": 187.19921875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

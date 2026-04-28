@@ -1,0 +1,2502 @@
+{
+  "config": {
+    "global_max_cores": 30,
+    "global_max_memory": 300,
+    "default_timeout": 7200,
+    "output_directory": "result_bigBenchSample_28-04-26_09-43-52/rerun"
+  },
+  "tamarin_versions": {
+    "merged": {
+      "path": "/home/mracouch/mergedStrategies/.stack-work/install/x86_64-linux-tinfo6/cf69096cedaf07b3115e434cb22c131434e585a850cd852d744eee7c5f55f01c/9.6.6/bin/tamarin-prover",
+      "version": "v1.11.0"
+    }
+  },
+  "tasks": {
+    "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__original": {
+      "theory_file": "/home/mracouch/files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinSign_withFix_noBSN.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__original",
+      "lemmas": [
+        {
+          "name": "oracle_correctness_two_sigs_same_credentials",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_secrecy_cre",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_weak_agreement_host",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_SP3_Unforgeability",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_non_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_two_sigs_different_credentials",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "csf19_wrapping--siv__original": {
+      "theory_file": "/home/mracouch/files_to_benchmark/csf19_wrapping/siv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "csf19_wrapping--siv__original",
+      "lemmas": [
+        {
+          "name": "Counter_Monotonicity",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "css18_5G--5G_AKA_priv__original": {
+      "theory_file": "/home/mracouch/files_to_benchmark/css18_5G/5G_AKA_priv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "css18_5G--5G_AKA_priv__original",
+      "lemmas": [
+        {
+          "name": "sqn_ue_nodecrease",
+          "tamarin_options": [
+            "--diff",
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_hss_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_ue_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "Observational_equivalence",
+          "tamarin_options": [
+            "--diff",
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "jcs19_xor--LAK06_state_xor__original": {
+      "theory_file": "/home/mracouch/files_to_benchmark/jcs19_xor/LAK06_state.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "jcs19_xor--LAK06_state_xor__original",
+      "lemmas": [
+        {
+          "name": "executable",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingSecrecy",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "noninjectiveagreementTAG",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingUpdateKey",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--modersheim__original": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/modersheim.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--modersheim__original",
+      "lemmas": [
+        {
+          "name": "Knows_Honest_Key_imp_Revoked",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--secure-device__original": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/secure-device.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--secure-device__original",
+      "lemmas": [
+        {
+          "name": "secrecy",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--session_key_agreement__original": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/session_key_agreement.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--session_key_agreement__original",
+      "lemmas": [
+        {
+          "name": "session_key_agreement",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "these_ls_chap5--Phoolproof_MA__original": {
+      "theory_file": "/home/mracouch/files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__original",
+      "lemmas": [
+        {
+          "name": "message_authentication",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "wisec--5G_handover_5GS_to_EPS__original": {
+      "theory_file": "/home/mracouch/files_to_benchmark/wisec/5G_handover_5GS_to_EPS.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "wisec--5G_handover_5GS_to_EPS__original",
+      "lemmas": [
+        {
+          "name": "secret_k_enb_star",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "injectiveagreement_ue_enb_k_enb",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_amf",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_asme",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_gnb",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "injectiveagreement_enb_ue_k_enb",
+          "tamarin_options": [
+            "-d0"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__escape": {
+      "theory_file": "/home/mracouch/files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinSign_withFix_noBSN.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__escape",
+      "lemmas": [
+        {
+          "name": "oracle_correctness_two_sigs_same_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_secrecy_cre",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_weak_agreement_host",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_SP3_Unforgeability",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_non_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_two_sigs_different_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "csf19_wrapping--siv__escape": {
+      "theory_file": "/home/mracouch/files_to_benchmark/csf19_wrapping/siv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "csf19_wrapping--siv__escape",
+      "lemmas": [
+        {
+          "name": "Counter_Monotonicity",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "css18_5G--5G_AKA_priv__escape": {
+      "theory_file": "/home/mracouch/files_to_benchmark/css18_5G/5G_AKA_priv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "css18_5G--5G_AKA_priv__escape",
+      "lemmas": [
+        {
+          "name": "sqn_ue_nodecrease",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_hss_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_ue_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "original_replayed_autn",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "Observational_equivalence",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "jcs19_xor--LAK06_state_xor__escape": {
+      "theory_file": "/home/mracouch/files_to_benchmark/jcs19_xor/LAK06_state.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "jcs19_xor--LAK06_state_xor__escape",
+      "lemmas": [
+        {
+          "name": "executable",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingSecrecy",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "noninjectiveagreementTAG",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingUpdateKey",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "noninjectiveagreementREADER",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--secure-device__escape": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/secure-device.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--secure-device__escape",
+      "lemmas": [
+        {
+          "name": "secrecy",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--session_key_agreement__escape": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/session_key_agreement.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--session_key_agreement__escape",
+      "lemmas": [
+        {
+          "name": "session_key_agreement",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "wisec--5G_handover_5GS_to_EPS__escape": {
+      "theory_file": "/home/mracouch/files_to_benchmark/wisec/5G_handover_5GS_to_EPS.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "wisec--5G_handover_5GS_to_EPS__escape",
+      "lemmas": [
+        {
+          "name": "secret_k_amf",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_gnb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Escape"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__proba": {
+      "theory_file": "/home/mracouch/files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinSign_withFix_noBSN.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__proba",
+      "lemmas": [
+        {
+          "name": "oracle_correctness_two_sigs_same_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_secrecy_cre",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_weak_agreement_host",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_SP3_Unforgeability",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_non_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_two_sigs_different_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "csf19_wrapping--siv__proba": {
+      "theory_file": "/home/mracouch/files_to_benchmark/csf19_wrapping/siv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "csf19_wrapping--siv__proba",
+      "lemmas": [
+        {
+          "name": "Counter_Monotonicity",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "css18_5G--5G_AKA_priv__proba": {
+      "theory_file": "/home/mracouch/files_to_benchmark/css18_5G/5G_AKA_priv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "css18_5G--5G_AKA_priv__proba",
+      "lemmas": [
+        {
+          "name": "sqn_ue_nodecrease",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_hss_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_ue_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "Observational_equivalence",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "jcs19_xor--LAK06_state_xor__proba": {
+      "theory_file": "/home/mracouch/files_to_benchmark/jcs19_xor/LAK06_state.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "jcs19_xor--LAK06_state_xor__proba",
+      "lemmas": [
+        {
+          "name": "executable",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingSecrecy",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "noninjectiveagreementTAG",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingUpdateKey",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--secure-device__proba": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/secure-device.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--secure-device__proba",
+      "lemmas": [
+        {
+          "name": "secrecy",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--session_key_agreement__proba": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/session_key_agreement.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--session_key_agreement__proba",
+      "lemmas": [
+        {
+          "name": "session_key_agreement",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "these_ls_chap5--Phoolproof_MA__proba": {
+      "theory_file": "/home/mracouch/files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__proba",
+      "lemmas": [
+        {
+          "name": "message_authentication",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "wisec--5G_handover_5GS_to_EPS__proba": {
+      "theory_file": "/home/mracouch/files_to_benchmark/wisec/5G_handover_5GS_to_EPS.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "wisec--5G_handover_5GS_to_EPS__proba",
+      "lemmas": [
+        {
+          "name": "secret_k_enb_star",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_amf",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_asme",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_gnb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "injectiveagreement_enb_ue_k_enb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Proba"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__backtrack": {
+      "theory_file": "/home/mracouch/files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinSign_withFix_noBSN.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__backtrack",
+      "lemmas": [
+        {
+          "name": "oracle_correctness_two_sigs_same_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_with_verify",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_aliveness_host",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_secrecy_cre",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_weak_agreement_host",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_SP3_Unforgeability",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_non_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_two_sigs_different_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_join_only",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_no_verify",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "csf19_wrapping--siv__backtrack": {
+      "theory_file": "/home/mracouch/files_to_benchmark/csf19_wrapping/siv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "csf19_wrapping--siv__backtrack",
+      "lemmas": [
+        {
+          "name": "Counter_Monotonicity",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "css18_5G--5G_AKA_priv__backtrack": {
+      "theory_file": "/home/mracouch/files_to_benchmark/css18_5G/5G_AKA_priv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "css18_5G--5G_AKA_priv__backtrack",
+      "lemmas": [
+        {
+          "name": "sqn_ue_nodecrease",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_hss_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_ue_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "original_replayed_autn",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "Observational_equivalence",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "jcs19_xor--LAK06_state_xor__backtrack": {
+      "theory_file": "/home/mracouch/files_to_benchmark/jcs19_xor/LAK06_state.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "jcs19_xor--LAK06_state_xor__backtrack",
+      "lemmas": [
+        {
+          "name": "executable",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingSecrecy",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "noninjectiveagreementTAG",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingUpdateKey",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "noninjectiveagreementREADER",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--session_key_agreement__backtrack": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/session_key_agreement.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--session_key_agreement__backtrack",
+      "lemmas": [
+        {
+          "name": "session_key_agreement",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "these_ls_chap5--Phoolproof_MA__backtrack": {
+      "theory_file": "/home/mracouch/files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__backtrack",
+      "lemmas": [
+        {
+          "name": "message_authentication",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "wisec--5G_handover_5GS_to_EPS__backtrack": {
+      "theory_file": "/home/mracouch/files_to_benchmark/wisec/5G_handover_5GS_to_EPS.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "wisec--5G_handover_5GS_to_EPS__backtrack",
+      "lemmas": [
+        {
+          "name": "secret_k_enb_star",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_amf",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_asme",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_gnb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "injectiveagreement_enb_ue_k_enb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=Backtrack"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__backAndAvoid": {
+      "theory_file": "/home/mracouch/files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinSign_withFix_noBSN.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__backAndAvoid",
+      "lemmas": [
+        {
+          "name": "oracle_correctness_two_sigs_same_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "auto_verify_multiple_pkes",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_with_verify",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_aliveness_host",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_secrecy_cre",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_weak_agreement_host",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_SP3_Unforgeability",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_non_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_two_sigs_different_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_join_only",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_no_verify",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "csf19_wrapping--siv__backAndAvoid": {
+      "theory_file": "/home/mracouch/files_to_benchmark/csf19_wrapping/siv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "csf19_wrapping--siv__backAndAvoid",
+      "lemmas": [
+        {
+          "name": "Key_IntegrityAndConfidentiality",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "origin",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "Counter_Monotonicity",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "Key_UniqueLevelandHandle",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "IV_Uniqueness",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "css18_5G--5G_AKA_priv__backAndAvoid": {
+      "theory_file": "/home/mracouch/files_to_benchmark/css18_5G/5G_AKA_priv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "css18_5G--5G_AKA_priv__backAndAvoid",
+      "lemmas": [
+        {
+          "name": "sqn_ue_nodecrease",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_hss_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "executability_honest",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "sqn_ue_invariance",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "original_replayed_autn",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "Observational_equivalence",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "jcs19_xor--LAK06_state_xor__backAndAvoid": {
+      "theory_file": "/home/mracouch/files_to_benchmark/jcs19_xor/LAK06_state.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "jcs19_xor--LAK06_state_xor__backAndAvoid",
+      "lemmas": [
+        {
+          "name": "executable",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingSecrecy",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "noninjectiveagreementTAG",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingUpdateKey",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "noninjectiveagreementREADER",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--secure-device__backAndAvoid": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/secure-device.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--secure-device__backAndAvoid",
+      "lemmas": [
+        {
+          "name": "secrecy",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--session_key_agreement__backAndAvoid": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/session_key_agreement.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--session_key_agreement__backAndAvoid",
+      "lemmas": [
+        {
+          "name": "session_key_agreement",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "these_ls_chap5--Phoolproof_MA__backAndAvoid": {
+      "theory_file": "/home/mracouch/files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__backAndAvoid",
+      "lemmas": [
+        {
+          "name": "functional",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "message_authentication",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "wisec--5G_handover_5GS_to_EPS__backAndAvoid": {
+      "theory_file": "/home/mracouch/files_to_benchmark/wisec/5G_handover_5GS_to_EPS.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "wisec--5G_handover_5GS_to_EPS__backAndAvoid",
+      "lemmas": [
+        {
+          "name": "secret_k_enb_star",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "injectiveagreement_ue_enb_k_enb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_amf",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_asme",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_gnb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "executability",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "injectiveagreement_enb_ue_k_enb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=BackAndAvoid"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__collectAndRestart": {
+      "theory_file": "/home/mracouch/files_to_benchmark/asiaccs_ecc/TPM_DAA_JoinSign_withFix_noBSN.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__collectAndRestart",
+      "lemmas": [
+        {
+          "name": "oracle_correctness_two_sigs_same_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "auto_verify_multiple_pkes",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_with_verify",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_aliveness_host",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_secrecy_cre",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_weak_agreement_host",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_SP3_Unforgeability",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_auth_non_injective_agreement_host_issuer",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "auto_bind_restriction",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_two_sigs_different_credentials",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_join_only",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "oracle_correctness_no_verify",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "auto_restriction_one_tpm_per_host",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "csf19_wrapping--siv__collectAndRestart": {
+      "theory_file": "/home/mracouch/files_to_benchmark/csf19_wrapping/siv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "csf19_wrapping--siv__collectAndRestart",
+      "lemmas": [
+        {
+          "name": "Key_IntegrityAndConfidentiality",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "origin",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "Counter_Monotonicity",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "css18_5G--5G_AKA_priv__collectAndRestart": {
+      "theory_file": "/home/mracouch/files_to_benchmark/css18_5G/5G_AKA_priv.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "css18_5G--5G_AKA_priv__collectAndRestart",
+      "lemmas": [
+        {
+          "name": "sqn_ue_nodecrease",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "executability_honest",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "original_replayed_autn",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "Observational_equivalence",
+          "tamarin_options": [
+            "--diff",
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "jcs19_xor--LAK06_state_xor__collectAndRestart": {
+      "theory_file": "/home/mracouch/files_to_benchmark/jcs19_xor/LAK06_state.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "jcs19_xor--LAK06_state_xor__collectAndRestart",
+      "lemmas": [
+        {
+          "name": "executable",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "helpingSecrecy",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "noninjectiveagreementREADER",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--modersheim__collectAndRestart": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/modersheim.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--modersheim__collectAndRestart",
+      "lemmas": [
+        {
+          "name": "Knows_Honest_Key_imp_Revoked",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--secure-device__collectAndRestart": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/secure-device.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--secure-device__collectAndRestart",
+      "lemmas": [
+        {
+          "name": "secrecy",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "smartverif--session_key_agreement__collectAndRestart": {
+      "theory_file": "/home/mracouch/files_to_benchmark/smartverif/session_key_agreement.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "smartverif--session_key_agreement__collectAndRestart",
+      "lemmas": [
+        {
+          "name": "session_key_agreement",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "these_ls_chap5--Phoolproof_MA__collectAndRestart": {
+      "theory_file": "/home/mracouch/files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__collectAndRestart",
+      "lemmas": [
+        {
+          "name": "message_authentication",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    },
+    "wisec--5G_handover_5GS_to_EPS__collectAndRestart": {
+      "theory_file": "/home/mracouch/files_to_benchmark/wisec/5G_handover_5GS_to_EPS.spthy",
+      "tamarin_versions": [
+        "merged"
+      ],
+      "output_file_prefix": "wisec--5G_handover_5GS_to_EPS__collectAndRestart",
+      "lemmas": [
+        {
+          "name": "secret_k_enb_star",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "injectiveagreement_ue_enb_k_enb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        },
+        {
+          "name": "secret_k_gnb",
+          "tamarin_options": [
+            "-d0",
+            "--strategy=CollectAndRestart"
+          ],
+          "resources": {
+            "max_cores": 4,
+            "max_memory": 40,
+            "timeout": 7200
+          }
+        }
+      ]
+    }
+  }
+}
