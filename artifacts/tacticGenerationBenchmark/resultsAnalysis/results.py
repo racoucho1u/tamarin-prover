@@ -72,11 +72,13 @@ def analysisGen(noBaseLine):
     for s in strategies:
         nbTypes = []
         for i in range(len(types)):
+            print(types[i])
             f, tp = 0, 0
             for lm in lemma[s]['lemmas']:
                 st = lemma[s]['lemmas'][lm]['status']
                 t = lemma[s]['lemmas'][lm]['lemma_type']
                 if (types[i] in t and selectLemma(noBaseLine,s,lm)):
+                    print(f"{t} -- {lm}")
                     tp += 1
                     if (st == "finito"):
                         f += 1
@@ -461,11 +463,17 @@ def selectLemma(noBaseLine,strategy,lem):
 	
     oracledS = oracled(os)
 
+    isSample = True
+    if onlySample:
+        isSample = lem in sampleLemmas and not "Observational_equivalence" in lem
+        if isSample and not lem in foundLemma:
+            foundLemma.append(lem)
+
     if noBaseLine:
         # and not lemma['develop']['lemmas'][lem]['status'] == "finito"
-        return(not dir=="emv" and not dir=="smartverif" and not n=="Observational_equivalence" and not lemma['develop']['lemmas'][lem]['status'] == "finito")	
+        return(isSample and not dir=="emv" and not dir=="smartverif" and not n=="Observational_equivalence" and not lemma['develop']['lemmas'][lem]['status'] == "finito")	
     else:
-        return(not dir=="emv" and not dir=="smartverif" and not n=="Observational_equivalence")
+        return(isSample and not dir=="emv" and not dir=="smartverif" and not n=="Observational_equivalence")
     
 if __name__ == "__main__":
 	
@@ -486,13 +494,23 @@ if __name__ == "__main__":
     for lm in lemma[strat[0]]['lemmas']:
         lemmaNames.append(lm)
 
+    sampleLemmas = []
+    foundLemma = []
+    onlySample = True
+    if onlySample:
+        with open("sampleLemmas",'r') as file:
+            lines = file.readlines()
+            for l in lines:
+                [dirname,filename,lemmaName] = l.split("--")
+                sampleLemmas.append(f"{filename}__{dirname}__{lemmaName[:-1]}")
+    print(len(sampleLemmas))
+
     noBaseLine = True
-    analysisGen(noBaseLine)
+    # analysisGen(noBaseLine)
     #Appendix
     analysisGen(not noBaseLine)
 
-    for t in range(len(types)):
-        compareN(types[t],labels[t],[0,1,2,3,4,5])
-        compare2by2(types[t],[1,2,3,4,5])
-    workflow([0,1,2,3,4,5])
-        
+    # for t in range(len(types)):
+    #     compareN(types[t],labels[t],[0,1,2,3,4,5])
+    #     compare2by2(types[t],[1,2,3,4,5])
+    # workflow([0,1,2,3,4,5])

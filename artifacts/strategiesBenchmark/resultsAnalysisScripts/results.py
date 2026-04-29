@@ -78,12 +78,14 @@ def analysisGen(dirname,onlyTarget,noBaseLine,noExists):
     for s in strategies:
         nbTypes = []
         for i in range(len(types)):
+            print(types[i])
             f, tp = 0, 0
             for lm in lemma[s]['lemmas']:
                 lmName = "--".join(lm.split("--")[:-1])+"--merged"
                 st = lemma[s]['lemmas'][lm]['status']
                 t = lemma[s]['lemmas'][lm]['lemma_type']
                 if (types[i] in t and selectLemma(onlyTarget,noBaseLine,noExists,s,lmName)):
+                    print(f"{t} -- {lm}")
                     tp += 1
                     if (st == "completed"):
                         f += 1
@@ -499,6 +501,8 @@ def selectLemma(targetLemma,noBaseLine,noExists,strategy,lem):
     oracledS = oracled(os)
     if targetLemma and not target:
         return False
+    if onlySample and ("jcs19" in lem or "Observational" in lem or "smartverif" in lem):
+        return False
     else:
         if noBaseLine:
             ogLemmaName = lmName.replace(strategy,"original")
@@ -519,9 +523,10 @@ if __name__ == "__main__":
     with open(filename,'r') as file:
         lemma =json.load(file)
 
-    noBaseLine = False
+    noBaseLine = True
     noExists = False
     onlyTarget = False
+    onlySample = True
 
     dirname = "/".join(filename.split("/")[:-1])
     dirname = dirname.split("../")[-1]
@@ -537,7 +542,7 @@ if __name__ == "__main__":
     Path(f"results/{dirname}").mkdir(parents=True, exist_ok=True)
 		
     strat = ["original","escape","backtrack","backAndAvoid","proba","collectAndRestart"]
-    # labels = ["All","Classic","Exists","Diff","Source","Reuse","Induction"]
+    # labels = ["All","Classic","Exists","Diff","Source" ,"Reuse","Induction"]
     # types = ["","0","1","2","3","4","5"]
     labels = ["All","Classic","Exists","Source","Reuse","Induction"]
     types = ["","0","1","3","4","5"]
@@ -547,12 +552,12 @@ if __name__ == "__main__":
         lemmaNames.append("--".join(lm.split("--")[:-1]))
 
     
-    analysisGen(dirname,onlyTarget,noBaseLine, noExists)
+    # analysisGen(dirname,onlyTarget,noBaseLine, noExists)
     #Appendix
     analysisGen(dirname,onlyTarget,not noBaseLine, noExists)
 
-    for t in range(len(types)):
-        compareN(dirname,onlyTarget,noExists,types[t],labels[t],[0,1,2,3,4,5])
-        compare2by2(dirname,onlyTarget,noExists,types[t],[1,2,3,4,5])
-    workflow(dirname,onlyTarget,noExists,[0,1,2,3,4,5])
+    # for t in range(len(types)):
+    #     compareN(dirname,onlyTarget,noExists,types[t],labels[t],[0,1,2,3,4,5])
+    #     compare2by2(dirname,onlyTarget,noExists,types[t],[1,2,3,4,5])
+    # workflow(dirname,onlyTarget,noExists,[0,1,2,3,4,5])
         
