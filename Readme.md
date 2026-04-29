@@ -1,17 +1,24 @@
-This folder contains the pythons scripts necessary to reproduce the experiences described in the paper "Adaptive Proof Strategies for Protocol Verification in Tamarin". Since the benchmarks are very long to run and the results files are too heavy to be stored on a git, provide a file data.json that contains the data extracted from our results, before analysis.
+# Artifacts for "Adaptive Proof Strategies for Protocol Verification in Tamarin"
 
-TODO: installation tamarin and compiler
-TODO: introducing data.json
+This repository contains two folders:
+- tamarin-prover: fork of the tamarin-prover tool with integrated adaptive strategies (see [Experimenting with the tools](experimenting-with-the-tools) on how to use it)
+- artifacs: python scripts necessary to reproduce the experiences described in the paper (see [Benchmarks](benchmarks)) 
 
 ## Experimenting with the tools
+TODO: installation tamarin and compiler
 
-#### Tamarin strategies
+
+### Tamarin strategies
 TODO options possibles et commandes associées
 
-#### Tactic generation
+### Tactic generation
 Ou prendre le script + quelles options lui donner
 
-## Strategies benchmark (strategiesBenchmark folder)
+## Benchmarks
+Since the benchmarks are very long to run and the results files are too heavy to be stored on a git, provide a file data.json that contains the data extracted from our results, before analysis.
+TODO: introducing data.json
+
+### Strategies benchmark (strategiesBenchmark folder)
 
 #### Running the benchmarks
 Running the strategies benchmark requires the tool `batch-tamarin`. It can be installed with the following command `pip3 install batch-tamarin`.
@@ -30,7 +37,7 @@ First, run `python3 analyseResultsBatchTamarinMergedVersion.py [path to results 
 And then `python3 results.py [path to results folder]\execution_report_extracted.json`
 Results are generated in a strategiesBenchmark/resultsAnalysisScripts/results subfolder.
 
-## Tactic generation benchmark (tacticGenerationBenchmark folder)
+### Tactic generation benchmark (tacticGenerationBenchmark folder)
 
 #### Running the benchmark
 To run the tactic generation benchmark as presented in the paper, run the command `python3 tacticGenBench.py` in the tacticGenerationBenchmark folder. The results will be stored under the tacticGeneration/results folder. The script results give a textual summary of the lemmas proved (or failed) by the benchmark while the other files store the proofs and attack traces that have been reached for each lemma.
