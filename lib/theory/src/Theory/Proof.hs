@@ -1154,17 +1154,17 @@ backtrackProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
 
         where
           explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> Proof (Maybe System)
-          explore [] (method0, cases0) igG = trace ("Removeme: no other way: "++show method0) node method0 cases0 (depth:igG) 
+          explore [] (method0, cases0) igG = node method0 cases0 (depth:igG) 
           explore ((InLoop (n,i,g), (cases, _expl)):_) _ igG = 
               if (depth-n) `elem` igG
-                then trace ("Removeme: bt and ignore: "++show (InLoop (n,i,g))) node (InLoop (n,i,g)) cases igG 
-                else trace ("Removeme:  bt and no ignore: "++show (InLoop (n,i,g))) node (InLoop (n,i,g)) M.empty igG 
+                then node (InLoop (n,i,g)) cases igG 
+                else node (InLoop (n,i,g)) M.empty igG 
           explore ((method, (cases, _expl)):suite) (method0, cases0) igG = case propagatedMethod of 
-              InLoop (0,_,_) -> trace ("Removeme: above loop: "++show method) explore suite (method0,cases0) igG 
+              InLoop (0,_,_) -> explore suite (method0,cases0) igG 
               InLoop (n,i,g) ->
                   if (depth-n) `elem` igG
-                    then trace ("Removeme: inLoop but ignore: "++show method0) node (InLoop (n,i,g)) cases igG 
-                    else trace ("Removeme: inLoop do not ignore: "++show method0) node (InLoop (n,i,g)) M.empty igG 
+                    then node (InLoop (n,i,g)) cases igG 
+                    else node (InLoop (n,i,g)) M.empty igG 
               _            -> node method cases igG
             where
                 propagatedMethod = propagateMethod cases method igG
@@ -1205,21 +1205,21 @@ backAndAvoidProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
 
         where
           explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> [Maybe Goal] -> Proof (Maybe System)
-          explore [] (method0, cases0) igG _blacklist = trace ("Removeme: no other way: "++show method0) node method0 cases0 (depth:igG) _blacklist
+          explore [] (method0, cases0) igG _blacklist = node method0 cases0 (depth:igG) _blacklist
           explore ((InLoop (n,it,g), (cases, _expl)):_) _ igG _blacklist = exportGoalsForTactic exportGoals depth g $
               if (depth-n) `elem` igG 
-                then trace ("Removeme: bt and ignore: "++show (InLoop (n,it,g))) node (InLoop (n,it,g)) cases igG _blacklist
-                else trace ("Removeme:  bt and no ignore: "++show (InLoop (n,it,g))) node (InLoop (n,it,g)) M.empty igG (fmap cleanGoal g:_blacklist)
+                then node (InLoop (n,it,g)) cases igG _blacklist
+                else node (InLoop (n,it,g)) M.empty igG (fmap cleanGoal g:_blacklist)
           explore ((method, (cases, _expl)):suite) (method0, cases0) igG _blacklist = 
             if fmap cleanGoal (extractGoal method) `elem` _blacklist
               then 
-                trace ("Removeme: blacklistIgnore: "++show method0) explore suite (method0,cases0) igG _blacklist
+                explore suite (method0,cases0) igG _blacklist
               else 
                 case propagatedMethod of --
-                  InLoop (0,_,_) -> trace ("Removeme: above loop: "++show method) explore suite (method0,cases0) igG newbl
+                  InLoop (0,_,_) -> explore suite (method0,cases0) igG newbl
                   InLoop (n,it,g) -> if (depth-n) `elem` igG 
-                                    then trace ("Removeme: inLoop but ignore: "++show method0) node (InLoop (n,it,g)) cases igG newbl
-                                    else trace ("Removeme: inLoop do not ignore: "++show method0) node (InLoop (n,it,g)) M.empty igG newbl --
+                                    then node (InLoop (n,it,g)) cases igG newbl
+                                    else node (InLoop (n,it,g)) M.empty igG newbl --
                   _            -> node method cases igG newbl
                 where
                     (propagatedMethod, newbl) = propagateMethod cases method igG _blacklist
