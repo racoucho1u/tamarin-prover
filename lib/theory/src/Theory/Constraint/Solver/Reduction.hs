@@ -580,7 +580,7 @@ substSystem = do
     substSolvedFormulas
     substLemmas
     c2 <- substGoals
-    -- substAutomatedStrategy
+    substAutomatedStrategy
     substNextGoalNr
     return (c1 <> c2)
 
