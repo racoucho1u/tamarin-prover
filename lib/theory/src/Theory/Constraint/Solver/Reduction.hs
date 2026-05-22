@@ -580,7 +580,7 @@ substSystem = do
     substSolvedFormulas
     substLemmas
     c2 <- substGoals
-    substAutomatedStrategy
+    -- substAutomatedStrategy
     substNextGoalNr
     return (c1 <> c2)
 
@@ -597,26 +597,26 @@ substSolvedFormulas = substPart sSolvedFormulas
 substLemmas         = substPart sLemmas
 substNextGoalNr     = return ()
 
-substAutomatedStrategy :: Reduction ()
-substAutomatedStrategy = do 
-    subst <- getM sSubst
-    modM sProofStrategy (substStrat subst)
-    where
-        substStrat :: LNSubst -> AutomatedProofStrategy -> AutomatedProofStrategy
-        substStrat _ Original = Original
-        substStrat subst (Escape (EscapeStrat gp b c)) = Escape (EscapeStrat (unifyLists subst gp) b c)
-        substStrat subst (Proba (ProbaStrat gp b c d)) = Proba (ProbaStrat (unifyLists subst gp) b c d)
-        substStrat subst (Backtrack (BacktrackStrat gp b c)) = Backtrack (BacktrackStrat (unifyListsB subst gp) b c) --Backtrack (BacktrackStrat (apply subst gp) b c)
-        substStrat subst (BackAndAvoid (BackAndAvoidStrat gp b c d e)) = BackAndAvoid (BackAndAvoidStrat (unifyListsB subst gp) b c d e)
-        substStrat subst (CollectAndRestart (CollectAndRestartStrat gp currentLoop loopFound)) = CollectAndRestart (CollectAndRestartStrat (unifyLists subst gp) currentLoop loopFound)
+-- substAutomatedStrategy :: Reduction ()
+-- substAutomatedStrategy = do 
+--     subst <- getM sSubst
+--     modM sProofStrategy (substStrat subst)
+--     where
+--         substStrat :: LNSubst -> AutomatedProofStrategy -> AutomatedProofStrategy
+--         substStrat _ Original = Original
+--         substStrat subst (Escape (EscapeStrat gp b c)) = Escape (EscapeStrat (unifyLists subst gp) b c)
+--         substStrat subst (Proba (ProbaStrat gp b c d)) = Proba (ProbaStrat (unifyLists subst gp) b c d)
+--         substStrat subst (Backtrack (BacktrackStrat gp b c)) = Backtrack (BacktrackStrat (unifyListsB subst gp) b c) --Backtrack (BacktrackStrat (apply subst gp) b c)
+--         substStrat subst (BackAndAvoid (BackAndAvoidStrat gp b c d e)) = BackAndAvoid (BackAndAvoidStrat (unifyListsB subst gp) b c d e)
+--         substStrat subst (CollectAndRestart (CollectAndRestartStrat gp currentLoop loopFound)) = CollectAndRestart (CollectAndRestartStrat (unifyLists subst gp) currentLoop loopFound)
 
-        unifyLists :: LNSubst -> [(Int,Int,[Goal])] -> [(Int,Int,[Goal])]
-        unifyLists _ [] = []
-        unifyLists subst ((d,i,goal):t) = (d,i,apply subst goal) : unifyLists subst t
+--         unifyLists :: LNSubst -> [(Int,Int,[Goal])] -> [(Int,Int,[Goal])]
+--         unifyLists _ [] = []
+--         unifyLists subst ((d,i,goal):t) = (d,i,apply subst goal) : unifyLists subst t
 
-        unifyListsB :: LNSubst -> [[Goal]] -> [[Goal]]
-        unifyListsB _ [] = []
-        unifyListsB subst (goal:t) = apply subst goal : unifyListsB subst t
+--         unifyListsB :: LNSubst -> [[Goal]] -> [[Goal]]
+--         unifyListsB _ [] = []
+--         unifyListsB subst (goal:t) = apply subst goal : unifyListsB subst t
 
 -- substAutomatedStrategy :: Reduction ()
 -- substAutomatedStrategy = do 
