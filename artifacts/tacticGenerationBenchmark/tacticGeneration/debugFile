@@ -1,0 +1,275 @@
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=10, tm_hour=18, tm_min=36, tm_sec=55, tm_wday=2, tm_yday=161, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaD_vot_ShHh.spthy --prove=Tall_As_Rec_D_5 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_Tall_As_Rec_D_5_aletheaD_vot_ShHh.spthy  2>> tacticGeneration/tacticBatch/Escape_Tall_As_Rec_D_5_aletheaD_vot_ShHh.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=53, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=indivVerif_b +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_indivVerif_b_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_indivVerif_b_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=53, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=indivVerif_b +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_indivVerif_b_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_indivVerif_b_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=54, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=indivVerif_b +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_indivVerif_b_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_indivVerif_b_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=54, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=DRvoterT +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_DRvoterT_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_DRvoterT_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=54, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=DRvoterT +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_DRvoterT_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_DRvoterT_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=54, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=DRvoterT +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_DRvoterT_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_DRvoterT_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=55, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=DRvoterC +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_DRvoterC_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_DRvoterC_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=55, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=DRvoterC +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_DRvoterC_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_DRvoterC_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=55, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=DRvoterC +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_DRvoterC_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_DRvoterC_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=55, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=indivVerif_v +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_indivVerif_v_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_indivVerif_v_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=56, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=indivVerif_v +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_indivVerif_v_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_indivVerif_v_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=56, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=indivVerif_v +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_indivVerif_v_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_indivVerif_v_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=56, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce4 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce4_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce4_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=56, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce4 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce4_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce4_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=57, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce4 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce4_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce4_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=57, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=functional +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_functional_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_functional_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=57, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=functional +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_functional_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_functional_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=57, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=functional +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_functional_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_functional_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=58, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce6 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce6_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce6_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=58, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce6 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce6_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce6_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=58, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce6 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce6_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce6_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=58, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce2 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce2_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce2_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=59, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce2 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce2_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce2_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=59, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce2 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce2_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce2_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=59, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=Uniqueness +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_Uniqueness_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_Uniqueness_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=52, tm_sec=59, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=Uniqueness +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_Uniqueness_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_Uniqueness_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=0, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=Uniqueness +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_Uniqueness_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_Uniqueness_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=0, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce1 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce1_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce1_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=0, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce1 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce1_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce1_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=0, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce1 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce1_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce1_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=1, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce5 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce5_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce5_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=1, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce5 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce5_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce5_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=1, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce5 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce5_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce5_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=1, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce3 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce3_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce3_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=2, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce3 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce3_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce3_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=2, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=onlyonce3 +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_onlyonce3_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_onlyonce3_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=2, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=DRauth +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_DRauth_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_DRauth_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=2, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=DRauth +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_DRauth_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_DRauth_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=3, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy --prove=DRauth +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_DRauth_aletheaDR_ShHh_RF.spthy  2>> tacticGeneration/tacticBatch/Escape_DRauth_aletheaDR_ShHh_RF.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=3, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh.spthy --prove=EligVerif_DR +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_EligVerif_DR_aletheaDR_ShHh.spthy  2>> tacticGeneration/tacticBatch/Escape_EligVerif_DR_aletheaDR_ShHh.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=3, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh.spthy --prove=EligVerif_DR +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_EligVerif_DR_aletheaDR_ShHh.spthy  2>> tacticGeneration/tacticBatch/Escape_EligVerif_DR_aletheaDR_ShHh.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=3, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_ShHh.spthy --prove=EligVerif_DR +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_EligVerif_DR_aletheaDR_ShHh.spthy  2>> tacticGeneration/tacticBatch/Escape_EligVerif_DR_aletheaDR_ShHh.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=4, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_SmHh.spthy --prove=EligVerif_DR +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_EligVerif_DR_aletheaDR_SmHh.spthy  2>> tacticGeneration/tacticBatch/Escape_EligVerif_DR_aletheaDR_SmHh.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=4, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_SmHh.spthy --prove=EligVerif_DR +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_EligVerif_DR_aletheaDR_SmHh.spthy  2>> tacticGeneration/tacticBatch/Escape_EligVerif_DR_aletheaDR_SmHh.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=4, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/aletheaDR_SmHh.spthy --prove=EligVerif_DR +RTS -N4 -RTS --heuristic=s  --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_EligVerif_DR_aletheaDR_SmHh.spthy  2>> tacticGeneration/tacticBatch/Escape_EligVerif_DR_aletheaDR_SmHh.spthy
+b''
+[]
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=5, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/GDH.spthy --prove=key_reachable_3 +RTS -N4 -RTS --heuristic=s -Dsecure --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_key_reachable_3_GDH.spthy  2>> tacticGeneration/tacticBatch/Escape_key_reachable_3_GDH.spthy
+b'\n==============================================================================\nsummary of summaries:\n\nanalyzed: ../files_to_benchmark/all/GDH.spthy\n\n  output:          tacticGeneration/results/Escape_key_reachable_3_GDH.spthy\n  processing time: 0.42s\n  \n  WARNING: 7 wellformedness check failed!\n           The analysis results might be wrong!\n  \n  No_Inv_exp (all-traces): analysis incomplete (1 steps)\n  Esk_secret (all-traces): analysis incomplete (1 steps)\n  Esk_fresh_name (all-traces): analysis incomplete (1 steps)\n  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)\n  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)\n  Exp_subterm (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)\n  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)\n  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)\n  Exp_factor_secret (all-traces): analysis incomplete (1 steps)\n  Exp_name_secret (all-traces): analysis incomplete (1 steps)\n  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)\n  key_secret_last (all-traces): analysis incomplete (1 steps)\n  key_secret (all-traces): analysis incomplete (1 steps)\n\n==============================================================================\n'
+['  No_Inv_exp (all-traces): analysis incomplete (1 steps)', '  Esk_secret (all-traces): analysis incomplete (1 steps)', '  Esk_fresh_name (all-traces): analysis incomplete (1 steps)', '  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)', '  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)', '  Exp_subterm (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)', '  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)', '  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)', '  Exp_factor_secret (all-traces): analysis incomplete (1 steps)', '  Exp_name_secret (all-traces): analysis incomplete (1 steps)', '  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)', '  key_secret_last (all-traces): analysis incomplete (1 steps)', '  key_secret (all-traces): analysis incomplete (1 steps)']
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=6, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/GDH.spthy --prove=key_reachable_3 +RTS -N4 -RTS --heuristic=s -Dsecure --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_key_reachable_3_GDH.spthy  2>> tacticGeneration/tacticBatch/Escape_key_reachable_3_GDH.spthy
+b'\n==============================================================================\nsummary of summaries:\n\nanalyzed: ../files_to_benchmark/all/GDH.spthy\n\n  output:          tacticGeneration/results/Escape_key_reachable_3_GDH.spthy\n  processing time: 0.49s\n  \n  WARNING: 7 wellformedness check failed!\n           The analysis results might be wrong!\n  \n  No_Inv_exp (all-traces): analysis incomplete (1 steps)\n  Esk_secret (all-traces): analysis incomplete (1 steps)\n  Esk_fresh_name (all-traces): analysis incomplete (1 steps)\n  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)\n  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)\n  Exp_subterm (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)\n  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)\n  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)\n  Exp_factor_secret (all-traces): analysis incomplete (1 steps)\n  Exp_name_secret (all-traces): analysis incomplete (1 steps)\n  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)\n  key_secret_last (all-traces): analysis incomplete (1 steps)\n  key_secret (all-traces): analysis incomplete (1 steps)\n\n==============================================================================\n'
+['  No_Inv_exp (all-traces): analysis incomplete (1 steps)', '  Esk_secret (all-traces): analysis incomplete (1 steps)', '  Esk_fresh_name (all-traces): analysis incomplete (1 steps)', '  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)', '  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)', '  Exp_subterm (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)', '  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)', '  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)', '  Exp_factor_secret (all-traces): analysis incomplete (1 steps)', '  Exp_name_secret (all-traces): analysis incomplete (1 steps)', '  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)', '  key_secret_last (all-traces): analysis incomplete (1 steps)', '  key_secret (all-traces): analysis incomplete (1 steps)']
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=6, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/GDH.spthy --prove=key_reachable_3 +RTS -N4 -RTS --heuristic=s -Dsecure --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_key_reachable_3_GDH.spthy  2>> tacticGeneration/tacticBatch/Escape_key_reachable_3_GDH.spthy
+b'\n==============================================================================\nsummary of summaries:\n\nanalyzed: ../files_to_benchmark/all/GDH.spthy\n\n  output:          tacticGeneration/results/Escape_key_reachable_3_GDH.spthy\n  processing time: 0.43s\n  \n  WARNING: 7 wellformedness check failed!\n           The analysis results might be wrong!\n  \n  No_Inv_exp (all-traces): analysis incomplete (1 steps)\n  Esk_secret (all-traces): analysis incomplete (1 steps)\n  Esk_fresh_name (all-traces): analysis incomplete (1 steps)\n  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)\n  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)\n  Exp_subterm (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)\n  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)\n  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)\n  Exp_factor_secret (all-traces): analysis incomplete (1 steps)\n  Exp_name_secret (all-traces): analysis incomplete (1 steps)\n  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)\n  key_secret_last (all-traces): analysis incomplete (1 steps)\n  key_secret (all-traces): analysis incomplete (1 steps)\n\n==============================================================================\n'
+['  No_Inv_exp (all-traces): analysis incomplete (1 steps)', '  Esk_secret (all-traces): analysis incomplete (1 steps)', '  Esk_fresh_name (all-traces): analysis incomplete (1 steps)', '  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)', '  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)', '  Exp_subterm (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)', '  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)', '  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)', '  Exp_factor_secret (all-traces): analysis incomplete (1 steps)', '  Exp_name_secret (all-traces): analysis incomplete (1 steps)', '  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)', '  key_secret_last (all-traces): analysis incomplete (1 steps)', '  key_secret (all-traces): analysis incomplete (1 steps)']
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=7, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/GDH.spthy --prove=key_reachable_4 +RTS -N4 -RTS --heuristic=s -Dsecure --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_key_reachable_4_GDH.spthy  2>> tacticGeneration/tacticBatch/Escape_key_reachable_4_GDH.spthy
+b'\n==============================================================================\nsummary of summaries:\n\nanalyzed: ../files_to_benchmark/all/GDH.spthy\n\n  output:          tacticGeneration/results/Escape_key_reachable_4_GDH.spthy\n  processing time: 0.39s\n  \n  WARNING: 7 wellformedness check failed!\n           The analysis results might be wrong!\n  \n  No_Inv_exp (all-traces): analysis incomplete (1 steps)\n  Esk_secret (all-traces): analysis incomplete (1 steps)\n  Esk_fresh_name (all-traces): analysis incomplete (1 steps)\n  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)\n  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)\n  Exp_subterm (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)\n  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)\n  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)\n  Exp_factor_secret (all-traces): analysis incomplete (1 steps)\n  Exp_name_secret (all-traces): analysis incomplete (1 steps)\n  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)\n  key_secret_last (all-traces): analysis incomplete (1 steps)\n  key_secret (all-traces): analysis incomplete (1 steps)\n\n==============================================================================\n'
+['  No_Inv_exp (all-traces): analysis incomplete (1 steps)', '  Esk_secret (all-traces): analysis incomplete (1 steps)', '  Esk_fresh_name (all-traces): analysis incomplete (1 steps)', '  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)', '  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)', '  Exp_subterm (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)', '  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)', '  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)', '  Exp_factor_secret (all-traces): analysis incomplete (1 steps)', '  Exp_name_secret (all-traces): analysis incomplete (1 steps)', '  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)', '  key_secret_last (all-traces): analysis incomplete (1 steps)', '  key_secret (all-traces): analysis incomplete (1 steps)']
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=8, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/GDH.spthy --prove=key_reachable_4 +RTS -N4 -RTS --heuristic=s -Dsecure --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_key_reachable_4_GDH.spthy  2>> tacticGeneration/tacticBatch/Escape_key_reachable_4_GDH.spthy
+b'\n==============================================================================\nsummary of summaries:\n\nanalyzed: ../files_to_benchmark/all/GDH.spthy\n\n  output:          tacticGeneration/results/Escape_key_reachable_4_GDH.spthy\n  processing time: 0.43s\n  \n  WARNING: 7 wellformedness check failed!\n           The analysis results might be wrong!\n  \n  No_Inv_exp (all-traces): analysis incomplete (1 steps)\n  Esk_secret (all-traces): analysis incomplete (1 steps)\n  Esk_fresh_name (all-traces): analysis incomplete (1 steps)\n  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)\n  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)\n  Exp_subterm (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)\n  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)\n  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)\n  Exp_factor_secret (all-traces): analysis incomplete (1 steps)\n  Exp_name_secret (all-traces): analysis incomplete (1 steps)\n  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)\n  key_secret_last (all-traces): analysis incomplete (1 steps)\n  key_secret (all-traces): analysis incomplete (1 steps)\n\n==============================================================================\n'
+['  No_Inv_exp (all-traces): analysis incomplete (1 steps)', '  Esk_secret (all-traces): analysis incomplete (1 steps)', '  Esk_fresh_name (all-traces): analysis incomplete (1 steps)', '  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)', '  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)', '  Exp_subterm (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)', '  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)', '  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)', '  Exp_factor_secret (all-traces): analysis incomplete (1 steps)', '  Exp_name_secret (all-traces): analysis incomplete (1 steps)', '  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)', '  key_secret_last (all-traces): analysis incomplete (1 steps)', '  key_secret (all-traces): analysis incomplete (1 steps)']
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=8, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/GDH.spthy --prove=key_reachable_4 +RTS -N4 -RTS --heuristic=s -Dsecure --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_key_reachable_4_GDH.spthy  2>> tacticGeneration/tacticBatch/Escape_key_reachable_4_GDH.spthy
+b'\n==============================================================================\nsummary of summaries:\n\nanalyzed: ../files_to_benchmark/all/GDH.spthy\n\n  output:          tacticGeneration/results/Escape_key_reachable_4_GDH.spthy\n  processing time: 0.41s\n  \n  WARNING: 7 wellformedness check failed!\n           The analysis results might be wrong!\n  \n  No_Inv_exp (all-traces): analysis incomplete (1 steps)\n  Esk_secret (all-traces): analysis incomplete (1 steps)\n  Esk_fresh_name (all-traces): analysis incomplete (1 steps)\n  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)\n  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)\n  Exp_subterm (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)\n  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)\n  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)\n  Exp_factor_secret (all-traces): analysis incomplete (1 steps)\n  Exp_name_secret (all-traces): analysis incomplete (1 steps)\n  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)\n  key_secret_last (all-traces): analysis incomplete (1 steps)\n  key_secret (all-traces): analysis incomplete (1 steps)\n\n==============================================================================\n'
+['  No_Inv_exp (all-traces): analysis incomplete (1 steps)', '  Esk_secret (all-traces): analysis incomplete (1 steps)', '  Esk_fresh_name (all-traces): analysis incomplete (1 steps)', '  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)', '  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)', '  Exp_subterm (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)', '  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)', '  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)', '  Exp_factor_secret (all-traces): analysis incomplete (1 steps)', '  Exp_name_secret (all-traces): analysis incomplete (1 steps)', '  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)', '  key_secret_last (all-traces): analysis incomplete (1 steps)', '  key_secret (all-traces): analysis incomplete (1 steps)']
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=9, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/GDH.spthy --prove=key_reachable_5 +RTS -N4 -RTS --heuristic=s -Dsecure --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_key_reachable_5_GDH.spthy  2>> tacticGeneration/tacticBatch/Escape_key_reachable_5_GDH.spthy
+b'\n==============================================================================\nsummary of summaries:\n\nanalyzed: ../files_to_benchmark/all/GDH.spthy\n\n  output:          tacticGeneration/results/Escape_key_reachable_5_GDH.spthy\n  processing time: 0.58s\n  \n  WARNING: 7 wellformedness check failed!\n           The analysis results might be wrong!\n  \n  No_Inv_exp (all-traces): analysis incomplete (1 steps)\n  Esk_secret (all-traces): analysis incomplete (1 steps)\n  Esk_fresh_name (all-traces): analysis incomplete (1 steps)\n  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)\n  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)\n  Exp_subterm (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)\n  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)\n  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)\n  Exp_factor_secret (all-traces): analysis incomplete (1 steps)\n  Exp_name_secret (all-traces): analysis incomplete (1 steps)\n  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)\n  key_secret_last (all-traces): analysis incomplete (1 steps)\n  key_secret (all-traces): analysis incomplete (1 steps)\n\n==============================================================================\n'
+['  No_Inv_exp (all-traces): analysis incomplete (1 steps)', '  Esk_secret (all-traces): analysis incomplete (1 steps)', '  Esk_fresh_name (all-traces): analysis incomplete (1 steps)', '  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)', '  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)', '  Exp_subterm (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)', '  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)', '  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)', '  Exp_factor_secret (all-traces): analysis incomplete (1 steps)', '  Exp_name_secret (all-traces): analysis incomplete (1 steps)', '  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)', '  key_secret_last (all-traces): analysis incomplete (1 steps)', '  key_secret (all-traces): analysis incomplete (1 steps)']
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=10, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/GDH.spthy --prove=key_reachable_5 +RTS -N4 -RTS --heuristic=s -Dsecure --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_key_reachable_5_GDH.spthy  2>> tacticGeneration/tacticBatch/Escape_key_reachable_5_GDH.spthy
+b'\n==============================================================================\nsummary of summaries:\n\nanalyzed: ../files_to_benchmark/all/GDH.spthy\n\n  output:          tacticGeneration/results/Escape_key_reachable_5_GDH.spthy\n  processing time: 0.48s\n  \n  WARNING: 7 wellformedness check failed!\n           The analysis results might be wrong!\n  \n  No_Inv_exp (all-traces): analysis incomplete (1 steps)\n  Esk_secret (all-traces): analysis incomplete (1 steps)\n  Esk_fresh_name (all-traces): analysis incomplete (1 steps)\n  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)\n  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)\n  Exp_subterm (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)\n  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)\n  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)\n  Exp_factor_secret (all-traces): analysis incomplete (1 steps)\n  Exp_name_secret (all-traces): analysis incomplete (1 steps)\n  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)\n  key_secret_last (all-traces): analysis incomplete (1 steps)\n  key_secret (all-traces): analysis incomplete (1 steps)\n\n==============================================================================\n'
+['  No_Inv_exp (all-traces): analysis incomplete (1 steps)', '  Esk_secret (all-traces): analysis incomplete (1 steps)', '  Esk_fresh_name (all-traces): analysis incomplete (1 steps)', '  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)', '  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)', '  Exp_subterm (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)', '  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)', '  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)', '  Exp_factor_secret (all-traces): analysis incomplete (1 steps)', '  Exp_name_secret (all-traces): analysis incomplete (1 steps)', '  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)', '  key_secret_last (all-traces): analysis incomplete (1 steps)', '  key_secret (all-traces): analysis incomplete (1 steps)']
+Scripting error
+time.struct_time(tm_year=2026, tm_mon=6, tm_mday=11, tm_hour=9, tm_min=53, tm_sec=10, tm_wday=3, tm_yday=162, tm_isdst=0)
+tamarin-prover ../files_to_benchmark/all/GDH.spthy --prove=key_reachable_5 +RTS -N4 -RTS --heuristic=s -Dsecure --strategy=Escape --exportGoals  --output=tacticGeneration/results/Escape_key_reachable_5_GDH.spthy  2>> tacticGeneration/tacticBatch/Escape_key_reachable_5_GDH.spthy
+b'\n==============================================================================\nsummary of summaries:\n\nanalyzed: ../files_to_benchmark/all/GDH.spthy\n\n  output:          tacticGeneration/results/Escape_key_reachable_5_GDH.spthy\n  processing time: 0.42s\n  \n  WARNING: 7 wellformedness check failed!\n           The analysis results might be wrong!\n  \n  No_Inv_exp (all-traces): analysis incomplete (1 steps)\n  Esk_secret (all-traces): analysis incomplete (1 steps)\n  Esk_fresh_name (all-traces): analysis incomplete (1 steps)\n  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)\n  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)\n  Exp_subterm (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)\n  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)\n  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)\n  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)\n  Exp_factor_secret (all-traces): analysis incomplete (1 steps)\n  Exp_name_secret (all-traces): analysis incomplete (1 steps)\n  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)\n  key_secret_last (all-traces): analysis incomplete (1 steps)\n  key_secret (all-traces): analysis incomplete (1 steps)\n\n==============================================================================\n'
+['  No_Inv_exp (all-traces): analysis incomplete (1 steps)', '  Esk_secret (all-traces): analysis incomplete (1 steps)', '  Esk_fresh_name (all-traces): analysis incomplete (1 steps)', '  ExpKeyFor_one (all-traces): analysis incomplete (1 steps)', '  Relate_KeyFor_RoundKey (all-traces): analysis incomplete (1 steps)', '  Exp_subterm (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk (all-traces): analysis incomplete (1 steps)', '  Exp_earlier_Esk_2 (all-traces): analysis incomplete (1 steps)', '  roundkey_keyfor_different (all-traces): analysis incomplete (1 steps)', '  Exp_nonce_or_product2 (all-traces): analysis incomplete (1 steps)', '  Exp_factor_secret (all-traces): analysis incomplete (1 steps)', '  Exp_name_secret (all-traces): analysis incomplete (1 steps)', '  Esk_Exp_same_gid (all-traces): analysis incomplete (1 steps)', '  key_secret_last (all-traces): analysis incomplete (1 steps)', '  key_secret (all-traces): analysis incomplete (1 steps)']

@@ -1,0 +1,96 @@
+Cannot prove lemma Tall_As_Rec_D_5 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_D_7 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma EligVerif_5 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_D_2 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_D_6 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_D_3 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma EligVerif_8 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma EligVerif_3 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma EligVerif_1 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secretSskD (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_D_4 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma EligVerif_2 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_D_1 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma ballotsFromVoters (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_D_8 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Prove lemma functional (file:../files_to_benchmark/all/aletheaD_vot_SmHh.spthy) with heuristic: {functional_0}.
+
+Cannot prove lemma EligVerif_7 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma EligVerif_4 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma EligVerif_6 (file:../files_to_benchmark/all/aletheaD_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma ballotsFromVoters (file:../files_to_benchmark/all/aletheaD_vot_SmHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_2 (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_3 (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_4 (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_1 (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_8 (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Prove lemma functional (file:../files_to_benchmark/all/alethea_vot_SmHh.spthy) with heuristic: {functional_0}.
+
+Cannot prove lemma indivVerif_b (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma DRvoterT (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma DRvoterC (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma indivVerif_v (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma onlyonce4 (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma functional (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma onlyonce6 (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma onlyonce2 (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Uniqueness (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma onlyonce1 (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma onlyonce5 (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma onlyonce3 (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma DRauth (file:../files_to_benchmark/all/aletheaDR_ShHh_RF.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma EligVerif_DR (file:../files_to_benchmark/all/aletheaDR_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma EligVerif_DR (file:../files_to_benchmark/all/aletheaDR_SmHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma key_reachable_3 (file:../files_to_benchmark/all/GDH.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma key_reachable_4 (file:../files_to_benchmark/all/GDH.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma key_reachable_5 (file:../files_to_benchmark/all/GDH.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_5 (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_6 (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma ballotsFromVoters (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma Tall_As_Rec_7 (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
