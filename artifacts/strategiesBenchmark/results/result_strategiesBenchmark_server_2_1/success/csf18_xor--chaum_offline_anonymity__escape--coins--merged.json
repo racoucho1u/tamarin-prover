@@ -1,0 +1,27 @@
+{
+  "task_id": "csf18_xor--chaum_offline_anonymity__escape--coins--merged",
+  "warnings": [
+    "1 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 2.34,
+  "wrapper_measures": {
+    "time": 2.5905723571777344,
+    "avg_memory": 74.88411458333333,
+    "peak_memory": 119.21875
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf18_xor--chaum_offline_anonymity__escape--coins--merged.spthy",
+  "verified_lemma": {
+    "coins": {
+      "steps": 309,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "exec",
+    "anonymity",
+    "caught"
+  ]
+}

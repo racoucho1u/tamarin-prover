@@ -1,0 +1,13 @@
+{
+  "task_id": "sp14--STR__backAndAvoid--key_reachable_5--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 577.902382850647,
+    "avg_memory": 17257.33719405595,
+    "peak_memory": 41292.6015625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

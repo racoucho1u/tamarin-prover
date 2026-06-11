@@ -1,0 +1,32 @@
+{
+  "task_id": "jcs19_xor--LD07__backtrack--helping_keys_disjoint_OutX--merged",
+  "warnings": [],
+  "tamarin_timing": 3.15,
+  "wrapper_measures": {
+    "time": 3.270922899246216,
+    "avg_memory": 49.4228515625,
+    "peak_memory": 67.48046875
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/jcs19_xor--LD07__backtrack--helping_keys_disjoint_OutX--merged.spthy",
+  "verified_lemma": {
+    "helping_keys_disjoint_OutX": {
+      "steps": 19,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helping_reader_start",
+    "helping_tag_start",
+    "helping_keys_reader_are_secret",
+    "helping_keys_disjoint_challenge",
+    "helping_keys_disjoint_XX",
+    "helping_keys_disjoint_XS",
+    "helping_keys_disjoint_DD",
+    "alive_tag",
+    "recentalive_tag_bounded",
+    "WA_tag",
+    "recentalive_reader",
+    "executable"
+  ]
+}

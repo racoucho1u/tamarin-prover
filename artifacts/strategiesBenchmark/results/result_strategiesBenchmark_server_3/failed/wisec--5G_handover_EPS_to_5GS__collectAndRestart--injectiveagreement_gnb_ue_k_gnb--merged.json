@@ -1,0 +1,13 @@
+{
+  "task_id": "wisec--5G_handover_EPS_to_5GS__collectAndRestart--injectiveagreement_gnb_ue_k_gnb--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.276473283768,
+    "avg_memory": 319.1090732554675,
+    "peak_memory": 327.98046875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

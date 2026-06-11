@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_non_binding_channel__collectAndRestart--cleanAttack_injectiveagreement_ue_hss_supi_noRev--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.679705619812,
+    "avg_memory": 1261.3252143734842,
+    "peak_memory": 1385.43359375
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

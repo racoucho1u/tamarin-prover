@@ -1,0 +1,19 @@
+{
+  "task_id": "sp14--STR__original--key_reachable_4--merged",
+  "warnings": [],
+  "tamarin_timing": 1.05,
+  "wrapper_measures": {
+    "time": 1.2587659358978271,
+    "avg_memory": 56.57421875,
+    "peak_memory": 112.42578125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/sp14--STR__original--key_reachable_4--merged.spthy",
+  "verified_lemma": {
+    "key_reachable_4": {
+      "steps": 23,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

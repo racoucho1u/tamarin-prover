@@ -1,0 +1,13 @@
+{
+  "task_id": "these_ls_chap3--aletheaD_vot_SmHh__backAndAvoid--Tall_As_Rec_D_1--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.201100349426,
+    "avg_memory": 268.32871063132376,
+    "peak_memory": 359.83984375
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

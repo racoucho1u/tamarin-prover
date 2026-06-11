@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_non_binding_channel__original--executability_resync--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 3321.7934110164642,
+    "avg_memory": 20588.16029227658,
+    "peak_memory": 41442.33203125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

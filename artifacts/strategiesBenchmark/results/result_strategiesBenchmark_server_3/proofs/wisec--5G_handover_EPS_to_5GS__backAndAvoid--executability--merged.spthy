@@ -1,0 +1,726 @@
+theory eps_to_5gs_over_n26_handover begin
+
+// Function signature and definition of the equational theory E
+
+builtins: multiset
+functions: KDF/2, fst/1, pair/2, sdec/2, senc/2, snd/1
+equations:
+    fst(<x.1, x.2>) = x.1,
+    sdec(senc(x.1, x.2), x.2) = x.1,
+    snd(<x.1, x.2>) = x.2
+
+
+
+
+
+
+
+
+
+
+
+rule (modulo E) send_secure:
+   [ SndS( ~cid, A, B, m ) ] --> [ Sec( ~cid, A, B, m ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) receive_secure:
+   [ Sec( ~cid, A, B, m ) ] --> [ RcvS( ~cid, A, B, m ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) secureChannel_compromised_in:
+   [ In( <~cid, A, B, x> ) ]
+  --[ Rev( A, 'secureChannel' ), Rev( B, 'secureChannel' ), Injected( x )
+  ]->
+   [ Sec( ~cid, A, B, x ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) secureChannel_compromised_out:
+   [ Sec( ~cid, A, B, m ) ]
+  --[ Rev( B, 'secureChannel' ), Rev( A, 'secureChannel' ) ]->
+   [ Out( <~cid, m> ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_AMF:
+   [ Fr( ~AMF_ID ) ]
+  --[ AMF_initialized( ~AMF_ID ) ]->
+   [ !AMF( ~AMF_ID ), Out( ~AMF_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_MME:
+   [ Fr( ~MME_ID ) ]
+  --[ MME_initialized( ~MME_ID ) ]->
+   [ !MME( ~MME_ID ), Out( ~MME_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_eNB:
+   [ Fr( ~eNB_ID ) ]
+  --[ ENB_initialized( ~eNB_ID ) ]->
+   [ !ENB( ~eNB_ID ), Out( ~eNB_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_gNB:
+   [ Fr( ~gNB_ID ) ]
+  --[ GNB_initialized( ~gNB_ID ) ]->
+   [ !GNB( ~gNB_ID ), Out( ~gNB_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) create_UE:
+   [ Fr( ~SUPI ) ] --[ UserEquipment( ~SUPI ) ]-> [ !UE( ~SUPI ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_UE:
+   [
+   !AMF( ~AMF_ID ), !MME( ~MME_ID ), !ENB( ~eNB_ID ), !GNB( ~gNB_ID ),
+   !UE( ~SUPI ), Fr( ~eNB_UE_S1AP_ID ), Fr( ~K_ASME ), In( '0' )
+   ]
+  --[
+  Subscribe( ~SUPI, ~eNB_ID ),
+  KeyDerived( <'K_eNB', KDF(~K_ASME, 'MAX_NAS_COUNT')>, ~K_ASME ),
+  KeyDerived( <'NH', 
+               KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT')))>,
+              ~K_ASME
+  )
+  ]->
+   [
+   !Ltk_sym_asme( ~AMF_ID, ~MME_ID, ~SUPI, <'K_ASME', ~K_ASME> ),
+   Intermediate_key( ~AMF_ID, ~MME_ID, ~SUPI,
+                     <'NH', KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT')))>
+   ),
+   Session_key( ~SUPI, ~eNB_ID, <'K_eNB', KDF(~K_ASME, 'MAX_NAS_COUNT')> ),
+   St_1_UE( ~SUPI, ~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT'),
+            KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT'))), ~MME_ID,
+            ~gNB_ID, ~eNB_ID
+   ),
+   St_1_eNB( ~eNB_ID, KDF(~K_ASME, 'MAX_NAS_COUNT'), ~MME_ID,
+             ~eNB_UE_S1AP_ID, ~gNB_ID
+   ),
+   St_1_MME( ~MME_ID, ~K_ASME, '0', ~SUPI,
+             KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT'))), '0',
+             ~eNB_UE_S1AP_ID
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) connect_networks_N26:
+   [ !AMF( ~AMF_ID ), !MME( ~MME_ID ), Fr( ~cid_N26 ) ]
+  --[ OnlyOnce( ~AMF_ID, ~MME_ID ) ]->
+   [ !N26( ~cid_N26, ~AMF_ID, ~MME_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) connect_networks_N2:
+   [ !GNB( ~gNB_ID ), !AMF( ~AMF_ID ), Fr( ~cid_N2 ) ]
+  --[ OnlyOnce( ~gNB_ID, ~AMF_ID ) ]->
+   [ !N2( ~cid_N2, ~gNB_ID, ~AMF_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) connect_networks_S1:
+   [ !ENB( ~eNB_ID ), !MME( ~MME_ID ), Fr( ~cid_S1 ) ]
+  --[ OnlyOnce( ~eNB_ID, ~MME_ID ) ]->
+   [ !S1( ~cid_S1, ~eNB_ID, ~MME_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_k_asme:
+   [ !Ltk_sym_asme( AMF_ID, MME_ID, SUPI, <'K_ASME', ~K_ASME> ) ]
+  --[
+  Rev( AMF_ID, <'K_ASME', ~K_ASME> ), Rev( MME_ID, <'K_ASME', ~K_ASME> ),
+  Rev( SUPI, <'K_ASME', ~K_ASME> )
+  ]->
+   [ Out( ~K_ASME ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_k_amf:
+   [ !Ltk_sym_amf( AMF_ID, SUPI, <'K_AMF', K_AMF> ) ]
+  --[ Rev( AMF_ID, <'K_AMF', K_AMF> ), Rev( SUPI, <'K_AMF', K_AMF> ) ]->
+   [ Out( K_AMF ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_k_enb:
+   [ Session_key( SUPI, eNB_ID, <'K_eNB', K_eNB> ) ]
+  --[ Rev( SUPI, <'K_eNB', K_eNB> ), Rev( eNB_ID, <'K_eNB', K_eNB> ) ]->
+   [ Out( K_eNB ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_k_gnb_star:
+   [ Session_key( SUPI, gNB_ID, <'K_gNB_star', K_gNB_star> ) ]
+  --[
+  Rev( SUPI, <'K_gNB_star', K_gNB_star> ),
+  Rev( gNB_ID, <'K_gNB_star', K_gNB_star> )
+  ]->
+   [ Out( K_gNB_star ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_nh:
+   [ Intermediate_key( AMF_ID, MME_ID, gNB_ID, <'NH', NH> ) ]
+  --[
+  Rev( AMF_ID, <'NH', NH> ), Rev( MME_ID, <'NH', NH> ),
+  Rev( gNB_ID, <'NH', NH> )
+  ]->
+   [ Out( NH ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) enb_snd_ho_required:
+   [
+   St_1_eNB( ~eNB_ID, K_eNB, ~MME_ID, ~eNB_UE_S1AP_ID, ~gNB_ID ),
+   !S1( ~cid_S1, ~eNB_ID, ~MME_ID )
+   ]
+  -->
+   [
+   St_2_eNB( ~eNB_ID, K_eNB, ~MME_ID, ~eNB_UE_S1AP_ID, ~gNB_ID ),
+   SndS( ~cid_S1, ~eNB_ID, ~MME_ID,
+         <'ho_required', ~eNB_UE_S1AP_ID, ~gNB_ID>
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) mme_rcv_ho_req_snd_fr_req:
+   [
+   St_1_MME( ~MME_ID, ~K_ASME, NAS_COUNT, ~SUPI, NH, NCC, ~eNB_UE_S1AP_ID ),
+   !S1( ~cid_S1, ~eNB_ID, ~MME_ID ), !N26( ~cid_N26, ~AMF_ID, ~MME_ID ),
+   RcvS( ~cid_S1, ~eNB_ID, ~MME_ID,
+         <'ho_required', ~eNB_UE_S1AP_ID, ~gNB_ID>
+   )
+   ]
+  -->
+   [
+   St_2_MME( ~MME_ID, ~K_ASME, NAS_COUNT, NH, NCC, ~AMF_ID, ~gNB_ID,
+             ~eNB_ID, ~SUPI, ~eNB_UE_S1AP_ID
+   ),
+   !Handover_Session( KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT'),
+                      <~AMF_ID, ~MME_ID, ~gNB_ID, ~eNB_ID, ~SUPI>
+   ),
+   SndS( ~cid_N26, ~MME_ID, ~AMF_ID,
+         <'fr_req', ~K_ASME, ~eNB_UE_S1AP_ID, ~gNB_ID, NAS_COUNT, NH, NCC>
+   )
+   ]
+
+  // loop breaker: [3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) amf_rcv_fr_req_snd_ho_req:
+   [
+   !AMF( ~AMF_ID ), !N26( ~cid_N26, ~AMF_ID, ~MME_ID ),
+   !N2( ~cid_N2, ~gNB_ID, ~AMF_ID ),
+   !Handover_Session( KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT'),
+                      <~AMF_ID, ~MME_ID, ~gNB_ID, ~eNB_ID, ~SUPI>
+   ),
+   Fr( ~AMF_UE_NGAP_ID ),
+   RcvS( ~cid_N26, ~MME_ID, ~AMF_ID,
+         <'fr_req', ~K_ASME, ~eNB_UE_S1AP_ID, ~gNB_ID, NAS_COUNT, NH, NCC>
+   )
+   ]
+  --[
+  KeyDerived( <'K_AMF', KDF(~K_ASME, NH)>, ~K_ASME ),
+  KeyDerived( <'NH', KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT')>,
+              KDF(~K_ASME, NH)
+  )
+  ]->
+   [
+   St_1_AMF( ~AMF_ID, ~K_ASME, KDF(~K_ASME, NH),
+             KDF(KDF(~K_ASME, NH), KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT')), '1',
+             ~eNB_UE_S1AP_ID, ~gNB_ID, ~AMF_UE_NGAP_ID
+   ),
+   !Ltk_sym_amf( ~AMF_ID, ~SUPI, <'K_AMF', KDF(~K_ASME, NH)> ),
+   Intermediate_key( ~AMF_ID, ~MME_ID, ~gNB_ID,
+                     <'NH', KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT')>
+   ),
+   Out( ~AMF_UE_NGAP_ID ),
+   SndS( ~cid_N2, ~AMF_ID, ~gNB_ID,
+         <'ho_req', ~AMF_UE_NGAP_ID, KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT'), '0'>
+   )
+   ]
+
+  // loop breaker: [5]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) gnb_rcv_ho_req_snd_ack:
+   [
+   !GNB( ~gNB_ID ), !N2( ~cid_N2, ~gNB_ID, ~AMF_ID ),
+   !Handover_Session( NH, <~AMF_ID, ~MME_ID, ~gNB_ID, ~eNB_ID, ~SUPI> ),
+   RcvS( ~cid_N2, ~AMF_ID, ~gNB_ID, <'ho_req', ~AMF_UE_NGAP_ID, NH, NCC> ),
+   Fr( ~gNB_UE_ID ), In( NCC )
+   ]
+  --[
+  Running( ~gNB_ID, ~SUPI, <'UE', 'gNB', 'K_gNB_star', KDF(NH, ~gNB_ID)> ),
+  KeyDerived( <'K_gNB_star', KDF(NH, ~gNB_ID)>, NH )
+  ]->
+   [
+   St_1_gNB( ~gNB_ID, KDF(NH, ~gNB_ID), NH, NCC, ~AMF_UE_NGAP_ID, ~gNB_UE_ID
+   ),
+   Session_key( ~SUPI, ~gNB_ID, <'K_gNB_star', KDF(NH, ~gNB_ID)> ),
+   Out( ~gNB_UE_ID ),
+   SndS( ~cid_N2, ~gNB_ID, ~AMF_ID,
+         <'ho_req_ack', ~AMF_UE_NGAP_ID, ~gNB_UE_ID, NCC>
+   )
+   ]
+
+  // loop breaker: [3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) amf_rcv_ack_snd_fr_res:
+   [
+   St_1_AMF( ~AMF_ID, ~K_ASME, K_AMF, NH_new, NCC_new, ~eNB_UE_S1AP_ID,
+             ~gNB_ID, ~AMF_UE_NGAP_ID
+   ),
+   !N2( ~cid_N2, ~gNB_ID, ~AMF_ID ), !N26( ~cid_N26, ~AMF_ID, ~MME_ID ),
+   RcvS( ~cid_N2, ~gNB_ID, ~AMF_ID,
+         <'ho_req_ack', ~AMF_UE_NGAP_ID, ~gNB_UE_ID, '0'>
+   )
+   ]
+  -->
+   [
+   St_2_AMF( ~AMF_ID, ~K_ASME, K_AMF, NH_new, NCC_new, ~eNB_UE_S1AP_ID,
+             ~gNB_ID, ~AMF_UE_NGAP_ID
+   ),
+   SndS( ~cid_N26, ~AMF_ID, ~MME_ID, <'fr_res', ~eNB_UE_S1AP_ID> )
+   ]
+
+  // loop breaker: [3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) mme_rcv_fr_res_snd_ho_cmd:
+   [
+   St_2_MME( ~MME_ID, ~K_ASME, NAS_COUNT, NH, NCC, ~AMF_ID, ~gNB_ID,
+             ~eNB_ID, ~SUPI, ~eNB_UE_S1AP_ID
+   ),
+   !N26( ~cid_N26, ~AMF_ID, ~MME_ID ), !S1( ~cid_S1, ~eNB_ID, ~MME_ID ),
+   RcvS( ~cid_N26, ~AMF_ID, ~MME_ID, <'fr_res', ~eNB_UE_S1AP_ID> )
+   ]
+  -->
+   [
+   St_3_MME( ~MME_ID, ~K_ASME, ~SUPI, NH ),
+   SndS( ~cid_S1, ~MME_ID, ~eNB_ID, <'ho_cmd', ~eNB_UE_S1AP_ID> )
+   ]
+
+  // loop breaker: [3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) enb_fwd_ho_cmd:
+   [
+   St_2_eNB( ~eNB_ID, K_eNB, ~MME_ID, ~eNB_UE_S1AP_ID, ~gNB_ID ),
+   !S1( ~cid_S1, ~eNB_ID, ~MME_ID ),
+   RcvS( ~cid_S1, ~MME_ID, ~eNB_ID, <'ho_cmd', ~eNB_UE_S1AP_ID> )
+   ]
+  -->
+   [
+   St_3_eNB( ~eNB_ID, K_eNB, ~MME_ID, ~eNB_UE_S1AP_ID, ~gNB_ID ),
+   Out( senc(<'ho_cmd', ~gNB_ID>, K_eNB) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_ho_cmd_snd_ho_complete:
+   [
+   St_1_UE( ~SUPI, ~K_ASME, K_eNB, NH, ~MME_ID, ~gNB_ID, ~eNB_ID ),
+   !Handover_Session( KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT'),
+                      <~AMF_ID, ~MME_ID, ~gNB_ID, ~eNB_ID, ~SUPI>
+   ),
+   In( senc(<'ho_cmd', ~gNB_ID>, K_eNB) )
+   ]
+  --[
+  Commit( ~SUPI, ~gNB_ID,
+          <'UE', 'gNB', 'K_gNB_star', 
+           KDF(KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT'), ~gNB_ID)>
+  ),
+  Running( ~SUPI, ~gNB_ID,
+           <'gNB', 'UE', 'K_gNB_star', 
+            KDF(KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT'), ~gNB_ID)>
+  ),
+  Honest( ~AMF_ID ), Honest( ~MME_ID ), Honest( ~eNB_ID ),
+  Honest( ~gNB_ID ), Honest( ~SUPI ),
+  KeyDerived( <'K_gNB_star', 
+               KDF(KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT'), ~gNB_ID)>,
+              KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT')
+  )
+  ]->
+   [
+   St_2_UE( ~SUPI, ~K_ASME, KDF(~K_ASME, NH),
+            KDF(KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT'), ~gNB_ID), ~MME_ID, ~gNB_ID,
+            ~eNB_ID
+   ),
+   Out( senc('handover_complete',
+             KDF(KDF(KDF(~K_ASME, NH), 'MAX_NAS_COUNT'), ~gNB_ID))
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) gnb_rcv_ho_complete_snd_ho_notify:
+   [
+   St_1_gNB( ~gNB_ID, K_gNB_star, NH, NCC, ~AMF_UE_NGAP_ID, ~gNB_UE_ID ),
+   !N2( ~cid_N2, ~gNB_ID, ~AMF_ID ),
+   !Handover_Session( NH, <~AMF_ID, ~MME_ID, ~gNB_ID, ~eNB_ID, ~SUPI> ),
+   In( senc('handover_complete', K_gNB_star) )
+   ]
+  --[
+  Commit( ~gNB_ID, ~SUPI, <'gNB', 'UE', 'K_gNB_star', K_gNB_star> ),
+  Honest( ~AMF_ID ), Honest( ~MME_ID ), Honest( ~eNB_ID ),
+  Honest( ~gNB_ID ), Honest( ~SUPI )
+  ]->
+   [
+   St_2_gNB( ~gNB_ID, K_gNB_star ),
+   SndS( ~cid_N2, ~gNB_ID, ~AMF_ID, 'handover_notify' )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) amf_rcv_ho_notify:
+   [
+   St_2_AMF( ~AMF_ID, ~K_ASME, K_AMF, NH_new, NCC_new, ~eNB_UE_S1AP_ID,
+             ~gNB_ID, ~AMF_UE_NGAP_ID
+   ),
+   !N2( ~cid_N2, ~gNB_ID, ~AMF_ID ),
+   RcvS( ~cid_N2, ~gNB_ID, ~AMF_ID, 'handover_notify' )
+   ]
+  --[ HandoverDone( K_AMF ) ]->
+   [ St_3_AMF( ~AMF_ID, ~K_ASME, K_AMF ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) handover_complete:
+   [
+   St_3_AMF( ~AMF_ID, ~K_ASME, K_AMF ),
+   St_3_MME( ~MME_ID, ~K_ASME, ~SUPI, NH ),
+   St_3_eNB( ~eNB_ID, K_eNB, ~MME_ID, ~eNB_UE_S1AP_ID, ~gNB_ID ),
+   St_2_gNB( ~gNB_ID, K_gNB_star ),
+   St_2_UE( ~SUPI, ~K_ASME, K_AMF, K_gNB_star, ~MME_ID, ~gNB_ID, ~eNB_ID )
+   ]
+  --[
+  Honest( ~AMF_ID ), Honest( ~MME_ID ), Honest( ~eNB_ID ),
+  Honest( ~gNB_ID ), Honest( ~SUPI ), Secret( <'K_ASME', ~K_ASME> ),
+  Secret( <'K_AMF', K_AMF> ), Secret( <'K_eNB', K_eNB> ),
+  Secret( <'K_gNB_star', K_gNB_star> )
+  ]->
+   [ ]
+
+  /* has exactly the trivial AC variant */
+
+restriction OnlyOnce:
+  "∀ p q #i #j.
+    ((OnlyOnce( p, q ) @ #i) ∧ (OnlyOnce( p, q ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+lemma executability:
+  exists-trace
+  "∃ x #i.
+    ((((((((HandoverDone( x ) @ #i) ∧
+           (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+          (∀ a #k. (HandoverDone( a ) @ #k) ⇒ (#k = #i))) ∧
+         (∀ a b #k1 #k2.
+           ((UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2)) ⇒
+           (#k1 = #k2))) ∧
+        (∀ a b #k1 #k2.
+          ((GNB_initialized( a ) @ #k1) ∧ (GNB_initialized( b ) @ #k2)) ⇒
+          (#k1 = #k2))) ∧
+       (∀ a b #k1 #k2.
+         ((AMF_initialized( a ) @ #k1) ∧ (AMF_initialized( b ) @ #k2)) ⇒
+         (#k1 = #k2))) ∧
+      (∀ a b #k1 #k2.
+        ((MME_initialized( a ) @ #k1) ∧ (MME_initialized( b ) @ #k2)) ⇒
+        (#k1 = #k2))) ∧
+     (∀ a b #k1 #k2.
+       ((ENB_initialized( a ) @ #k1) ∧ (ENB_initialized( b ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a b c d #k1 #k2.
+      ((Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2)) ⇒ (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x #i.
+  (HandoverDone( x ) @ #i)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (∀ a #k. (HandoverDone( a ) @ #k) ⇒ #k = #i) ∧
+  (∀ a b #k1 #k2.
+    (UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (GNB_initialized( a ) @ #k1) ∧ (GNB_initialized( b ) @ #k2)
+   ⇒
+    #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (AMF_initialized( a ) @ #k1) ∧ (AMF_initialized( b ) @ #k2)
+   ⇒
+    #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (MME_initialized( a ) @ #k1) ∧ (MME_initialized( b ) @ #k2)
+   ⇒
+    #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (ENB_initialized( a ) @ #k1) ∧ (ENB_initialized( b ) @ #k2)
+   ⇒
+    #k1 = #k2) ∧
+  (∀ a b c d #k1 #k2.
+    (Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2) ⇒ #k1 = #k2)"
+*/
+simplify
+solve( St_2_AMF( ~AMF_ID, ~K_ASME, x, NH_new, NCC_new, ~eNB_UE_S1AP_ID,
+                 ~gNB_ID, ~AMF_UE_NGAP_ID
+       ) ▶₀ #i )
+  case amf_rcv_ack_snd_fr_res
+  solve( !N2( ~cid_N2, ~gNB_ID, ~AMF_ID ) ▶₁ #i )
+    case connect_networks_N2
+    solve( RcvS( ~cid_N2, ~gNB_ID, ~AMF_ID, 'handover_notify' ) ▶₂ #i )
+      case receive_secure_case_1
+      solve( !KU( senc('handover_complete',
+                       KDF(KDF(KDF(~K_ASME,
+                                   KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT')))),
+                               'MAX_NAS_COUNT'),
+                           ~gNB_ID))
+             ) @ #vk.1 )
+        case ue_rcv_ho_cmd_snd_ho_complete
+        solve( !KU( senc(<'ho_cmd', ~gNB_ID>, KDF(~K_ASME, 'MAX_NAS_COUNT'))
+               ) @ #vk.3 )
+          case enb_fwd_ho_cmd_case_1
+          solve( RcvS( ~cid_S1, ~eNB_ID, ~MME_ID,
+                       <'ho_required', ~eNB_UE_S1AP_ID.1, ~gNB_ID>
+                 ) ▶₃ #vr.5 )
+            case receive_secure_case_1
+            solve( RcvS( ~cid_N2, ~AMF_ID, ~gNB_ID,
+                         <'ho_req', ~AMF_UE_NGAP_ID.1, 
+                          KDF(KDF(~K_ASME,
+                                  KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT')))),
+                              'MAX_NAS_COUNT'), 
+                          NCC.1>
+                   ) ▶₃ #vr.15 )
+              case receive_secure_case_1
+              solve( RcvS( ~cid_N26, ~AMF_ID, ~MME_ID, <'fr_res', ~eNB_UE_S1AP_ID.1>
+                     ) ▶₃ #vr.21 )
+                case receive_secure_case_1
+                solve( RcvS( ~cid_N2, ~gNB_ID, ~AMF_ID,
+                             <'ho_req_ack', ~AMF_UE_NGAP_ID, ~gNB_UE_ID, '0'>
+                       ) ▶₃ #vr )
+                  case receive_secure_case_1
+                  solve( RcvS( ~cid_N2, ~gNB_ID, ~AMF_ID,
+                               <'ho_req_ack', ~AMF_UE_NGAP_ID.2, ~gNB_UE_ID.2, '0'>
+                         ) ▶₃ #vr.29 )
+                  /* in loop (dpth: 1, it: 0) */
+                    case receive_secure_case_1
+                    solve( RcvS( ~cid_N26, ~MME_ID, ~AMF_ID,
+                                 <'fr_req', ~K_ASME, ~eNB_UE_S1AP_ID, ~gNB_ID, NAS_COUNT, 
+                                  KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT'))), NCC>
+                           ) ▶₅ #vr.1 )
+                      case receive_secure_case_1
+                      solve( RcvS( ~cid_N26, ~MME_ID, ~AMF_ID,
+                                   <'fr_req', ~K_ASME, ~eNB_UE_S1AP_ID.1, ~gNB_ID, NAS_COUNT, 
+                                    KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT'))), NCC>
+                             ) ▶₅ #vr.26 )
+                      /* in loop (dpth: 1, it: 0) */
+                        case receive_secure_case_1
+                        solve( RcvS( ~cid_N26, ~MME_ID, ~AMF_ID,
+                                     <'fr_req', ~K_ASME, ~eNB_UE_S1AP_ID, ~gNB_ID, NAS_COUNT, 
+                                      KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT'))), NCC>
+                               ) ▶₅ #vr.29 )
+                          case receive_secure_case_1
+                          solve( RcvS( ~cid_N2, ~AMF_ID, ~gNB_ID,
+                                       <'ho_req', ~AMF_UE_NGAP_ID, 
+                                        KDF(KDF(~K_ASME,
+                                                KDF(~K_ASME, KDF(~K_ASME, KDF(~K_ASME, 'MAX_NAS_COUNT')))),
+                                            'MAX_NAS_COUNT'), 
+                                        '0'>
+                                 ) ▶₃ #vr.30 )
+                            case receive_secure_case_1
+                            SOLVED // trace found
+                          qed
+                        qed
+                      qed
+                    qed
+                  qed
+                qed
+              qed
+            qed
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+lemma injectiveagreement_ue_gnb_k_gnb:
+  all-traces
+  "∀ a b r #i.
+    (Commit( a, b, <'UE', 'gNB', 'K_gNB_star', r> ) @ #i) ⇒
+    ((∃ #j.
+       (Running( b, a, <'UE', 'gNB', 'K_gNB_star', r> ) @ #j) ∧
+       (¬(∃ a2 b2 #i2.
+           (Commit( a2, b2, <'UE', 'gNB', 'K_gNB_star', r> ) @ #i2) ∧
+           (¬(#i2 = #i))))) ∨
+     (∃ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ a b r #i.
+  (Commit( a, b, <'UE', 'gNB', 'K_gNB_star', r> ) @ #i)
+ ∧
+  (∀ #j.
+    (Running( b, a, <'UE', 'gNB', 'K_gNB_star', r> ) @ #j)
+   ⇒
+    ∃ a2 b2 #i2.
+     (Commit( a2, b2, <'UE', 'gNB', 'K_gNB_star', r> ) @ #i2) ∧ ¬(#i2 = #i)) ∧
+  (∀ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma injectiveagreement_gnb_ue_k_gnb:
+  all-traces
+  "∀ a b r #i.
+    (Commit( a, b, <'gNB', 'UE', 'K_gNB_star', r> ) @ #i) ⇒
+    ((∃ #j.
+       (Running( b, a, <'gNB', 'UE', 'K_gNB_star', r> ) @ #j) ∧
+       (¬(∃ a2 b2 #i2.
+           (Commit( a2, b2, <'gNB', 'UE', 'K_gNB_star', r> ) @ #i2) ∧
+           (¬(#i2 = #i))))) ∨
+     (∃ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ a b r #i.
+  (Commit( a, b, <'gNB', 'UE', 'K_gNB_star', r> ) @ #i)
+ ∧
+  (∀ #j.
+    (Running( b, a, <'gNB', 'UE', 'K_gNB_star', r> ) @ #j)
+   ⇒
+    ∃ a2 b2 #i2.
+     (Commit( a2, b2, <'gNB', 'UE', 'K_gNB_star', r> ) @ #i2) ∧ ¬(#i2 = #i)) ∧
+  (∀ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_k_asme:
+  all-traces
+  "∀ q #i.
+    (Secret( <'K_ASME', q> ) @ #i) ⇒
+    (((¬(∃ #k. K( q ) @ #k)) ∨
+      (∃ X #k. (Rev( X, <'K_ASME', q> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+     (∃ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ q #i.
+  (Secret( <'K_ASME', q> ) @ #i)
+ ∧
+  (∃ #k. (K( q ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_ASME', q> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_k_amf:
+  all-traces
+  "∀ p q #i #j.
+    ((Secret( <'K_AMF', p> ) @ #i) ∧ (KeyDerived( <'K_AMF', p>, q ) @ #j)) ⇒
+    ((((¬(∃ #k. K( p ) @ #k)) ∨
+       (∃ X #k. (Rev( X, <'K_AMF', p> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+      (∃ X #k. (Rev( X, <'K_ASME', q> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+     (∃ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q #i #j.
+  (Secret( <'K_AMF', p> ) @ #i) ∧ (KeyDerived( <'K_AMF', p>, q ) @ #j)
+ ∧
+  (∃ #k. (K( p ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_AMF', p> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, <'K_ASME', q> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_k_enb:
+  all-traces
+  "∀ q r #i #j.
+    ((Secret( <'K_eNB', r> ) @ #i) ∧ (KeyDerived( <'K_eNB', r>, q ) @ #j)) ⇒
+    ((((¬(∃ #k. K( r ) @ #k)) ∨
+       (∃ X #k. (Rev( X, <'K_eNB', r> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+      (∃ X #k. (Rev( X, <'K_ASME', q> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+     (∃ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ q r #i #j.
+  (Secret( <'K_eNB', r> ) @ #i) ∧ (KeyDerived( <'K_eNB', r>, q ) @ #j)
+ ∧
+  (∃ #k. (K( r ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_eNB', r> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, <'K_ASME', q> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_k_gnb_star:
+  all-traces
+  "∀ s t #i #j.
+    ((Secret( <'K_gNB_star', s> ) @ #i) ∧
+     (KeyDerived( <'K_gNB_star', s>, t ) @ #j)) ⇒
+    ((((((¬(∃ #k. K( s ) @ #k)) ∨
+         (∃ X #k. (Rev( X, <'K_gNB_star', s> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+        (∃ X #k. (Rev( X, <'NH', t> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+       (∃ X p #k #l.
+         ((KeyDerived( <'NH', t>, p ) @ #l) ∧ (Rev( X, <'K_AMF', p> ) @ #k)) ∧
+         (Honest( X ) @ #i))) ∨
+      (∃ X p q #k #l #m.
+        (((KeyDerived( <'NH', t>, p ) @ #l) ∧
+          (KeyDerived( <'K_AMF', p>, q ) @ #m)) ∧
+         (Rev( X, <'K_ASME', q> ) @ #k)) ∧
+        (Honest( X ) @ #i))) ∨
+     (∃ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ s t #i #j.
+  (Secret( <'K_gNB_star', s> ) @ #i) ∧
+  (KeyDerived( <'K_gNB_star', s>, t ) @ #j)
+ ∧
+  (∃ #k. (K( s ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_gNB_star', s> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, <'NH', t> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X p #k #l.
+    (KeyDerived( <'NH', t>, p ) @ #l) ∧
+    (Rev( X, <'K_AMF', p> ) @ #k) ∧
+    (Honest( X ) @ #i)
+   ⇒
+    ⊥) ∧
+  (∀ X p q #k #l #m.
+    (KeyDerived( <'NH', t>, p ) @ #l) ∧
+    (KeyDerived( <'K_AMF', p>, q ) @ #m) ∧
+    (Rev( X, <'K_ASME', q> ) @ #k) ∧
+    (Honest( X ) @ #i)
+   ⇒
+    ⊥) ∧
+  (∀ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* All wellformedness checks were successful. */
+
+/*
+Generated from:
+Tamarin version 1.11.0
+Maude version 3.4
+Git revision: df2fd84dbb3b3def8309c2a84c04d653d7c4db77 (with uncommited changes), branch: mergedAutomatedStrategies
+Compiled at: 2026-01-16 14:58:06.862219863 UTC
+*/
+
+end

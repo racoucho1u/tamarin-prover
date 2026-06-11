@@ -1,0 +1,28 @@
+{
+  "task_id": "csf19_wrapping--siv__escape--IV_Uniqueness--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 31.44,
+  "wrapper_measures": {
+    "time": 31.843947410583496,
+    "avg_memory": 344.8616431451613,
+    "peak_memory": 714.36328125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf19_wrapping--siv__escape--IV_Uniqueness--merged.spthy",
+  "verified_lemma": {
+    "IV_Uniqueness": {
+      "steps": 766,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "origin",
+    "Counter_Monotonicity",
+    "Key_UsageImpliesInitialization",
+    "Key_IntegrityAndConfidentiality",
+    "Key_UniqueLevelandHandle"
+  ]
+}

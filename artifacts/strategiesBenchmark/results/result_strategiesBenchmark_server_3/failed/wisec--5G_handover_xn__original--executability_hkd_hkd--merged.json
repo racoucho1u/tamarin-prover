@@ -1,0 +1,13 @@
+{
+  "task_id": "wisec--5G_handover_xn__original--executability_hkd_hkd--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 4459.7513563632965,
+    "avg_memory": 21909.882508208775,
+    "peak_memory": 41091.91796875
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

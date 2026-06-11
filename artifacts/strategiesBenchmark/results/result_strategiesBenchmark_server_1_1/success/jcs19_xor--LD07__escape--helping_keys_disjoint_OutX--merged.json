@@ -1,0 +1,32 @@
+{
+  "task_id": "jcs19_xor--LD07__escape--helping_keys_disjoint_OutX--merged",
+  "warnings": [],
+  "tamarin_timing": 4.14,
+  "wrapper_measures": {
+    "time": 4.284529447555542,
+    "avg_memory": 75.4328125,
+    "peak_memory": 104.75
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/jcs19_xor--LD07__escape--helping_keys_disjoint_OutX--merged.spthy",
+  "verified_lemma": {
+    "helping_keys_disjoint_OutX": {
+      "steps": 74,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helping_reader_start",
+    "helping_tag_start",
+    "helping_keys_reader_are_secret",
+    "helping_keys_disjoint_challenge",
+    "helping_keys_disjoint_XX",
+    "helping_keys_disjoint_XS",
+    "helping_keys_disjoint_DD",
+    "alive_tag",
+    "recentalive_tag_bounded",
+    "WA_tag",
+    "recentalive_reader",
+    "executable"
+  ]
+}

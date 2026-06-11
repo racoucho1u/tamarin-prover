@@ -1,0 +1,19 @@
+{
+  "task_id": "these_ls_chap4--aletheaDR_ShHh_RF__escape--functional--merged",
+  "error_description": "An unexpected error occurred, see stderr output below for details.",
+  "wrapper_measures": {
+    "time": 0.1840682029724121,
+    "avg_memory": 0.5390625,
+    "peak_memory": 0.5390625
+  },
+  "return_code": 1,
+  "last_stderr_lines": [
+    "maude tool: 'maude'",
+    " checking version: 2.7.1. OK.",
+    " checking installation: OK.",
+    "\"files_to_benchmark/these_ls_chap4/aletheaDR_ShHh_RF.spthy\" (line 140, column 40):",
+    "unexpected \")\"",
+    "expecting term",
+    "diff operator found, but flag diff not set"
+  ]
+}

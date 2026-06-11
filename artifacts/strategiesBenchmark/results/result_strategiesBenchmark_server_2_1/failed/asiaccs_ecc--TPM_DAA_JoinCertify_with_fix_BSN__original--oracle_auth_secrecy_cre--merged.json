@@ -1,0 +1,13 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinCertify_with_fix_BSN__original--oracle_auth_secrecy_cre--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1241.7382278442383,
+    "avg_memory": 18287.92204301075,
+    "peak_memory": 41245.8203125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

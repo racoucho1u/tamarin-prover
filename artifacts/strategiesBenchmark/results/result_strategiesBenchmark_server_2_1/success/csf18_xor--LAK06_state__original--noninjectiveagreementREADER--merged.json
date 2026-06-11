@@ -1,0 +1,28 @@
+{
+  "task_id": "csf18_xor--LAK06_state__original--noninjectiveagreementREADER--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 910.93,
+  "wrapper_measures": {
+    "time": 914.256557226181,
+    "avg_memory": 8563.634323325397,
+    "peak_memory": 16928.46875
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf18_xor--LAK06_state__original--noninjectiveagreementREADER--merged.spthy",
+  "verified_lemma": {},
+  "falsified_lemma": {
+    "noninjectiveagreementREADER": {
+      "steps": 0,
+      "analysis_type": "all-traces"
+    }
+  },
+  "unterminated_lemma": [
+    "helpingUpdateKey",
+    "helpingStackHash",
+    "helpingSecrecy",
+    "executable",
+    "noninjectiveagreementTAG"
+  ]
+}

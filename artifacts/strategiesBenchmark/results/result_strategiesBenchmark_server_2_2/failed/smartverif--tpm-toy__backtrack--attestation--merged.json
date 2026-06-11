@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--tpm-toy__backtrack--attestation--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1523.5621166229248,
+    "avg_memory": 20667.586606540797,
+    "peak_memory": 42600.12109375
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

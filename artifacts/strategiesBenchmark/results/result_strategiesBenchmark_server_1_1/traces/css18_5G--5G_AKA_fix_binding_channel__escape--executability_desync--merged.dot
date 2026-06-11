@@ -1,0 +1,127 @@
+digraph "trace_5G_aka_fix_SL2-AS0-CL0-A1-C1-NB_executability_desync-hss_receive_air_send_aia-receive_secure_case_1-coerce-ue_receive_authReq_fail_freshness_send_sync_failure-d_0_fst-ue_send_attachReq-ue_receive_authReq_fail_freshness_send_sync_failure_case_3-Xor-seaf_receive_aia_send_authReq-hss_receive_air_send_aia-receive_secure_case_1-ue_send_attachReq-add_subscription-receive_secure_case_1-ue_sqn_increase_case_3-add_subscription-init_homeNet-seaf_receive_aia_send_authReq-init_servNet-coerce-seaf_receive_aia_send_authReq-seaf_receive_attachReq_send_air-d_0_snd-d_0_fst-d_0_fst-Xor" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n6[shape="record",label="{{<n0> St_1_HSS( ~tid, ~idHN, ~supi, \<AE1, ~idHN\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idSN, \<'5G', ~idSN\>, ~k, UN3, KD2, ~RAND,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~sqn_root, ~sk_HN, ~cid\l)\l|<n1> Sqn_HSS( ~supi,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idHN, UN3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~sqn_root, UN4\l)\l|<n2> RcvS( ~cid, ~idSN,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idHN,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'resync', ~RAND, XO1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FS1\>\l)\l|<n3> In( UN2 )}|{<n4> #i : hss_receive_authSync[Sqn_HSS_Invariance( ~idHN, ~supi, UN1, ~sqn_root, UN2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HSS_Resync_End( UN2 )]\l}|{<n5> Sqn_HSS( ~supi, ~idHN, UN1, ~sqn_root, UN2 )}}",fillcolor="#d5d897",style="filled",fontcolor="black",role="Undefined"];
+n15[shape="record",label="{{<n7> Fr( ~supi )|<n8> Fr( ~k )|<n9> Fr( ~sqn_root )|<n10> !HSS( ~idHN, ~sk_HN )}|{<n11> #j : add_subscription[Subscribe( ~supi, ~idHN ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sqn_Create( ~supi, ~idHN, ~sqn_root ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreateUser( ~supi, ~k, ~idHN )]\l}|{<n12> !Ltk_Sym( ~supi, ~idHN, ~k,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~sqn_root\l)\l|<n13> Sqn_UE( ~supi, ~idHN, UN5,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~sqn_root, '1'\l)\l|<n14> Sqn_HSS( ~supi, ~idHN, UN5,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~sqn_root, '1'\l)\l}}",fillcolor="#d2d897",style="filled",fontcolor="black",role="Undefined"];
+n16[label="#vf : isend",shape="ellipse"];
+n17[label="#vk : coerce[!KU( XO1 )]",shape="ellipse"];
+n18[label="#vl : irecv",shape="ellipse"];
+n30[shape="record",label="{{<n19> !HSS( ~idHN, ~sk_HN\l)\l|<n20> RcvS( ~cid, ~idSN, ~idHN,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'air', \<AE1, ~idHN\>, '5G', \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idSN\>\l)\l|<n21> !Ltk_Sym( ~supi,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idHN, ~k, ~sqn_root\l)\l|<n22> Sqn_HSS( ~supi,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idHN, UN5,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~sqn_root, '1'\l)\l|<n23> Fr( ~RAND )|<n24> Fr( ~tid )|<n25> In( '1' )}|{<n26> #vr : hss_receive_air_send_aia[Sqn_HSS_Invariance( ~idHN, ~supi, UN3, ~sqn_root, UN4 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Src( ~RAND, \<XO2, F6\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KSEAF( KD1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Start_HSS_Session( ~idHN ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HSS_Send_Aia( ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idHN, ~idSN, \<'SEAF', 'HSS', 'K_seaf', KD1\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idHN, ~idSN, \<'SEAF', 'HSS', 'supi', ~supi\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idHN, ~idSN, \<'SEAF', 'HSS', 'RES_star', KD2\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idHN, ~supi, \<'UE', 'HSS', 'K_seaf', KD1\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idHN, ~supi, \<'UE', 'HSS', 'supi', ~supi\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idHN, ~supi, \<'UE', 'HSS', 'AUTN', XO2, F6\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( ~supi ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( ~idHN ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( ~idSN )]\l}|{<n27> St_1_HSS( ~tid, ~idHN, ~supi, \<AE1, ~idHN\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idSN, \<'5G', ~idSN\>, ~k, UN3, KD2, ~RAND,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~sqn_root, ~sk_HN, ~cid\l)\l|<n28> Sqn_HSS( ~supi,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idHN, UN3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~sqn_root, UN4\l)\l|<n29> SndS( ~cid, ~idHN, ~idSN,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'aia', ~RAND, SH1, KD1, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XO2, F6\>\l)\l}}",fillcolor="#cdd997",style="filled",fontcolor="black",role="Undefined"];
+n31[label="#vk.1 : coerce[!KU( FS1 )]",shape="ellipse"];
+n32[label="#vl.1 : irecv",shape="ellipse"];
+n39[shape="record",label="{{<n33> Fr( ~sk_HN )|<n34> Fr( ~idHN )}|{<n35> #vr.1 : init_homeNet[HomeNet( ~idHN )]}|{<n36> !HSS( ~idHN, ~sk_HN )|<n37> !Pk( ~idHN, PK1 )|<n38> Out( \<~idHN, PK1\> )}}",fillcolor="#c8d998",style="filled",fontcolor="black",role="Undefined"];
+n40[label="#vk.2 : coerce[!KU( F6 )]",shape="ellipse"];
+n41[label="#vl.2 : irecv",shape="ellipse"];
+n42[label="#vk.3 : coerce[!KU( AE1 )]",shape="ellipse"];
+n43[label="#vk.4 : coerce[!KU( ~idHN )]",shape="ellipse"];
+n44[label="#vl.4 : irecv",shape="ellipse"];
+n49[shape="record",label="{{<n45> St_2_SEAF( ~tid.1, ~idSN, \<'5G', ~idSN\>, AE1, ~idHN, ~RAND, SH1, KD1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~cid\l)\l|<n46> In( \<XO1, FS1\> )}|{<n47> #vr.4 : seaf_receive_syncFailure_send_authSync}|{<n48> SndS( ~cid, ~idSN, ~idHN, \<'resync', ~RAND, XO1, FS1\> )}}",fillcolor="#badb99",style="filled",fontcolor="black",role="Undefined"];
+n50[label="#vk.5 : coerce[!KU( ~RAND )]",shape="ellipse"];
+n56[shape="record",label="{{<n51> St_1_SEAF( ~tid.1, ~idSN, \<'5G', ~idSN\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AE1, ~idHN, ~cid\l)\l|<n52> RcvS( ~cid, ~idHN, ~idSN,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'aia', ~RAND, SH1, KD1, XO2, F6\>\l)\l}|{<n53> #vr.5 : seaf_receive_aia_send_authReq[Out_Src( ~RAND, \<XO2, F6\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idSN, ~idHN, \<'HSS', 'SEAF', 'K_seaf', KD1\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running_anonymous( ~idSN, \<'UE', 'SEAF', 'K_seaf', KD1\> )]\l}|{<n54> St_2_SEAF( ~tid.1, ~idSN, \<'5G', ~idSN\>, AE1, ~idHN,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~RAND, SH1, KD1, ~cid\l)\l|<n55> Out( \<~RAND, \<XO2, F6\>, '5G', \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idSN\>\l)\l}}",fillcolor="#b7db99",style="filled",fontcolor="black",role="Undefined"];
+n57[label="#vf.6 : isend",shape="ellipse"];
+n58[label="#vk.6 : coerce[!KU( ~idSN )]",shape="ellipse"];
+n66[shape="record",label="{{<n59> !SEAF( ~idSN, \<'5G', ~idSN\> )|<n60> Fr( ~tid.1 )|<n61> Fr( ~cid )|<n62> In( \<AE1, ~idHN\> )}|{<n63> #vr.6 : seaf_receive_attachReq_send_air[Start_SEAF_Session( ~idSN )]}|{<n64> St_1_SEAF( ~tid.1, ~idSN, \<'5G', ~idSN\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AE1, ~idHN, ~cid\l)\l|<n65> SndS( ~cid, ~idSN, ~idHN,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'air', \<AE1, ~idHN\>, '5G', ~idSN\>\l)\l}}",fillcolor="#b5db99",style="filled",fontcolor="black",role="Undefined"];
+n67[label="#vk.7 : coerce[!KU( XO2 )]",shape="ellipse"];
+n72[shape="record",label="{{<n68> Fr( ~idSN )}|{<n69> #vr.7 : init_servNet[ServNet( ~idSN )]}|{<n70> !SEAF( ~idSN, \<'5G', ~idSN\> )|<n71> Out( \<'5G', ~idSN\> )}}",fillcolor="#b2db99",style="filled",fontcolor="black",role="Undefined"];
+n80[shape="record",label="{{<n73> St_1_UE( ~tid.2, ~supi,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idHN, ~k, ~sqn_root\l)\l|<n74> Sqn_UE( ~supi, ~idHN, UN1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~sqn_root, UN2\l)\l|<n75> In( \<~RAND, \<XO2, F6\>, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'5G', ~idSN\>\l)\l|<n76> In( UN2 )}|{<n77> #vr.8 : ue_receive_authReq_fail_freshness_send_sync_failure[Greater_Or_Equal_Than( UN1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN3\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sqn_UE_Invariance( ~supi, ~idHN, UN1, ~sqn_root, UN2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sqn_UE_Nochange( ~supi, ~idHN, UN1 )]\l}|{<n78> Out( \<XO1, FS1\> )|<n79> Sqn_UE( ~supi, ~idHN, UN1, ~sqn_root, UN2 )}}",fillcolor="#b0dc9a",style="filled",fontcolor="black",role="Undefined"];
+n81[label="#vf.9 : isend",shape="ellipse"];
+n82[label="#vr.9 : d_0_fst",shape="ellipse"];
+n90[shape="record",label="{{<n83> !Ltk_Sym( ~supi, ~idHN, ~k, ~sqn_root )|<n84> !Pk( ~idHN, PK1 )|<n85> Fr( ~R )|<n86> Fr( ~tid.2 )}|{<n87> #vr.10 : ue_send_attachReq[Start_UE_Session( ~supi )]}|{<n88> St_1_UE( ~tid.2, ~supi, ~idHN, ~k, ~sqn_root )|<n89> Out( \<AE1, ~idHN\> )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n91[label="#vr.11 : d_0_snd",shape="ellipse"];
+n92[label="#vf.12 : isend",shape="ellipse"];
+n93[label="#vr.12 : d_0_snd",shape="ellipse"];
+n94[label="#vr.13 : d_0_fst",shape="ellipse"];
+n95[label="#vf.14 : isend",shape="ellipse"];
+n96[label="#vf.15 : isend",shape="ellipse"];
+n100[shape="record",label="{{<n97> Sec( ~cid, ~idSN, ~idHN, \<'air', \<AE1, ~idHN\>, '5G', ~idSN\> )}|{<n98> #vr.15 : receive_secure}|{<n99> RcvS( ~cid, ~idSN, ~idHN, \<'air', \<AE1, ~idHN\>, '5G', ~idSN\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n104[shape="record",label="{{<n101> SndS( ~cid, ~idSN, ~idHN, \<'air', \<AE1, ~idHN\>, '5G', ~idSN\> )}|{<n102> #vr.16 : send_secure}|{<n103> Sec( ~cid, ~idSN, ~idHN, \<'air', \<AE1, ~idHN\>, '5G', ~idSN\> )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n105[label="#vf.18 : isend",shape="ellipse"];
+n110[shape="record",label="{{<n106> Sqn_UE( ~supi, ~idHN, UN5, ~sqn_root, '1' )|<n107> In( UN4 )}|{<n108> #vr.20 : ue_sqn_increase[Sqn_UE_Invariance( ~supi, ~idHN, UN1, ~sqn_root, UN2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sqn_UE_Change( ~supi, ~idHN, UN1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sqn_UE_Desync( )]\l}|{<n109> Sqn_UE( ~supi, ~idHN, UN1, ~sqn_root, UN2 )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n111[label="!KU( UN2 ) @ #vk.14",shape="ellipse",color="gray"];
+n112[label="!KU( UN4 ) @ #vk.15",shape="ellipse",color="gray"];
+n15:n12 -> n30:n21[style="bold",weight="10.0",color="gray50"];
+n15:n12 -> n90:n83[style="bold",weight="10.0",color="gray50"];
+n15:n13 -> n110:n106[style="bold",weight="10.0"];
+n15:n14 -> n30:n22[style="bold",weight="10.0"];
+n16 -> n6:n3[color="gray30"];
+n18 -> n82[color="orangered2"];
+n18 -> n91[color="orangered2"];
+n30:n27 -> n6:n0[style="bold",weight="10.0"];
+n30:n28 -> n6:n1[style="bold",weight="10.0"];
+n30:n29 -> n56:n52[style="bold",weight="10.0"];
+n32 -> n50[color="orangered2"];
+n32 -> n93[color="orangered2"];
+n39:n36 -> n15:n10[style="bold",weight="10.0",color="gray50"];
+n39:n36 -> n30:n19[style="bold",weight="10.0",color="gray50"];
+n39:n37 -> n90:n84[style="bold",weight="10.0",color="gray50"];
+n39:n38 -> n43[color="orangered2"];
+n41 -> n42[color="orangered2"];
+n44 -> n58[color="orangered2"];
+n49:n48 -> n6:n2[style="bold",weight="10.0"];
+n56:n54 -> n49:n45[style="bold",weight="10.0"];
+n56:n55 -> n32[color="gray30"];
+n57 -> n30:n25[color="gray30"];
+n66:n64 -> n56:n51[style="bold",weight="10.0"];
+n66:n65 -> n104:n101[style="bold",weight="10.0"];
+n72:n70 -> n66:n59[style="bold",weight="10.0",color="gray50"];
+n72:n71 -> n44[color="gray30"];
+n80:n78 -> n18[color="gray30"];
+n81 -> n49:n46[color="gray30"];
+n82 -> n17[color="orangered2"];
+n90:n88 -> n80:n73[style="bold",weight="10.0"];
+n90:n89 -> n41[color="gray30"];
+n91 -> n31[color="orangered2"];
+n92 -> n66:n62[color="gray30"];
+n93 -> n94[color="orangered2"];
+n94 -> n40[color="orangered2"];
+n94 -> n67[color="orangered2"];
+n95 -> n80:n75[color="gray30"];
+n96 -> n80:n76[color="gray30"];
+n100:n99 -> n30:n20[style="bold",weight="10.0"];
+n104:n103 -> n100:n97[style="bold",weight="10.0"];
+n105 -> n110:n107[color="gray30"];
+n110:n109 -> n80:n74[style="bold",weight="10.0"];
+n17 -> n81[color="red",style="dashed"];
+n18 -> n81[color="red",style="dashed"];
+n31 -> n81[color="red",style="dashed"];
+n32 -> n95[color="red",style="dashed"];
+n40 -> n95[color="red",style="dashed"];
+n41 -> n92[color="red",style="dashed"];
+n42 -> n92[color="red",style="dashed"];
+n43 -> n92[color="red",style="dashed"];
+n44 -> n95[color="red",style="dashed"];
+n50 -> n95[color="red",style="dashed"];
+n58 -> n95[color="red",style="dashed"];
+n67 -> n95[color="red",style="dashed"];
+n93 -> n95[color="red",style="dashed"];
+n94 -> n95[color="red",style="dashed"];
+n111 -> n16[color="red",style="dashed"];
+n111 -> n96[color="red",style="dashed"];
+n112 -> n111[color="red",style="dashed"];
+n112 -> n105[color="red",style="dashed"];
+{
+rank="sink";
+n113[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">F7</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">f5(~k, ~RAND)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">FS2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">f5_star(~k, ~RAND)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">KD2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">KDF(&lt;f3(~k, ~RAND), f4(~k, ~RAND)&gt;,<BR ALIGN="LEFT"/> &#32;&#32;&#32;&lt;&lt;'5G', ~idSN&gt;, f2(~k, ~RAND), ~RAND&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">PK1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">pk(~sk_HN)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">AE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">aenc(&lt;~supi, ~R&gt;, PK1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SH1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">SHA256(KD2, ~RAND)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1'++'1'++~sqn_root)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">FS1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">f1_star(~k, &lt;UN1, ~RAND&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1'++'1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1'++~sqn_root)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">F6</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">f1(~k, &lt;UN3, ~RAND, '5G', ~idSN&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN5</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++~sqn_root)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">XO1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(FS2⊕UN1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">XO2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(F7⊕UN3)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">KD3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">KDF(&lt;f3(~k, ~RAND), f4(~k, ~RAND)&gt;, &lt;&lt;'5G', ~idSN&gt;, XO2&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">KD1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">KDF(KD3, &lt;'5G', ~idSN&gt;)</TD></TR></TABLE>>];
+
+}
+n6:n4 -> n113[style="invis"];
+
+}

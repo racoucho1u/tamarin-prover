@@ -1,0 +1,28 @@
+{
+  "task_id": "csf18_xor--LAK06_state__collectAndRestart--helpingUpdateKey--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 9.16,
+  "wrapper_measures": {
+    "time": 9.391616106033325,
+    "avg_memory": 65.759765625,
+    "peak_memory": 82.83203125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf18_xor--LAK06_state__collectAndRestart--helpingUpdateKey--merged.spthy",
+  "verified_lemma": {
+    "helpingUpdateKey": {
+      "steps": 28,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helpingStackHash",
+    "helpingSecrecy",
+    "executable",
+    "noninjectiveagreementTAG",
+    "noninjectiveagreementREADER"
+  ]
+}

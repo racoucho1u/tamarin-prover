@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_fix_non_binding_channel__collectAndRestart--sqn_ue_nodecrease--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.614187002182,
+    "avg_memory": 382.2925410259142,
+    "peak_memory": 383.921875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

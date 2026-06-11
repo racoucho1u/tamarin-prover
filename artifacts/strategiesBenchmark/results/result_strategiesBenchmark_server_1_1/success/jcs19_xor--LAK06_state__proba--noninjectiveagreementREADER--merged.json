@@ -1,0 +1,25 @@
+{
+  "task_id": "jcs19_xor--LAK06_state__proba--noninjectiveagreementREADER--merged",
+  "warnings": [],
+  "tamarin_timing": 1786.81,
+  "wrapper_measures": {
+    "time": 1788.7097282409668,
+    "avg_memory": 13454.612093946764,
+    "peak_memory": 25509.1171875
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/jcs19_xor--LAK06_state__proba--noninjectiveagreementREADER--merged.spthy",
+  "verified_lemma": {},
+  "falsified_lemma": {
+    "noninjectiveagreementREADER": {
+      "steps": 0,
+      "analysis_type": "all-traces"
+    }
+  },
+  "unterminated_lemma": [
+    "helpingUpdateKey",
+    "helpingStackHash",
+    "helpingSecrecy",
+    "executable",
+    "noninjectiveagreementTAG"
+  ]
+}

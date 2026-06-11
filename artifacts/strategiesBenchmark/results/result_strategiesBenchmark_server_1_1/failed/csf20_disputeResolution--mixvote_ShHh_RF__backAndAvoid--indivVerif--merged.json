@@ -1,0 +1,13 @@
+{
+  "task_id": "csf20_disputeResolution--mixvote_ShHh_RF__backAndAvoid--indivVerif--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.473552942276,
+    "avg_memory": 1056.251154930079,
+    "peak_memory": 1087.98046875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

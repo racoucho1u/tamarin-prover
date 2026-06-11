@@ -1,0 +1,33 @@
+{
+  "task_id": "smartverif--pkcs11__escape--cannot_obtain_key_ind--merged",
+  "warnings": [
+    "9 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 591.51,
+  "wrapper_measures": {
+    "time": 593.3815739154816,
+    "avg_memory": 6069.3406533354955,
+    "peak_memory": 7513.9453125
+  },
+  "output_spthy": "result_strategiesBenchmark_2/proofs/smartverif--pkcs11__escape--cannot_obtain_key_ind--merged.spthy",
+  "verified_lemma": {
+    "cannot_obtain_key_ind": {
+      "steps": 764,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "dec_limits",
+    "trusted_as_ut_impossible",
+    "untrusted_as_ut_impossible",
+    "untrusted_as_wt_impossible",
+    "trusted_as_wt_impossible",
+    "bad_keys",
+    "no_key_is_wrap_and_dec_or_unwrap_and_dec_ind",
+    "no_key_is_enc_and_unwrap",
+    "cannot_obtain_key"
+  ]
+}

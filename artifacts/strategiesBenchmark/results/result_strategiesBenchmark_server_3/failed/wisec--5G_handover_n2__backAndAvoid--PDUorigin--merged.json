@@ -1,0 +1,13 @@
+{
+  "task_id": "wisec--5G_handover_n2__backAndAvoid--PDUorigin--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7201.121807098389,
+    "avg_memory": 4183.878751709808,
+    "peak_memory": 4188.4609375
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "task_id": "csf19_wrapping--gcm__collectAndRestart--Key_UsageImpliesInitialization--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 21.07,
+  "wrapper_measures": {
+    "time": 21.33030104637146,
+    "avg_memory": 270.3048735119047,
+    "peak_memory": 386.046875
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf19_wrapping--gcm__collectAndRestart--Key_UsageImpliesInitialization--merged.spthy",
+  "verified_lemma": {
+    "Key_UsageImpliesInitialization": {
+      "steps": 78,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "origin",
+    "Counter_Monotonicity",
+    "IV_Uniqueness",
+    "Key_IntegrityAndConfidentiality",
+    "Key_UniqueLevelandHandle"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "task_id": "css18_5G--5G_AKA_priv__backAndAvoid--executability_honest--merged",
+  "warnings": [],
+  "tamarin_timing": 2539.24,
+  "wrapper_measures": {
+    "time": 2539.588002681732,
+    "avg_memory": 996.2077862793163,
+    "peak_memory": 1369.21484375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/css18_5G--5G_AKA_priv__backAndAvoid--executability_honest--merged.spthy",
+  "verified_lemma": {
+    "executability_honest": {
+      "steps": 22,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "dummy",
+    "dummy",
+    "rand_autn_src",
+    "rand_autn_src",
+    "sqn_ue_invariance",
+    "sqn_ue_invariance",
+    "sqn_hss_invariance",
+    "sqn_hss_invariance",
+    "sqn_ue_src",
+    "sqn_ue_src",
+    "sqn_hss_src",
+    "sqn_hss_src",
+    "sqn_ue_nodecrease",
+    "sqn_ue_nodecrease",
+    "sqn_ue_unique",
+    "sqn_ue_unique",
+    "original_replayed_autn",
+    "original_replayed_autn"
+  ]
+}

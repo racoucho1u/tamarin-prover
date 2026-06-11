@@ -1,0 +1,77 @@
+digraph "trace_Chaum_Offline_Anonymity_SL2-AS0-CL0-A1-C1-NB_caught-case_1-C_1-Register_Corrupted_Bank_pk-C_1-Register_Corrupted_Bank_pk-C_2_case_1-C_2_case_2-c_sign-c_sign-c_sign-c_sign-C_1_case_1-C_1_case_1-Register_Corrupted_Bank_pk-C_1-C_1" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n5[shape="record",label="{{<n0> !St_C_1( ~C, ~y, ~r )|<n1> In( SI1 )|<n2> !Bank_Pk( $B, pk(~skB) )}|{<n3> #i1 : C_2[Coin( (~C⊕~y), ~y, ~r ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spend( ~C, ~y, ~r )]\l}|{<n4> Out( \<(~C⊕~y), SI4\> )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n11[shape="record",label="{{<n6> !St_C_1( ~C, ~y, ~r )|<n7> In( SI1 )|<n8> !Bank_Pk( $B, pk(~skB) )}|{<n9> #i2 : C_2[Coin( (~C⊕~y), ~y, ~r ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spend( ~C, ~y, ~r )]\l}|{<n10> Out( \<(~C⊕~y), SI4\> )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n15[shape="record",label="{{<n12> Fr( ~C )}|{<n13> #j : test_subject[TestSubject( ~C )]}|{<n14> !Customer( ~C )}}",fillcolor="#ccd998",style="filled",fontcolor="black",role="Undefined"];
+n16[label="#k : coerce[!KU( ~C )]",shape="ellipse"];
+n17[label="#vk : coerce[!KU( ~y.1 )]",shape="ellipse"];
+n24[shape="record",label="{{<n18> Fr( ~y )|<n19> Fr( ~r )|<n20> !Customer( ~C )}|{<n21> #vr : C_1[Mint( (~C⊕~y), ~y, ~r ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mint( ~y, ~y, ~r )]\l}|{<n22> Out( \<BL2, blind(~y, ~r)\> )|<n23> !St_C_1( ~C, ~y, ~r )}}",fillcolor="#a7dd9a",style="filled",fontcolor="black",role="Undefined"];
+n25[label="#vf.1 : isend",shape="ellipse"];
+n26[label="#vk.1 : c_sign[!KU( SI1 )]",shape="ellipse"];
+n32[shape="record",label="{{<n27> Fr( ~skB )}|{<n28> #vr.1 : Register_Corrupted_Bank_pk[OnlyOnce( )]}|{<n29> !Bank_Ltk( $B, ~skB )|<n30> !Bank_Pk( $B, pk(~skB) )|<n31> Out( ~skB )}}",fillcolor="#bcda99",style="filled",fontcolor="black",role="Undefined"];
+n33[label="#vf.2 : isend",shape="ellipse"];
+n34[label="#vk.2 : c_sign[!KU( SI3 )]",shape="ellipse"];
+n40[shape="record",label="{{<n35> !St_C_1( ~C, ~y.1, ~r.1 )|<n36> In( SI3 )|<n37> !Bank_Pk( $B, pk(~skB) )}|{<n38> #vr.2 : C_2[Coin( (~C⊕~y.1), ~y.1, ~r.1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spend( ~C, ~y.1, ~r.1 )]\l}|{<n39> Out( \<(~C⊕~y.1), sign((~C⊕~y.1), ~skB)\> )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n41[label="#vk.3 : c_sign[!KU( SI2 )]",shape="ellipse"];
+n42[label="#vk.4 : coerce[!KU( BL2 )]",shape="ellipse"];
+n43[label="#vl.4 : irecv",shape="ellipse"];
+n50[shape="record",label="{{<n44> Fr( ~y.1 )|<n45> Fr( ~r.1 )|<n46> !Customer( ~C )}|{<n47> #vr.4 : C_1[Mint( (~C⊕~y.1), ~y.1, ~r.1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mint( ~y.1, ~y.1, ~r.1 )]\l}|{<n48> Out( \<BL1, BL3\> )|<n49> !St_C_1( ~C, ~y.1, ~r.1 )}}",fillcolor="#a7dd9a",style="filled",fontcolor="black",role="Undefined"];
+n51[label="#vk.5 : coerce[!KU( ~skB )]",shape="ellipse"];
+n52[label="#vr.5 : d_xor",shape="ellipse"];
+n53[label="#vf.6 : isend",shape="ellipse"];
+n54[label="#vk.6 : coerce[!KU( BL1 )]",shape="ellipse"];
+n60[shape="record",label="{{<n55> !St_C_1( ~C, ~y.1, ~r.1 )|<n56> In( SI2 )|<n57> !Bank_Pk( $B, pk(~skB) )}|{<n58> #vr.6 : C_2[Coin( ~y.1, ~y.1, ~r.1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Spend( ~C, ~y.1, ~r.1 )]\l}|{<n59> Out( \<~y.1, sign(~y.1, ~skB)\> )}}",fillcolor="#a3dd9b",style="filled",fontcolor="black",role="Undefined"];
+n61[label="#vk.7 : coerce[!KU( BL3 )]",shape="ellipse"];
+n62[label="#vf.9 : isend",shape="ellipse"];
+n15:n14 -> n24:n20[style="bold",weight="10.0",color="gray50"];
+n15:n14 -> n50:n46[style="bold",weight="10.0",color="gray50"];
+n24:n22 -> n42[color="orangered2"];
+n24:n23 -> n5:n0[style="bold",weight="10.0",color="gray50"];
+n24:n23 -> n11:n6[style="bold",weight="10.0",color="gray50"];
+n25 -> n5:n1[color="gray30"];
+n32:n30 -> n5:n2[style="bold",weight="10.0",color="gray50"];
+n32:n30 -> n11:n8[style="bold",weight="10.0",color="gray50"];
+n32:n30 -> n40:n37[style="bold",weight="10.0",color="gray50"];
+n32:n30 -> n60:n57[style="bold",weight="10.0",color="gray50"];
+n32:n31 -> n51[color="orangered2"];
+n33 -> n11:n7[color="gray30"];
+n40:n39 -> n52[color="orangered2"];
+n43 -> n54[color="orangered2"];
+n43 -> n61[color="orangered2"];
+n50:n48 -> n43[color="gray30"];
+n50:n49 -> n40:n35[style="bold",weight="10.0",color="gray50"];
+n50:n49 -> n60:n55[style="bold",weight="10.0",color="gray50"];
+n52 -> n16[color="orangered2"];
+n53 -> n40:n36[color="gray30"];
+n60:n59 -> n17[color="orangered2"];
+n62 -> n60:n56[color="gray30"];
+n5:n3 -> n11:n9[color="black",style="dashed"];
+n17 -> n52[color="red",style="dashed"];
+n26 -> n25[color="red",style="dashed"];
+n26 -> n33[color="red",style="dashed"];
+n34 -> n53[color="red",style="dashed"];
+n41 -> n62[color="red",style="dashed"];
+n42 -> n26[color="red",style="dashed"];
+n51 -> n26[color="red",style="dashed"];
+n51 -> n34[color="red",style="dashed"];
+n51 -> n41[color="red",style="dashed"];
+n54 -> n34[color="red",style="dashed"];
+n61 -> n41[color="red",style="dashed"];
+{
+rank="sink";
+n63[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">BL1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">blind((~C⊕~y.1), ~r.1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">BL2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">blind((~C⊕~y), ~r)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">BL3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">blind(~y.1, ~r.1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign(BL2, ~skB)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign(BL3, ~skB)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign(BL1, ~skB)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SI4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sign((~C⊕~y), ~skB)</TD></TR></TABLE>>];
+
+}
+n11:n9 -> n63[style="invis"];
+n16 -> n63[style="invis"];
+
+}

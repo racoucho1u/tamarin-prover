@@ -1,0 +1,13 @@
+{
+  "task_id": "csf18_xor--KCL07-UK3__collectAndRestart--Observational_equivalence--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1863.36914396286,
+    "avg_memory": 20722.678707700285,
+    "peak_memory": 42295.37109375
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

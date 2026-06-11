@@ -1,0 +1,28 @@
+{
+  "task_id": "csf18_xor--LAK06_state__collectAndRestart--helpingStackHash--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 3.61,
+  "wrapper_measures": {
+    "time": 3.823779821395874,
+    "avg_memory": 48.1826171875,
+    "peak_memory": 68.984375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf18_xor--LAK06_state__collectAndRestart--helpingStackHash--merged.spthy",
+  "verified_lemma": {
+    "helpingStackHash": {
+      "steps": 13,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helpingUpdateKey",
+    "helpingSecrecy",
+    "executable",
+    "noninjectiveagreementTAG",
+    "noninjectiveagreementREADER"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--key-registration__collectAndRestart--honest_revoked--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.446091175079,
+    "avg_memory": 213.27077622116215,
+    "peak_memory": 239.8046875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

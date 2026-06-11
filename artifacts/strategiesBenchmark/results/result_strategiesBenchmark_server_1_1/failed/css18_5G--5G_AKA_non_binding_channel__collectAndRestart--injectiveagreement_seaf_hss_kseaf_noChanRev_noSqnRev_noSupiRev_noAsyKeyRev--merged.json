@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_non_binding_channel__collectAndRestart--injectiveagreement_seaf_hss_kseaf_noChanRev_noSqnRev_noSupiRev_noAsyKeyRev--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.485644817352,
+    "avg_memory": 295.6954309554745,
+    "peak_memory": 295.921875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

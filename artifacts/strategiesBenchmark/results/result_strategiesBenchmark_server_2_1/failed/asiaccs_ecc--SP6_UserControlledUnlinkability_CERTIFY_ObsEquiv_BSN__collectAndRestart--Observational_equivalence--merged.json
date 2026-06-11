@@ -1,0 +1,13 @@
+{
+  "task_id": "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__collectAndRestart--Observational_equivalence--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 5142.48996090889,
+    "avg_memory": 21649.3294766544,
+    "peak_memory": 41666.48828125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

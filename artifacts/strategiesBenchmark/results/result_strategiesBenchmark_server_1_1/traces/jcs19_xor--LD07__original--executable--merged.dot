@@ -1,0 +1,40 @@
+digraph "trace_LD07_SL2-AS0-CL0-A1-C1-NB_executable-reader1-tag1-tag1-split-tag1-tag1-split_case_3-split_case_05-reader1-Setup-tag1-Setup" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n7[shape="record",label="{{<n0> Initiated( ~r1 )|<n1> Reader( ~k, ~k1 )|<n2> In( H1 )|<n3> Fr( ~k1.1 )}|{<n4> #i : reader2[Reader( ~k, ~k1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AliveTag( ~k, (~k⊕~k1), ~r1, (~k1⊕~r1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( ~k, 'Reader', ~k1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Response( ~k, 'Reader' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( H1, H1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyS( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyS( ~k1.1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyS( ~k1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyD( ~k1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyX( (~k1⊕~r1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OutK( XO2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ch( ~r1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reader2rule( )]\l}|{<n5> Out( \<XO2, h((~k⊕~k1.1))\> )|<n6> Reader( ~k, ~k1.1 )}}",fillcolor="#d5d897",style="filled",fontcolor="black",role="Undefined"];
+n14[shape="record",label="{{<n8> In( ~r1 )|<n9> Tag( ~k, (~k⊕~k1) )}|{<n10> #j : tag1[ResponseTag( ~k, (~k⊕~k1), ~r1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TagKey( ~k, (~k⊕~k1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Response( ~k, 'Tag' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ChallengeTag( (~k⊕~k1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tag( ~k, (~k⊕~k1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~k, 'Tag', (~k⊕~k1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyTag( (~k⊕~k1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tag1rule( ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( ~r1, zero )]\l}|{<n11> Out( H1 )|<n12> Tag( ~k, (~k⊕~k1) )|<n13> TagRunning( ~k, (~k⊕~k1) )}}",fillcolor="#cdd998",style="filled",fontcolor="black",role="Undefined"];
+n15[label="#vf : isend",shape="ellipse"];
+n16[label="#vk : coerce[!KU( H1 )]",shape="ellipse"];
+n21[shape="record",label="{{<n17> Fr( ~r1 )}|{<n18> #vr : reader1[ChallengeReader( ~r1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ch( ~r1 )]\l}|{<n19> Out( ~r1 )|<n20> Initiated( ~r1 )}}",fillcolor="#beda99",style="filled",fontcolor="black",role="Undefined"];
+n27[shape="record",label="{{<n22> Fr( ~k )|<n23> Fr( ~k1 )}|{<n24> #i.1 : Setup[Setup( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyS( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyS( ~k1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( )]\l}|{<n25> Reader( ~k, ~k1 )|<n26> Tag( ~k, (~k⊕~k1) )}}",fillcolor="#b6db99",style="filled",fontcolor="black",role="Undefined"];
+n33[shape="record",label="{{<n28> In( \<~r1, H1\> )|<n29> Tag( ~k, (~k⊕~k1) )|<n30> TagRunning( ~k, (~k⊕~k1) )}|{<n31> #k.1 : tag2[Update( ~k, XO1, 'Tag' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( H1, H1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AliveReader( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyTag( XO1 )]\l}|{<n32> Tag( ~k, XO1 )}}",fillcolor="#aedc9a",style="filled",fontcolor="black",role="Undefined"];
+n34[label="#vk.1 : coerce[!KU( ~r1 )]",shape="ellipse"];
+n35[label="#vf.2 : isend",shape="ellipse"];
+n36[label="#vf.6 : isend",shape="ellipse"];
+n14:n11 -> n16[color="orangered2"];
+n14:n12 -> n33:n29[style="bold",weight="10.0"];
+n14:n13 -> n33:n30[style="bold",weight="10.0"];
+n15 -> n7:n2[color="gray30"];
+n21:n19 -> n34[color="orangered2"];
+n21:n20 -> n7:n0[style="bold",weight="10.0"];
+n27:n25 -> n7:n1[style="bold",weight="10.0"];
+n27:n26 -> n14:n9[style="bold",weight="10.0"];
+n35 -> n33:n28[color="gray30"];
+n36 -> n14:n8[color="gray30"];
+n16 -> n15[color="red",style="dashed"];
+n16 -> n35[color="red",style="dashed"];
+n34 -> n35[color="red",style="dashed"];
+n34 -> n36[color="red",style="dashed"];
+{
+rank="sink";
+n37[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">XO1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(~k⊕~k1⊕~r1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h(XO1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">XO2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(~k1⊕~k1.1)</TD></TR></TABLE>>];
+
+}
+n7:n4 -> n37[style="invis"];
+n33:n31 -> n37[style="invis"];
+
+}

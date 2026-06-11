@@ -1,0 +1,19 @@
+{
+  "task_id": "sp14--STR__collectAndRestart--key_reachable_2--merged",
+  "warnings": [],
+  "tamarin_timing": 1.6,
+  "wrapper_measures": {
+    "time": 1.7487823963165283,
+    "avg_memory": 42.0703125,
+    "peak_memory": 83.33203125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/sp14--STR__collectAndRestart--key_reachable_2--merged.spthy",
+  "verified_lemma": {
+    "key_reachable_2": {
+      "steps": 10,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

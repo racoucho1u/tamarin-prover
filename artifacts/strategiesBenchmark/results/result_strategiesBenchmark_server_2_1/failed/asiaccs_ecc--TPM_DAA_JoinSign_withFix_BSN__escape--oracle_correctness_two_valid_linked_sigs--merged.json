@@ -1,0 +1,13 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_BSN__escape--oracle_correctness_two_valid_linked_sigs--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1386.8423144817352,
+    "avg_memory": 25020.93936177618,
+    "peak_memory": 41314.1328125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

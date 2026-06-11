@@ -1,0 +1,13 @@
+{
+  "task_id": "these_ls_chap3--alethea_vot_SmHh__original--Tall_As_Rec_1--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 4173.067121505737,
+    "avg_memory": 20254.1607914361,
+    "peak_memory": 41565.01953125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

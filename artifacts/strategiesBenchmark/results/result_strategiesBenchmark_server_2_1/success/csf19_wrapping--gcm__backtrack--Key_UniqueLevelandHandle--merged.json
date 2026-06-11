@@ -1,0 +1,28 @@
+{
+  "task_id": "csf19_wrapping--gcm__backtrack--Key_UniqueLevelandHandle--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 30.83,
+  "wrapper_measures": {
+    "time": 31.130728244781494,
+    "avg_memory": 299.4162046370968,
+    "peak_memory": 375.27734375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf19_wrapping--gcm__backtrack--Key_UniqueLevelandHandle--merged.spthy",
+  "verified_lemma": {
+    "Key_UniqueLevelandHandle": {
+      "steps": 170,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "origin",
+    "Counter_Monotonicity",
+    "IV_Uniqueness",
+    "Key_UsageImpliesInitialization",
+    "Key_IntegrityAndConfidentiality"
+  ]
+}

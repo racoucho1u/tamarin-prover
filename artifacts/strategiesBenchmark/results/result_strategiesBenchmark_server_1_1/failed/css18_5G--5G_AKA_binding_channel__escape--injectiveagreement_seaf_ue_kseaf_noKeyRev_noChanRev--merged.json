@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_binding_channel__escape--injectiveagreement_seaf_ue_kseaf_noKeyRev_noChanRev--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 3913.972402572632,
+    "avg_memory": 21134.524765461552,
+    "peak_memory": 41176.78515625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

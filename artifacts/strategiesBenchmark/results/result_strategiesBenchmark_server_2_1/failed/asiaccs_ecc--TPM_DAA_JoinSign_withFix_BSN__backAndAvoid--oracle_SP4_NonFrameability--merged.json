@@ -1,0 +1,13 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_BSN__backAndAvoid--oracle_SP4_NonFrameability--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7203.846397638321,
+    "avg_memory": 24021.05455919854,
+    "peak_memory": 24439.51953125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

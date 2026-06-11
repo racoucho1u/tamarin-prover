@@ -1,0 +1,13 @@
+{
+  "task_id": "csf20_disputeResolution--mixvote_ShHh_RF__original--Observational_equivalence--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 4036.037346839905,
+    "avg_memory": 20324.91841871041,
+    "peak_memory": 41386.1796875
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

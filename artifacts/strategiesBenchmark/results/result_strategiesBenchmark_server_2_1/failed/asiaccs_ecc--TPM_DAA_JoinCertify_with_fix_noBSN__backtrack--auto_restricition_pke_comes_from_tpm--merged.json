@@ -1,0 +1,13 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinCertify_with_fix_noBSN__backtrack--auto_restricition_pke_comes_from_tpm--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 63.4173378944397,
+    "avg_memory": 0.0,
+    "peak_memory": 0.0
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

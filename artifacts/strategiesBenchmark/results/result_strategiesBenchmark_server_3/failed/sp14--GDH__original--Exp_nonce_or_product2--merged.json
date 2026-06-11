@@ -1,0 +1,13 @@
+{
+  "task_id": "sp14--GDH__original--Exp_nonce_or_product2--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 640.989706993103,
+    "avg_memory": 20156.267467222013,
+    "peak_memory": 41467.859375
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

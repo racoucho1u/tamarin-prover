@@ -1,0 +1,22 @@
+{
+  "task_id": "smartverif--pkcs11__collectAndRestart--untrusted_as_wt_impossible--merged",
+  "error_description": "An unexpected error occurred, see stderr output below for details.",
+  "wrapper_measures": {
+    "time": 17.47351837158203,
+    "avg_memory": 343.5997242647059,
+    "peak_memory": 541.71875
+  },
+  "return_code": 1,
+  "last_stderr_lines": [
+    " stdin:   ",
+    " stdout:  3.2",
+    "",
+    " stderr:  ",
+    " checking installation: OK.",
+    "[Theory PKCS11TemplatePolicy] Theory loaded",
+    "[Theory PKCS11TemplatePolicy] Theory translated",
+    "[Theory PKCS11TemplatePolicy] Theory closed",
+    "[Saturating Sources] Step 1 (Max 5)",
+    "tamarin-prover-1.4.1-2468-g300638b4: <<loop>>"
+  ]
+}

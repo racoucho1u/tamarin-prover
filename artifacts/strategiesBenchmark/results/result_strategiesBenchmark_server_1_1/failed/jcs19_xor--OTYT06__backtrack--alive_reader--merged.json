@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--OTYT06__backtrack--alive_reader--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.714371442795,
+    "avg_memory": 1184.156916812129,
+    "peak_memory": 1646.72265625
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

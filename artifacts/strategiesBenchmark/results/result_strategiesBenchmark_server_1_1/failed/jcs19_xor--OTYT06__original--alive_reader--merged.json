@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--OTYT06__original--alive_reader--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1325.6856544017792,
+    "avg_memory": 20514.153336915577,
+    "peak_memory": 41731.6484375
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

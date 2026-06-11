@@ -1,0 +1,13 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinQuotePCR_with_fix_BSN__proba--oracle_auth_secrecy_cre--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1482.9530217647552,
+    "avg_memory": 19617.525507432198,
+    "peak_memory": 40972.51953125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

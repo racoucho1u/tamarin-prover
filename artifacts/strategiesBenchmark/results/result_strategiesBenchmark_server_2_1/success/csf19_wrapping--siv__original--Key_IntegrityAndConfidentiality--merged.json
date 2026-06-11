@@ -1,0 +1,28 @@
+{
+  "task_id": "csf19_wrapping--siv__original--Key_IntegrityAndConfidentiality--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 55.13,
+  "wrapper_measures": {
+    "time": 55.45812439918518,
+    "avg_memory": 427.98444602272735,
+    "peak_memory": 573.71484375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf19_wrapping--siv__original--Key_IntegrityAndConfidentiality--merged.spthy",
+  "verified_lemma": {
+    "Key_IntegrityAndConfidentiality": {
+      "steps": 550,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "origin",
+    "Counter_Monotonicity",
+    "IV_Uniqueness",
+    "Key_UsageImpliesInitialization",
+    "Key_UniqueLevelandHandle"
+  ]
+}

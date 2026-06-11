@@ -1,0 +1,13 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinQuotePCR_with_fix_BSN__escape--oracle_SP4_NonFrameability--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 2292.9278786182404,
+    "avg_memory": 21663.85362670737,
+    "peak_memory": 41956.00390625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

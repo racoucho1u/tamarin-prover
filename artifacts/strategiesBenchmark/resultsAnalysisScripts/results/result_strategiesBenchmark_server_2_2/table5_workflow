@@ -1,0 +1,7 @@
+ & \textbf{All} & \textbf{Classic} & \textbf{Exists} & \textbf{Source} & \textbf{Reuse} & \textbf{Induction} \\1. &Backtracking & Backtracking & Develop & Develop & Escape & Escape\\
+2. &Escape & CollectAndRestart & - & - & - & -\\
+3. &Develop & - & - & - & - & -\\
+\begin{tabular}{l} \textbf{Workflow} \\ \textbf{success}\end{tabular} & 23 (9) & 14 (1) & 0 (0) & 1 (1) & 8 (7) & 4 (3)\\
+\begin{tabular}{c} \textbf{Termination rate} \\ \textbf{in \%}\end{tabular} & 71.88 (28.12) & 60.87 (4.35) & 0 (0) & 100.0 (100.0) & 100.0 (87.5) & 100.0 (75.0)\\
+\begin{tabular}{c} \textbf{Improvement in \%} \\ \textbf{(/baseline)}\end{tabular} & +43.75999999999999 & +56.519999999999996 & +0 & +0.0 & +12.5 & +25.0\\
+\begin{tabular}{c} \textbf{Improvement in \%} \\ \textbf{(/best approach)}\end{tabular}& +18.759999999999998 & +4.349999999999994 & +0 & +0.0 & +0.0 & +0.0\\

@@ -1,0 +1,24 @@
+{
+  "task_id": "these_ls_chap3--alethea_vot_ShHh_RF__collectAndRestart--indivVerif_v--merged",
+  "warnings": [],
+  "tamarin_timing": 395.98,
+  "wrapper_measures": {
+    "time": 396.22646737098694,
+    "avg_memory": 370.90304021317843,
+    "peak_memory": 542.015625
+  },
+  "output_spthy": "result_strategiesBenchmark_cassis_2/proofs/these_ls_chap3--alethea_vot_ShHh_RF__collectAndRestart--indivVerif_v--merged.spthy",
+  "verified_lemma": {
+    "indivVerif_v": {
+      "steps": 480,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "functional",
+    "functional",
+    "indivVerif_b",
+    "indivVerif_b"
+  ]
+}

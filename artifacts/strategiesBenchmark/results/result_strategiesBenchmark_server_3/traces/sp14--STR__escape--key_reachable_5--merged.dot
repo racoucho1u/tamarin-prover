@@ -1,0 +1,229 @@
+digraph "trace_STR_SL2-AS0-CL0-A1-C1-NB_key_reachable_5-StepLeader-CreateGroup-StartOther-StepOther-CreateGroup-StartOther-StepOther-CreateGroup-StartOther-StepOther-CreateGroup-StartOther-RecvOther-CreateGroup-StartOther-StepLeader-split_case_2-StepLeader-split_case_2-StepOther-StepOther-RecvOther-StepLeader-split_case_2-StepOther-RecvOther-StartLeader-split_case_1-RecvOther" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n7[shape="record",label="{{<n0> In( \<ST3, $gid, UN2\>\l)\l|<n1> LoopLeader( $gid, $A,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN2, EX2\l)\l|<n2> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n3> !AO( $B.3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EpkOf', $gid, UN2, 'g'^~x.4\>\l)\l}|{<n4> #j1 : StepLeader[Accept( $gid, $A, '1', UN2, UN2, EX1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<ST3, $gid, UN2\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Leq( UN2, UN2 )]\l}|{<n5> LoopLeader( $gid, $A, UN6, EX1 )|<n6> !AO( $A, \<'GpkFor', $gid, UN2, 'g'^te(EX2)\> )}}",fillcolor="#b3db99",style="filled",fontcolor="black",role="Undefined"];
+n14[shape="record",label="{{<n8> In( \<ST1, $gid, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN5, UN2\>\l)\l|<n9> LoopOther( $gid, $B,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN5, UN2, EX2\l)\l|<n10> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n11> !AO( $B.3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EpkOf', $gid, UN2, 'g'^~x.4\>\l)\l}|{<n12> #j2 : StepOther[Accept( $gid, $B, UN5, UN2, UN2, EX1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Less( UN5, UN2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN5, '1' )]\l}|{<n13> LoopOther( $gid, $B, UN5, UN6, EX1 )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n21[shape="record",label="{{<n15> In( \<ST1, $gid, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN4, UN2\>\l)\l|<n16> LoopOther( $gid, $B.1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN4, UN2, EX2\l)\l|<n17> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n18> !AO( $B.3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EpkOf', $gid, UN2, 'g'^~x.4\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l}|{<n19> #j3 : StepOther[Accept( $gid, $B.1, UN4, UN2, UN2, EX1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Less( UN4, UN2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN4, '1' )]\l}|{<n20> LoopOther( $gid, $B.1, UN4, UN6, EX1 )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n28[shape="record",label="{{<n22> In( \<ST1, $gid, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN3, UN2\>\l)\l|<n23> LoopOther( $gid, $B.2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN3, UN2, EX2\l)\l|<n24> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n25> !AO( $B.3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EpkOf', $gid, UN2, 'g'^~x.4\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l}|{<n26> #j4 : StepOther[Accept( $gid, $B.2, UN3, UN2, UN2, EX1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Less( UN3, UN2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN3, '1' )]\l}|{<n27> LoopOther( $gid, $B.2, UN3, UN6, EX1 )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n35[shape="record",label="{{<n29> In( \<RE1, $gid, UN2\>\l)\l|<n30> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n31> RecvOther( $gid, $B.3,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN2, ~x.4\l)\l|<n32> !AO( $A,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'GpkFor', $gid, UN2, 'g'^te(EX2)\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l}|{<n33> #j5 : RecvOther[Accept( $gid, $B.3, UN2, UN2, UN2, EX1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<RE1, $gid, UN2\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN2, '1' )]\l}|{<n34> LoopOther( $gid, $B.3, UN2, UN6, EX1 )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n36[label="#vf : isend",shape="ellipse"];
+n40[shape="record",label="{{<n37> In( \<CR1, $gid, UN2, UN1\> )}|{<n38> #vr : CreateGroup[Uniq( \<CR1, $gid\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreateGroup( $gid, UN2, UN1 )]\l}|{<n39> !Group( $gid, UN2, UN1 )}}",fillcolor="#c7d998",style="filled",fontcolor="black",role="Undefined"];
+n41[label="#vf.1 : isend",shape="ellipse"];
+n48[shape="record",label="{{<n42> In( \<ST2, $gid, UN2\> )|<n43> !Group( $gid, UN2, UN1 )|<n44> Fr( ~x.4 )}|{<n45> #vr.1 : StartOther[Uniq( \<ST2, $gid, UN2\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN2, '1' )]\l}|{<n46> RecvOther( $gid, $B.3, UN2, ~x.4 )|<n47> !AO( $B.3, \<'EpkOf', $gid, UN2, 'g'^~x.4\> )}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n49[label="#vf.2 : isend",shape="ellipse"];
+n57[shape="record",label="{{<n50> In( \<ST3, $gid, UN3\>\l)\l|<n51> LoopLeader( $gid, $A,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN3, EX3\l)\l|<n52> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n53> !AO( $B.2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EpkOf', $gid, UN3, 'g'^~x\>\l)\l}|{<n54> #vr.2 : StepLeader[Accept( $gid, $A, '1', UN3, UN2, EX2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<ST3, $gid, UN3\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Leq( UN3, UN2 )]\l}|{<n55> LoopLeader( $gid, $A, UN2, EX2 )|<n56> !AO( $A, \<'GpkFor', $gid, UN3, 'g'^te(EX3)\> )}}",fillcolor="#b3db99",style="filled",fontcolor="black",role="Undefined"];
+n64[shape="record",label="{{<n58> In( \<ST2, $gid, UN3\> )|<n59> !Group( $gid, UN2, UN1 )|<n60> Fr( ~x )}|{<n61> #vr.3 : StartOther[Uniq( \<ST2, $gid, UN3\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN3, '1' )]\l}|{<n62> RecvOther( $gid, $B.2, UN3, ~x )|<n63> !AO( $B.2, \<'EpkOf', $gid, UN3, 'g'^~x\> )}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n65[label="#vf.4 : isend",shape="ellipse"];
+n72[shape="record",label="{{<n66> In( \<ST1, $gid, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN5, UN3\>\l)\l|<n67> LoopOther( $gid, $B,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN5, UN3, EX3\l)\l|<n68> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n69> !AO( $B.2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EpkOf', $gid, UN3, 'g'^~x\>\l)\l}|{<n70> #vr.4 : StepOther[Accept( $gid, $B, UN5, UN3, UN2, EX2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Less( UN5, UN3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN5, '1' )]\l}|{<n71> LoopOther( $gid, $B, UN5, UN2, EX2 )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n73[label="#vf.5 : isend",shape="ellipse"];
+n80[shape="record",label="{{<n74> In( \<ST1, $gid, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN4, UN3\>\l)\l|<n75> LoopOther( $gid, $B.1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN4, UN3, EX3\l)\l|<n76> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n77> !AO( $B.2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EpkOf', $gid, UN3, 'g'^~x\>\l)\l}|{<n78> #vr.5 : StepOther[Accept( $gid, $B.1, UN4, UN3, UN2, EX2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Less( UN4, UN3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN4, '1' )]\l}|{<n79> LoopOther( $gid, $B.1, UN4, UN2, EX2 )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n81[label="#vf.6 : isend",shape="ellipse"];
+n88[shape="record",label="{{<n82> In( \<RE1, $gid, UN3\>\l)\l|<n83> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n84> RecvOther( $gid,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$B.2, UN3, ~x\l)\l|<n85> !AO( $A,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'GpkFor', $gid, UN3, 'g'^te(EX3)\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l}|{<n86> #vr.6 : RecvOther[Accept( $gid, $B.2, UN3, UN3, UN2, EX2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<RE1, $gid, UN3\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN3, '1' )]\l}|{<n87> LoopOther( $gid, $B.2, UN3, UN2, EX2 )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n89[label="#vf.7 : isend",shape="ellipse"];
+n97[shape="record",label="{{<n90> In( \<ST3, $gid, UN4\>\l)\l|<n91> LoopLeader( $gid, $A,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN4, EX4\l)\l|<n92> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n93> !AO( $B.1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EpkOf', $gid, UN4, 'g'^~x.1\>\l)\l}|{<n94> #vr.7 : StepLeader[Accept( $gid, $A, '1', UN4, UN2, EX3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<ST3, $gid, UN4\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Leq( UN4, UN2 )]\l}|{<n95> LoopLeader( $gid, $A, UN3, EX3 )|<n96> !AO( $A, \<'GpkFor', $gid, UN4, 'g'^te(EX4)\> )}}",fillcolor="#b3db99",style="filled",fontcolor="black",role="Undefined"];
+n98[label="#vf.8 : isend",shape="ellipse"];
+n105[shape="record",label="{{<n99> In( \<ST2, $gid, UN4\> )|<n100> !Group( $gid, UN2, UN1 )|<n101> Fr( ~x.1 )}|{<n102> #vr.8 : StartOther[Uniq( \<ST2, $gid, UN4\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN4, '1' )]\l}|{<n103> RecvOther( $gid, $B.1, UN4, ~x.1 )|<n104> !AO( $B.1, \<'EpkOf', $gid, UN4, 'g'^~x.1\> )}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n106[label="#vf.9 : isend",shape="ellipse"];
+n113[shape="record",label="{{<n107> In( \<ST1, $gid, \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN5, UN4\>\l)\l|<n108> LoopOther( $gid, $B,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN5, UN4, EX4\l)\l|<n109> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n110> !AO( $B.1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'EpkOf', $gid, UN4, 'g'^~x.1\>\l)\l}|{<n111> #vr.9 : StepOther[Accept( $gid, $B, UN5, UN4, UN2, EX3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Less( UN5, UN4 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN5, '1' )]\l}|{<n112> LoopOther( $gid, $B, UN5, UN3, EX3 )}}",fillcolor="#addc9a",style="filled",fontcolor="black",role="Undefined"];
+n120[shape="record",label="{{<n114> In( \<RE1, $gid, UN4\>\l)\l|<n115> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n116> RecvOther( $gid, $B.1,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN4, ~x.1\l)\l|<n117> !AO( $A,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'GpkFor', $gid, UN4, 'g'^te(EX4)\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l}|{<n118> #vr.10 : RecvOther[Accept( $gid, $B.1, UN4, UN4, UN2, EX3 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<RE1, $gid, UN4\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN4, '1' )]\l}|{<n119> LoopOther( $gid, $B.1, UN4, UN3, EX3 )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n121[label="#vf.11 : isend",shape="ellipse"];
+n129[shape="record",label="{{<n122> In( \<ST4, $gid\> )|<n123> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n124> Fr( ~x.2 )|<n125> !AO( $B, \<'EpkOf', $gid, UN5, 'g'^~x.3\>\l)\l}|{<n126> #vr.11 : StartLeader[Accept( $gid, $A, '1', UN5, UN2, EX4 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<ST4, $gid\> )]\l}|{<n127> LoopLeader( $gid, $A, UN4, EX4 )|<n128> !AO( $A, \<'GpkFor', $gid, UN5, 'g'^~x.2\> )}}",fillcolor="#a7dd9a",style="filled",fontcolor="black",role="Undefined"];
+n130[label="#vf.12 : isend",shape="ellipse"];
+n137[shape="record",label="{{<n131> In( \<ST2, $gid, UN5\> )|<n132> !Group( $gid, UN2, UN1 )|<n133> Fr( ~x.3 )}|{<n134> #vr.12 : StartOther[Uniq( \<ST2, $gid, UN5\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN5, '1' )]\l}|{<n135> RecvOther( $gid, $B, UN5, ~x.3 )|<n136> !AO( $B, \<'EpkOf', $gid, UN5, 'g'^~x.3\> )}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n138[label="#vf.13 : isend",shape="ellipse"];
+n145[shape="record",label="{{<n139> In( \<RE1, $gid, UN5\>\l)\l|<n140> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n141> RecvOther( $gid, $B,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN5, ~x.3\l)\l|<n142> !AO( $A,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'GpkFor', $gid, UN5, 'g'^~x.2\>\l)\l}|{<n143> #vr.13 : RecvOther[Accept( $gid, $B, UN5, UN5, UN2, EX4 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<RE1, $gid, UN5\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN5, '1' )]\l}|{<n144> LoopOther( $gid, $B, UN5, UN4, EX4 )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n146[label="#vf.14 : isend",shape="ellipse"];
+n147[label="#vf.15 : isend",shape="ellipse"];
+n148[label="#vf.17 : isend",shape="ellipse"];
+n149[label="#vf.18 : isend",shape="ellipse"];
+n150[label="#vf.19 : isend",shape="ellipse"];
+n151[label="#vf.21 : isend",shape="ellipse"];
+n152[label="#vf.23 : isend",shape="ellipse"];
+n153[label="!KU( UN2 ) @ #vk.32",shape="ellipse",color="gray"];
+n154[label="!KU( UN1 ) @ #vk.38",shape="ellipse",color="gray"];
+n155[label="!KU( (<UN5, $B>++<UN4, $B.1>++<UN3, $B.2>++<UN2, $B.3>) ) @ #vk.39",shape="ellipse",color="gray"];
+n156[label="!KU( (<'1', $A>++<UN5, $B>++<UN4, $B.1>++<UN2, $B.3>) ) @ #vk.40",shape="ellipse",color="gray"];
+n157[label="!KU( (<'1', $A>++<UN2, $B.3>) ) @ #vk.41",shape="ellipse",color="gray"];
+n158[label="!KU( (<'1', $A>++<UN5, $B>++<UN3, $B.2>++<UN2, $B.3>) ) @ #vk.42",shape="ellipse",color="gray"];
+n159[label="!KU( (<UN3, $B.2>++<UN2, $B.3>) ) @ #vk.43",shape="ellipse",color="gray"];
+n160[label="!KU( (<'1', $A>++<UN4, $B.1>++<UN3, $B.2>++<UN2, $B.3>) ) @ #vk.44",shape="ellipse",color="gray"];
+n161[label="!KU( (<UN4, $B.1>++<UN3, $B.2>++<UN2, $B.3>) ) @ #vk.45",shape="ellipse",color="gray"];
+n162[label="!KU( UN5 ) @ #vk.47",shape="ellipse",color="gray"];
+n163[label="!KU( UN4 ) @ #vk.48",shape="ellipse",color="gray"];
+n164[label="!KU( UN3 ) @ #vk.49",shape="ellipse",color="gray"];
+n165[label="!KU( (<'1', $A>++<UN5, $B>++<UN4, $B.1>++<UN3, $B.2>) ) @ #vk.57",shape="ellipse",color="gray"];
+n166[label="!KU( (<UN5, $B>++<UN4, $B.1>++<UN3, $B.2>) ) @ #vk.58",shape="ellipse",color="gray"];
+n167[label="!KU( (<UN5, $B>++<UN4, $B.1>) ) @ #vk.59",shape="ellipse",color="gray"];
+n7:n6 -> n35:n32[style="bold",weight="10.0",color="gray50"];
+n36 -> n7:n0[color="gray30"];
+n40:n39 -> n7:n2[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n14:n10[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n21:n17[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n28:n24[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n35:n30[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n48:n43[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n57:n52[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n64:n59[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n72:n68[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n80:n76[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n88:n83[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n97:n92[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n105:n100[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n113:n109[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n120:n115[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n129:n123[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n137:n132[style="bold",weight="10.0",color="gray50"];
+n40:n39 -> n145:n140[style="bold",weight="10.0",color="gray50"];
+n41 -> n40:n37[color="gray30"];
+n48:n46 -> n35:n31[style="bold",weight="10.0"];
+n48:n47 -> n7:n3[style="bold",weight="10.0",color="gray50"];
+n48:n47 -> n14:n11[style="bold",weight="10.0",color="gray50"];
+n48:n47 -> n21:n18[style="bold",weight="10.0",color="gray50"];
+n48:n47 -> n28:n25[style="bold",weight="10.0",color="gray50"];
+n49 -> n48:n42[color="gray30"];
+n57:n55 -> n7:n1[style="bold",weight="10.0"];
+n57:n56 -> n88:n85[style="bold",weight="10.0",color="gray50"];
+n64:n62 -> n88:n84[style="bold",weight="10.0"];
+n64:n63 -> n57:n53[style="bold",weight="10.0",color="gray50"];
+n64:n63 -> n72:n69[style="bold",weight="10.0",color="gray50"];
+n64:n63 -> n80:n77[style="bold",weight="10.0",color="gray50"];
+n65 -> n14:n8[color="gray30"];
+n72:n71 -> n14:n9[style="bold",weight="10.0"];
+n73 -> n21:n15[color="gray30"];
+n80:n79 -> n21:n16[style="bold",weight="10.0"];
+n81 -> n28:n22[color="gray30"];
+n88:n87 -> n28:n23[style="bold",weight="10.0"];
+n89 -> n35:n29[color="gray30"];
+n97:n95 -> n57:n51[style="bold",weight="10.0"];
+n97:n96 -> n120:n117[style="bold",weight="10.0",color="gray50"];
+n98 -> n57:n50[color="gray30"];
+n105:n103 -> n120:n116[style="bold",weight="10.0"];
+n105:n104 -> n97:n93[style="bold",weight="10.0",color="gray50"];
+n105:n104 -> n113:n110[style="bold",weight="10.0",color="gray50"];
+n106 -> n64:n58[color="gray30"];
+n113:n112 -> n72:n67[style="bold",weight="10.0"];
+n120:n119 -> n80:n75[style="bold",weight="10.0"];
+n121 -> n72:n66[color="gray30"];
+n129:n127 -> n97:n91[style="bold",weight="10.0"];
+n129:n128 -> n145:n142[style="bold",weight="10.0",color="gray50"];
+n130 -> n80:n74[color="gray30"];
+n137:n135 -> n145:n141[style="bold",weight="10.0"];
+n137:n136 -> n129:n125[style="bold",weight="10.0",color="gray50"];
+n138 -> n88:n82[color="gray30"];
+n145:n144 -> n113:n108[style="bold",weight="10.0"];
+n146 -> n97:n90[color="gray30"];
+n147 -> n105:n99[color="gray30"];
+n148 -> n113:n107[color="gray30"];
+n149 -> n120:n114[color="gray30"];
+n150 -> n129:n122[color="gray30"];
+n151 -> n137:n131[color="gray30"];
+n152 -> n145:n139[color="gray30"];
+n153 -> n36[color="red",style="dashed"];
+n153 -> n41[color="red",style="dashed"];
+n153 -> n49[color="red",style="dashed"];
+n153 -> n65[color="red",style="dashed"];
+n153 -> n73[color="red",style="dashed"];
+n153 -> n81[color="red",style="dashed"];
+n153 -> n89[color="red",style="dashed"];
+n153 -> n154[color="red",style="dashed"];
+n153 -> n155[color="red",style="dashed"];
+n153 -> n156[color="red",style="dashed"];
+n153 -> n157[color="red",style="dashed"];
+n153 -> n158[color="red",style="dashed"];
+n153 -> n159[color="red",style="dashed"];
+n153 -> n160[color="red",style="dashed"];
+n153 -> n161[color="red",style="dashed"];
+n154 -> n41[color="red",style="dashed"];
+n155 -> n154[color="red",style="dashed"];
+n156 -> n154[color="red",style="dashed"];
+n157 -> n154[color="red",style="dashed"];
+n157 -> n156[color="red",style="dashed"];
+n158 -> n154[color="red",style="dashed"];
+n159 -> n154[color="red",style="dashed"];
+n159 -> n158[color="red",style="dashed"];
+n160 -> n154[color="red",style="dashed"];
+n161 -> n154[color="red",style="dashed"];
+n161 -> n155[color="red",style="dashed"];
+n161 -> n160[color="red",style="dashed"];
+n162 -> n65[color="red",style="dashed"];
+n162 -> n121[color="red",style="dashed"];
+n162 -> n148[color="red",style="dashed"];
+n162 -> n151[color="red",style="dashed"];
+n162 -> n152[color="red",style="dashed"];
+n162 -> n154[color="red",style="dashed"];
+n162 -> n155[color="red",style="dashed"];
+n162 -> n156[color="red",style="dashed"];
+n162 -> n158[color="red",style="dashed"];
+n162 -> n164[color="red",style="dashed"];
+n162 -> n165[color="red",style="dashed"];
+n162 -> n166[color="red",style="dashed"];
+n162 -> n167[color="red",style="dashed"];
+n163 -> n73[color="red",style="dashed"];
+n163 -> n130[color="red",style="dashed"];
+n163 -> n146[color="red",style="dashed"];
+n163 -> n147[color="red",style="dashed"];
+n163 -> n148[color="red",style="dashed"];
+n163 -> n149[color="red",style="dashed"];
+n163 -> n154[color="red",style="dashed"];
+n163 -> n155[color="red",style="dashed"];
+n163 -> n156[color="red",style="dashed"];
+n163 -> n160[color="red",style="dashed"];
+n163 -> n161[color="red",style="dashed"];
+n163 -> n165[color="red",style="dashed"];
+n163 -> n166[color="red",style="dashed"];
+n163 -> n167[color="red",style="dashed"];
+n164 -> n81[color="red",style="dashed"];
+n164 -> n98[color="red",style="dashed"];
+n164 -> n106[color="red",style="dashed"];
+n164 -> n121[color="red",style="dashed"];
+n164 -> n130[color="red",style="dashed"];
+n164 -> n138[color="red",style="dashed"];
+n164 -> n154[color="red",style="dashed"];
+n164 -> n155[color="red",style="dashed"];
+n164 -> n158[color="red",style="dashed"];
+n164 -> n159[color="red",style="dashed"];
+n164 -> n160[color="red",style="dashed"];
+n164 -> n161[color="red",style="dashed"];
+n164 -> n165[color="red",style="dashed"];
+n164 -> n166[color="red",style="dashed"];
+n165 -> n154[color="red",style="dashed"];
+n166 -> n154[color="red",style="dashed"];
+n166 -> n155[color="red",style="dashed"];
+n166 -> n165[color="red",style="dashed"];
+n167 -> n154[color="red",style="dashed"];
+n167 -> n155[color="red",style="dashed"];
+n167 -> n156[color="red",style="dashed"];
+n167 -> n165[color="red",style="dashed"];
+n167 -> n166[color="red",style="dashed"];
+{
+rank="sink";
+n168[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">CR1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'CreateGroup'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(~x.2*~x.3)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">EX4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'g'^MU4</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(~x.1*te(EX4))</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">EX3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'g'^MU3</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(~x*te(EX3))</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">EX2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'g'^MU2</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">MU1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(~x.4*te(EX2))</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">EX1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'g'^MU1</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">RE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'RecvOther'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">ST1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'StepOther'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">ST2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'StartOther'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">ST3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'StepLeader'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">ST4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'StartLeader'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1'++'1'++'1'++'1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1'++'1'++'1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1'++'1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN5</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(&lt;'1', $A&gt;++&lt;UN5, $B&gt;++&lt;UN4, $B.1&gt;++&lt;UN3, $B.2&gt;++&lt;UN2, $B.3&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN6</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1'++'1'++'1'++'1'++'1')</TD></TR></TABLE>>];
+
+}
+n14:n12 -> n168[style="invis"];
+n21:n19 -> n168[style="invis"];
+n28:n26 -> n168[style="invis"];
+n35:n33 -> n168[style="invis"];
+
+}

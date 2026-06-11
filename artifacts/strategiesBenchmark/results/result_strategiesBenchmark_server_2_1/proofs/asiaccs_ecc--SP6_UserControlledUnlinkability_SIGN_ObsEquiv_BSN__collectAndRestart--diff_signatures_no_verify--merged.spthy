@@ -1,0 +1,325 @@
+theory SP6_UserControlledUnlinkability_ObsEquiv_withBSN begin
+
+// Function signature and definition of the equational theory E
+
+builtins: multiset
+functions: BSN/1, E/2, E_S/2, F1/1, F2/1, H_SHA256/1, H_k_1/1, H_k_4/4,
+           H_k_9/9, H_n_2/2, H_n_4/4, H_p/1, KDF_AES/1, KDF_EK/1, KDF_a/3, L_J/2,
+           MAC/2, Message/1, PkX/2, PkY/2, PointG1/2, RB/2, RD/2, accept/0, adec/2,
+           aenc/2, calcE/1, calcE_S/1, calcL_J/1, calcRB/1, calcRD/1, curlyK/1,
+           fst/1, len16/1, minus/2, multp/2, pair/2, pk/1, plus/2, sdec/2, senc/2,
+           snd/1, verifyCre1/4, verifyCre2/5, verifyCre3/4, verifyCre4/5
+equations:
+    adec(aenc(x.1, pk(x.2)), x.2) = x.1,
+    fst(<x.1, x.2>) = x.1,
+    sdec(senc(x.1, x.2), x.2) = x.1,
+    snd(<x.1, x.2>) = x.2
+
+
+
+
+
+
+
+restriction single_issuer_single_init [right]:
+  "∀ #i #j. ((Issuer_Init( ) @ #i) ∧ (Issuer_Init( ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+restriction single_issuer_single_init [left]:
+  "∀ #i #j. ((Issuer_Init( ) @ #i) ∧ (Issuer_Init( ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+rule (modulo E) Issuer_Init:
+   [ Fr( ~x ), Fr( ~y ) ]
+  --[ Issuer_Init( ), OnlyOnce( 'Issuer_Init' ) ]->
+   [
+   !Ltk( 'Issuer', ~x, ~y ), !Pk( 'Issuer', PkX(~x, 'P2'), PkY(~y, 'P2') ),
+   Out( <PkX(~x, 'P2'), PkY(~y, 'P2')> )
+   ]
+
+rule (modulo E) Issuer_KeyReveal:
+   [ !Ltk( I, x, y ) ]
+  --[ KeyReveal( 'Issuer_KeyReveal', I ) ]->
+   [ Out( <x, y> ) ]
+
+rule (modulo E) Generate_TPM_DAA_Signatures:
+   [
+   !Pk( I, PkX(x, 'P2'), PkY(y, 'P2') ), !Ltk( I, x, y ), Fr( ~r1 ),
+   Fr( ~r3 ), Fr( ~message ), Fr( ~basename1 ), Fr( ~basename2 ),
+   Fr( ~basename3 ), Fr( ~TPM_EK_Seed1 ), Fr( ~f1 ), Fr( ~sl_1 ),
+   Fr( ~cv1_1 ), Fr( ~r_cv1_1 ), Fr( ~n_M_1 ), Fr( ~sl_2 ), Fr( ~cv1_2 ),
+   Fr( ~r_cv1_2 ), Fr( ~n_M_2 ), Fr( ~TPM_EK_Seed3 ), Fr( ~f3 ),
+   Fr( ~sl_3 ), Fr( ~cv1_3 ), Fr( ~r_cv1_3 ), Fr( ~n_M_3 )
+   ]
+  --[ CreateSigmas( ), OnlyOnce( 'SIGN' ) ]->
+   [
+   CorrectSigma1( 'CorrectSigma1',
+                  L_J(~r_cv1_1, PointG1(H_p(F1(BSN(~basename1))), F2(BSN(~basename1)))),
+                  E_S(~r_cv1_1, multp(~sl_1, multp(y, multp(~r1, 'P1')))),
+                  <BSN(~basename1), multp(~sl_1, multp(~r1, 'P1')), 
+                   multp(~sl_1, multp(y, multp(~r1, 'P1'))), 
+                   multp(~sl_1,
+                         plus(multp(x, multp(~r1, 'P1')),
+                              multp(multp(multp(~r1, x), y), multp(~f1, 'P1')))), 
+                   multp(~sl_1, multp(multp(~r1, y), multp(~f1, 'P1'))), 
+                   PointG1(H_p(F1(BSN(~basename1))), F2(BSN(~basename1))), 
+                   multp(~f1, PointG1(H_p(F1(BSN(~basename1))), F2(BSN(~basename1)))), 
+                   H_n_2(~n_M_1,
+                         H_k_1(H_k_9(Message(~message), multp(~sl_1, multp(~r1, 'P1')),
+                                     multp(~sl_1, multp(y, multp(~r1, 'P1'))),
+                                     multp(~sl_1,
+                                           plus(multp(x, multp(~r1, 'P1')),
+                                                multp(multp(multp(~r1, x), y), multp(~f1, 'P1')))),
+                                     multp(~sl_1, multp(multp(~r1, y), multp(~f1, 'P1'))),
+                                     PointG1(H_p(F1(BSN(~basename1))), F2(BSN(~basename1))),
+                                     multp(~f1, PointG1(H_p(F1(BSN(~basename1))), F2(BSN(~basename1)))),
+                                     L_J(~r_cv1_1, PointG1(H_p(F1(BSN(~basename1))), F2(BSN(~basename1)))),
+                                     E_S(~r_cv1_1, multp(~sl_1, multp(y, multp(~r1, 'P1'))))))), 
+                   plus(~r_cv1_1,
+                        multp(H_n_2(~n_M_1,
+                                    H_k_1(H_k_9(Message(~message), multp(~sl_1, multp(~r1, 'P1')),
+                                                multp(~sl_1, multp(y, multp(~r1, 'P1'))),
+                                                multp(~sl_1,
+                                                      plus(multp(x, multp(~r1, 'P1')),
+                                                           multp(multp(multp(~r1, x), y), multp(~f1, 'P1')))),
+                                                multp(~sl_1, multp(multp(~r1, y), multp(~f1, 'P1'))),
+                                                PointG1(H_p(F1(BSN(~basename1))), F2(BSN(~basename1))),
+                                                multp(~f1,
+                                                      PointG1(H_p(F1(BSN(~basename1))), F2(BSN(~basename1)))),
+                                                L_J(~r_cv1_1,
+                                                    PointG1(H_p(F1(BSN(~basename1))), F2(BSN(~basename1)))),
+                                                E_S(~r_cv1_1, multp(~sl_1, multp(y, multp(~r1, 'P1'))))))),
+                              ~f1)), 
+                   ~n_M_1, Message(~message), 'TPM_Signature_Of_m'>
+   ),
+   CorrectSigma2( 'CorrectSigma2',
+                  L_J(~r_cv1_2, PointG1(H_p(F1(BSN(~basename2))), F2(BSN(~basename2)))),
+                  E_S(~r_cv1_2, multp(~sl_2, multp(y, multp(~r1, 'P1')))),
+                  <BSN(~basename2), multp(~sl_2, multp(~r1, 'P1')), 
+                   multp(~sl_2, multp(y, multp(~r1, 'P1'))), 
+                   multp(~sl_2,
+                         plus(multp(x, multp(~r1, 'P1')),
+                              multp(multp(multp(~r1, x), y), multp(~f1, 'P1')))), 
+                   multp(~sl_2, multp(multp(~r1, y), multp(~f1, 'P1'))), 
+                   PointG1(H_p(F1(BSN(~basename2))), F2(BSN(~basename2))), 
+                   multp(~f1, PointG1(H_p(F1(BSN(~basename2))), F2(BSN(~basename2)))), 
+                   H_n_2(~n_M_2,
+                         H_k_1(H_k_9(Message(~message), multp(~sl_2, multp(~r1, 'P1')),
+                                     multp(~sl_2, multp(y, multp(~r1, 'P1'))),
+                                     multp(~sl_2,
+                                           plus(multp(x, multp(~r1, 'P1')),
+                                                multp(multp(multp(~r1, x), y), multp(~f1, 'P1')))),
+                                     multp(~sl_2, multp(multp(~r1, y), multp(~f1, 'P1'))),
+                                     PointG1(H_p(F1(BSN(~basename2))), F2(BSN(~basename2))),
+                                     multp(~f1, PointG1(H_p(F1(BSN(~basename2))), F2(BSN(~basename2)))),
+                                     L_J(~r_cv1_2, PointG1(H_p(F1(BSN(~basename2))), F2(BSN(~basename2)))),
+                                     E_S(~r_cv1_2, multp(~sl_2, multp(y, multp(~r1, 'P1'))))))), 
+                   plus(~r_cv1_2,
+                        multp(H_n_2(~n_M_2,
+                                    H_k_1(H_k_9(Message(~message), multp(~sl_2, multp(~r1, 'P1')),
+                                                multp(~sl_2, multp(y, multp(~r1, 'P1'))),
+                                                multp(~sl_2,
+                                                      plus(multp(x, multp(~r1, 'P1')),
+                                                           multp(multp(multp(~r1, x), y), multp(~f1, 'P1')))),
+                                                multp(~sl_2, multp(multp(~r1, y), multp(~f1, 'P1'))),
+                                                PointG1(H_p(F1(BSN(~basename2))), F2(BSN(~basename2))),
+                                                multp(~f1,
+                                                      PointG1(H_p(F1(BSN(~basename2))), F2(BSN(~basename2)))),
+                                                L_J(~r_cv1_2,
+                                                    PointG1(H_p(F1(BSN(~basename2))), F2(BSN(~basename2)))),
+                                                E_S(~r_cv1_2, multp(~sl_2, multp(y, multp(~r1, 'P1'))))))),
+                              ~f1)), 
+                   ~n_M_2, Message(~message), 'TPM_Signature_Of_m'>
+   ),
+   CorrectSigma3( 'CorrectSigma3',
+                  L_J(~r_cv1_3, PointG1(H_p(F1(BSN(~basename3))), F2(BSN(~basename3)))),
+                  E_S(~r_cv1_3, multp(~sl_3, multp(y, multp(~r3, 'P1')))),
+                  <BSN(~basename3), multp(~sl_3, multp(~r3, 'P1')), 
+                   multp(~sl_3, multp(y, multp(~r3, 'P1'))), 
+                   multp(~sl_3,
+                         plus(multp(x, multp(~r3, 'P1')),
+                              multp(multp(multp(~r3, x), y), multp(~f3, 'P1')))), 
+                   multp(~sl_3, multp(multp(~r3, y), multp(~f3, 'P1'))), 
+                   PointG1(H_p(F1(BSN(~basename3))), F2(BSN(~basename3))), 
+                   multp(~f3, PointG1(H_p(F1(BSN(~basename3))), F2(BSN(~basename3)))), 
+                   H_n_2(~n_M_3,
+                         H_k_1(H_k_9(Message(~message), multp(~sl_3, multp(~r3, 'P1')),
+                                     multp(~sl_3, multp(y, multp(~r3, 'P1'))),
+                                     multp(~sl_3,
+                                           plus(multp(x, multp(~r3, 'P1')),
+                                                multp(multp(multp(~r3, x), y), multp(~f3, 'P1')))),
+                                     multp(~sl_3, multp(multp(~r3, y), multp(~f3, 'P1'))),
+                                     PointG1(H_p(F1(BSN(~basename3))), F2(BSN(~basename3))),
+                                     multp(~f3, PointG1(H_p(F1(BSN(~basename3))), F2(BSN(~basename3)))),
+                                     L_J(~r_cv1_3, PointG1(H_p(F1(BSN(~basename3))), F2(BSN(~basename3)))),
+                                     E_S(~r_cv1_3, multp(~sl_3, multp(y, multp(~r3, 'P1'))))))), 
+                   plus(~r_cv1_3,
+                        multp(H_n_2(~n_M_3,
+                                    H_k_1(H_k_9(Message(~message), multp(~sl_3, multp(~r3, 'P1')),
+                                                multp(~sl_3, multp(y, multp(~r3, 'P1'))),
+                                                multp(~sl_3,
+                                                      plus(multp(x, multp(~r3, 'P1')),
+                                                           multp(multp(multp(~r3, x), y), multp(~f3, 'P1')))),
+                                                multp(~sl_3, multp(multp(~r3, y), multp(~f3, 'P1'))),
+                                                PointG1(H_p(F1(BSN(~basename3))), F2(BSN(~basename3))),
+                                                multp(~f3,
+                                                      PointG1(H_p(F1(BSN(~basename3))), F2(BSN(~basename3)))),
+                                                L_J(~r_cv1_3,
+                                                    PointG1(H_p(F1(BSN(~basename3))), F2(BSN(~basename3)))),
+                                                E_S(~r_cv1_3, multp(~sl_3, multp(y, multp(~r3, 'P1'))))))),
+                              ~f3)), 
+                   ~n_M_3, Message(~message), 'TPM_Signature_Of_m'>
+   ),
+   TPM_PublicKeys( <pk(KDF_EK(~TPM_EK_Seed1)), 'DAA_public_data', 
+                    multp(~f1, 'P1')>,
+                   <pk(KDF_EK(~TPM_EK_Seed3)), 'DAA_public_data', multp(~f3, 'P1')>
+   )
+   ]
+
+rule (modulo E) Diff_DAA_SIGN_no_verify:
+   [
+   CorrectSigma1( 'CorrectSigma1', L1, E1,
+                  <bsn1, R1, S1, T1, W1, J1, K1, h2_host1, smalls1, ~n_M_1, msg, 
+                   'TPM_Signature_Of_m'>
+   ),
+   CorrectSigma2( 'CorrectSigma2', L2, E2,
+                  <bsn2, R2, S2, T2, W2, J2, K2, h2_host2, smalls2, ~n_M_2, msg, 
+                   'TPM_Signature_Of_m'>
+   ),
+   CorrectSigma3( 'CorrectSigma3', L3, E3,
+                  <bsn3, R3, S3, T3, W3, J3, K3, h2_host3, smalls3, ~n_M_3, msg, 
+                   'TPM_Signature_Of_m'>
+   ),
+   TPM_PublicKeys( TPM1_Keys, TPM2_Keys )
+   ]
+  --[ Diff_Sigs( ), OnlyOnce( 'Diff_DAA_SIGN' ) ]->
+   [
+   Out( TPM1_Keys ), Out( TPM2_Keys ),
+   Out( <'diffSigma', 
+         <L1, E1, bsn1, R1, S1, T1, W1, J1, K1, h2_host1, smalls1, ~n_M_1, msg, 
+          'TPM_Signature_Of_m'>, 
+         diff(<L2, E2, bsn2, R2, S2, T2, W2, J2, K2, h2_host2, smalls2, ~n_M_2, 
+               msg, 'TPM_Signature_Of_m'>, <L3, E3, bsn3, R3, S3, T3, W3, J3, K3, 
+                                            h2_host3, smalls3, ~n_M_3, msg, 'TPM_Signature_Of_m'>)
+        >
+   )
+   ]
+
+lemma diff_signatures_no_verify [right]:
+  exists-trace
+  "∃ #t1 #t2 #t3.
+    ((((((Issuer_Init( ) @ #t1) ∧ (CreateSigmas( ) @ #t2)) ∧
+        (Diff_Sigs( ) @ #t3)) ∧
+       (#t1 < #t2)) ∧
+      (#t2 < #t3)) ∧
+     (¬(∃ RevealEvent ENTITY #k1. KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+    (∀ event #i #j.
+      ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ #t1 #t2 #t3.
+  (Issuer_Init( ) @ #t1) ∧ (CreateSigmas( ) @ #t2) ∧ (Diff_Sigs( ) @ #t3)
+ ∧
+  (#t1 < #t2) ∧
+  (#t2 < #t3) ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j)"
+*/
+simplify
+solve( !Pk( I, PkX(x.1, 'P2'), PkY(y.1, 'P2') ) ▶₀ #t2 )
+  case Issuer_Init
+  solve( !Ltk( 'Issuer', ~x, ~y ) ▶₁ #t2 )
+    case Issuer_Init
+    solve( CorrectSigma1( 'CorrectSigma1', L1, E1,
+                          <bsn1, R1, S1, T1, W1, J1, K1, h2_host1, smalls1, ~n_M_1.1, msg, 
+                           'TPM_Signature_Of_m'>
+           ) ▶₀ #t3 )
+      case Generate_TPM_DAA_Signatures
+      solve( CorrectSigma2( 'CorrectSigma2', L2, E2,
+                            <bsn2, R2, S2, T2, W2, J2, K2, h2_host2, smalls2, ~n_M_2.1, 
+                             Message(~message), 'TPM_Signature_Of_m'>
+             ) ▶₁ #t3 )
+        case Generate_TPM_DAA_Signatures
+        solve( CorrectSigma3( 'CorrectSigma3', L3, E3,
+                              <bsn3, R3, S3, T3, W3, J3, K3, h2_host3, smalls3, ~n_M_3.1, 
+                               Message(~message), 'TPM_Signature_Of_m'>
+               ) ▶₂ #t3 )
+          case Generate_TPM_DAA_Signatures
+          solve( TPM_PublicKeys( TPM1_Keys, TPM2_Keys ) ▶₃ #t3 )
+            case Generate_TPM_DAA_Signatures
+            SOLVED // trace found
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+lemma diff_signatures_no_verify [left]:
+  exists-trace
+  "∃ #t1 #t2 #t3.
+    ((((((Issuer_Init( ) @ #t1) ∧ (CreateSigmas( ) @ #t2)) ∧
+        (Diff_Sigs( ) @ #t3)) ∧
+       (#t1 < #t2)) ∧
+      (#t2 < #t3)) ∧
+     (¬(∃ RevealEvent ENTITY #k1. KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+    (∀ event #i #j.
+      ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ #t1 #t2 #t3.
+  (Issuer_Init( ) @ #t1) ∧ (CreateSigmas( ) @ #t2) ∧ (Diff_Sigs( ) @ #t3)
+ ∧
+  (#t1 < #t2) ∧
+  (#t2 < #t3) ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j)"
+*/
+simplify
+solve( !Pk( I, PkX(x.1, 'P2'), PkY(y.1, 'P2') ) ▶₀ #t2 )
+  case Issuer_Init
+  solve( !Ltk( 'Issuer', ~x, ~y ) ▶₁ #t2 )
+    case Issuer_Init
+    solve( CorrectSigma1( 'CorrectSigma1', L1, E1,
+                          <bsn1, R1, S1, T1, W1, J1, K1, h2_host1, smalls1, ~n_M_1.1, msg, 
+                           'TPM_Signature_Of_m'>
+           ) ▶₀ #t3 )
+      case Generate_TPM_DAA_Signatures
+      solve( CorrectSigma2( 'CorrectSigma2', L2, E2,
+                            <bsn2, R2, S2, T2, W2, J2, K2, h2_host2, smalls2, ~n_M_2.1, 
+                             Message(~message), 'TPM_Signature_Of_m'>
+             ) ▶₁ #t3 )
+        case Generate_TPM_DAA_Signatures
+        solve( CorrectSigma3( 'CorrectSigma3', L3, E3,
+                              <bsn3, R3, S3, T3, W3, J3, K3, h2_host3, smalls3, ~n_M_3.1, 
+                               Message(~message), 'TPM_Signature_Of_m'>
+               ) ▶₂ #t3 )
+          case Generate_TPM_DAA_Signatures
+          solve( TPM_PublicKeys( TPM1_Keys, TPM2_Keys ) ▶₃ #t3 )
+            case Generate_TPM_DAA_Signatures
+            SOLVED // trace found
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+diffLemma Observational_equivalence:
+by sorry
+
+/* All wellformedness checks were successful. */
+
+/*
+Generated from:
+Tamarin version 1.11.0
+Maude version 3.2 (unsupported)
+Git revision: df2fd84dbb3b3def8309c2a84c04d653d7c4db77 (with uncommited changes), branch: mergedAutomatedStrategies
+Compiled at: 2026-01-16 14:58:06.862219863 UTC
+*/
+
+end

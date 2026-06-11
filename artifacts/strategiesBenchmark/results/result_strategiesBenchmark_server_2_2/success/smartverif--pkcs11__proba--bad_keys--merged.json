@@ -1,0 +1,33 @@
+{
+  "task_id": "smartverif--pkcs11__proba--bad_keys--merged",
+  "warnings": [
+    "9 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 103.33,
+  "wrapper_measures": {
+    "time": 104.61470603942871,
+    "avg_memory": 2219.138288909314,
+    "peak_memory": 5241.73046875
+  },
+  "output_spthy": "result_strategiesBenchmark_2/proofs/smartverif--pkcs11__proba--bad_keys--merged.spthy",
+  "verified_lemma": {
+    "bad_keys": {
+      "steps": 444,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "dec_limits",
+    "trusted_as_ut_impossible",
+    "untrusted_as_ut_impossible",
+    "untrusted_as_wt_impossible",
+    "trusted_as_wt_impossible",
+    "no_key_is_wrap_and_dec_or_unwrap_and_dec_ind",
+    "no_key_is_enc_and_unwrap",
+    "cannot_obtain_key_ind",
+    "cannot_obtain_key"
+  ]
+}

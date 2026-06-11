@@ -1,0 +1,25 @@
+{
+  "task_id": "csf18_xor--KCL07-UK3__backtrack--recentalive_tag--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 340.31,
+  "wrapper_measures": {
+    "time": 340.51070857048035,
+    "avg_memory": 86.75798898719873,
+    "peak_memory": 111.80078125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf18_xor--KCL07-UK3__backtrack--recentalive_tag--merged.spthy",
+  "verified_lemma": {
+    "recentalive_tag": {
+      "steps": 270,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "executable",
+    "executable"
+  ]
+}

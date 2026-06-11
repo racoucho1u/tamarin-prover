@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--OTYT06__backtrack--desynch_impossible--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.794672012329,
+    "avg_memory": 1991.486873286639,
+    "peak_memory": 2966.703125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

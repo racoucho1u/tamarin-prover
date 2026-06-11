@@ -1,0 +1,13 @@
+{
+  "task_id": "csf18_xor--LAK06_state__proba--noninjectiveagreementTAG--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1626.5569760799408,
+    "avg_memory": 18689.626206707813,
+    "peak_memory": 41674.453125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

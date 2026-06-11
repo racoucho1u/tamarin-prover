@@ -1,0 +1,30 @@
+{
+  "task_id": "csf20_disputeResolution--mixvote_ShHh_RF_reuseAsRestriction__escape--AuthP--merged",
+  "warnings": [],
+  "tamarin_timing": 4113.01,
+  "wrapper_measures": {
+    "time": 4117.375158786774,
+    "avg_memory": 15387.432308161046,
+    "peak_memory": 25337.73046875
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf20_disputeResolution--mixvote_ShHh_RF_reuseAsRestriction__escape--AuthP--merged.spthy",
+  "verified_lemma": {
+    "AuthP": {
+      "steps": 10414,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "functional",
+    "functional",
+    "indivVerif",
+    "indivVerif",
+    "VoterC",
+    "VoterC",
+    "TimelyP",
+    "TimelyP",
+    "Uniqueness",
+    "Uniqueness"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "task_id": "sp14--GDH__escape--ExpKeyFor_one--merged",
+  "warnings": [
+    "5 wellformedness check failed!"
+  ],
+  "tamarin_timing": 3.89,
+  "wrapper_measures": {
+    "time": 4.114678621292114,
+    "avg_memory": 137.568359375,
+    "peak_memory": 245.0546875
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/sp14--GDH__escape--ExpKeyFor_one--merged.spthy",
+  "verified_lemma": {
+    "ExpKeyFor_one": {
+      "steps": 16,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "No_Inv_exp",
+    "Esk_secret",
+    "Esk_fresh_name",
+    "Relate_KeyFor_RoundKey",
+    "Exp_subterm",
+    "Exp_earlier_Esk",
+    "Exp_earlier_Esk_2",
+    "roundkey_keyfor_different",
+    "Exp_nonce_or_product2",
+    "Exp_factor_secret",
+    "Exp_name_secret",
+    "Esk_Exp_same_gid",
+    "key_secret_last",
+    "key_secret"
+  ]
+}

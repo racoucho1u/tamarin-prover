@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_fix_binding_channel__backAndAvoid--executability_desync--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.967620134354,
+    "avg_memory": 1707.246139869307,
+    "peak_memory": 5885.67578125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

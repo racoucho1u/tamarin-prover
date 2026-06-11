@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LAK06_state__backtrack--helpingUpdateKey--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.201975107193,
+    "avg_memory": 871.6905877446594,
+    "peak_memory": 941.16796875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

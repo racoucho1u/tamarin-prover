@@ -1,0 +1,50 @@
+digraph "trace_STR_SL2-AS0-CL0-A1-C1-NB_key_reachable_2-StartLeader-CreateGroup-StartOther-RecvOther-CreateGroup-StartOther-StartLeader-split_case_1" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n7[shape="record",label="{{<n0> In( \<ST1, $gid\> )|<n1> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n2> Fr( ~x )|<n3> !AO( $B, \<'EpkOf', $gid, UN2, 'g'^~x.1\> )}|{<n4> #j1 : StartLeader[Accept( $gid, $A, '1', UN2, UN2, EX1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<ST1, $gid\> )]\l}|{<n5> LoopLeader( $gid, $A, UN3, EX1 )|<n6> !AO( $A, \<'GpkFor', $gid, UN2, 'g'^~x\> )}}",fillcolor="#d5d897",style="filled",fontcolor="black",role="Undefined"];
+n14[shape="record",label="{{<n8> In( \<RE1, $gid, UN2\>\l)\l|<n9> !Group( $gid, UN2,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN1\l)\l|<n10> RecvOther( $gid, $B,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;UN2, ~x.1\l)\l|<n11> !AO( $A,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'GpkFor', $gid, UN2, 'g'^~x\>\l)\l}|{<n12> #j2 : RecvOther[Accept( $gid, $B, UN2, UN2, UN2, EX1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uniq( \<RE1, $gid, UN2\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN2, '1' )]\l}|{<n13> LoopOther( $gid, $B, UN2, UN3, EX1 )}}",fillcolor="#c7d998",style="filled",fontcolor="black",role="Undefined"];
+n15[label="#vf : isend",shape="ellipse"];
+n19[shape="record",label="{{<n16> In( \<CR1, $gid, UN2, UN1\> )}|{<n17> #vr : CreateGroup[Uniq( \<CR1, $gid\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CreateGroup( $gid, UN2, UN1 )]\l}|{<n18> !Group( $gid, UN2, UN1 )}}",fillcolor="#badb99",style="filled",fontcolor="black",role="Undefined"];
+n26[shape="record",label="{{<n20> In( \<ST2, $gid, UN2\> )|<n21> !Group( $gid, UN2, UN1 )|<n22> Fr( ~x.1 )}|{<n23> #vr.1 : StartOther[Uniq( \<ST2, $gid, UN2\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InEq( UN2, '1' )]\l}|{<n24> RecvOther( $gid, $B, UN2, ~x.1 )|<n25> !AO( $B, \<'EpkOf', $gid, UN2, 'g'^~x.1\> )}}",fillcolor="#acdc9a",style="filled",fontcolor="black",role="Undefined"];
+n27[label="#vf.2 : isend",shape="ellipse"];
+n28[label="#vf.3 : isend",shape="ellipse"];
+n29[label="#vf.5 : isend",shape="ellipse"];
+n30[label="!KU( UN2 ) @ #vk.10",shape="ellipse",color="gray"];
+n31[label="!KU( UN1 ) @ #vk.12",shape="ellipse",color="gray"];
+n32[label="!KU( (<'1', $A>++<UN2, $B>) ) @ #vk.13",shape="ellipse",color="gray"];
+n33[label="!KU( (<'1', $A>++<'1', $A>) ) @ #vk.16",shape="ellipse",color="gray"];
+n7:n6 -> n14:n11[style="bold",weight="10.0",color="gray50"];
+n15 -> n7:n0[color="gray30"];
+n19:n18 -> n7:n1[style="bold",weight="10.0",color="gray50"];
+n19:n18 -> n14:n9[style="bold",weight="10.0",color="gray50"];
+n19:n18 -> n26:n21[style="bold",weight="10.0",color="gray50"];
+n26:n24 -> n14:n10[style="bold",weight="10.0"];
+n26:n25 -> n7:n3[style="bold",weight="10.0",color="gray50"];
+n27 -> n19:n16[color="gray30"];
+n28 -> n26:n20[color="gray30"];
+n29 -> n14:n8[color="gray30"];
+n30 -> n27[color="red",style="dashed"];
+n30 -> n28[color="red",style="dashed"];
+n30 -> n29[color="red",style="dashed"];
+n30 -> n31[color="red",style="dashed"];
+n30 -> n32[color="red",style="dashed"];
+n31 -> n27[color="red",style="dashed"];
+n32 -> n31[color="red",style="dashed"];
+n33 -> n31[color="red",style="dashed"];
+{
+rank="sink";
+n34[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">CR1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'CreateGroup'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">EX1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'g'^(~x*~x.1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">RE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'RecvOther'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">ST1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'StartLeader'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">ST2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'StartOther'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1')</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(&lt;'1', $A&gt;++&lt;'1', $A&gt;++&lt;UN2, $B&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">('1'++'1'++'1')</TD></TR></TABLE>>];
+
+}
+n14:n12 -> n34[style="invis"];
+
+}

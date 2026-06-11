@@ -1,0 +1,3432 @@
+theory TPM_DAA_JoinQuote_with_fix_BSN begin
+
+// Function signature and definition of the equational theory E
+
+functions: BSN/1, E/2, E_S/2, F1/1, F2/1, H_6/1, H_SHA256/1, H_k_1/1,
+           H_k_2/2, H_k_4/4, H_k_9/9, H_n_2/2, H_n_8/8, H_p/1, KDF_AES/1, KDF_EK/1,
+           KDF_a/3, L_J/2, MAC/2, Message/1, Nonce/1, Pcr_Set/1, PkX/2, PkY/2,
+           PointG1/2, RB/2, RD/2, accept/0, adec/2, aenc/2, calcE/1, calcE_S_quot/4,
+           calcL_J_quot/4, calcRB/1, calcRD/1, certify/1, curlyK/1, fst/1, len16/1,
+           minus/2, multp/2, pair/2, pk/1, plus/2, publicData/1, quotePCR/2, sdec/2,
+           senc/2, snd/1, verifyCre1/4, verifyCre2/5, verifyCre3/4, verifyCre4/5
+equations:
+    adec(aenc(x.1, pk(x.2)), x.2) = x.1,
+    calcE(minus(multp(plus(r_cv,
+                           multp(H_n_2(n_J, H_k_1(H_k_4(P1, Q, E(r_cv, P1), str))), f)),
+                      P1),
+                multp(H_n_2(n_J, H_k_1(H_k_4(P1, Q, E(r_cv, P1), str))), multp(f, P1))))
+  = E(r_cv, P1),
+    calcE_S_quot(plus(r_cv1,
+                      multp(H_n_2(n_Q,
+                                  H_k_2(H_k_9(pcrData, R, S, T, W, J, K, L, E),
+                                        H_6(quotePCR(pcrset, pcrset_values)))),
+                            f)),
+                 multp(l, multp(y, multp(r, P1))),
+                 H_n_2(n_Q,
+                       H_k_2(H_k_9(pcrData, R, S, T, W, J, K, L, E),
+                             H_6(quotePCR(pcrset, pcrset_values)))),
+                 multp(l, multp(multp(r, y), multp(f, P1))))
+  = E_S(r_cv1, multp(l, multp(y, multp(r, P1)))),
+    calcL_J_quot(plus(r_cv1,
+                      multp(H_n_2(n_Q,
+                                  H_k_2(H_k_9(pcrData, R, S, T, W, J, K, L, E),
+                                        H_6(quotePCR(pcrset, pcrset_values)))),
+                            f)),
+                 PointG1(H_p(F1(bsn)), F2(bsn)),
+                 H_n_2(n_Q,
+                       H_k_2(H_k_9(pcrData, R, S, T, W, J, K, L, E),
+                             H_6(quotePCR(pcrset, pcrset_values)))),
+                 multp(f, PointG1(H_p(F1(bsn)), F2(bsn))))
+  = L_J(r_cv1, PointG1(H_p(F1(bsn)), F2(bsn))),
+    calcRB(minus(multp(plus(l,
+                            multp(multp(y, r),
+                                  H_n_8(P1, multp(f, P1), RB(l, P1), RD(l, multp(f, P1)), multp(r, P1),
+                                        multp(y, multp(r, P1)),
+                                        plus(multp(x, multp(r, P1)), multp(multp(multp(r, x), y), Q)),
+                                        multp(multp(r, y), Q)))),
+                       P1),
+                 multp(H_n_8(P1, multp(f, P1), RB(l, P1), RD(l, multp(f, P1)),
+                             multp(r, P1), multp(y, multp(r, P1)),
+                             plus(multp(x, multp(r, P1)), multp(multp(multp(r, x), y), Q)),
+                             multp(multp(r, y), Q)),
+                       multp(y, multp(r, P1)))))
+  = RB(l, P1),
+    calcRD(minus(multp(plus(l,
+                            multp(multp(y, r),
+                                  H_n_8(P1, multp(f, P1), RB(l, P1), RD(l, multp(f, P1)), multp(r, P1),
+                                        multp(y, multp(r, P1)),
+                                        plus(multp(x, multp(r, P1)), multp(multp(multp(r, x), y), Q)),
+                                        multp(multp(r, y), Q)))),
+                       multp(f, P1)),
+                 multp(H_n_8(P1, multp(f, P1), RB(l, P1), RD(l, multp(f, P1)),
+                             multp(r, P1), multp(y, multp(r, P1)),
+                             plus(multp(x, multp(r, P1)), multp(multp(multp(r, x), y), Q)),
+                             multp(multp(r, y), Q)),
+                       multp(multp(r, y), multp(f, P1)))))
+  = RD(l, multp(f, P1)),
+    fst(<x.1, x.2>) = x.1,
+    sdec(senc(x.1, x.2), x.2) = x.1,
+    snd(<x.1, x.2>) = x.2,
+    verifyCre1(multp(r, P1), PkY(y, P2), multp(y, multp(r, P1)), P2)
+  = accept,
+    verifyCre2(multp(r, P1), multp(multp(~r, y), multp(f, P1)), PkX(x, P2),
+               plus(multp(x, multp(r, P1)), multp(multp(multp(r, x), y), multp(f, P1))),
+               P2)
+  = accept,
+    verifyCre3(multp(l, multp(r, P1)), PkY(y, P2),
+               multp(l, multp(y, multp(r, P1))), P2)
+  = accept,
+    verifyCre4(multp(l, multp(r, P1)),
+               multp(l, multp(multp(r, y), multp(f, P1))), PkX(x, P2),
+               multp(l,
+                     plus(multp(x, multp(r, P1)),
+                          multp(multp(multp(r, x), y), multp(f, P1)))),
+               P2)
+  = accept
+
+
+
+
+
+
+
+
+
+
+
+restriction equality:
+  "∀ #i x y. (Eq( x, y ) @ #i) ⇒ (x = y)"
+  // safety formula
+
+restriction notlinked:
+  "∀ #i J1 J2 K1 K2.
+    (NotLinked( J1, J2, K1, K2 ) @ #i) ⇒ ((¬(J1 = J2)) ∨ (¬(K1 = K2)))"
+  // safety formula
+
+restriction single_issuer_single_init:
+  "∀ I1 I2 #i #j.
+    ((Issuer_Init( I1 ) @ #i) ∧ (Issuer_Init( I2 ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+restriction single_host_init:
+  "∀ Host #i #j.
+    ((Host_Init( Host ) @ #i) ∧ (Host_Init( Host ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+restriction single_tpm_init:
+  "∀ PS #i #j. ((TPM_Init( PS ) @ #i) ∧ (TPM_Init( PS ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+restriction every_id_must_be_one_of_tpm_host_issuer:
+  "∀ Ent1 Ent2 Ent3 #i #j #k.
+    (((Host_Init( Ent1 ) @ #i) ∧ (TPM_Init( Ent2 ) @ #j)) ∧
+     (Issuer_Init( Ent3 ) @ #k)) ⇒
+    (((¬(Ent1 = Ent2)) ∧ (¬(Ent1 = Ent3))) ∧ (¬(Ent2 = Ent3)))"
+  // safety formula
+
+rule (modulo E) ChanOut_S[color=#ffffff]:
+   [ Out_S( $A, $B, x ), !F_Paired( $A, $B ) ]
+  --[ ChanOut_S( $A, $B, x ) ]->
+   [ Sec( $A, $B, x ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ChanIn_S[color=#ffffff]:
+   [ Sec( $A, $B, x ) ] --[ ChanIn_S( $A, $B, x ) ]-> [ In_S( $A, $B, x ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Issuer_Init:
+   [ Fr( ~x ), Fr( ~y ) ]
+  --[ Issuer_Init( 'Issuer' ), OnlyOnce( 'Issuer_Init' ) ]->
+   [
+   !Ltk( 'Issuer', ~x, ~y ), !Pk( 'Issuer', PkX(~x, 'P2'), PkY(~y, 'P2') ),
+   Out( <PkX(~x, 'P2'), PkY(~y, 'P2')> ), !Issuer_Initialised( 'Issuer' )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Issuer_KeyReveal:
+   [ !Ltk( I, ~x, ~y ) ]
+  --[ KeyReveal( 'Issuer_KeyReveal', I ) ]->
+   [ Out( <~x, ~y> ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM_INIT:
+   [ Fr( ~TPM_AES_Seed ), Fr( ~TPM_EK_Seed ) ]
+  --[ TPM_Init( $PS ), OnlyOnce( 'TPM_INIT' ) ]->
+   [
+   !TPM_AES_Key( $PS, KDF_AES(~TPM_AES_Seed) ),
+   TPM_EK_SEED( $PS, ~TPM_EK_Seed ), TPM_Initialised( $PS )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM_AESReveal:
+   [ !TPM_AES_Key( PS, aes_key ) ]
+  --[ KeyReveal( 'TPM_AESReveal', PS ) ]->
+   [ Out( aes_key ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Init:
+   [ ]
+  --[ Host_Init( $AS ), OnlyOnce( 'Host_Init' ) ]->
+   [ Host_Initialised( $AS ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Platform_Setup:
+   [
+   TPM_Initialised( $PS ), Host_Initialised( $AS ), !Issuer_Initialised( I )
+   ]
+  --[ Bind( $PS, $AS, I ), OnlyOnce( 'Platform_Setup' ) ]->
+   [
+   Out_S( $AS, $PS, 'createPrimary' ), !F_Paired( $AS, $PS ),
+   !F_Paired( $PS, $AS )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM2_CreatePrimary:
+   [ In_S( $AS, $PS, 'createPrimary' ), TPM_EK_SEED( $PS, ~TPM_EK_Seed ) ]
+  --[
+  TPM2_EK_Created( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ),
+  OnlyOnce( 'TPM2_CreatePrimary' )
+  ]->
+   [
+   Out_S( $PS, $AS,
+          <<'EK_public_data', pk(KDF_EK(~TPM_EK_Seed))>, 'returnEK'>
+   ),
+   !TPM_ENDORSEMENT_SK( $PS, KDF_EK(~TPM_EK_Seed), pk(KDF_EK(~TPM_EK_Seed))
+   ),
+   !TPM_ENDORSEMENT_PK( $PS, <'EK_public_data', pk(KDF_EK(~TPM_EK_Seed))> )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM_EKReveal:
+   [
+   !TPM_ENDORSEMENT_SK( PS, KDF_EK(~TPM_EK_Seed), pk(KDF_EK(~TPM_EK_Seed)) )
+   ]
+  --[
+  KeyReveal( 'TPM_EKReveal_tpm', PS ),
+  KeyReveal( 'TPM_EKReveal_pke', pk(KDF_EK(~TPM_EK_Seed)) )
+  ]->
+   [ Out( KDF_EK(~TPM_EK_Seed) ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Store_EK:
+   [
+   In_S( $PS, $AS,
+         <<'EK_public_data', pk(KDF_EK(~TPM_EK_Seed))>, 'returnEK'>
+   )
+   ]
+  --[ Store_EK( $PS, $AS ), OnlyOnce( 'Host_Store_EK' ) ]->
+   [
+   Out_S( $AS, $PS, <pk(KDF_EK(~TPM_EK_Seed)), 'createDAAKey'> ),
+   Host_State_01( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM2_Create:
+   [
+   In_S( $AS, $PS, <pk(KDF_EK(~TPM_EK_Seed)), 'createDAAKey'> ),
+   !TPM_AES_Key( $PS, aes_key ), Fr( ~f )
+   ]
+  --[
+  TPM2_DAA_Created( $PS, $AS ),
+  DeriveDAAKey( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), ~f ),
+  OnlyOnce( 'TPM2_Create' )
+  ]->
+   [
+   Out_S( $PS, $AS,
+          <senc(~f, aes_key), <'DAA_public_data', multp(~f, 'P1')>, 'returnDAAKey'>
+   ),
+   !TPM_DAA_SK( $PS, pk(KDF_EK(~TPM_EK_Seed)), ~f )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM_DAAReveal:
+   [ !TPM_DAA_SK( PS, pk(KDF_EK(~TPM_EK_Seed)), ~f ) ]
+  --[
+  KeyReveal( 'TPM_DAAReveal_tpm', PS ),
+  KeyReveal( 'TPM_DAAReveal_pke', pk(KDF_EK(~TPM_EK_Seed)) )
+  ]->
+   [ Out( ~f ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Store_DAA_Key:
+   [
+   In_S( $PS, $AS,
+         <senc(~f, KDF_AES(~TPM_AES_Seed)), <'DAA_public_data', multp(~f, 'P1')>, 
+          'returnDAAKey'>
+   ),
+   Host_State_01( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) )
+   ]
+  --[
+  Store_DAA( $PS, $AS ),
+  PlatformSendKeys( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                    <'DAA_public_data', multp(~f, 'P1')>, 'Issuer'
+  ),
+  Alive( $AS ), Role( 'Platform' ), Honest( $PS ), Honest( $AS ),
+  Honest( pk(KDF_EK(~TPM_EK_Seed)) ), Honest( 'Issuer' ),
+  OnlyOnce( 'Host_Store_DAA_Key' )
+  ]->
+   [
+   !EK_FOR_ISSUER( pk(KDF_EK(~TPM_EK_Seed)) ),
+   Out( <pk(KDF_EK(~TPM_EK_Seed)), <'DAA_public_data', multp(~f, 'P1')>, 
+         'join_Issuer_1'>
+   ),
+   Host_State_02( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                  <'DAA_public_data', multp(~f, 'P1')>, senc(~f, KDF_AES(~TPM_AES_Seed))
+   )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Issuer_Check_EK_Send_Challenge:
+   [
+   In( <pk(KDF_EK(TPM_EK_Seed)), <'DAA_public_data', multp(f, 'P1')>, 
+        'join_Issuer_1'>
+   ),
+   Fr( ~K_1 ), Fr( ~s ), !EK_FOR_ISSUER( pk(KDF_EK(TPM_EK_Seed)) )
+   ]
+  --[
+  Check_Ek( pk(KDF_EK(TPM_EK_Seed)) ),
+  Check_QPD( <'DAA_public_data', multp(f, 'P1')> ),
+  Associate( curlyK(~K_1), pk(KDF_EK(TPM_EK_Seed)),
+             <'DAA_public_data', multp(f, 'P1')>
+  ),
+  Alive( 'Issuer' ), Honest( 'Issuer' ), Honest( pk(KDF_EK(TPM_EK_Seed)) ),
+  IssuerReceivedKeys( 'Issuer', pk(KDF_EK(TPM_EK_Seed)),
+                      <'DAA_public_data', multp(f, 'P1')>
+  ),
+  OnlyOnce( 'Issuer_Check_EK_Send_Challenge' )
+  ]->
+   [
+   Out( <
+         MAC(<'1', 
+              len16(senc(<'1', curlyK(~K_1)>,
+                         KDF_a(<'1', ~s>, 'STORAGE',
+                               <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>))), 
+              senc(<'1', curlyK(~K_1)>,
+                   KDF_a(<'1', ~s>, 'STORAGE',
+                         <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>)), 
+              '1', 'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>,
+             KDF_a(<'1', ~s>, 'INTEGRITY', 'NULL')), 
+         len16(senc(<'1', curlyK(~K_1)>,
+                    KDF_a(<'1', ~s>, 'STORAGE',
+                          <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>))), 
+         senc(<'1', curlyK(~K_1)>,
+              KDF_a(<'1', ~s>, 'STORAGE',
+                    <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>)), 
+         aenc(<'1', ~s>, pk(KDF_EK(TPM_EK_Seed))), 'Host_SendChallenge'>
+   ),
+   Issuer_State_01( 'Issuer', curlyK(~K_1), pk(KDF_EK(TPM_EK_Seed)),
+                    <'DAA_public_data', multp(f, 'P1')>
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Passthrough_1:
+   [
+   In( <curlyH, len16(curlyK_hat), curlyK_hat, 
+        aenc(s, pk(KDF_EK(~TPM_EK_Seed))), 'Host_SendChallenge'>
+   ),
+   Host_State_02( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), Q_PD, Q_SD )
+   ]
+  --[ Passthrough_ActivateCred( $PS, $AS ), OnlyOnce( 'Host_Passthrough' )
+  ]->
+   [
+   Out_S( $AS, $PS,
+          <Q_SD, Q_PD, curlyH, len16(curlyK_hat), curlyK_hat, 
+           aenc(s, pk(KDF_EK(~TPM_EK_Seed))), 'TPM2_ActivateCredentials'>
+   ),
+   Host_State_03( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), Q_PD, Q_SD )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM2_ActivateCredential:
+   [
+   In_S( $AS, $PS,
+         <senc(~f, aes_key), <'DAA_public_data', multp(~f, 'P1')>, curlyH, 
+          len16(senc(<'1', curlyK(K_1)>, k_e)), senc(<'1', curlyK(K_1)>, k_e), 
+          aenc(<'1', s>, pk(KDF_EK(~TPM_EK_Seed))), 'TPM2_ActivateCredentials'>
+   ),
+   !TPM_AES_Key( $PS, aes_key ),
+   !TPM_ENDORSEMENT_SK( $PS, e, pk(KDF_EK(~TPM_EK_Seed)) )
+   ]
+  --[
+  Eq( MAC(<'1', len16(senc(<'1', curlyK(K_1)>, k_e)), 
+           senc(<'1', curlyK(K_1)>, k_e), '1', 'SHA256', 
+           H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>,
+          KDF_a(<'1', snd(adec(aenc(<'1', s>, pk(KDF_EK(~TPM_EK_Seed))), e))>,
+                'INTEGRITY', 'NULL')),
+      curlyH
+  ),
+  Eq( k_e,
+      KDF_a(<'1', snd(adec(aenc(<'1', s>, pk(KDF_EK(~TPM_EK_Seed))), e))>,
+            'STORAGE',
+            <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>)
+  ),
+  CurlyK_recomputed( $PS, $AS ), OnlyOnce( 'TPM2_ActivateCredential' )
+  ]->
+   [
+   Out_S( $PS, $AS,
+          <
+           snd(sdec(senc(<'1', curlyK(K_1)>, k_e),
+                    KDF_a(<'1', snd(adec(aenc(<'1', s>, pk(KDF_EK(~TPM_EK_Seed))), e))>,
+                          'STORAGE',
+                          <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>))), 
+           'ret_TPM2_ActivateCredentials'>
+   )
+   ]
+
+  // loop breaker: [0]
+  /*
+  rule (modulo AC) TPM2_ActivateCredential:
+     [
+     In_S( $AS, $PS,
+           <senc(~f, aes_key), <'DAA_public_data', multp(~f, 'P1')>, curlyH, 
+            len16(senc(<'1', curlyK(K_1)>, k_e)), senc(<'1', curlyK(K_1)>, k_e), 
+            aenc(<'1', s>, pk(KDF_EK(~TPM_EK_Seed))), 'TPM2_ActivateCredentials'>
+     ),
+     !TPM_AES_Key( $PS, aes_key ),
+     !TPM_ENDORSEMENT_SK( $PS, e, pk(KDF_EK(~TPM_EK_Seed)) )
+     ]
+    --[
+    Eq( MAC(<'1', len16(senc(<'1', curlyK(K_1)>, k_e)), 
+             senc(<'1', curlyK(K_1)>, k_e), '1', 'SHA256', 
+             H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>,
+            KDF_a(<'1', z.1>, 'INTEGRITY', 'NULL')),
+        curlyH
+    ),
+    Eq( k_e,
+        KDF_a(<'1', z.1>, 'STORAGE',
+              <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>)
+    ),
+    CurlyK_recomputed( $PS, $AS ), OnlyOnce( 'TPM2_ActivateCredential' )
+    ]->
+     [ Out_S( $PS, $AS, <z, 'ret_TPM2_ActivateCredentials'> ) ]
+    variants (modulo AC)
+    1. ~TPM_EK_Seed
+             = ~TPM_EK_Seed.27
+       ~f    = ~f.28
+       K_1   = K_1.29
+       e     = e.32
+       k_e   = k_e.33
+       s     = s.34
+       z     = snd(sdec(senc(<'1', curlyK(K_1.29)>, k_e.33),
+                        KDF_a(<'1', 
+                               snd(adec(aenc(<'1', s.34>, pk(KDF_EK(~TPM_EK_Seed.27))), e.32))>,
+                              'STORAGE',
+                              <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(~f.28, 'P1')>)>)))
+       z.1   = snd(adec(aenc(<'1', s.34>, pk(KDF_EK(~TPM_EK_Seed.27))), e.32))
+    
+    2. ~TPM_EK_Seed
+             = ~TPM_EK_Seed.27
+       ~f    = ~f.28
+       K_1   = K_1.29
+       e     = e.32
+       k_e   = KDF_a(<'1', 
+                      snd(adec(aenc(<'1', s.34>, pk(KDF_EK(~TPM_EK_Seed.27))), e.32))>,
+                     'STORAGE',
+                     <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(~f.28, 'P1')>)>)
+       s     = s.34
+       z     = curlyK(K_1.29)
+       z.1   = snd(adec(aenc(<'1', s.34>, pk(KDF_EK(~TPM_EK_Seed.27))), e.32))
+    
+    3. ~TPM_EK_Seed
+             = ~TPM_EK_Seed.27
+       ~f    = ~f.28
+       K_1   = K_1.29
+       e     = KDF_EK(~TPM_EK_Seed.27)
+       k_e   = k_e.33
+       s     = s.34
+       z     = snd(sdec(senc(<'1', curlyK(K_1.29)>, k_e.33),
+                        KDF_a(<'1', s.34>, 'STORAGE',
+                              <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(~f.28, 'P1')>)>)))
+       z.1   = s.34
+    
+    4. ~TPM_EK_Seed
+             = ~TPM_EK_Seed.27
+       ~f    = ~f.28
+       K_1   = K_1.29
+       e     = KDF_EK(~TPM_EK_Seed.27)
+       k_e   = KDF_a(<'1', s.34>, 'STORAGE',
+                     <'1', 'SHA256', H_SHA256(<'DAA_public_data', multp(~f.28, 'P1')>)>)
+       s     = s.34
+       z     = curlyK(K_1.29)
+       z.1   = s.34
+    // loop breaker: [0]
+  */
+
+rule (modulo E) Host_ReceiveCurlyK:
+   [
+   In_S( $PS, $AS, <curlyK(K_1), 'ret_TPM2_ActivateCredentials'> ),
+   !Pk( 'Issuer', PkX(x, 'P2'), PkY(y, 'P2') ),
+   Host_State_03( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), Q_PD, Q_SD )
+   ]
+  --[ Received_CurlyK( $PS, $AS ), OnlyOnce( 'Host_ReceiveCurlyK' ) ]->
+   [
+   Out_S( $AS, $PS,
+          <BSN('bottom'), BSN('bottom'), BSN('bottom'), 'TPM2_Commit'>
+   ),
+   Host_CurlyK1( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), curlyK(K_1) ),
+   Host_State_04( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), Q_PD, Q_SD,
+                  <PkX(x, 'P2'), PkY(y, 'P2'), curlyK(K_1), pk(KDF_EK(~TPM_EK_Seed))>
+   )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM2_Commit:
+   [
+   In_S( $AS, $PS,
+         <BSN('bottom'), BSN('bottom'), BSN('bottom'), 'TPM2_Commit'>
+   ),
+   Fr( ~cv ), Fr( ~r_cv )
+   ]
+  --[ TPM2_Commited( $PS, $AS ), OnlyOnce( 'TPM2_Commit' ) ]->
+   [
+   Out_S( $PS, $AS, <E(~r_cv, 'P1'), Nonce(~cv), 'retTPM2_commit'> ),
+   TPM_CV_E( $PS, Nonce(~cv), ~r_cv )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_ReceiveEAndCV:
+   [
+   In_S( $PS, $AS, <E(r_cv, 'P1'), Nonce(cv), 'retTPM2_commit'> ),
+   Host_State_04( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                  <'DAA_public_data', multp(~f, 'P1')>, Q_SD, str
+   )
+   ]
+  --[ Host_Created_p( $PS, $AS ), OnlyOnce( 'Host_ReceiveEAndCV' ) ]->
+   [
+   Out_S( $AS, $PS,
+          <H_k_4('P1', multp(~f, 'P1'), E(r_cv, 'P1'), str), 'TPM2_Hash'>
+   ),
+   Host_cv( $PS, $AS, Nonce(cv) ),
+   Host_State_05( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                  <'DAA_public_data', multp(~f, 'P1')>, Q_SD
+   )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM2_Hash:
+   [ In_S( $AS, $PS, <p, 'TPM2_Hash'> ), Fr( ~tkt ) ]
+  --[ TPM2_Created_P_TPM( $PS, $AS ), OnlyOnce( 'TPM2_Hash' ) ]->
+   [
+   Out_S( $PS, $AS, <H_k_1(p), Nonce(~tkt), 'ret_TPM2_Hash'> ),
+   TPM_tkt( $PS, Nonce(~tkt) )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Receive_P_TPM_TKT:
+   [
+   In_S( $PS, $AS, <H_k_1(p), Nonce(tkt), 'ret_TPM2_Hash'> ),
+   Host_cv( $PS, $AS, Nonce(cv) )
+   ]
+  --[ Host_Received_P_TPM( $PS, $AS ), OnlyOnce( 'Host_Receive_P_TPM_TKT' )
+  ]->
+   [
+   Out_S( $AS, $PS, <H_k_1(p), Nonce(tkt), Nonce(cv), 'TPM2_Sign'> ),
+   Host_Store_P_TPM( $AS, H_k_1(p) )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM2_Sign:
+   [
+   In_S( $AS, $PS, <p_tpm, ticket_host, cv1, 'TPM2_Sign'> ),
+   TPM_tkt( $PS, ticket ), !TPM_DAA_SK( $PS, pk(KDF_EK(~TPM_EK_Seed)), ~f ),
+   TPM_CV_E( $PS, cvval, ~r_cv ), Fr( ~n_J )
+   ]
+  --[
+  TPM2_Signed_P_TPM( $PS, $AS ), Eq( cvval, cv1 ),
+  Eq( ticket_host, ticket ), OnlyOnce( 'TPM2_Sign' )
+  ]->
+   [
+   Out_S( $PS, $AS,
+          <Nonce(~n_J), plus(~r_cv, multp(H_n_2(Nonce(~n_J), p_tpm), ~f)), 
+           'ret_TPM2_Sign'>
+   )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Receive_Signature_P_TPM:
+   [
+   In_S( $PS, $AS,
+         <Nonce(n_J), plus(r_cv, multp(H_n_2(Nonce(n_J), p_tpm), f)), 
+          'ret_TPM2_Sign'>
+   ),
+   Host_Store_P_TPM( $AS, p_tpm ),
+   Host_CurlyK1( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), curlyK(K_1) )
+   ]
+  --[
+  Host_Received_Signed_P_TPM( $PS, $AS ),
+  Running( pk(KDF_EK(~TPM_EK_Seed)), 'Issuer', curlyK(K_1) ), Alive( $AS ),
+  Honest( $AS ), Honest( pk(KDF_EK(~TPM_EK_Seed)) ), Honest( 'Issuer' ),
+  Role( 'Platform' ), OnlyOnce( 'Host_Receive_Signature_P_TPM' )
+  ]->
+   [
+   Out( <curlyK(K_1), Nonce(n_J), H_n_2(Nonce(n_J), p_tpm), 
+         plus(r_cv, multp(H_n_2(Nonce(n_J), p_tpm), f)), 
+         'Issuer_SendChallengeResponse'>
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Issuer_Verify_Challenge_Issue_Credentials:
+   [
+   In( <curlyK(K_rec), Nonce(n_J), H_n_2(n_J_1, p_tpm_1), 
+        plus(r_cv, multp(v_1, f_1)), 'Issuer_SendChallengeResponse'>
+   ),
+   Issuer_State_01( 'Issuer', curlyK(K_1), pk(KDF_EK(TPM_EK_Seed)),
+                    <'DAA_public_data', multp(f, 'P1')>
+   ),
+   !Pk( 'Issuer', PkX(~x, 'P2'), PkY(~y, 'P2') ), !Ltk( 'Issuer', ~x, ~y ),
+   Fr( ~r ), Fr( ~l ), Fr( ~s_2 ), Fr( ~K_2 )
+   ]
+  --[
+  Eq( curlyK(K_rec), curlyK(K_1) ),
+  Eq( H_n_2(n_J_1, p_tpm_1),
+      H_n_2(Nonce(n_J),
+            H_k_1(H_k_4('P1', multp(f, 'P1'),
+                        calcE(minus(multp(plus(r_cv, multp(v_1, f_1)), 'P1'),
+                                    multp(H_n_2(n_J_1, p_tpm_1), multp(f, 'P1')))),
+                        <PkX(~x, 'P2'), PkY(~y, 'P2'), curlyK(K_1), pk(KDF_EK(TPM_EK_Seed))>)))
+  ),
+  Commit( 'Issuer', pk(KDF_EK(TPM_EK_Seed)), curlyK(K_1) ),
+  Running( 'Issuer', pk(KDF_EK(TPM_EK_Seed)),
+           <multp(~r, 'P1'), multp(~y, multp(~r, 'P1')), 
+            plus(multp(~x, multp(~r, 'P1')),
+                 multp(multp(multp(~r, ~x), ~y), multp(f, 'P1'))), 
+            multp(multp(~r, ~y), multp(f, 'P1'))>
+  ),
+  Alive( 'Issuer' ), Honest( 'Issuer' ), Honest( pk(KDF_EK(TPM_EK_Seed)) ),
+  Issuer_VerifyChallengeIssueCredentials( 'Issuer', pk(KDF_EK(TPM_EK_Seed))
+  ),
+  OnlyOnce( 'Issuer_Verify_Challenge' )
+  ]->
+   [
+   Out( <
+         MAC(<
+              len16(senc(curlyK(~K_2),
+                         KDF_a(~s_2, 'STORAGE',
+                               <'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>))), 
+              senc(curlyK(~K_2),
+                   KDF_a(~s_2, 'STORAGE',
+                         <'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>)), 
+              'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>,
+             KDF_a(~s_2, 'INTEGRITY', 'NULL')), 
+         len16(senc(curlyK(~K_2),
+                    KDF_a(~s_2, 'STORAGE',
+                          <'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>))), 
+         senc(curlyK(~K_2),
+              KDF_a(~s_2, 'STORAGE',
+                    <'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>)), 
+         aenc(~s_2, pk(KDF_EK(TPM_EK_Seed))), 
+         senc(<multp(~r, 'P1'), multp(~y, multp(~r, 'P1')), 
+               plus(multp(~x, multp(~r, 'P1')),
+                    multp(multp(multp(~r, ~x), ~y), multp(f, 'P1'))), 
+               multp(multp(~r, ~y), multp(f, 'P1')), 
+               H_n_8('P1', multp(f, 'P1'), RB(~l, 'P1'), RD(~l, multp(f, 'P1')),
+                     multp(~r, 'P1'), multp(~y, multp(~r, 'P1')),
+                     plus(multp(~x, multp(~r, 'P1')),
+                          multp(multp(multp(~r, ~x), ~y), multp(f, 'P1'))),
+                     multp(multp(~r, ~y), multp(f, 'P1'))), 
+               plus(~l,
+                    multp(multp(~y, ~r),
+                          H_n_8('P1', multp(f, 'P1'), RB(~l, 'P1'), RD(~l, multp(f, 'P1')),
+                                multp(~r, 'P1'), multp(~y, multp(~r, 'P1')),
+                                plus(multp(~x, multp(~r, 'P1')),
+                                     multp(multp(multp(~r, ~x), ~y), multp(f, 'P1'))),
+                                multp(multp(~r, ~y), multp(f, 'P1')))))
+              >,
+              curlyK(~K_2)), 
+         'Host_CompleteJoin'>
+   )
+   ]
+
+  /*
+  rule (modulo AC) Issuer_Verify_Challenge_Issue_Credentials:
+     [
+     In( <curlyK(K_rec), Nonce(n_J), H_n_2(n_J_1, p_tpm_1), 
+          plus(r_cv, multp(v_1, f_1)), 'Issuer_SendChallengeResponse'>
+     ),
+     Issuer_State_01( 'Issuer', curlyK(K_1), pk(KDF_EK(TPM_EK_Seed)),
+                      <'DAA_public_data', multp(f, 'P1')>
+     ),
+     !Pk( 'Issuer', PkX(~x, 'P2'), PkY(~y, 'P2') ), !Ltk( 'Issuer', ~x, ~y ),
+     Fr( ~r ), Fr( ~l ), Fr( ~s_2 ), Fr( ~K_2 )
+     ]
+    --[
+    Eq( curlyK(K_rec), curlyK(K_1) ),
+    Eq( H_n_2(n_J_1, p_tpm_1),
+        H_n_2(Nonce(n_J),
+              H_k_1(H_k_4('P1', multp(f, 'P1'), z,
+                          <PkX(~x, 'P2'), PkY(~y, 'P2'), curlyK(K_1), pk(KDF_EK(TPM_EK_Seed))>)))
+    ),
+    Commit( 'Issuer', pk(KDF_EK(TPM_EK_Seed)), curlyK(K_1) ),
+    Running( 'Issuer', pk(KDF_EK(TPM_EK_Seed)),
+             <multp(~r, 'P1'), multp(~y, multp(~r, 'P1')), 
+              plus(multp(~x, multp(~r, 'P1')),
+                   multp(multp(multp(~r, ~x), ~y), multp(f, 'P1'))), 
+              multp(multp(~r, ~y), multp(f, 'P1'))>
+    ),
+    Alive( 'Issuer' ), Honest( 'Issuer' ), Honest( pk(KDF_EK(TPM_EK_Seed)) ),
+    Issuer_VerifyChallengeIssueCredentials( 'Issuer', pk(KDF_EK(TPM_EK_Seed))
+    ),
+    OnlyOnce( 'Issuer_Verify_Challenge' )
+    ]->
+     [
+     Out( <
+           MAC(<
+                len16(senc(curlyK(~K_2),
+                           KDF_a(~s_2, 'STORAGE',
+                                 <'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>))), 
+                senc(curlyK(~K_2),
+                     KDF_a(~s_2, 'STORAGE',
+                           <'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>)), 
+                'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>,
+               KDF_a(~s_2, 'INTEGRITY', 'NULL')), 
+           len16(senc(curlyK(~K_2),
+                      KDF_a(~s_2, 'STORAGE',
+                            <'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>))), 
+           senc(curlyK(~K_2),
+                KDF_a(~s_2, 'STORAGE',
+                      <'SHA256', H_SHA256(<'DAA_public_data', multp(f, 'P1')>)>)), 
+           aenc(~s_2, pk(KDF_EK(TPM_EK_Seed))), 
+           senc(<multp(~r, 'P1'), multp(~y, multp(~r, 'P1')), 
+                 plus(multp(~x, multp(~r, 'P1')),
+                      multp(multp(multp(~r, ~x), ~y), multp(f, 'P1'))), 
+                 multp(multp(~r, ~y), multp(f, 'P1')), 
+                 H_n_8('P1', multp(f, 'P1'), RB(~l, 'P1'), RD(~l, multp(f, 'P1')),
+                       multp(~r, 'P1'), multp(~y, multp(~r, 'P1')),
+                       plus(multp(~x, multp(~r, 'P1')),
+                            multp(multp(multp(~r, ~x), ~y), multp(f, 'P1'))),
+                       multp(multp(~r, ~y), multp(f, 'P1'))), 
+                 plus(~l,
+                      multp(multp(~y, ~r),
+                            H_n_8('P1', multp(f, 'P1'), RB(~l, 'P1'), RD(~l, multp(f, 'P1')),
+                                  multp(~r, 'P1'), multp(~y, multp(~r, 'P1')),
+                                  plus(multp(~x, multp(~r, 'P1')),
+                                       multp(multp(multp(~r, ~x), ~y), multp(f, 'P1'))),
+                                  multp(multp(~r, ~y), multp(f, 'P1')))))
+                >,
+                curlyK(~K_2)), 
+           'Host_CompleteJoin'>
+     )
+     ]
+    variants (modulo AC)
+    1. f     = f.35
+       f_1   = f_1.36
+       n_J_1 = n_J_1.38
+       p_tpm_1
+             = p_tpm_1.39
+       r_cv  = r_cv.40
+       v_1   = v_1.41
+       z     = calcE(minus(multp(plus(r_cv.40, multp(v_1.41, f_1.36)), 'P1'),
+                           multp(H_n_2(n_J_1.38, p_tpm_1.39), multp(f.35, 'P1'))))
+    
+    2. f     = f.224
+       f_1   = f.224
+       n_J_1 = n_J_1.227
+       p_tpm_1
+             = H_k_1(H_k_4('P1', x.435, E(r_cv.229, 'P1'), x.437))
+       r_cv  = r_cv.229
+       v_1   = H_n_2(n_J_1.227,
+                     H_k_1(H_k_4('P1', x.435, E(r_cv.229, 'P1'), x.437)))
+       z     = E(r_cv.229, 'P1')
+  */
+
+rule (modulo E) Host_Passthrough_2:
+   [
+   In( <curlyH, len16(curlyK_2_hat), curlyK_2_hat, 
+        aenc(~s_2, pk(KDF_EK(~TPM_EK_Seed))), C_hat, 'Host_CompleteJoin'>
+   ),
+   Host_State_05( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), Q_PD, Q_SD )
+   ]
+  --[
+  Passthrough_ActivateCred2( $PS, $AS ), OnlyOnce( 'Host_Passthrough_2' )
+  ]->
+   [
+   Out_S( $AS, $PS,
+          <Q_SD, Q_PD, curlyH, len16(curlyK_2_hat), curlyK_2_hat, 
+           aenc(~s_2, pk(KDF_EK(~TPM_EK_Seed))), 'TPM2_ActivateCredentials_2'>
+   ),
+   Host_State_06( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), Q_PD, C_hat )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM2_ActivateCredential_2:
+   [
+   In_S( $AS, $PS,
+         <Q_SD, <'DAA_public_data', multp(~f, 'P1')>, curlyH, 
+          len16(senc(curlyK(K_2), k_e)), senc(curlyK(K_2), k_e), 
+          aenc(s_2, pk(KDF_EK(~TPM_EK_Seed))), 'TPM2_ActivateCredentials_2'>
+   ),
+   !TPM_AES_Key( $PS, aes_key ),
+   !TPM_ENDORSEMENT_SK( $PS, e, pk(KDF_EK(~TPM_EK_Seed)) )
+   ]
+  --[
+  Eq( MAC(<len16(senc(curlyK(K_2), k_e)), senc(curlyK(K_2), k_e), 
+           'SHA256', H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>,
+          KDF_a(s_2, 'INTEGRITY', 'NULL')),
+      curlyH
+  ),
+  Eq( k_e,
+      KDF_a(s_2, 'STORAGE',
+            <'SHA256', H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>)
+  ),
+  CurlyK2_recomputed( $PS, $AS ), OnlyOnce( 'TPM2_ActivateCredential_2' )
+  ]->
+   [
+   Out_S( $PS, $AS,
+          <
+           sdec(senc(curlyK(K_2), k_e),
+                KDF_a(s_2, 'STORAGE',
+                      <'SHA256', H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>)), 
+           'ret_TPM2_ActivateCredentials_2'>
+   )
+   ]
+
+  // loop breaker: [0]
+  /*
+  rule (modulo AC) TPM2_ActivateCredential_2:
+     [
+     In_S( $AS, $PS,
+           <Q_SD, <'DAA_public_data', multp(~f, 'P1')>, curlyH, 
+            len16(senc(curlyK(K_2), k_e)), senc(curlyK(K_2), k_e), 
+            aenc(s_2, pk(KDF_EK(~TPM_EK_Seed))), 'TPM2_ActivateCredentials_2'>
+     ),
+     !TPM_AES_Key( $PS, aes_key ),
+     !TPM_ENDORSEMENT_SK( $PS, e, pk(KDF_EK(~TPM_EK_Seed)) )
+     ]
+    --[
+    Eq( MAC(<len16(senc(curlyK(K_2), k_e)), senc(curlyK(K_2), k_e), 
+             'SHA256', H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>,
+            KDF_a(s_2, 'INTEGRITY', 'NULL')),
+        curlyH
+    ),
+    Eq( k_e,
+        KDF_a(s_2, 'STORAGE',
+              <'SHA256', H_SHA256(<'DAA_public_data', multp(~f, 'P1')>)>)
+    ),
+    CurlyK2_recomputed( $PS, $AS ), OnlyOnce( 'TPM2_ActivateCredential_2' )
+    ]->
+     [ Out_S( $PS, $AS, <z, 'ret_TPM2_ActivateCredentials_2'> ) ]
+    variants (modulo AC)
+    1. ~f    = ~f.24
+       K_2   = K_2.25
+       k_e   = k_e.30
+       s_2   = s_2.31
+       z     = sdec(senc(curlyK(K_2.25), k_e.30),
+                    KDF_a(s_2.31, 'STORAGE',
+                          <'SHA256', H_SHA256(<'DAA_public_data', multp(~f.24, 'P1')>)>))
+    
+    2. ~f    = ~f.24
+       K_2   = K_2.25
+       k_e   = KDF_a(s_2.31, 'STORAGE',
+                     <'SHA256', H_SHA256(<'DAA_public_data', multp(~f.24, 'P1')>)>)
+       s_2   = s_2.31
+       z     = curlyK(K_2.25)
+    // loop breaker: [0]
+  */
+
+rule (modulo E) Host_JoinComplete:
+   [
+   In_S( $PS, $AS, <curlyK(K_2_rec), 'ret_TPM2_ActivateCredentials_2'> ),
+   !Pk( 'Issuer', PkX(x, 'P2'), PkY(y, 'P2') ),
+   Host_State_06( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                  <'DAA_public_data', multp(~f, 'P1')>, senc(<A, B, C, D, u, j>, curlyK_2)
+   )
+   ]
+  --[
+  Eq( curlyK_2, curlyK(K_2_rec) ),
+  Eq( u,
+      H_n_8('P1', multp(~f, 'P1'), calcRB(minus(multp(j, 'P1'), multp(u, B))),
+            calcRD(minus(multp(j, multp(~f, 'P1')), multp(u, D))), A, B, C, D)
+  ),
+  Eq( verifyCre1(A, PkY(y, 'P2'), B, 'P2'), accept ),
+  Eq( verifyCre2(A, D, PkX(x, 'P2'), C, 'P2'), accept ),
+  JoinCompleted( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ),
+  Commit( pk(KDF_EK(~TPM_EK_Seed)), 'Issuer', <A, B, C, D> ),
+  Role( 'Platform' ),
+  Secret( pk(KDF_EK(~TPM_EK_Seed)), 'Issuer', <A, B, C, D> ),
+  Honest( $PS ), Honest( $AS ), Honest( pk(KDF_EK(~TPM_EK_Seed)) ),
+  Honest( 'Issuer' ), OnlyOnce( 'Host_JoinComplete' )
+  ]->
+   [
+   !Host_State_RNDCreds( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), A, B, C, D ),
+   !Host_Join_Complete( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ),
+   Host_Org_Creds( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), A, B, C, D )
+   ]
+
+  // loop breaker: [0]
+  /*
+  rule (modulo AC) Host_JoinComplete:
+     [
+     In_S( $PS, $AS, <curlyK(K_2_rec), 'ret_TPM2_ActivateCredentials_2'> ),
+     !Pk( 'Issuer', PkX(x, 'P2'), PkY(y, 'P2') ),
+     Host_State_06( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                    <'DAA_public_data', multp(~f, 'P1')>, senc(<A, B, C, D, u, j>, curlyK_2)
+     )
+     ]
+    --[
+    Eq( curlyK_2, curlyK(K_2_rec) ),
+    Eq( u, H_n_8('P1', multp(~f, 'P1'), z, z.1, A, B, C, D) ),
+    Eq( z.2, accept ), Eq( z.3, accept ),
+    JoinCompleted( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ),
+    Commit( pk(KDF_EK(~TPM_EK_Seed)), 'Issuer', <A, B, C, D> ),
+    Role( 'Platform' ),
+    Secret( pk(KDF_EK(~TPM_EK_Seed)), 'Issuer', <A, B, C, D> ),
+    Honest( $PS ), Honest( $AS ), Honest( pk(KDF_EK(~TPM_EK_Seed)) ),
+    Honest( 'Issuer' ), OnlyOnce( 'Host_JoinComplete' )
+    ]->
+     [
+     !Host_State_RNDCreds( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), A, B, C, D ),
+     !Host_Join_Complete( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ),
+     Host_Org_Creds( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), A, B, C, D )
+     ]
+    variants (modulo AC)
+     1. ~f    = ~f.35
+        A     = A.36
+        B     = B.37
+        C     = C.38
+        D     = D.39
+        j     = j.42
+        u     = u.43
+        x     = x.44
+        y     = y.45
+        z     = calcRB(minus(multp(j.42, 'P1'), multp(u.43, B.37)))
+        z.1   = calcRD(minus(multp(j.42, multp(~f.35, 'P1')), multp(u.43, D.39)))
+        z.2   = verifyCre1(A.36, PkY(y.45, 'P2'), B.37, 'P2')
+        z.3   = verifyCre2(A.36, D.39, PkX(x.44, 'P2'), C.38, 'P2')
+    
+     2. ~f    = ~f.158
+        A     = multp(x.310, x.311)
+        B     = multp(y.168, multp(x.310, x.311))
+        C     = C.161
+        D     = D.162
+        j     = j.165
+        u     = u.166
+        x     = x.167
+        y     = y.168
+        z     = calcRB(minus(multp(j.165, 'P1'),
+                             multp(u.166, multp(y.168, multp(x.310, x.311)))))
+        z.1   = calcRD(minus(multp(j.165, multp(~f.158, 'P1')),
+                             multp(u.166, D.162)))
+        z.2   = accept
+        z.3   = verifyCre2(multp(x.310, x.311), D.162, PkX(x.167, 'P2'), C.161,
+                           'P2')
+    
+     3. ~f    = ~f.163
+        A     = multp(x.315, x.316)
+        B     = B.165
+        C     = plus(multp(x.172, multp(x.315, x.316)),
+                     multp(multp(multp(x.315, x.172), x.319), multp(x.320, x.316)))
+        D     = multp(multp(~x.321, x.319), multp(x.320, x.316))
+        j     = j.170
+        u     = u.171
+        x     = x.172
+        y     = y.173
+        z     = calcRB(minus(multp(j.170, 'P1'), multp(u.171, B.165)))
+        z.1   = calcRD(minus(multp(j.170, multp(~f.163, 'P1')),
+                             multp(u.171, multp(multp(~x.321, x.319), multp(x.320, x.316)))))
+        z.2   = verifyCre1(multp(x.315, x.316), PkY(y.173, 'P2'), B.165, 'P2')
+        z.3   = accept
+    
+     4. ~f    = ~f.163
+        A     = multp(x.315, x.316)
+        B     = multp(y.173, multp(x.315, x.316))
+        C     = plus(multp(x.172, multp(x.315, x.316)),
+                     multp(multp(multp(x.315, x.172), x.319), multp(x.320, x.316)))
+        D     = multp(multp(~x.321, x.319), multp(x.320, x.316))
+        j     = j.170
+        u     = u.171
+        x     = x.172
+        y     = y.173
+        z     = calcRB(minus(multp(j.170, 'P1'),
+                             multp(u.171, multp(y.173, multp(x.315, x.316)))))
+        z.1   = calcRD(minus(multp(j.170, multp(~f.163, 'P1')),
+                             multp(u.171, multp(multp(~x.321, x.319), multp(x.320, x.316)))))
+        z.2   = accept
+        z.3   = accept
+    
+     5. ~f    = ~f.165
+        A     = multp(~x.318, 'P1')
+        B     = multp(y.175, multp(~x.318, 'P1'))
+        C     = plus(multp(x.174, multp(~x.318, 'P1')),
+                     multp(multp(multp(~x.318, x.174), y.175), multp(~f.165, 'P1')))
+        D     = multp(multp(~x.318, y.175), multp(~f.165, 'P1'))
+        j     = plus(x.323,
+                     multp(multp(y.175, ~x.318),
+                           H_n_8('P1', multp(~f.165, 'P1'), RB(x.323, 'P1'),
+                                 RD(x.323, multp(~f.165, 'P1')), multp(~x.318, 'P1'),
+                                 multp(y.175, multp(~x.318, 'P1')),
+                                 plus(multp(x.324, multp(~x.318, 'P1')),
+                                      multp(multp(multp(~x.318, x.324), y.175), x.325)),
+                                 multp(multp(~x.318, y.175), x.325))))
+        u     = H_n_8('P1', multp(~f.165, 'P1'), RB(x.323, 'P1'),
+                      RD(x.323, multp(~f.165, 'P1')), multp(~x.318, 'P1'),
+                      multp(y.175, multp(~x.318, 'P1')),
+                      plus(multp(x.324, multp(~x.318, 'P1')),
+                           multp(multp(multp(~x.318, x.324), y.175), x.325)),
+                      multp(multp(~x.318, y.175), x.325))
+        x     = x.174
+        y     = y.175
+        z     = RB(x.323, 'P1')
+        z.1   = RD(x.323, multp(~f.165, 'P1'))
+        z.2   = accept
+        z.3   = accept
+    
+     6. ~f    = ~f.165
+        A     = multp(x.318, 'P1')
+        B     = multp(y.175, multp(x.318, 'P1'))
+        C     = C.168
+        D     = multp(multp(x.318, y.175), multp(~f.165, 'P1'))
+        j     = plus(x.323,
+                     multp(multp(y.175, x.318),
+                           H_n_8('P1', multp(~f.165, 'P1'), RB(x.323, 'P1'),
+                                 RD(x.323, multp(~f.165, 'P1')), multp(x.318, 'P1'),
+                                 multp(y.175, multp(x.318, 'P1')),
+                                 plus(multp(x.324, multp(x.318, 'P1')),
+                                      multp(multp(multp(x.318, x.324), y.175), x.325)),
+                                 multp(multp(x.318, y.175), x.325))))
+        u     = H_n_8('P1', multp(~f.165, 'P1'), RB(x.323, 'P1'),
+                      RD(x.323, multp(~f.165, 'P1')), multp(x.318, 'P1'),
+                      multp(y.175, multp(x.318, 'P1')),
+                      plus(multp(x.324, multp(x.318, 'P1')),
+                           multp(multp(multp(x.318, x.324), y.175), x.325)),
+                      multp(multp(x.318, y.175), x.325))
+        x     = x.174
+        y     = y.175
+        z     = RB(x.323, 'P1')
+        z.1   = RD(x.323, multp(~f.165, 'P1'))
+        z.2   = accept
+        z.3   = verifyCre2(multp(x.318, 'P1'),
+                           multp(multp(x.318, y.175), multp(~f.165, 'P1')), PkX(x.174, 'P2'), C.168,
+                           'P2')
+    
+     7. ~f    = ~f.166
+        A     = A.167
+        B     = multp(x.318, multp(x.319, 'P1'))
+        C     = C.169
+        D     = D.170
+        j     = plus(x.324,
+                     multp(multp(x.318, x.319),
+                           H_n_8('P1', multp(x.325, 'P1'), RB(x.324, 'P1'),
+                                 RD(x.324, multp(x.325, 'P1')), multp(x.319, 'P1'),
+                                 multp(x.318, multp(x.319, 'P1')),
+                                 plus(multp(x.326, multp(x.319, 'P1')),
+                                      multp(multp(multp(x.319, x.326), x.318), x.327)),
+                                 multp(multp(x.319, x.318), x.327))))
+        u     = H_n_8('P1', multp(x.325, 'P1'), RB(x.324, 'P1'),
+                      RD(x.324, multp(x.325, 'P1')), multp(x.319, 'P1'),
+                      multp(x.318, multp(x.319, 'P1')),
+                      plus(multp(x.326, multp(x.319, 'P1')),
+                           multp(multp(multp(x.319, x.326), x.318), x.327)),
+                      multp(multp(x.319, x.318), x.327))
+        x     = x.175
+        y     = y.176
+        z     = RB(x.324, 'P1')
+        z.1   = calcRD(minus(multp(plus(x.324,
+                                        multp(multp(x.318, x.319),
+                                              H_n_8('P1', multp(x.325, 'P1'), RB(x.324, 'P1'),
+                                                    RD(x.324, multp(x.325, 'P1')), multp(x.319, 'P1'),
+                                                    multp(x.318, multp(x.319, 'P1')),
+                                                    plus(multp(x.326, multp(x.319, 'P1')),
+                                                         multp(multp(multp(x.319, x.326), x.318), x.327)),
+                                                    multp(multp(x.319, x.318), x.327)))),
+                                   multp(~f.166, 'P1')),
+                             multp(H_n_8('P1', multp(x.325, 'P1'), RB(x.324, 'P1'),
+                                         RD(x.324, multp(x.325, 'P1')), multp(x.319, 'P1'),
+                                         multp(x.318, multp(x.319, 'P1')),
+                                         plus(multp(x.326, multp(x.319, 'P1')),
+                                              multp(multp(multp(x.319, x.326), x.318), x.327)),
+                                         multp(multp(x.319, x.318), x.327)),
+                                   D.170)))
+        z.2   = verifyCre1(A.167, PkY(y.176, 'P2'),
+                           multp(x.318, multp(x.319, 'P1')), 'P2')
+        z.3   = verifyCre2(A.167, D.170, PkX(x.175, 'P2'), C.169, 'P2')
+    
+     8. ~f    = ~f.166
+        A     = A.167
+        B     = multp(x.320, multp(x.321, 'P1'))
+        C     = C.169
+        D     = multp(multp(x.321, x.320), multp(~f.166, 'P1'))
+        j     = plus(x.325,
+                     multp(multp(x.320, x.321),
+                           H_n_8('P1', multp(~f.166, 'P1'), RB(x.325, 'P1'),
+                                 RD(x.325, multp(~f.166, 'P1')), multp(x.321, 'P1'),
+                                 multp(x.320, multp(x.321, 'P1')),
+                                 plus(multp(x.326, multp(x.321, 'P1')),
+                                      multp(multp(multp(x.321, x.326), x.320), x.327)),
+                                 multp(multp(x.321, x.320), x.327))))
+        u     = H_n_8('P1', multp(~f.166, 'P1'), RB(x.325, 'P1'),
+                      RD(x.325, multp(~f.166, 'P1')), multp(x.321, 'P1'),
+                      multp(x.320, multp(x.321, 'P1')),
+                      plus(multp(x.326, multp(x.321, 'P1')),
+                           multp(multp(multp(x.321, x.326), x.320), x.327)),
+                      multp(multp(x.321, x.320), x.327))
+        x     = x.175
+        y     = y.176
+        z     = RB(x.325, 'P1')
+        z.1   = RD(x.325, multp(~f.166, 'P1'))
+        z.2   = verifyCre1(A.167, PkY(y.176, 'P2'),
+                           multp(x.320, multp(x.321, 'P1')), 'P2')
+        z.3   = verifyCre2(A.167,
+                           multp(multp(x.321, x.320), multp(~f.166, 'P1')), PkX(x.175, 'P2'), C.169,
+                           'P2')
+    
+     9. ~f    = ~f.166
+        A     = multp(x.318, 'P1')
+        B     = multp(y.176, multp(x.318, 'P1'))
+        C     = C.169
+        D     = D.170
+        j     = plus(x.324,
+                     multp(multp(y.176, x.318),
+                           H_n_8('P1', multp(x.325, 'P1'), RB(x.324, 'P1'),
+                                 RD(x.324, multp(x.325, 'P1')), multp(x.318, 'P1'),
+                                 multp(y.176, multp(x.318, 'P1')),
+                                 plus(multp(x.326, multp(x.318, 'P1')),
+                                      multp(multp(multp(x.318, x.326), y.176), x.327)),
+                                 multp(multp(x.318, y.176), x.327))))
+        u     = H_n_8('P1', multp(x.325, 'P1'), RB(x.324, 'P1'),
+                      RD(x.324, multp(x.325, 'P1')), multp(x.318, 'P1'),
+                      multp(y.176, multp(x.318, 'P1')),
+                      plus(multp(x.326, multp(x.318, 'P1')),
+                           multp(multp(multp(x.318, x.326), y.176), x.327)),
+                      multp(multp(x.318, y.176), x.327))
+        x     = x.175
+        y     = y.176
+        z     = RB(x.324, 'P1')
+        z.1   = calcRD(minus(multp(plus(x.324,
+                                        multp(multp(y.176, x.318),
+                                              H_n_8('P1', multp(x.325, 'P1'), RB(x.324, 'P1'),
+                                                    RD(x.324, multp(x.325, 'P1')), multp(x.318, 'P1'),
+                                                    multp(y.176, multp(x.318, 'P1')),
+                                                    plus(multp(x.326, multp(x.318, 'P1')),
+                                                         multp(multp(multp(x.318, x.326), y.176), x.327)),
+                                                    multp(multp(x.318, y.176), x.327)))),
+                                   multp(~f.166, 'P1')),
+                             multp(H_n_8('P1', multp(x.325, 'P1'), RB(x.324, 'P1'),
+                                         RD(x.324, multp(x.325, 'P1')), multp(x.318, 'P1'),
+                                         multp(y.176, multp(x.318, 'P1')),
+                                         plus(multp(x.326, multp(x.318, 'P1')),
+                                              multp(multp(multp(x.318, x.326), y.176), x.327)),
+                                         multp(multp(x.318, y.176), x.327)),
+                                   D.170)))
+        z.2   = accept
+        z.3   = verifyCre2(multp(x.318, 'P1'), D.170, PkX(x.175, 'P2'), C.169,
+                           'P2')
+    
+    10. ~f    = ~f.166
+        A     = multp(x.319, 'P1')
+        B     = multp(x.320, multp(~x.321, 'P1'))
+        C     = plus(multp(x.175, multp(x.319, 'P1')),
+                     multp(multp(multp(x.319, x.175), x.320), multp(~f.166, 'P1')))
+        D     = multp(multp(~x.321, x.320), multp(~f.166, 'P1'))
+        j     = plus(x.325,
+                     multp(multp(x.320, ~x.321),
+                           H_n_8('P1', multp(~f.166, 'P1'), RB(x.325, 'P1'),
+                                 RD(x.325, multp(~f.166, 'P1')), multp(~x.321, 'P1'),
+                                 multp(x.320, multp(~x.321, 'P1')),
+                                 plus(multp(x.326, multp(~x.321, 'P1')),
+                                      multp(multp(multp(~x.321, x.326), x.320), x.327)),
+                                 multp(multp(~x.321, x.320), x.327))))
+        u     = H_n_8('P1', multp(~f.166, 'P1'), RB(x.325, 'P1'),
+                      RD(x.325, multp(~f.166, 'P1')), multp(~x.321, 'P1'),
+                      multp(x.320, multp(~x.321, 'P1')),
+                      plus(multp(x.326, multp(~x.321, 'P1')),
+                           multp(multp(multp(~x.321, x.326), x.320), x.327)),
+                      multp(multp(~x.321, x.320), x.327))
+        x     = x.175
+        y     = y.176
+        z     = RB(x.325, 'P1')
+        z.1   = RD(x.325, multp(~f.166, 'P1'))
+        z.2   = verifyCre1(multp(x.319, 'P1'), PkY(y.176, 'P2'),
+                           multp(x.320, multp(~x.321, 'P1')), 'P2')
+        z.3   = accept
+    
+    11. ~f    = ~f.167
+        A     = A.168
+        B     = B.169
+        C     = C.170
+        D     = multp(multp(x.323, x.324), multp(~f.167, 'P1'))
+        j     = plus(x.327,
+                     multp(multp(x.324, x.323),
+                           H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                                 RD(x.327, multp(~f.167, 'P1')), multp(x.323, 'P1'),
+                                 multp(x.324, multp(x.323, 'P1')),
+                                 plus(multp(x.328, multp(x.323, 'P1')),
+                                      multp(multp(multp(x.323, x.328), x.324), x.329)),
+                                 multp(multp(x.323, x.324), x.329))))
+        u     = H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                      RD(x.327, multp(~f.167, 'P1')), multp(x.323, 'P1'),
+                      multp(x.324, multp(x.323, 'P1')),
+                      plus(multp(x.328, multp(x.323, 'P1')),
+                           multp(multp(multp(x.323, x.328), x.324), x.329)),
+                      multp(multp(x.323, x.324), x.329))
+        x     = x.176
+        y     = y.177
+        z     = calcRB(minus(multp(plus(x.327,
+                                        multp(multp(x.324, x.323),
+                                              H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                                                    RD(x.327, multp(~f.167, 'P1')), multp(x.323, 'P1'),
+                                                    multp(x.324, multp(x.323, 'P1')),
+                                                    plus(multp(x.328, multp(x.323, 'P1')),
+                                                         multp(multp(multp(x.323, x.328), x.324), x.329)),
+                                                    multp(multp(x.323, x.324), x.329)))),
+                                   'P1'),
+                             multp(H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                                         RD(x.327, multp(~f.167, 'P1')), multp(x.323, 'P1'),
+                                         multp(x.324, multp(x.323, 'P1')),
+                                         plus(multp(x.328, multp(x.323, 'P1')),
+                                              multp(multp(multp(x.323, x.328), x.324), x.329)),
+                                         multp(multp(x.323, x.324), x.329)),
+                                   B.169)))
+        z.1   = RD(x.327, multp(~f.167, 'P1'))
+        z.2   = verifyCre1(A.168, PkY(y.177, 'P2'), B.169, 'P2')
+        z.3   = verifyCre2(A.168,
+                           multp(multp(x.323, x.324), multp(~f.167, 'P1')), PkX(x.176, 'P2'), C.170,
+                           'P2')
+    
+    12. ~f    = ~f.167
+        A     = multp(x.320, 'P1')
+        B     = B.169
+        C     = plus(multp(x.176, multp(x.320, 'P1')),
+                     multp(multp(multp(x.320, x.176), x.323), multp(~f.167, 'P1')))
+        D     = multp(multp(~x.324, x.323), multp(~f.167, 'P1'))
+        j     = plus(x.327,
+                     multp(multp(x.323, ~x.324),
+                           H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                                 RD(x.327, multp(~f.167, 'P1')), multp(~x.324, 'P1'),
+                                 multp(x.323, multp(~x.324, 'P1')),
+                                 plus(multp(x.328, multp(~x.324, 'P1')),
+                                      multp(multp(multp(~x.324, x.328), x.323), x.329)),
+                                 multp(multp(~x.324, x.323), x.329))))
+        u     = H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                      RD(x.327, multp(~f.167, 'P1')), multp(~x.324, 'P1'),
+                      multp(x.323, multp(~x.324, 'P1')),
+                      plus(multp(x.328, multp(~x.324, 'P1')),
+                           multp(multp(multp(~x.324, x.328), x.323), x.329)),
+                      multp(multp(~x.324, x.323), x.329))
+        x     = x.176
+        y     = y.177
+        z     = calcRB(minus(multp(plus(x.327,
+                                        multp(multp(x.323, ~x.324),
+                                              H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                                                    RD(x.327, multp(~f.167, 'P1')), multp(~x.324, 'P1'),
+                                                    multp(x.323, multp(~x.324, 'P1')),
+                                                    plus(multp(x.328, multp(~x.324, 'P1')),
+                                                         multp(multp(multp(~x.324, x.328), x.323), x.329)),
+                                                    multp(multp(~x.324, x.323), x.329)))),
+                                   'P1'),
+                             multp(H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                                         RD(x.327, multp(~f.167, 'P1')), multp(~x.324, 'P1'),
+                                         multp(x.323, multp(~x.324, 'P1')),
+                                         plus(multp(x.328, multp(~x.324, 'P1')),
+                                              multp(multp(multp(~x.324, x.328), x.323), x.329)),
+                                         multp(multp(~x.324, x.323), x.329)),
+                                   B.169)))
+        z.1   = RD(x.327, multp(~f.167, 'P1'))
+        z.2   = verifyCre1(multp(x.320, 'P1'), PkY(y.177, 'P2'), B.169, 'P2')
+        z.3   = accept
+    
+    13. ~f    = ~f.167
+        A     = multp(x.320, 'P1')
+        B     = multp(y.177, multp(x.320, 'P1'))
+        C     = plus(multp(x.176, multp(x.320, 'P1')),
+                     multp(multp(multp(x.320, x.176), x.323), multp(~f.167, 'P1')))
+        D     = multp(multp(~x.324, x.323), multp(~f.167, 'P1'))
+        j     = plus(x.327,
+                     multp(multp(x.323, ~x.324),
+                           H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                                 RD(x.327, multp(~f.167, 'P1')), multp(~x.324, 'P1'),
+                                 multp(x.323, multp(~x.324, 'P1')),
+                                 plus(multp(x.328, multp(~x.324, 'P1')),
+                                      multp(multp(multp(~x.324, x.328), x.323), x.329)),
+                                 multp(multp(~x.324, x.323), x.329))))
+        u     = H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                      RD(x.327, multp(~f.167, 'P1')), multp(~x.324, 'P1'),
+                      multp(x.323, multp(~x.324, 'P1')),
+                      plus(multp(x.328, multp(~x.324, 'P1')),
+                           multp(multp(multp(~x.324, x.328), x.323), x.329)),
+                      multp(multp(~x.324, x.323), x.329))
+        x     = x.176
+        y     = y.177
+        z     = calcRB(minus(multp(plus(x.327,
+                                        multp(multp(x.323, ~x.324),
+                                              H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                                                    RD(x.327, multp(~f.167, 'P1')), multp(~x.324, 'P1'),
+                                                    multp(x.323, multp(~x.324, 'P1')),
+                                                    plus(multp(x.328, multp(~x.324, 'P1')),
+                                                         multp(multp(multp(~x.324, x.328), x.323), x.329)),
+                                                    multp(multp(~x.324, x.323), x.329)))),
+                                   'P1'),
+                             multp(H_n_8('P1', multp(~f.167, 'P1'), RB(x.327, 'P1'),
+                                         RD(x.327, multp(~f.167, 'P1')), multp(~x.324, 'P1'),
+                                         multp(x.323, multp(~x.324, 'P1')),
+                                         plus(multp(x.328, multp(~x.324, 'P1')),
+                                              multp(multp(multp(~x.324, x.328), x.323), x.329)),
+                                         multp(multp(~x.324, x.323), x.329)),
+                                   multp(y.177, multp(x.320, 'P1')))))
+        z.1   = RD(x.327, multp(~f.167, 'P1'))
+        z.2   = accept
+        z.3   = accept
+    
+    14. ~f    = ~f.168
+        A     = multp(x.320, 'P1')
+        B     = multp(y.178, multp(x.320, 'P1'))
+        C     = plus(multp(x.177, multp(x.320, 'P1')),
+                     multp(multp(multp(x.320, x.177), x.323), multp(x.324, 'P1')))
+        D     = multp(multp(~x.325, x.323), multp(x.324, 'P1'))
+        j     = plus(x.328,
+                     multp(multp(y.178, x.320),
+                           H_n_8('P1', multp(x.329, 'P1'), RB(x.328, 'P1'),
+                                 RD(x.328, multp(x.329, 'P1')), multp(x.320, 'P1'),
+                                 multp(y.178, multp(x.320, 'P1')),
+                                 plus(multp(x.330, multp(x.320, 'P1')),
+                                      multp(multp(multp(x.320, x.330), y.178), x.331)),
+                                 multp(multp(x.320, y.178), x.331))))
+        u     = H_n_8('P1', multp(x.329, 'P1'), RB(x.328, 'P1'),
+                      RD(x.328, multp(x.329, 'P1')), multp(x.320, 'P1'),
+                      multp(y.178, multp(x.320, 'P1')),
+                      plus(multp(x.330, multp(x.320, 'P1')),
+                           multp(multp(multp(x.320, x.330), y.178), x.331)),
+                      multp(multp(x.320, y.178), x.331))
+        x     = x.177
+        y     = y.178
+        z     = RB(x.328, 'P1')
+        z.1   = calcRD(minus(multp(plus(x.328,
+                                        multp(multp(y.178, x.320),
+                                              H_n_8('P1', multp(x.329, 'P1'), RB(x.328, 'P1'),
+                                                    RD(x.328, multp(x.329, 'P1')), multp(x.320, 'P1'),
+                                                    multp(y.178, multp(x.320, 'P1')),
+                                                    plus(multp(x.330, multp(x.320, 'P1')),
+                                                         multp(multp(multp(x.320, x.330), y.178), x.331)),
+                                                    multp(multp(x.320, y.178), x.331)))),
+                                   multp(~f.168, 'P1')),
+                             multp(H_n_8('P1', multp(x.329, 'P1'), RB(x.328, 'P1'),
+                                         RD(x.328, multp(x.329, 'P1')), multp(x.320, 'P1'),
+                                         multp(y.178, multp(x.320, 'P1')),
+                                         plus(multp(x.330, multp(x.320, 'P1')),
+                                              multp(multp(multp(x.320, x.330), y.178), x.331)),
+                                         multp(multp(x.320, y.178), x.331)),
+                                   multp(multp(~x.325, x.323), multp(x.324, 'P1')))))
+        z.2   = accept
+        z.3   = accept
+    
+    15. ~f    = ~f.168
+        A     = multp(x.321, x.322)
+        B     = multp(y.178, multp(x.321, x.322))
+        C     = C.171
+        D     = multp(multp(x.325, x.326), multp(~f.168, 'P1'))
+        j     = plus(x.329,
+                     multp(multp(x.326, x.325),
+                           H_n_8('P1', multp(~f.168, 'P1'), RB(x.329, 'P1'),
+                                 RD(x.329, multp(~f.168, 'P1')), multp(x.325, 'P1'),
+                                 multp(x.326, multp(x.325, 'P1')),
+                                 plus(multp(x.330, multp(x.325, 'P1')),
+                                      multp(multp(multp(x.325, x.330), x.326), x.331)),
+                                 multp(multp(x.325, x.326), x.331))))
+        u     = H_n_8('P1', multp(~f.168, 'P1'), RB(x.329, 'P1'),
+                      RD(x.329, multp(~f.168, 'P1')), multp(x.325, 'P1'),
+                      multp(x.326, multp(x.325, 'P1')),
+                      plus(multp(x.330, multp(x.325, 'P1')),
+                           multp(multp(multp(x.325, x.330), x.326), x.331)),
+                      multp(multp(x.325, x.326), x.331))
+        x     = x.177
+        y     = y.178
+        z     = calcRB(minus(multp(plus(x.329,
+                                        multp(multp(x.326, x.325),
+                                              H_n_8('P1', multp(~f.168, 'P1'), RB(x.329, 'P1'),
+                                                    RD(x.329, multp(~f.168, 'P1')), multp(x.325, 'P1'),
+                                                    multp(x.326, multp(x.325, 'P1')),
+                                                    plus(multp(x.330, multp(x.325, 'P1')),
+                                                         multp(multp(multp(x.325, x.330), x.326), x.331)),
+                                                    multp(multp(x.325, x.326), x.331)))),
+                                   'P1'),
+                             multp(H_n_8('P1', multp(~f.168, 'P1'), RB(x.329, 'P1'),
+                                         RD(x.329, multp(~f.168, 'P1')), multp(x.325, 'P1'),
+                                         multp(x.326, multp(x.325, 'P1')),
+                                         plus(multp(x.330, multp(x.325, 'P1')),
+                                              multp(multp(multp(x.325, x.330), x.326), x.331)),
+                                         multp(multp(x.325, x.326), x.331)),
+                                   multp(y.178, multp(x.321, x.322)))))
+        z.1   = RD(x.329, multp(~f.168, 'P1'))
+        z.2   = accept
+        z.3   = verifyCre2(multp(x.321, x.322),
+                           multp(multp(x.325, x.326), multp(~f.168, 'P1')), PkX(x.177, 'P2'), C.171,
+                           'P2')
+    
+    16. ~f    = ~f.170
+        A     = multp(x.322, x.323)
+        B     = multp(x.324, multp(x.325, 'P1'))
+        C     = plus(multp(x.179, multp(x.322, x.323)),
+                     multp(multp(multp(x.322, x.179), x.327), multp(x.328, x.323)))
+        D     = multp(multp(~x.329, x.327), multp(x.328, x.323))
+        j     = plus(x.332,
+                     multp(multp(x.324, x.325),
+                           H_n_8('P1', multp(x.333, 'P1'), RB(x.332, 'P1'),
+                                 RD(x.332, multp(x.333, 'P1')), multp(x.325, 'P1'),
+                                 multp(x.324, multp(x.325, 'P1')),
+                                 plus(multp(x.334, multp(x.325, 'P1')),
+                                      multp(multp(multp(x.325, x.334), x.324), x.335)),
+                                 multp(multp(x.325, x.324), x.335))))
+        u     = H_n_8('P1', multp(x.333, 'P1'), RB(x.332, 'P1'),
+                      RD(x.332, multp(x.333, 'P1')), multp(x.325, 'P1'),
+                      multp(x.324, multp(x.325, 'P1')),
+                      plus(multp(x.334, multp(x.325, 'P1')),
+                           multp(multp(multp(x.325, x.334), x.324), x.335)),
+                      multp(multp(x.325, x.324), x.335))
+        x     = x.179
+        y     = y.180
+        z     = RB(x.332, 'P1')
+        z.1   = calcRD(minus(multp(plus(x.332,
+                                        multp(multp(x.324, x.325),
+                                              H_n_8('P1', multp(x.333, 'P1'), RB(x.332, 'P1'),
+                                                    RD(x.332, multp(x.333, 'P1')), multp(x.325, 'P1'),
+                                                    multp(x.324, multp(x.325, 'P1')),
+                                                    plus(multp(x.334, multp(x.325, 'P1')),
+                                                         multp(multp(multp(x.325, x.334), x.324), x.335)),
+                                                    multp(multp(x.325, x.324), x.335)))),
+                                   multp(~f.170, 'P1')),
+                             multp(H_n_8('P1', multp(x.333, 'P1'), RB(x.332, 'P1'),
+                                         RD(x.332, multp(x.333, 'P1')), multp(x.325, 'P1'),
+                                         multp(x.324, multp(x.325, 'P1')),
+                                         plus(multp(x.334, multp(x.325, 'P1')),
+                                              multp(multp(multp(x.325, x.334), x.324), x.335)),
+                                         multp(multp(x.325, x.324), x.335)),
+                                   multp(multp(~x.329, x.327), multp(x.328, x.323)))))
+        z.2   = verifyCre1(multp(x.322, x.323), PkY(y.180, 'P2'),
+                           multp(x.324, multp(x.325, 'P1')), 'P2')
+        z.3   = accept
+    // loop breaker: [0]
+  */
+
+rule (modulo E) Host_CredentialsReveal:
+   [ Host_Org_Creds( $PS, $AS, pk(KDF_EK(TPM_EK_Seed)), A, B, C, D ) ]
+  --[
+  KeyReveal( 'Host_OrgCred_Reveal', $AS ),
+  KeyReveal( 'TPM_OrgCred_Reveal', $PS ),
+  KeyReveal( 'PKE_OrgCred_Reveal', pk(KDF_EK(TPM_EK_Seed)) )
+  ]->
+   [ Out( <A, B, C, D> ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Randomise_Credentials:
+   [
+   !Host_State_RNDCreds( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), A, B, C, D ),
+   Fr( ~l )
+   ]
+  --[ RandomisedCredentials( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ) ]->
+   [
+   !Host_Random_Credentials( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                             multp(~l, A), multp(~l, B), multp(~l, C), multp(~l, D)
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Generate_Basename:
+   [
+   !Host_Join_Complete( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ),
+   Fr( ~BaseName )
+   ]
+  --[ GenerateBasename( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ) ]->
+   [ !Host_BaseName( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), BSN(~BaseName) ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Basename:
+   [
+   !Host_Random_Credentials( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), R, S, T, W
+   ),
+   !Host_BaseName( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), bsn )
+   ]
+  --[ SetBasename( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), bsn ) ]->
+   [ !Host_State_07( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), R, S, T, W, bsn ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Process_Credentials:
+   [
+   !Host_State_07( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                   multp(~l, multp(r, 'P1')), multp(~l, multp(y, multp(r, 'P1'))),
+                   multp(~l,
+                         plus(multp(x, multp(r, 'P1')), multp(multp(multp(r, x), y), Q))),
+                   multp(~l, multp(multp(r, y), Q)), BSN(basename)
+   )
+   ]
+  --[
+  ProcessRandomisedCredentials( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                                BSN(basename)
+  ),
+  QuotePCROnlyOnce( 'Host_Randomise_Credentials' )
+  ]->
+   [
+   Out_S( $AS, $PS,
+          <F1(BSN(basename)), F2(BSN(basename)), 
+           multp(~l, multp(y, multp(r, 'P1'))), 'TPM2_Commit_rand'>
+   ),
+   Host_State_08( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), BSN(basename),
+                  multp(~l, multp(r, 'P1')), multp(~l, multp(y, multp(r, 'P1'))),
+                  multp(~l,
+                        plus(multp(x, multp(r, 'P1')), multp(multp(multp(r, x), y), Q))),
+                  multp(~l, multp(multp(r, y), Q)),
+                  PointG1(H_p(F1(BSN(basename))), F2(BSN(basename)))
+   ),
+   Host_Rnd_Creds( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), BSN(basename),
+                   multp(~l, multp(r, 'P1')), multp(~l, multp(y, multp(r, 'P1'))),
+                   multp(~l,
+                         plus(multp(x, multp(r, 'P1')), multp(multp(multp(r, x), y), Q))),
+                   multp(~l, multp(multp(r, y), Q))
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_RandomCredentialsReveal:
+   [ Host_Rnd_Creds( $PS, $AS, pk(KDF_EK(TPM_EK_Seed)), bsn, R, S, T, W ) ]
+  --[
+  KeyReveal( 'Host_RndCred_Reveal', $AS ),
+  KeyReveal( 'TPM_RndCred_Reveal', $PS ),
+  KeyReveal( 'PKE_RndCred_Reveal', pk(KDF_EK(TPM_EK_Seed)) )
+  ]->
+   [ Out( <bsn, R, S, T, W> ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM2_Commit_2:
+   [
+   In_S( $AS, $PS, <F1(bsn), F2(bsn), S, 'TPM2_Commit_rand'> ),
+   !TPM_DAA_SK( $PS, pk(KDF_EK(~TPM_EK_Seed)), ~f ), Fr( ~cv1 ),
+   Fr( ~r_cv1 )
+   ]
+  --[
+  TPMCommitRandomised( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ),
+  CheckInG1( PointG1(H_p(F1(bsn)), F2(bsn)) ),
+  SignOnlyOnce( 'TPM2_Commit_2' )
+  ]->
+   [
+   Out_S( $PS, $AS,
+          <multp(~f, PointG1(H_p(F1(bsn)), F2(bsn))), 
+           L_J(~r_cv1, PointG1(H_p(F1(bsn)), F2(bsn))), E_S(~r_cv1, S), 
+           Nonce(~cv1), 'ret_TPM2_Commit_rand'>
+   ),
+   TPM_Commit_RCV1( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), Nonce(~cv1), ~r_cv1
+   )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Request_PCR_Quote:
+   [
+   In_S( $PS, $AS, <K, L, E, Nonce(cv1), 'ret_TPM2_Commit_rand'> ),
+   Fr( ~pcr_set ),
+   Host_State_08( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), BSN(basename),
+                  multp(sl, multp(r, 'P1')), multp(sl, multp(y, multp(r, 'P1'))),
+                  multp(sl,
+                        plus(multp(x, multp(r, 'P1')), multp(multp(multp(r, x), y), Q))),
+                  multp(sl, multp(multp(r, y), Q)), J
+   )
+   ]
+  --[
+  RequestPCRQuote( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ),
+  QuotePCROnlyOnce( 'Host_Request_PCR_Quote' )
+  ]->
+   [
+   Out_S( $AS, $PS,
+          <pk(KDF_EK(~TPM_EK_Seed)), 
+           H_k_9('pcr_data', multp(sl, multp(r, 'P1')),
+                 multp(sl, multp(y, multp(r, 'P1'))),
+                 multp(sl,
+                       plus(multp(x, multp(r, 'P1')), multp(multp(multp(r, x), y), Q))),
+                 multp(sl, multp(multp(r, y), Q)), J, K, L, E), 
+           Nonce(cv1), Pcr_Set(~pcr_set), 'TPM2_Quote'>
+   ),
+   Host_State_09( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                  H_k_9('pcr_data', multp(sl, multp(r, 'P1')),
+                        multp(sl, multp(y, multp(r, 'P1'))),
+                        multp(sl,
+                              plus(multp(x, multp(r, 'P1')), multp(multp(multp(r, x), y), Q))),
+                        multp(sl, multp(multp(r, y), Q)), J, K, L, E),
+                  'pcr_data', Pcr_Set(~pcr_set), BSN(basename), multp(sl, multp(r, 'P1')),
+                  multp(sl, multp(y, multp(r, 'P1'))),
+                  multp(sl,
+                        plus(multp(x, multp(r, 'P1')), multp(multp(multp(r, x), y), Q))),
+                  multp(sl, multp(multp(r, y), Q)), J, K, L, E
+   )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) TPM2_Quote:
+   [
+   In_S( $AS, $PS,
+         <pk(KDF_EK(~TPM_EK_Seed)), H_k_9(pcrData, R, S, T, W, J, K, L, E), 
+          cv1val_in, pcrset, 'TPM2_Quote'>
+   ),
+   !TPM_DAA_SK( $PS, pk(KDF_EK(~TPM_EK_Seed)), ~f ),
+   TPM_Commit_RCV1( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), cv1val, ~r_cv1 ),
+   Fr( ~pcrset_values ), Fr( ~rnd_n_Q )
+   ]
+  --[
+  TPM2_Created_PCRQuote_TPM( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)) ),
+  Eq( cv1val_in, cv1val ), QuotePCROnlyOnce( 'TPM2_Quote' )
+  ]->
+   [
+   Out_S( $PS, $AS,
+          <quotePCR(pcrset, ~pcrset_values), 
+           plus(~r_cv1,
+                multp(H_n_2(Nonce(~rnd_n_Q),
+                            H_k_2(H_k_9(pcrData, R, S, T, W, J, K, L, E),
+                                  H_6(quotePCR(pcrset, ~pcrset_values)))),
+                      ~f)), 
+           Nonce(~rnd_n_Q), 'ret_TPM2_Quote'>
+   )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Host_Receive_Quoted_PCR:
+   [
+   In_S( $PS, $AS,
+         <quotePCR(Pcr_Set(~pcr_set), pcrset_values), plus(r_cv1, multp(h2, f)), 
+          Nonce(rnd_n_Q), 'ret_TPM2_Quote'>
+   ),
+   Host_State_09( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), small_c, 'pcr_data',
+                  Pcr_Set(~pcr_set), BSN(basename), multp(sl, A), multp(sl, B),
+                  multp(sl, C), multp(sl, D),
+                  PointG1(H_p(F1(BSN(basename))), F2(BSN(basename))),
+                  multp(f, PointG1(H_p(F1(BSN(basename))), F2(BSN(basename)))),
+                  L_J(r_cv1, PointG1(H_p(F1(BSN(basename))), F2(BSN(basename)))),
+                  E_S(r_cv1, S)
+   )
+   ]
+  --[
+  Host_Receive_Quoted_PCR( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                           Pcr_Set(~pcr_set)
+  ),
+  Host_Sends_Quote( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                    <Pcr_Set(~pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+                     multp(sl, C), multp(sl, D), 
+                     PointG1(H_p(F1(BSN(basename))), F2(BSN(basename))), 
+                     multp(f, PointG1(H_p(F1(BSN(basename))), F2(BSN(basename)))), 
+                     quotePCR(Pcr_Set(~pcr_set), pcrset_values), 
+                     H_n_2(Nonce(rnd_n_Q),
+                           H_k_2(small_c, H_6(quotePCR(Pcr_Set(~pcr_set), pcrset_values)))), 
+                     plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 'pcr_data'>
+  ),
+  Host_Sends_Quote_With_BSN( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)),
+                             BSN(basename),
+                             <Pcr_Set(~pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+                              multp(sl, C), multp(sl, D), 
+                              PointG1(H_p(F1(BSN(basename))), F2(BSN(basename))), 
+                              multp(f, PointG1(H_p(F1(BSN(basename))), F2(BSN(basename)))), 
+                              quotePCR(Pcr_Set(~pcr_set), pcrset_values), 
+                              H_n_2(Nonce(rnd_n_Q),
+                                    H_k_2(small_c, H_6(quotePCR(Pcr_Set(~pcr_set), pcrset_values)))), 
+                              plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 'pcr_data'>
+  ),
+  Host_Sends_Quote_cred( $PS, $AS, pk(KDF_EK(~TPM_EK_Seed)), BSN(basename),
+                         multp(sl, A), multp(sl, B), multp(sl, C), multp(sl, D),
+                         <Pcr_Set(~pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+                          multp(sl, C), multp(sl, D), 
+                          PointG1(H_p(F1(BSN(basename))), F2(BSN(basename))), 
+                          multp(f, PointG1(H_p(F1(BSN(basename))), F2(BSN(basename)))), 
+                          quotePCR(Pcr_Set(~pcr_set), pcrset_values), 
+                          H_n_2(Nonce(rnd_n_Q),
+                                H_k_2(small_c, H_6(quotePCR(Pcr_Set(~pcr_set), pcrset_values)))), 
+                          plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 'pcr_data'>
+  ),
+  Honest( $PS ), Honest( $AS ), Honest( pk(KDF_EK(~TPM_EK_Seed)) ),
+  QuotePCROnlyOnce( 'Host_Receive_Quoted_PCR' )
+  ]->
+   [
+   Out( <Pcr_Set(~pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+         multp(sl, C), multp(sl, D), 
+         PointG1(H_p(F1(BSN(basename))), F2(BSN(basename))), 
+         multp(f, PointG1(H_p(F1(BSN(basename))), F2(BSN(basename)))), 
+         quotePCR(Pcr_Set(~pcr_set), pcrset_values), 
+         H_n_2(Nonce(rnd_n_Q),
+               H_k_2(small_c, H_6(quotePCR(Pcr_Set(~pcr_set), pcrset_values)))), 
+         plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 'pcr_data'>
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Verifier_Check_TPM_PCR_Quote:
+   [
+   In( <Pcr_Set(pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+        multp(sl, C), multp(sl, D), PointG1(H_p(s_2_bar), y_2), 
+        multp(f, PointG1(H_p(s_2_bar), y_2)), quotePCR(pcrset, pcrset_values), 
+        H_n_2(Nonce(rnd_n_Q), h1), plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 
+        'pcr_data'>
+   ),
+   !Pk( 'Issuer', pkX, pkY )
+   ]
+  --[
+  Eq( Pcr_Set(pcr_set), pcrset ),
+  Eq( PointG1(H_p(F1(BSN(basename))), F2(BSN(basename))),
+      PointG1(H_p(s_2_bar), y_2)
+  ),
+  Eq( verifyCre3(multp(sl, A), pkY, multp(sl, B), 'P2'), accept ),
+  Eq( verifyCre4(multp(sl, A), multp(sl, D), pkX, multp(sl, C), 'P2'),
+      accept
+  ),
+  Eq( H_n_2(Nonce(rnd_n_Q),
+            H_k_2(H_k_9('pcr_data', multp(sl, A), multp(sl, B), multp(sl, C),
+                        multp(sl, D), PointG1(H_p(F1(BSN(basename))), F2(BSN(basename))),
+                        multp(f, PointG1(H_p(s_2_bar), y_2)),
+                        calcL_J_quot(plus(r_cv1, multp(h2, f)), PointG1(H_p(s_2_bar), y_2),
+                                     H_n_2(Nonce(rnd_n_Q), h1), multp(f, PointG1(H_p(s_2_bar), y_2))),
+                        calcE_S_quot(plus(r_cv1, multp(h2, f)), multp(sl, B),
+                                     H_n_2(Nonce(rnd_n_Q), h1), multp(sl, D))),
+                  H_6(quotePCR(pcrset, pcrset_values)))),
+      H_n_2(Nonce(rnd_n_Q), h1)
+  ),
+  VerifiedQuotedPCR( $V,
+                     <Pcr_Set(pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+                      multp(sl, C), multp(sl, D), PointG1(H_p(s_2_bar), y_2), 
+                      multp(f, PointG1(H_p(s_2_bar), y_2)), quotePCR(pcrset, pcrset_values), 
+                      H_n_2(Nonce(rnd_n_Q), h1), plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 
+                      'pcr_data'>
+  ),
+  VerifiedQuotedPCRDeAnonymised( BSN(basename),
+                                 <Pcr_Set(pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+                                  multp(sl, C), multp(sl, D), PointG1(H_p(s_2_bar), y_2), 
+                                  multp(f, PointG1(H_p(s_2_bar), y_2)), quotePCR(pcrset, pcrset_values), 
+                                  H_n_2(Nonce(rnd_n_Q), h1), plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 
+                                  'pcr_data'>,
+                                 f
+  ),
+  QuotePCROnlyOnce( 'Verifier_Check_TPM_PCR_Quote' )
+  ]->
+   [
+   !SignatureVerified( $V,
+                       <Pcr_Set(pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+                        multp(sl, C), multp(sl, D), PointG1(H_p(s_2_bar), y_2), 
+                        multp(f, PointG1(H_p(s_2_bar), y_2)), quotePCR(pcrset, pcrset_values), 
+                        H_n_2(Nonce(rnd_n_Q), h1), plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 
+                        'pcr_data'>
+   )
+   ]
+
+  /*
+  rule (modulo AC) Verifier_Check_TPM_PCR_Quote:
+     [
+     In( <Pcr_Set(pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+          multp(sl, C), multp(sl, D), PointG1(H_p(s_2_bar), y_2), 
+          multp(f, PointG1(H_p(s_2_bar), y_2)), quotePCR(pcrset, pcrset_values), 
+          H_n_2(Nonce(rnd_n_Q), h1), plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 
+          'pcr_data'>
+     ),
+     !Pk( 'Issuer', pkX, pkY )
+     ]
+    --[
+    Eq( Pcr_Set(pcr_set), pcrset ),
+    Eq( PointG1(H_p(F1(BSN(basename))), F2(BSN(basename))),
+        PointG1(H_p(s_2_bar), y_2)
+    ),
+    Eq( z, accept ), Eq( z.1, accept ),
+    Eq( H_n_2(Nonce(rnd_n_Q),
+              H_k_2(H_k_9('pcr_data', multp(sl, A), multp(sl, B), multp(sl, C),
+                          multp(sl, D), PointG1(H_p(F1(BSN(basename))), F2(BSN(basename))),
+                          multp(f, PointG1(H_p(s_2_bar), y_2)), z.2, z.3),
+                    H_6(quotePCR(pcrset, pcrset_values)))),
+        H_n_2(Nonce(rnd_n_Q), h1)
+    ),
+    VerifiedQuotedPCR( $V,
+                       <Pcr_Set(pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+                        multp(sl, C), multp(sl, D), PointG1(H_p(s_2_bar), y_2), 
+                        multp(f, PointG1(H_p(s_2_bar), y_2)), quotePCR(pcrset, pcrset_values), 
+                        H_n_2(Nonce(rnd_n_Q), h1), plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 
+                        'pcr_data'>
+    ),
+    VerifiedQuotedPCRDeAnonymised( BSN(basename),
+                                   <Pcr_Set(pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+                                    multp(sl, C), multp(sl, D), PointG1(H_p(s_2_bar), y_2), 
+                                    multp(f, PointG1(H_p(s_2_bar), y_2)), quotePCR(pcrset, pcrset_values), 
+                                    H_n_2(Nonce(rnd_n_Q), h1), plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 
+                                    'pcr_data'>,
+                                   f
+    ),
+    QuotePCROnlyOnce( 'Verifier_Check_TPM_PCR_Quote' )
+    ]->
+     [
+     !SignatureVerified( $V,
+                         <Pcr_Set(pcr_set), BSN(basename), multp(sl, A), multp(sl, B), 
+                          multp(sl, C), multp(sl, D), PointG1(H_p(s_2_bar), y_2), 
+                          multp(f, PointG1(H_p(s_2_bar), y_2)), quotePCR(pcrset, pcrset_values), 
+                          H_n_2(Nonce(rnd_n_Q), h1), plus(r_cv1, multp(h2, f)), Nonce(rnd_n_Q), 
+                          'pcr_data'>
+     )
+     ]
+    variants (modulo AC)
+     1. A     = A.44
+        B     = B.45
+        C     = C.46
+        D     = D.47
+        f     = f.49
+        h1    = h1.50
+        h2    = h2.51
+        pkX   = pkX.55
+        pkY   = pkY.56
+        r_cv1 = r_cv1.57
+        rnd_n_Q
+              = rnd_n_Q.58
+        s_2_bar
+              = s_2_bar.59
+        sl    = sl.60
+        y_2   = y_2.61
+        z     = verifyCre3(multp(sl.60, A.44), pkY.56, multp(sl.60, B.45), 'P2')
+        z.1   = verifyCre4(multp(sl.60, A.44), multp(sl.60, D.47), pkX.55,
+                           multp(sl.60, C.46), 'P2')
+        z.2   = calcL_J_quot(plus(r_cv1.57, multp(h2.51, f.49)),
+                             PointG1(H_p(s_2_bar.59), y_2.61), H_n_2(Nonce(rnd_n_Q.58), h1.50),
+                             multp(f.49, PointG1(H_p(s_2_bar.59), y_2.61)))
+        z.3   = calcE_S_quot(plus(r_cv1.57, multp(h2.51, f.49)),
+                             multp(sl.60, B.45), H_n_2(Nonce(rnd_n_Q.58), h1.50), multp(sl.60, D.47))
+    
+     2. A     = A.93
+        B     = multp(x.167, multp(x.168, x.169))
+        C     = C.95
+        D     = multp(multp(x.168, x.167), multp(f.98, x.169))
+        f     = f.98
+        h1    = H_k_2(H_k_9(x.173, x.174, x.175, x.176, x.177, x.178, x.179,
+                            x.180, x.181),
+                      H_6(quotePCR(x.182, x.183)))
+        h2    = H_n_2(Nonce(rnd_n_Q.107),
+                      H_k_2(H_k_9(x.173, x.174, x.175, x.176, x.177, x.178, x.179, x.180,
+                                  x.181),
+                            H_6(quotePCR(x.182, x.183))))
+        pkX   = pkX.104
+        pkY   = pkY.105
+        r_cv1 = r_cv1.106
+        rnd_n_Q
+              = rnd_n_Q.107
+        s_2_bar
+              = s_2_bar.108
+        sl    = sl.109
+        y_2   = y_2.110
+        z     = verifyCre3(multp(sl.109, A.93), pkY.105,
+                           multp(sl.109, multp(x.167, multp(x.168, x.169))), 'P2')
+        z.1   = verifyCre4(multp(sl.109, A.93),
+                           multp(sl.109, multp(multp(x.168, x.167), multp(f.98, x.169))), pkX.104,
+                           multp(sl.109, C.95), 'P2')
+        z.2   = calcL_J_quot(plus(r_cv1.106,
+                                  multp(H_n_2(Nonce(rnd_n_Q.107),
+                                              H_k_2(H_k_9(x.173, x.174, x.175, x.176, x.177, x.178, x.179,
+                                                          x.180, x.181),
+                                                    H_6(quotePCR(x.182, x.183)))),
+                                        f.98)),
+                             PointG1(H_p(s_2_bar.108), y_2.110),
+                             H_n_2(Nonce(rnd_n_Q.107),
+                                   H_k_2(H_k_9(x.173, x.174, x.175, x.176, x.177, x.178, x.179, x.180,
+                                               x.181),
+                                         H_6(quotePCR(x.182, x.183)))),
+                             multp(f.98, PointG1(H_p(s_2_bar.108), y_2.110)))
+        z.3   = E_S(r_cv1.106, multp(sl.109, multp(x.167, multp(x.168, x.169))))
+    
+     3. A     = A.95
+        B     = B.96
+        C     = C.97
+        D     = D.98
+        f     = f.100
+        h1    = H_k_2(H_k_9(x.169, x.170, x.171, x.172, x.173, x.174, x.175,
+                            x.176, x.177),
+                      H_6(quotePCR(x.178, x.179)))
+        h2    = H_n_2(Nonce(rnd_n_Q.109),
+                      H_k_2(H_k_9(x.169, x.170, x.171, x.172, x.173, x.174, x.175, x.176,
+                                  x.177),
+                            H_6(quotePCR(x.178, x.179))))
+        pkX   = pkX.106
+        pkY   = pkY.107
+        r_cv1 = r_cv1.108
+        rnd_n_Q
+              = rnd_n_Q.109
+        s_2_bar
+              = F1(x.187)
+        sl    = sl.111
+        y_2   = F2(x.187)
+        z     = verifyCre3(multp(sl.111, A.95), pkY.107, multp(sl.111, B.96),
+                           'P2')
+        z.1   = verifyCre4(multp(sl.111, A.95), multp(sl.111, D.98), pkX.106,
+                           multp(sl.111, C.97), 'P2')
+        z.2   = L_J(r_cv1.108, PointG1(H_p(F1(x.187)), F2(x.187)))
+        z.3   = calcE_S_quot(plus(r_cv1.108,
+                                  multp(H_n_2(Nonce(rnd_n_Q.109),
+                                              H_k_2(H_k_9(x.169, x.170, x.171, x.172, x.173, x.174, x.175,
+                                                          x.176, x.177),
+                                                    H_6(quotePCR(x.178, x.179)))),
+                                        f.100)),
+                             multp(sl.111, B.96),
+                             H_n_2(Nonce(rnd_n_Q.109),
+                                   H_k_2(H_k_9(x.169, x.170, x.171, x.172, x.173, x.174, x.175, x.176,
+                                               x.177),
+                                         H_6(quotePCR(x.178, x.179)))),
+                             multp(sl.111, D.98))
+    
+     4. A     = A.101
+        B     = multp(x.175, multp(x.176, x.177))
+        C     = C.103
+        D     = multp(multp(x.176, x.175), multp(f.106, x.177))
+        f     = f.106
+        h1    = H_k_2(H_k_9(x.181, x.182, x.183, x.184, x.185, x.186, x.187,
+                            x.188, x.189),
+                      H_6(quotePCR(x.190, x.191)))
+        h2    = H_n_2(Nonce(rnd_n_Q.115),
+                      H_k_2(H_k_9(x.181, x.182, x.183, x.184, x.185, x.186, x.187, x.188,
+                                  x.189),
+                            H_6(quotePCR(x.190, x.191))))
+        pkX   = pkX.112
+        pkY   = pkY.113
+        r_cv1 = r_cv1.114
+        rnd_n_Q
+              = rnd_n_Q.115
+        s_2_bar
+              = F1(x.199)
+        sl    = sl.117
+        y_2   = F2(x.199)
+        z     = verifyCre3(multp(sl.117, A.101), pkY.113,
+                           multp(sl.117, multp(x.175, multp(x.176, x.177))), 'P2')
+        z.1   = verifyCre4(multp(sl.117, A.101),
+                           multp(sl.117, multp(multp(x.176, x.175), multp(f.106, x.177))), pkX.112,
+                           multp(sl.117, C.103), 'P2')
+        z.2   = L_J(r_cv1.114, PointG1(H_p(F1(x.199)), F2(x.199)))
+        z.3   = E_S(r_cv1.114, multp(sl.117, multp(x.175, multp(x.176, x.177))))
+    
+     5. A     = multp(x.131, x.132)
+        B     = multp(x.133, multp(x.131, x.132))
+        C     = plus(multp(x.134, multp(x.131, x.132)),
+                     multp(multp(multp(x.131, x.134), x.135), multp(x.136, x.132)))
+        D     = multp(multp(x.131, x.135), multp(x.136, x.132))
+        f     = f.72
+        h1    = h1.73
+        h2    = h2.74
+        pkX   = PkX(x.134, 'P2')
+        pkY   = PkY(x.133, 'P2')
+        r_cv1 = r_cv1.80
+        rnd_n_Q
+              = rnd_n_Q.81
+        s_2_bar
+              = s_2_bar.82
+        sl    = sl.83
+        y_2   = y_2.84
+        z     = accept
+        z.1   = accept
+        z.2   = calcL_J_quot(plus(r_cv1.80, multp(h2.74, f.72)),
+                             PointG1(H_p(s_2_bar.82), y_2.84), H_n_2(Nonce(rnd_n_Q.81), h1.73),
+                             multp(f.72, PointG1(H_p(s_2_bar.82), y_2.84)))
+        z.3   = calcE_S_quot(plus(r_cv1.80, multp(h2.74, f.72)),
+                             multp(sl.83, multp(x.133, multp(x.131, x.132))),
+                             H_n_2(Nonce(rnd_n_Q.81), h1.73),
+                             multp(sl.83, multp(multp(x.131, x.135), multp(x.136, x.132))))
+    
+     6. A     = multp(x.142, x.143)
+        B     = multp(x.144, multp(x.142, x.143))
+        C     = plus(multp(x.145, multp(x.142, x.143)),
+                     multp(multp(multp(x.142, x.145), x.144), multp(f.83, x.143)))
+        D     = multp(multp(x.142, x.144), multp(f.83, x.143))
+        f     = f.83
+        h1    = H_k_2(H_k_9(x.148, x.149, x.150, x.151, x.152, x.153, x.154,
+                            x.155, x.156),
+                      H_6(quotePCR(x.157, x.158)))
+        h2    = H_n_2(Nonce(rnd_n_Q.92),
+                      H_k_2(H_k_9(x.148, x.149, x.150, x.151, x.152, x.153, x.154, x.155,
+                                  x.156),
+                            H_6(quotePCR(x.157, x.158))))
+        pkX   = PkX(x.145, 'P2')
+        pkY   = pkY.90
+        r_cv1 = r_cv1.91
+        rnd_n_Q
+              = rnd_n_Q.92
+        s_2_bar
+              = s_2_bar.93
+        sl    = sl.94
+        y_2   = y_2.95
+        z     = verifyCre3(multp(sl.94, multp(x.142, x.143)), pkY.90,
+                           multp(sl.94, multp(x.144, multp(x.142, x.143))), 'P2')
+        z.1   = accept
+        z.2   = calcL_J_quot(plus(r_cv1.91,
+                                  multp(H_n_2(Nonce(rnd_n_Q.92),
+                                              H_k_2(H_k_9(x.148, x.149, x.150, x.151, x.152, x.153, x.154,
+                                                          x.155, x.156),
+                                                    H_6(quotePCR(x.157, x.158)))),
+                                        f.83)),
+                             PointG1(H_p(s_2_bar.93), y_2.95),
+                             H_n_2(Nonce(rnd_n_Q.92),
+                                   H_k_2(H_k_9(x.148, x.149, x.150, x.151, x.152, x.153, x.154, x.155,
+                                               x.156),
+                                         H_6(quotePCR(x.157, x.158)))),
+                             multp(f.83, PointG1(H_p(s_2_bar.93), y_2.95)))
+        z.3   = E_S(r_cv1.91, multp(sl.94, multp(x.144, multp(x.142, x.143))))
+    
+     7. A     = multp(x.142, x.143)
+        B     = multp(x.144, multp(x.142, x.143))
+        C     = plus(multp(x.145, multp(x.142, x.143)),
+                     multp(multp(multp(x.142, x.145), x.144), multp(f.83, x.143)))
+        D     = multp(multp(x.142, x.144), multp(f.83, x.143))
+        f     = f.83
+        h1    = H_k_2(H_k_9(x.148, x.149, x.150, x.151, x.152, x.153, x.154,
+                            x.155, x.156),
+                      H_6(quotePCR(x.157, x.158)))
+        h2    = H_n_2(Nonce(rnd_n_Q.92),
+                      H_k_2(H_k_9(x.148, x.149, x.150, x.151, x.152, x.153, x.154, x.155,
+                                  x.156),
+                            H_6(quotePCR(x.157, x.158))))
+        pkX   = PkX(x.145, 'P2')
+        pkY   = PkY(x.144, 'P2')
+        r_cv1 = r_cv1.91
+        rnd_n_Q
+              = rnd_n_Q.92
+        s_2_bar
+              = s_2_bar.93
+        sl    = sl.94
+        y_2   = y_2.95
+        z     = accept
+        z.1   = accept
+        z.2   = calcL_J_quot(plus(r_cv1.91,
+                                  multp(H_n_2(Nonce(rnd_n_Q.92),
+                                              H_k_2(H_k_9(x.148, x.149, x.150, x.151, x.152, x.153, x.154,
+                                                          x.155, x.156),
+                                                    H_6(quotePCR(x.157, x.158)))),
+                                        f.83)),
+                             PointG1(H_p(s_2_bar.93), y_2.95),
+                             H_n_2(Nonce(rnd_n_Q.92),
+                                   H_k_2(H_k_9(x.148, x.149, x.150, x.151, x.152, x.153, x.154, x.155,
+                                               x.156),
+                                         H_6(quotePCR(x.157, x.158)))),
+                             multp(f.83, PointG1(H_p(s_2_bar.93), y_2.95)))
+        z.3   = E_S(r_cv1.91, multp(sl.94, multp(x.144, multp(x.142, x.143))))
+    
+     8. A     = multp(x.143, x.144)
+        B     = multp(x.145, multp(x.143, x.144))
+        C     = C.75
+        D     = D.76
+        f     = f.78
+        h1    = h1.79
+        h2    = h2.80
+        pkX   = pkX.84
+        pkY   = PkY(x.145, 'P2')
+        r_cv1 = r_cv1.86
+        rnd_n_Q
+              = rnd_n_Q.87
+        s_2_bar
+              = s_2_bar.88
+        sl    = sl.89
+        y_2   = y_2.90
+        z     = accept
+        z.1   = verifyCre4(multp(sl.89, multp(x.143, x.144)), multp(sl.89, D.76),
+                           pkX.84, multp(sl.89, C.75), 'P2')
+        z.2   = calcL_J_quot(plus(r_cv1.86, multp(h2.80, f.78)),
+                             PointG1(H_p(s_2_bar.88), y_2.90), H_n_2(Nonce(rnd_n_Q.87), h1.79),
+                             multp(f.78, PointG1(H_p(s_2_bar.88), y_2.90)))
+        z.3   = calcE_S_quot(plus(r_cv1.86, multp(h2.80, f.78)),
+                             multp(sl.89, multp(x.145, multp(x.143, x.144))),
+                             H_n_2(Nonce(rnd_n_Q.87), h1.79), multp(sl.89, D.76))
+    
+     9. A     = multp(x.148, x.149)
+        B     = multp(x.150, multp(x.148, x.149))
+        C     = plus(multp(x.151, multp(x.148, x.149)),
+                     multp(multp(multp(x.148, x.151), x.150), multp(f.89, x.149)))
+        D     = multp(multp(x.148, x.150), multp(f.89, x.149))
+        f     = f.89
+        h1    = H_k_2(H_k_9(x.154, x.155, x.156, x.157, x.158, x.159, x.160,
+                            x.161, x.162),
+                      H_6(quotePCR(x.163, x.164)))
+        h2    = H_n_2(Nonce(rnd_n_Q.98),
+                      H_k_2(H_k_9(x.154, x.155, x.156, x.157, x.158, x.159, x.160, x.161,
+                                  x.162),
+                            H_6(quotePCR(x.163, x.164))))
+        pkX   = PkX(x.151, 'P2')
+        pkY   = PkY(x.150, 'P2')
+        r_cv1 = r_cv1.97
+        rnd_n_Q
+              = rnd_n_Q.98
+        s_2_bar
+              = F1(x.170)
+        sl    = sl.100
+        y_2   = F2(x.170)
+        z     = accept
+        z.1   = accept
+        z.2   = L_J(r_cv1.97, PointG1(H_p(F1(x.170)), F2(x.170)))
+        z.3   = E_S(r_cv1.97, multp(sl.100, multp(x.150, multp(x.148, x.149))))
+    
+    10. A     = multp(x.149, x.150)
+        B     = multp(x.151, multp(x.149, x.150))
+        C     = plus(multp(x.152, multp(x.149, x.150)),
+                     multp(multp(multp(x.149, x.152), x.151), multp(f.90, x.150)))
+        D     = multp(multp(x.149, x.151), multp(f.90, x.150))
+        f     = f.90
+        h1    = H_k_2(H_k_9(x.155, x.156, x.157, x.158, x.159, x.160, x.161,
+                            x.162, x.163),
+                      H_6(quotePCR(x.164, x.165)))
+        h2    = H_n_2(Nonce(rnd_n_Q.99),
+                      H_k_2(H_k_9(x.155, x.156, x.157, x.158, x.159, x.160, x.161, x.162,
+                                  x.163),
+                            H_6(quotePCR(x.164, x.165))))
+        pkX   = PkX(x.152, 'P2')
+        pkY   = pkY.97
+        r_cv1 = r_cv1.98
+        rnd_n_Q
+              = rnd_n_Q.99
+        s_2_bar
+              = F1(x.172)
+        sl    = sl.101
+        y_2   = F2(x.172)
+        z     = verifyCre3(multp(sl.101, multp(x.149, x.150)), pkY.97,
+                           multp(sl.101, multp(x.151, multp(x.149, x.150))), 'P2')
+        z.1   = accept
+        z.2   = L_J(r_cv1.98, PointG1(H_p(F1(x.172)), F2(x.172)))
+        z.3   = E_S(r_cv1.98, multp(sl.101, multp(x.151, multp(x.149, x.150))))
+    
+    11. A     = multp(x.150, x.151)
+        B     = multp(x.152, multp(x.150, x.151))
+        C     = plus(multp(x.153, multp(x.150, x.151)),
+                     multp(multp(multp(x.150, x.153), x.154), multp(x.155, x.151)))
+        D     = multp(multp(x.150, x.154), multp(x.155, x.151))
+        f     = f.91
+        h1    = H_k_2(H_k_9(x.158, x.159, x.160, x.161, x.162, x.163, x.164,
+                            x.165, x.166),
+                      H_6(quotePCR(x.167, x.168)))
+        h2    = H_n_2(Nonce(rnd_n_Q.100),
+                      H_k_2(H_k_9(x.158, x.159, x.160, x.161, x.162, x.163, x.164, x.165,
+                                  x.166),
+                            H_6(quotePCR(x.167, x.168))))
+        pkX   = PkX(x.153, 'P2')
+        pkY   = PkY(x.152, 'P2')
+        r_cv1 = r_cv1.99
+        rnd_n_Q
+              = rnd_n_Q.100
+        s_2_bar
+              = F1(x.174)
+        sl    = sl.102
+        y_2   = F2(x.174)
+        z     = accept
+        z.1   = accept
+        z.2   = L_J(r_cv1.99, PointG1(H_p(F1(x.174)), F2(x.174)))
+        z.3   = calcE_S_quot(plus(r_cv1.99,
+                                  multp(H_n_2(Nonce(rnd_n_Q.100),
+                                              H_k_2(H_k_9(x.158, x.159, x.160, x.161, x.162, x.163, x.164,
+                                                          x.165, x.166),
+                                                    H_6(quotePCR(x.167, x.168)))),
+                                        f.91)),
+                             multp(sl.102, multp(x.152, multp(x.150, x.151))),
+                             H_n_2(Nonce(rnd_n_Q.100),
+                                   H_k_2(H_k_9(x.158, x.159, x.160, x.161, x.162, x.163, x.164, x.165,
+                                               x.166),
+                                         H_6(quotePCR(x.167, x.168)))),
+                             multp(sl.102, multp(multp(x.150, x.154), multp(x.155, x.151))))
+    
+    12. A     = multp(x.151, x.152)
+        B     = B.80
+        C     = plus(multp(x.154, multp(x.151, x.152)),
+                     multp(multp(multp(x.151, x.154), x.155), multp(x.156, x.152)))
+        D     = multp(multp(x.151, x.155), multp(x.156, x.152))
+        f     = f.84
+        h1    = h1.85
+        h2    = h2.86
+        pkX   = PkX(x.154, 'P2')
+        pkY   = pkY.91
+        r_cv1 = r_cv1.92
+        rnd_n_Q
+              = rnd_n_Q.93
+        s_2_bar
+              = s_2_bar.94
+        sl    = sl.95
+        y_2   = y_2.96
+        z     = verifyCre3(multp(sl.95, multp(x.151, x.152)), pkY.91,
+                           multp(sl.95, B.80), 'P2')
+        z.1   = accept
+        z.2   = calcL_J_quot(plus(r_cv1.92, multp(h2.86, f.84)),
+                             PointG1(H_p(s_2_bar.94), y_2.96), H_n_2(Nonce(rnd_n_Q.93), h1.85),
+                             multp(f.84, PointG1(H_p(s_2_bar.94), y_2.96)))
+        z.3   = calcE_S_quot(plus(r_cv1.92, multp(h2.86, f.84)),
+                             multp(sl.95, B.80), H_n_2(Nonce(rnd_n_Q.93), h1.85),
+                             multp(sl.95, multp(multp(x.151, x.155), multp(x.156, x.152))))
+    
+    13. A     = multp(x.157, x.158)
+        B     = multp(x.159, multp(x.157, x.158))
+        C     = C.89
+        D     = multp(multp(x.157, x.159), multp(f.92, x.158))
+        f     = f.92
+        h1    = H_k_2(H_k_9(x.163, x.164, x.165, x.166, x.167, x.168, x.169,
+                            x.170, x.171),
+                      H_6(quotePCR(x.172, x.173)))
+        h2    = H_n_2(Nonce(rnd_n_Q.101),
+                      H_k_2(H_k_9(x.163, x.164, x.165, x.166, x.167, x.168, x.169, x.170,
+                                  x.171),
+                            H_6(quotePCR(x.172, x.173))))
+        pkX   = pkX.98
+        pkY   = PkY(x.159, 'P2')
+        r_cv1 = r_cv1.100
+        rnd_n_Q
+              = rnd_n_Q.101
+        s_2_bar
+              = s_2_bar.102
+        sl    = sl.103
+        y_2   = y_2.104
+        z     = accept
+        z.1   = verifyCre4(multp(sl.103, multp(x.157, x.158)),
+                           multp(sl.103, multp(multp(x.157, x.159), multp(f.92, x.158))), pkX.98,
+                           multp(sl.103, C.89), 'P2')
+        z.2   = calcL_J_quot(plus(r_cv1.100,
+                                  multp(H_n_2(Nonce(rnd_n_Q.101),
+                                              H_k_2(H_k_9(x.163, x.164, x.165, x.166, x.167, x.168, x.169,
+                                                          x.170, x.171),
+                                                    H_6(quotePCR(x.172, x.173)))),
+                                        f.92)),
+                             PointG1(H_p(s_2_bar.102), y_2.104),
+                             H_n_2(Nonce(rnd_n_Q.101),
+                                   H_k_2(H_k_9(x.163, x.164, x.165, x.166, x.167, x.168, x.169, x.170,
+                                               x.171),
+                                         H_6(quotePCR(x.172, x.173)))),
+                             multp(f.92, PointG1(H_p(s_2_bar.102), y_2.104)))
+        z.3   = E_S(r_cv1.100, multp(sl.103, multp(x.159, multp(x.157, x.158))))
+    
+    14. A     = multp(x.164, x.165)
+        B     = multp(x.166, multp(x.164, x.165))
+        C     = C.96
+        D     = multp(multp(x.164, x.166), multp(f.99, x.165))
+        f     = f.99
+        h1    = H_k_2(H_k_9(x.170, x.171, x.172, x.173, x.174, x.175, x.176,
+                            x.177, x.178),
+                      H_6(quotePCR(x.179, x.180)))
+        h2    = H_n_2(Nonce(rnd_n_Q.108),
+                      H_k_2(H_k_9(x.170, x.171, x.172, x.173, x.174, x.175, x.176, x.177,
+                                  x.178),
+                            H_6(quotePCR(x.179, x.180))))
+        pkX   = pkX.105
+        pkY   = PkY(x.166, 'P2')
+        r_cv1 = r_cv1.107
+        rnd_n_Q
+              = rnd_n_Q.108
+        s_2_bar
+              = F1(x.187)
+        sl    = sl.110
+        y_2   = F2(x.187)
+        z     = accept
+        z.1   = verifyCre4(multp(sl.110, multp(x.164, x.165)),
+                           multp(sl.110, multp(multp(x.164, x.166), multp(f.99, x.165))), pkX.105,
+                           multp(sl.110, C.96), 'P2')
+        z.2   = L_J(r_cv1.107, PointG1(H_p(F1(x.187)), F2(x.187)))
+        z.3   = E_S(r_cv1.107, multp(sl.110, multp(x.166, multp(x.164, x.165))))
+    
+    15. A     = multp(x.165, x.166)
+        B     = multp(x.167, multp(x.165, x.166))
+        C     = C.97
+        D     = D.98
+        f     = f.100
+        h1    = H_k_2(H_k_9(x.172, x.173, x.174, x.175, x.176, x.177, x.178,
+                            x.179, x.180),
+                      H_6(quotePCR(x.181, x.182)))
+        h2    = H_n_2(Nonce(rnd_n_Q.109),
+                      H_k_2(H_k_9(x.172, x.173, x.174, x.175, x.176, x.177, x.178, x.179,
+                                  x.180),
+                            H_6(quotePCR(x.181, x.182))))
+        pkX   = pkX.106
+        pkY   = PkY(x.167, 'P2')
+        r_cv1 = r_cv1.108
+        rnd_n_Q
+              = rnd_n_Q.109
+        s_2_bar
+              = F1(x.189)
+        sl    = sl.111
+        y_2   = F2(x.189)
+        z     = accept
+        z.1   = verifyCre4(multp(sl.111, multp(x.165, x.166)),
+                           multp(sl.111, D.98), pkX.106, multp(sl.111, C.97), 'P2')
+        z.2   = L_J(r_cv1.108, PointG1(H_p(F1(x.189)), F2(x.189)))
+        z.3   = calcE_S_quot(plus(r_cv1.108,
+                                  multp(H_n_2(Nonce(rnd_n_Q.109),
+                                              H_k_2(H_k_9(x.172, x.173, x.174, x.175, x.176, x.177, x.178,
+                                                          x.179, x.180),
+                                                    H_6(quotePCR(x.181, x.182)))),
+                                        f.100)),
+                             multp(sl.111, multp(x.167, multp(x.165, x.166))),
+                             H_n_2(Nonce(rnd_n_Q.109),
+                                   H_k_2(H_k_9(x.172, x.173, x.174, x.175, x.176, x.177, x.178, x.179,
+                                               x.180),
+                                         H_6(quotePCR(x.181, x.182)))),
+                             multp(sl.111, D.98))
+    
+    16. A     = multp(x.171, x.172)
+        B     = B.100
+        C     = plus(multp(x.174, multp(x.171, x.172)),
+                     multp(multp(multp(x.171, x.174), x.175), multp(x.176, x.172)))
+        D     = multp(multp(x.171, x.175), multp(x.176, x.172))
+        f     = f.104
+        h1    = H_k_2(H_k_9(x.179, x.180, x.181, x.182, x.183, x.184, x.185,
+                            x.186, x.187),
+                      H_6(quotePCR(x.188, x.189)))
+        h2    = H_n_2(Nonce(rnd_n_Q.113),
+                      H_k_2(H_k_9(x.179, x.180, x.181, x.182, x.183, x.184, x.185, x.186,
+                                  x.187),
+                            H_6(quotePCR(x.188, x.189))))
+        pkX   = PkX(x.174, 'P2')
+        pkY   = pkY.111
+        r_cv1 = r_cv1.112
+        rnd_n_Q
+              = rnd_n_Q.113
+        s_2_bar
+              = F1(x.196)
+        sl    = sl.115
+        y_2   = F2(x.196)
+        z     = verifyCre3(multp(sl.115, multp(x.171, x.172)), pkY.111,
+                           multp(sl.115, B.100), 'P2')
+        z.1   = accept
+        z.2   = L_J(r_cv1.112, PointG1(H_p(F1(x.196)), F2(x.196)))
+        z.3   = calcE_S_quot(plus(r_cv1.112,
+                                  multp(H_n_2(Nonce(rnd_n_Q.113),
+                                              H_k_2(H_k_9(x.179, x.180, x.181, x.182, x.183, x.184, x.185,
+                                                          x.186, x.187),
+                                                    H_6(quotePCR(x.188, x.189)))),
+                                        f.104)),
+                             multp(sl.115, B.100),
+                             H_n_2(Nonce(rnd_n_Q.113),
+                                   H_k_2(H_k_9(x.179, x.180, x.181, x.182, x.183, x.184, x.185, x.186,
+                                               x.187),
+                                         H_6(quotePCR(x.188, x.189)))),
+                             multp(sl.115, multp(multp(x.171, x.175), multp(x.176, x.172))))
+  */
+
+rule (modulo E) Signatures_Linked:
+   [
+   !SignatureVerified( $V,
+                       <pcrset1, bsn_in1, R1, S1, T1, W1, J1, K1, curlyP1, h2_host1, small_s1, 
+                        n_Q1, pcrData1>
+   ),
+   !SignatureVerified( $V,
+                       <pcrset2, bsn_in2, R2, S2, T2, W2, J2, K2, curlyP2, h2_host2, small_s2, 
+                        n_Q2, pcrData2>
+   )
+   ]
+  --[
+  Eq( bsn_in1, bsn_in2 ), Eq( J1, J2 ), Eq( K1, K2 ),
+  LinkedSignatures( bsn_in1,
+                    <pcrset1, bsn_in1, R1, S1, T1, W1, J1, K1, curlyP1, h2_host1, small_s1, 
+                     n_Q1, pcrData1>,
+                    <pcrset2, bsn_in2, R2, S2, T2, W2, J2, K2, curlyP2, h2_host2, small_s2, 
+                     n_Q2, pcrData2>
+  )
+  ]->
+   [ ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Signatures_NotLinked:
+   [
+   !SignatureVerified( $V,
+                       <pcrset1, bsn_in1, R1, S1, T1, W1, J1, K1, curlyP1, h2_host1, small_s1, 
+                        n_Q1, pcrData1>
+   ),
+   !SignatureVerified( $V,
+                       <pcrset2, bsn_in2, R2, S2, T2, W2, J2, K2, curlyP2, h2_host2, small_s2, 
+                        n_Q2, pcrData2>
+   )
+   ]
+  --[
+  NotLinked( J1, J2, K1, K2 ),
+  UnlinkedSignatures( <pcrset1, bsn_in1, R1, S1, T1, W1, J1, K1, curlyP1, 
+                       h2_host1, small_s1, n_Q1, pcrData1>,
+                      <pcrset2, bsn_in2, R2, S2, T2, W2, J2, K2, curlyP2, h2_host2, small_s2, 
+                       n_Q2, pcrData2>
+  )
+  ]->
+   [ ]
+
+  /* has exactly the trivial AC variant */
+
+lemma auto_bind_restriction:
+  all-traces
+  "∀ Ent1 Ent2 Ent3 #i.
+    (Bind( Ent1, Ent2, Ent3 ) @ #i) ⇒
+    (((¬(Ent1 = Ent2)) ∧ (¬(Ent1 = Ent3))) ∧ (¬(Ent2 = Ent3)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ Ent1 Ent2 Ent3 #i.
+  (Bind( Ent1, Ent2, Ent3 ) @ #i)
+ ∧
+  ((Ent1 = Ent2) ∨ (Ent1 = Ent3) ∨ (Ent2 = Ent3))"
+*/
+by sorry
+
+lemma auto_restriction_one_host_per_tpm:
+  all-traces
+  "∀ TPM Host1 Host2 #i #j.
+    ((Bind( Host1, TPM, 'Issuer' ) @ #i) ∧
+     (Bind( Host2, TPM, 'Issuer' ) @ #j)) ⇒
+    (#i = #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ TPM Host1 Host2 #i #j.
+  (Bind( Host1, TPM, 'Issuer' ) @ #i) ∧ (Bind( Host2, TPM, 'Issuer' ) @ #j)
+ ∧
+  ¬(#i = #j)"
+*/
+by sorry
+
+lemma auto_restriction_one_tpm_per_host:
+  all-traces
+  "∀ TPM1 TPM2 Host #i #j.
+    ((Bind( Host, TPM1, 'Issuer' ) @ #i) ∧
+     (Bind( Host, TPM2, 'Issuer' ) @ #j)) ⇒
+    (#i = #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ TPM1 TPM2 Host #i #j.
+  (Bind( Host, TPM1, 'Issuer' ) @ #i) ∧ (Bind( Host, TPM2, 'Issuer' ) @ #j)
+ ∧
+  ¬(#i = #j)"
+*/
+by sorry
+
+lemma auto_restricition_pke_comes_from_tpm:
+  all-traces
+  "∀ pke #i.
+    (Check_Ek( pke ) @ #i) ⇒
+    (∃ TPM Host #j. TPM2_EK_Created( TPM, Host, pke ) @ #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ pke #i.
+  (Check_Ek( pke ) @ #i)
+ ∧
+  ∀ TPM Host #j. (TPM2_EK_Created( TPM, Host, pke ) @ #j) ⇒ ⊥"
+*/
+simplify
+solve( !EK_FOR_ISSUER( pk(KDF_EK(TPM_EK_Seed)) ) ▶₃ #i )
+  case Host_Store_DAA_Key
+  solve( In_S( $PS, $AS,
+               <senc(~f.1, KDF_AES(~TPM_AES_Seed)), 
+                <'DAA_public_data', multp(~f.1, 'P1')>, 'returnDAAKey'>
+         ) ▶₀ #vr )
+    case ChanIn_S
+    solve( In_S( $PS, $AS,
+                 <<'EK_public_data', pk(KDF_EK(~TPM_EK_Seed))>, 'returnEK'>
+           ) ▶₀ #vr.1 )
+      case ChanIn_S
+      by contradiction /* from formulas */
+    qed
+  qed
+qed
+
+lemma auto_restriction_single_issuer:
+  all-traces
+  "∀ I1 I2 #i #j.
+    ((Issuer_Init( I1 ) @ #i) ∧ (Issuer_Init( I2 ) @ #j)) ⇒ (I1 = I2)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ I1 I2 #i #j.
+  (Issuer_Init( I1 ) @ #i) ∧ (Issuer_Init( I2 ) @ #j) ∧ ¬(I1 = I2)"
+*/
+by sorry
+
+lemma auto_verify_multiple_pkes:
+  exists-trace
+  "∃ TPM1 TPM2 Host1 Host2 pke1 qpd1 pke2 qpd2 #t1 #t2 #t3 #t4.
+    ((((((((PlatformSendKeys( TPM1, Host1, pke1, qpd1, 'Issuer' ) @ #t1) ∧
+           (PlatformSendKeys( TPM2, Host2, pke2, qpd2, 'Issuer' ) @ #t2)) ∧
+          (IssuerReceivedKeys( 'Issuer', pke1, qpd1 ) @ #t3)) ∧
+         (IssuerReceivedKeys( 'Issuer', pke2, qpd2 ) @ #t4)) ∧
+        (¬(pke1 = pke2))) ∧
+       (¬(qpd1 = qpd2))) ∧
+      (¬(Host1 = Host2))) ∧
+     (¬(TPM1 = TPM2))) ∧
+    (¬(∃ RevealEvent ENTITY #k1. KeyReveal( RevealEvent, ENTITY ) @ #k1))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM1 TPM2 Host1 Host2 pke1 qpd1 pke2 qpd2 #t1 #t2 #t3 #t4.
+  (PlatformSendKeys( TPM1, Host1, pke1, qpd1, 'Issuer' ) @ #t1) ∧
+  (PlatformSendKeys( TPM2, Host2, pke2, qpd2, 'Issuer' ) @ #t2) ∧
+  (IssuerReceivedKeys( 'Issuer', pke1, qpd1 ) @ #t3) ∧
+  (IssuerReceivedKeys( 'Issuer', pke2, qpd2 ) @ #t4)
+ ∧
+  (¬(pke1 = pke2)) ∧
+  (¬(qpd1 = qpd2)) ∧
+  (¬(Host1 = Host2)) ∧
+  (¬(TPM1 = TPM2)) ∧
+  (∀ RevealEvent ENTITY #k1. (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥)"
+*/
+by sorry
+
+lemma oracle_correctness_two_quotes_same_credentials_same_bsn:
+  exists-trace
+  "∃ TPM Host pke bsn R S T W sigma1 sigma2 #t01 #t02.
+    (((((Host_Sends_Quote_cred( TPM, Host, pke, bsn, R, S, T, W, sigma1
+         ) @ #t01) ∧
+        (Host_Sends_Quote_cred( TPM, Host, pke, bsn, R, S, T, W, sigma2
+         ) @ #t02)) ∧
+       (#t01 < #t02)) ∧
+      (¬(sigma1 = sigma2))) ∧
+     (¬(∃ RevealEvent ENTITY #k1. KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+    (∀ event #i #j.
+      ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM Host pke bsn R S T W sigma1 sigma2 #t01 #t02.
+  (Host_Sends_Quote_cred( TPM, Host, pke, bsn, R, S, T, W, sigma1
+   ) @ #t01) ∧
+  (Host_Sends_Quote_cred( TPM, Host, pke, bsn, R, S, T, W, sigma2 ) @ #t02)
+ ∧
+  (#t01 < #t02) ∧
+  (¬(sigma1 = sigma2)) ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j)"
+*/
+by sorry
+
+lemma oracle_correctness_two_quotes_same_credentials_different_bsn:
+  exists-trace
+  "∃ TPM Host pke bsn1 bsn2 R S T W sigma1 sigma2 #t01 #t02.
+    ((((((Host_Sends_Quote_cred( TPM, Host, pke, bsn1, R, S, T, W, sigma1
+          ) @ #t01) ∧
+         (Host_Sends_Quote_cred( TPM, Host, pke, bsn2, R, S, T, W, sigma2
+          ) @ #t02)) ∧
+        (#t01 < #t02)) ∧
+       (¬(sigma1 = sigma2))) ∧
+      (¬(bsn1 = bsn2))) ∧
+     (¬(∃ RevealEvent ENTITY #k1. KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+    (∀ event #i #j.
+      ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM Host pke bsn1 bsn2 R S T W sigma1 sigma2 #t01 #t02.
+  (Host_Sends_Quote_cred( TPM, Host, pke, bsn1, R, S, T, W, sigma1
+   ) @ #t01) ∧
+  (Host_Sends_Quote_cred( TPM, Host, pke, bsn2, R, S, T, W, sigma2
+   ) @ #t02)
+ ∧
+  (#t01 < #t02) ∧
+  (¬(sigma1 = sigma2)) ∧
+  (¬(bsn1 = bsn2)) ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j)"
+*/
+by sorry
+
+lemma oracle_correctness_two_quotes_different_credentials_same_bsn:
+  exists-trace
+  "∃ TPM Host pke bsn R1 S1 T1 W1 sigma1 R2 S2 T2 W2 sigma2 #t01 #t02.
+    (((((((((Host_Sends_Quote_cred( TPM, Host, pke, bsn, R1, S1, T1, W1,
+                                    sigma1
+             ) @ #t01) ∧
+            (Host_Sends_Quote_cred( TPM, Host, pke, bsn, R2, S2, T2, W2, sigma2
+             ) @ #t02)) ∧
+           (¬(#t01 = #t02))) ∧
+          (¬(R1 = R2))) ∧
+         (¬(S1 = S2))) ∧
+        (¬(T1 = T2))) ∧
+       (¬(W1 = W2))) ∧
+      (¬(sigma1 = sigma2))) ∧
+     (¬(∃ RevealEvent ENTITY #k1. KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+    (∀ event #i #j.
+      ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM Host pke bsn R1 S1 T1 W1 sigma1 R2 S2 T2 W2 sigma2 #t01 #t02.
+  (Host_Sends_Quote_cred( TPM, Host, pke, bsn, R1, S1, T1, W1, sigma1
+   ) @ #t01) ∧
+  (Host_Sends_Quote_cred( TPM, Host, pke, bsn, R2, S2, T2, W2, sigma2
+   ) @ #t02)
+ ∧
+  (¬(#t01 = #t02)) ∧
+  (¬(R1 = R2)) ∧
+  (¬(S1 = S2)) ∧
+  (¬(T1 = T2)) ∧
+  (¬(W1 = W2)) ∧
+  (¬(sigma1 = sigma2)) ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j)"
+*/
+by sorry
+
+lemma oracle_correctness_two_quotes_different_credentials_different_bsn:
+  exists-trace
+  "∃ TPM Host pke bsn1 R1 S1 T1 W1 sigma1 bsn2 R2 S2 T2 W2 sigma2 #t01
+     #t02.
+    ((((((((((Host_Sends_Quote_cred( TPM, Host, pke, bsn1, R1, S1, T1, W1,
+                                     sigma1
+              ) @ #t01) ∧
+             (Host_Sends_Quote_cred( TPM, Host, pke, bsn2, R2, S2, T2, W2, sigma2
+              ) @ #t02)) ∧
+            (¬(#t01 = #t02))) ∧
+           (¬(R1 = R2))) ∧
+          (¬(S1 = S2))) ∧
+         (¬(T1 = T2))) ∧
+        (¬(W1 = W2))) ∧
+       (¬(sigma1 = sigma2))) ∧
+      (¬(bsn1 = bsn2))) ∧
+     (¬(∃ RevealEvent ENTITY #k1. KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+    (∀ event #i #j.
+      ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM Host pke bsn1 R1 S1 T1 W1 sigma1 bsn2 R2 S2 T2 W2 sigma2 #t01
+   #t02.
+  (Host_Sends_Quote_cred( TPM, Host, pke, bsn1, R1, S1, T1, W1, sigma1
+   ) @ #t01) ∧
+  (Host_Sends_Quote_cred( TPM, Host, pke, bsn2, R2, S2, T2, W2, sigma2
+   ) @ #t02)
+ ∧
+  (¬(#t01 = #t02)) ∧
+  (¬(R1 = R2)) ∧
+  (¬(S1 = S2)) ∧
+  (¬(T1 = T2)) ∧
+  (¬(W1 = W2)) ∧
+  (¬(sigma1 = sigma2)) ∧
+  (¬(bsn1 = bsn2)) ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j)"
+*/
+by sorry
+
+lemma oracle_correctness_two_valid_linked_quotes:
+  exists-trace
+  "∃ TPM Host pke bsn sigma1 sigma2 #t01 #t02 #t03.
+    (((((((Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn, sigma1 ) @ #t01) ∧
+          (Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn, sigma2 ) @ #t02)) ∧
+         (¬(sigma1 = sigma2))) ∧
+        (¬(∃ RevealEvent ENTITY #k1. KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+       (LinkedSignatures( bsn, sigma1, sigma2 ) @ #t03)) ∧
+      (#t01 < #t02)) ∧
+     (#t02 < #t03)) ∧
+    (∀ event #i #j.
+      ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM Host pke bsn sigma1 sigma2 #t01 #t02 #t03.
+  (Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn, sigma1 ) @ #t01) ∧
+  (Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn, sigma2 ) @ #t02) ∧
+  (LinkedSignatures( bsn, sigma1, sigma2 ) @ #t03)
+ ∧
+  (¬(sigma1 = sigma2)) ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (#t01 < #t02) ∧
+  (#t02 < #t03) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j)"
+*/
+by sorry
+
+lemma oracle_correctness_two_valid_unlinked_quotes:
+  exists-trace
+  "∃ TPM Host pke bsn1 bsn2 sigma1 sigma2 #t01 #t02 #t03.
+    (((((Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn1, sigma1 ) @ #t01) ∧
+        (Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn2, sigma2 ) @ #t02)) ∧
+       (¬(bsn1 = bsn2))) ∧
+      (¬(∃ RevealEvent ENTITY #k1. KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+     (UnlinkedSignatures( sigma1, sigma2 ) @ #t03)) ∧
+    (∀ event #i #j.
+      ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM Host pke bsn1 bsn2 sigma1 sigma2 #t01 #t02 #t03.
+  (Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn1, sigma1 ) @ #t01) ∧
+  (Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn2, sigma2 ) @ #t02) ∧
+  (UnlinkedSignatures( sigma1, sigma2 ) @ #t03)
+ ∧
+  (¬(bsn1 = bsn2)) ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j)"
+*/
+by sorry
+
+lemma oracle_correctness_join_only:
+  exists-trace
+  "∃ TPM Host pke qpd #t01 #t02 #t03 #t04 #t05 #t06 #t07 #t08 #t09 #t10
+     #t11 #t12 #t13 #t14 #t15 #t16 #t17 #t18 #t19 #t20 #t21 #t22.
+    ((((((((((((((((((((((((((((((((((((((((((((Issuer_Init( 'Issuer'
+                                                ) @ #t01) ∧
+                                               (Host_Init( Host ) @ #t02)) ∧
+                                              (TPM_Init( TPM ) @ #t03)) ∧
+                                             (¬(∃ RevealEvent ENTITY #k1.
+                                                 KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+                                            (Bind( TPM, Host, 'Issuer' ) @ #t04)) ∧
+                                           (TPM2_EK_Created( TPM, Host, pke ) @ #t05)) ∧
+                                          (Store_EK( TPM, Host ) @ #t06)) ∧
+                                         (TPM2_DAA_Created( TPM, Host ) @ #t07)) ∧
+                                        (Store_DAA( TPM, Host ) @ #t08)) ∧
+                                       (IssuerReceivedKeys( 'Issuer', pke, qpd ) @ #t09)) ∧
+                                      (Passthrough_ActivateCred( TPM, Host ) @ #t10)) ∧
+                                     (CurlyK_recomputed( TPM, Host ) @ #t11)) ∧
+                                    (Received_CurlyK( TPM, Host ) @ #t12)) ∧
+                                   (TPM2_Commited( TPM, Host ) @ #t13)) ∧
+                                  (Host_Created_p( TPM, Host ) @ #t14)) ∧
+                                 (TPM2_Created_P_TPM( TPM, Host ) @ #t15)) ∧
+                                (Host_Received_P_TPM( TPM, Host ) @ #t16)) ∧
+                               (TPM2_Signed_P_TPM( TPM, Host ) @ #t17)) ∧
+                              (Host_Received_Signed_P_TPM( TPM, Host ) @ #t18)) ∧
+                             (Issuer_VerifyChallengeIssueCredentials( 'Issuer', pke ) @ #t19)) ∧
+                            (Passthrough_ActivateCred2( TPM, Host ) @ #t20)) ∧
+                           (CurlyK2_recomputed( TPM, Host ) @ #t21)) ∧
+                          (JoinCompleted( TPM, Host, pke ) @ #t22)) ∧
+                         (#t01 < #t02)) ∧
+                        (#t02 < #t04)) ∧
+                       (#t03 < #t04)) ∧
+                      (#t04 < #t05)) ∧
+                     (#t05 < #t06)) ∧
+                    (#t06 < #t07)) ∧
+                   (#t07 < #t08)) ∧
+                  (#t08 < #t09)) ∧
+                 (#t09 < #t10)) ∧
+                (#t10 < #t11)) ∧
+               (#t11 < #t12)) ∧
+              (#t12 < #t13)) ∧
+             (#t13 < #t14)) ∧
+            (#t14 < #t15)) ∧
+           (#t15 < #t16)) ∧
+          (#t16 < #t17)) ∧
+         (#t17 < #t18)) ∧
+        (#t18 < #t19)) ∧
+       (#t19 < #t20)) ∧
+      (#t20 < #t21)) ∧
+     (#t21 < #t22)) ∧
+    (∀ event #i #j.
+      ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM Host pke qpd #t01 #t02 #t03 #t04 #t05 #t06 #t07 #t08 #t09 #t10
+   #t11 #t12 #t13 #t14 #t15 #t16 #t17 #t18 #t19 #t20 #t21 #t22.
+  (Issuer_Init( 'Issuer' ) @ #t01) ∧
+  (Host_Init( Host ) @ #t02) ∧
+  (TPM_Init( TPM ) @ #t03) ∧
+  (Bind( TPM, Host, 'Issuer' ) @ #t04) ∧
+  (TPM2_EK_Created( TPM, Host, pke ) @ #t05) ∧
+  (Store_EK( TPM, Host ) @ #t06) ∧
+  (TPM2_DAA_Created( TPM, Host ) @ #t07) ∧
+  (Store_DAA( TPM, Host ) @ #t08) ∧
+  (IssuerReceivedKeys( 'Issuer', pke, qpd ) @ #t09) ∧
+  (Passthrough_ActivateCred( TPM, Host ) @ #t10) ∧
+  (CurlyK_recomputed( TPM, Host ) @ #t11) ∧
+  (Received_CurlyK( TPM, Host ) @ #t12) ∧
+  (TPM2_Commited( TPM, Host ) @ #t13) ∧
+  (Host_Created_p( TPM, Host ) @ #t14) ∧
+  (TPM2_Created_P_TPM( TPM, Host ) @ #t15) ∧
+  (Host_Received_P_TPM( TPM, Host ) @ #t16) ∧
+  (TPM2_Signed_P_TPM( TPM, Host ) @ #t17) ∧
+  (Host_Received_Signed_P_TPM( TPM, Host ) @ #t18) ∧
+  (Issuer_VerifyChallengeIssueCredentials( 'Issuer', pke ) @ #t19) ∧
+  (Passthrough_ActivateCred2( TPM, Host ) @ #t20) ∧
+  (CurlyK2_recomputed( TPM, Host ) @ #t21) ∧
+  (JoinCompleted( TPM, Host, pke ) @ #t22)
+ ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (#t01 < #t02) ∧
+  (#t02 < #t04) ∧
+  (#t03 < #t04) ∧
+  (#t04 < #t05) ∧
+  (#t05 < #t06) ∧
+  (#t06 < #t07) ∧
+  (#t07 < #t08) ∧
+  (#t08 < #t09) ∧
+  (#t09 < #t10) ∧
+  (#t10 < #t11) ∧
+  (#t11 < #t12) ∧
+  (#t12 < #t13) ∧
+  (#t13 < #t14) ∧
+  (#t14 < #t15) ∧
+  (#t15 < #t16) ∧
+  (#t16 < #t17) ∧
+  (#t17 < #t18) ∧
+  (#t18 < #t19) ∧
+  (#t19 < #t20) ∧
+  (#t20 < #t21) ∧
+  (#t21 < #t22) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j)"
+*/
+by sorry
+
+lemma oracle_correctness_no_verify:
+  exists-trace
+  "∃ TPM Host pke qpd #t01 #t02 #t03 #t04 #t05 #t06 #t07 #t08 #t09 #t10
+     #t11 #t12 #t13 #t14 #t15 #t16 #t17 #t18 #t19 #t20 #t21 #t22 #t23 bsn #t24
+     #t25 #t26 #t27 sigma #t28 #t29.
+    (((((((((((((((((((((((((((((((((((((((((((((((((((((((((((Issuer_Init( 'Issuer'
+                                                               ) @ #t01) ∧
+                                                              (Host_Init( Host ) @ #t02)) ∧
+                                                             (TPM_Init( TPM ) @ #t03)) ∧
+                                                            (¬(∃ RevealEvent ENTITY #k1.
+                                                                KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+                                                           (Bind( TPM, Host, 'Issuer' ) @ #t04)) ∧
+                                                          (TPM2_EK_Created( TPM, Host, pke ) @ #t05)) ∧
+                                                         (Store_EK( TPM, Host ) @ #t06)) ∧
+                                                        (TPM2_DAA_Created( TPM, Host ) @ #t07)) ∧
+                                                       (Store_DAA( TPM, Host ) @ #t08)) ∧
+                                                      (IssuerReceivedKeys( 'Issuer', pke, qpd ) @ #t09)) ∧
+                                                     (Passthrough_ActivateCred( TPM, Host ) @ #t10)) ∧
+                                                    (CurlyK_recomputed( TPM, Host ) @ #t11)) ∧
+                                                   (Received_CurlyK( TPM, Host ) @ #t12)) ∧
+                                                  (TPM2_Commited( TPM, Host ) @ #t13)) ∧
+                                                 (Host_Created_p( TPM, Host ) @ #t14)) ∧
+                                                (TPM2_Created_P_TPM( TPM, Host ) @ #t15)) ∧
+                                               (Host_Received_P_TPM( TPM, Host ) @ #t16)) ∧
+                                              (TPM2_Signed_P_TPM( TPM, Host ) @ #t17)) ∧
+                                             (Host_Received_Signed_P_TPM( TPM, Host ) @ #t18)) ∧
+                                            (Issuer_VerifyChallengeIssueCredentials( 'Issuer', pke
+                                             ) @ #t19)) ∧
+                                           (Passthrough_ActivateCred2( TPM, Host ) @ #t20)) ∧
+                                          (CurlyK2_recomputed( TPM, Host ) @ #t21)) ∧
+                                         (JoinCompleted( TPM, Host, pke ) @ #t22)) ∧
+                                        (RandomisedCredentials( TPM, Host, pke ) @ #t23)) ∧
+                                       (SetBasename( TPM, Host, pke, bsn ) @ #t24)) ∧
+                                      (ProcessRandomisedCredentials( TPM, Host, pke, bsn ) @ #t25)) ∧
+                                     (TPMCommitRandomised( TPM, Host, pke ) @ #t26)) ∧
+                                    (RequestPCRQuote( TPM, Host, pke ) @ #t27)) ∧
+                                   (TPM2_Created_PCRQuote_TPM( TPM, Host, pke ) @ #t28)) ∧
+                                  (Host_Sends_Quote( TPM, Host, pke, sigma ) @ #t29)) ∧
+                                 (#t01 < #t02)) ∧
+                                (#t02 < #t04)) ∧
+                               (#t03 < #t04)) ∧
+                              (#t04 < #t05)) ∧
+                             (#t05 < #t06)) ∧
+                            (#t06 < #t07)) ∧
+                           (#t07 < #t08)) ∧
+                          (#t08 < #t09)) ∧
+                         (#t09 < #t10)) ∧
+                        (#t10 < #t11)) ∧
+                       (#t11 < #t12)) ∧
+                      (#t12 < #t13)) ∧
+                     (#t13 < #t14)) ∧
+                    (#t14 < #t15)) ∧
+                   (#t15 < #t16)) ∧
+                  (#t16 < #t17)) ∧
+                 (#t17 < #t18)) ∧
+                (#t18 < #t19)) ∧
+               (#t19 < #t20)) ∧
+              (#t20 < #t21)) ∧
+             (#t21 < #t22)) ∧
+            (#t22 < #t23)) ∧
+           (#t23 < #t24)) ∧
+          (#t24 < #t25)) ∧
+         (#t25 < #t26)) ∧
+        (#t26 < #t27)) ∧
+       (#t27 < #t28)) ∧
+      (#t28 < #t29)) ∧
+     (∀ event #i #j.
+       ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))) ∧
+    (∀ event #i #j.
+      ((QuotePCROnlyOnce( event ) @ #i) ∧ (QuotePCROnlyOnce( event ) @ #j)) ⇒
+      (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM Host pke qpd #t01 #t02 #t03 #t04 #t05 #t06 #t07 #t08 #t09 #t10
+   #t11 #t12 #t13 #t14 #t15 #t16 #t17 #t18 #t19 #t20 #t21 #t22 #t23 bsn #t24
+   #t25 #t26 #t27 sigma #t28 #t29.
+  (Issuer_Init( 'Issuer' ) @ #t01) ∧
+  (Host_Init( Host ) @ #t02) ∧
+  (TPM_Init( TPM ) @ #t03) ∧
+  (Bind( TPM, Host, 'Issuer' ) @ #t04) ∧
+  (TPM2_EK_Created( TPM, Host, pke ) @ #t05) ∧
+  (Store_EK( TPM, Host ) @ #t06) ∧
+  (TPM2_DAA_Created( TPM, Host ) @ #t07) ∧
+  (Store_DAA( TPM, Host ) @ #t08) ∧
+  (IssuerReceivedKeys( 'Issuer', pke, qpd ) @ #t09) ∧
+  (Passthrough_ActivateCred( TPM, Host ) @ #t10) ∧
+  (CurlyK_recomputed( TPM, Host ) @ #t11) ∧
+  (Received_CurlyK( TPM, Host ) @ #t12) ∧
+  (TPM2_Commited( TPM, Host ) @ #t13) ∧
+  (Host_Created_p( TPM, Host ) @ #t14) ∧
+  (TPM2_Created_P_TPM( TPM, Host ) @ #t15) ∧
+  (Host_Received_P_TPM( TPM, Host ) @ #t16) ∧
+  (TPM2_Signed_P_TPM( TPM, Host ) @ #t17) ∧
+  (Host_Received_Signed_P_TPM( TPM, Host ) @ #t18) ∧
+  (Issuer_VerifyChallengeIssueCredentials( 'Issuer', pke ) @ #t19) ∧
+  (Passthrough_ActivateCred2( TPM, Host ) @ #t20) ∧
+  (CurlyK2_recomputed( TPM, Host ) @ #t21) ∧
+  (JoinCompleted( TPM, Host, pke ) @ #t22) ∧
+  (RandomisedCredentials( TPM, Host, pke ) @ #t23) ∧
+  (SetBasename( TPM, Host, pke, bsn ) @ #t24) ∧
+  (ProcessRandomisedCredentials( TPM, Host, pke, bsn ) @ #t25) ∧
+  (TPMCommitRandomised( TPM, Host, pke ) @ #t26) ∧
+  (RequestPCRQuote( TPM, Host, pke ) @ #t27) ∧
+  (TPM2_Created_PCRQuote_TPM( TPM, Host, pke ) @ #t28) ∧
+  (Host_Sends_Quote( TPM, Host, pke, sigma ) @ #t29)
+ ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (#t01 < #t02) ∧
+  (#t02 < #t04) ∧
+  (#t03 < #t04) ∧
+  (#t04 < #t05) ∧
+  (#t05 < #t06) ∧
+  (#t06 < #t07) ∧
+  (#t07 < #t08) ∧
+  (#t08 < #t09) ∧
+  (#t09 < #t10) ∧
+  (#t10 < #t11) ∧
+  (#t11 < #t12) ∧
+  (#t12 < #t13) ∧
+  (#t13 < #t14) ∧
+  (#t14 < #t15) ∧
+  (#t15 < #t16) ∧
+  (#t16 < #t17) ∧
+  (#t17 < #t18) ∧
+  (#t18 < #t19) ∧
+  (#t19 < #t20) ∧
+  (#t20 < #t21) ∧
+  (#t21 < #t22) ∧
+  (#t22 < #t23) ∧
+  (#t23 < #t24) ∧
+  (#t24 < #t25) ∧
+  (#t25 < #t26) ∧
+  (#t26 < #t27) ∧
+  (#t27 < #t28) ∧
+  (#t28 < #t29) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j) ∧
+  (∀ event #i #j.
+    (QuotePCROnlyOnce( event ) @ #i) ∧ (QuotePCROnlyOnce( event ) @ #j)
+   ⇒
+    #i = #j)"
+*/
+by sorry
+
+lemma oracle_correctness_with_verify:
+  exists-trace
+  "∃ TPM Host pke qpd #t01 #t02 #t03 #t04 #t05 #t06 #t07 #t08 #t09 #t10
+     #t11 #t12 #t13 #t14 #t15 #t16 #t17 #t18 #t19 #t20 #t21 #t22 #t23 bsn
+     sigma #t24 #t25 #t26 #t27 #t28 #t29 #t30 Verifier.
+    (((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((Issuer_Init( 'Issuer'
+                                                                 ) @ #t01) ∧
+                                                                (Host_Init( Host ) @ #t02)) ∧
+                                                               (TPM_Init( TPM ) @ #t03)) ∧
+                                                              (¬(∃ RevealEvent ENTITY #k1.
+                                                                  KeyReveal( RevealEvent, ENTITY ) @ #k1))) ∧
+                                                             (Bind( TPM, Host, 'Issuer' ) @ #t04)) ∧
+                                                            (TPM2_EK_Created( TPM, Host, pke ) @ #t05)) ∧
+                                                           (Store_EK( TPM, Host ) @ #t06)) ∧
+                                                          (TPM2_DAA_Created( TPM, Host ) @ #t07)) ∧
+                                                         (Store_DAA( TPM, Host ) @ #t08)) ∧
+                                                        (IssuerReceivedKeys( 'Issuer', pke, qpd ) @ #t09)) ∧
+                                                       (Passthrough_ActivateCred( TPM, Host ) @ #t10)) ∧
+                                                      (CurlyK_recomputed( TPM, Host ) @ #t11)) ∧
+                                                     (Received_CurlyK( TPM, Host ) @ #t12)) ∧
+                                                    (TPM2_Commited( TPM, Host ) @ #t13)) ∧
+                                                   (Host_Created_p( TPM, Host ) @ #t14)) ∧
+                                                  (TPM2_Created_P_TPM( TPM, Host ) @ #t15)) ∧
+                                                 (Host_Received_P_TPM( TPM, Host ) @ #t16)) ∧
+                                                (TPM2_Signed_P_TPM( TPM, Host ) @ #t17)) ∧
+                                               (Host_Received_Signed_P_TPM( TPM, Host ) @ #t18)) ∧
+                                              (Issuer_VerifyChallengeIssueCredentials( 'Issuer', pke
+                                               ) @ #t19)) ∧
+                                             (Passthrough_ActivateCred2( TPM, Host ) @ #t20)) ∧
+                                            (CurlyK2_recomputed( TPM, Host ) @ #t21)) ∧
+                                           (JoinCompleted( TPM, Host, pke ) @ #t22)) ∧
+                                          (RandomisedCredentials( TPM, Host, pke ) @ #t23)) ∧
+                                         (SetBasename( TPM, Host, pke, bsn ) @ #t24)) ∧
+                                        (ProcessRandomisedCredentials( TPM, Host, pke, bsn ) @ #t25)) ∧
+                                       (TPMCommitRandomised( TPM, Host, pke ) @ #t26)) ∧
+                                      (RequestPCRQuote( TPM, Host, pke ) @ #t27)) ∧
+                                     (TPM2_Created_PCRQuote_TPM( TPM, Host, pke ) @ #t28)) ∧
+                                    (Host_Sends_Quote( TPM, Host, pke, sigma ) @ #t29)) ∧
+                                   (VerifiedQuotedPCR( Verifier, sigma ) @ #t30)) ∧
+                                  (#t01 < #t02)) ∧
+                                 (#t02 < #t04)) ∧
+                                (#t03 < #t04)) ∧
+                               (#t04 < #t05)) ∧
+                              (#t05 < #t06)) ∧
+                             (#t06 < #t07)) ∧
+                            (#t07 < #t08)) ∧
+                           (#t08 < #t09)) ∧
+                          (#t09 < #t10)) ∧
+                         (#t10 < #t11)) ∧
+                        (#t11 < #t12)) ∧
+                       (#t12 < #t13)) ∧
+                      (#t13 < #t14)) ∧
+                     (#t14 < #t15)) ∧
+                    (#t15 < #t16)) ∧
+                   (#t16 < #t17)) ∧
+                  (#t17 < #t18)) ∧
+                 (#t18 < #t19)) ∧
+                (#t19 < #t20)) ∧
+               (#t20 < #t21)) ∧
+              (#t21 < #t22)) ∧
+             (#t22 < #t23)) ∧
+            (#t23 < #t24)) ∧
+           (#t24 < #t25)) ∧
+          (#t25 < #t26)) ∧
+         (#t26 < #t27)) ∧
+        (#t27 < #t28)) ∧
+       (#t28 < #t29)) ∧
+      (#t29 < #t30)) ∧
+     (∀ event #i #j.
+       ((OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j)) ⇒ (#i = #j))) ∧
+    (∀ event #i #j.
+      ((QuotePCROnlyOnce( event ) @ #i) ∧ (QuotePCROnlyOnce( event ) @ #j)) ⇒
+      (#i = #j))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ TPM Host pke qpd #t01 #t02 #t03 #t04 #t05 #t06 #t07 #t08 #t09 #t10
+   #t11 #t12 #t13 #t14 #t15 #t16 #t17 #t18 #t19 #t20 #t21 #t22 #t23 bsn
+   sigma #t24 #t25 #t26 #t27 #t28 #t29 #t30 Verifier.
+  (Issuer_Init( 'Issuer' ) @ #t01) ∧
+  (Host_Init( Host ) @ #t02) ∧
+  (TPM_Init( TPM ) @ #t03) ∧
+  (Bind( TPM, Host, 'Issuer' ) @ #t04) ∧
+  (TPM2_EK_Created( TPM, Host, pke ) @ #t05) ∧
+  (Store_EK( TPM, Host ) @ #t06) ∧
+  (TPM2_DAA_Created( TPM, Host ) @ #t07) ∧
+  (Store_DAA( TPM, Host ) @ #t08) ∧
+  (IssuerReceivedKeys( 'Issuer', pke, qpd ) @ #t09) ∧
+  (Passthrough_ActivateCred( TPM, Host ) @ #t10) ∧
+  (CurlyK_recomputed( TPM, Host ) @ #t11) ∧
+  (Received_CurlyK( TPM, Host ) @ #t12) ∧
+  (TPM2_Commited( TPM, Host ) @ #t13) ∧
+  (Host_Created_p( TPM, Host ) @ #t14) ∧
+  (TPM2_Created_P_TPM( TPM, Host ) @ #t15) ∧
+  (Host_Received_P_TPM( TPM, Host ) @ #t16) ∧
+  (TPM2_Signed_P_TPM( TPM, Host ) @ #t17) ∧
+  (Host_Received_Signed_P_TPM( TPM, Host ) @ #t18) ∧
+  (Issuer_VerifyChallengeIssueCredentials( 'Issuer', pke ) @ #t19) ∧
+  (Passthrough_ActivateCred2( TPM, Host ) @ #t20) ∧
+  (CurlyK2_recomputed( TPM, Host ) @ #t21) ∧
+  (JoinCompleted( TPM, Host, pke ) @ #t22) ∧
+  (RandomisedCredentials( TPM, Host, pke ) @ #t23) ∧
+  (SetBasename( TPM, Host, pke, bsn ) @ #t24) ∧
+  (ProcessRandomisedCredentials( TPM, Host, pke, bsn ) @ #t25) ∧
+  (TPMCommitRandomised( TPM, Host, pke ) @ #t26) ∧
+  (RequestPCRQuote( TPM, Host, pke ) @ #t27) ∧
+  (TPM2_Created_PCRQuote_TPM( TPM, Host, pke ) @ #t28) ∧
+  (Host_Sends_Quote( TPM, Host, pke, sigma ) @ #t29) ∧
+  (VerifiedQuotedPCR( Verifier, sigma ) @ #t30)
+ ∧
+  (∀ RevealEvent ENTITY #k1.
+    (KeyReveal( RevealEvent, ENTITY ) @ #k1) ⇒ ⊥) ∧
+  (#t01 < #t02) ∧
+  (#t02 < #t04) ∧
+  (#t03 < #t04) ∧
+  (#t04 < #t05) ∧
+  (#t05 < #t06) ∧
+  (#t06 < #t07) ∧
+  (#t07 < #t08) ∧
+  (#t08 < #t09) ∧
+  (#t09 < #t10) ∧
+  (#t10 < #t11) ∧
+  (#t11 < #t12) ∧
+  (#t12 < #t13) ∧
+  (#t13 < #t14) ∧
+  (#t14 < #t15) ∧
+  (#t15 < #t16) ∧
+  (#t16 < #t17) ∧
+  (#t17 < #t18) ∧
+  (#t18 < #t19) ∧
+  (#t19 < #t20) ∧
+  (#t20 < #t21) ∧
+  (#t21 < #t22) ∧
+  (#t22 < #t23) ∧
+  (#t23 < #t24) ∧
+  (#t24 < #t25) ∧
+  (#t25 < #t26) ∧
+  (#t26 < #t27) ∧
+  (#t27 < #t28) ∧
+  (#t28 < #t29) ∧
+  (#t29 < #t30) ∧
+  (∀ event #i #j.
+    (OnlyOnce( event ) @ #i) ∧ (OnlyOnce( event ) @ #j) ⇒ #i = #j) ∧
+  (∀ event #i #j.
+    (QuotePCROnlyOnce( event ) @ #i) ∧ (QuotePCROnlyOnce( event ) @ #j)
+   ⇒
+    #i = #j)"
+*/
+by sorry
+
+lemma oracle_auth_aliveness_host_very_weak:
+  all-traces
+  "∀ pke n #i.
+    (Commit( pke, 'Issuer', n ) @ #i) ⇒
+    ((∃ #j. Issuer_Init( 'Issuer' ) @ #j) ∨
+     (∃ RevealEvent Entity #kr.
+       (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ pke n #i.
+  (Commit( pke, 'Issuer', n ) @ #i)
+ ∧
+  (∀ #j. (Issuer_Init( 'Issuer' ) @ #j) ⇒ ⊥) ∧
+  (∀ RevealEvent Entity #kr.
+    (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma oracle_auth_aliveness_host:
+  all-traces
+  "∀ pke n1 #i.
+    (Commit( pke, 'Issuer', n1 ) @ #i) ⇒
+    ((∃ #k. Alive( 'Issuer' ) @ #k) ∨
+     (∃ RevealEvent Entity #kr.
+       (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ pke n1 #i.
+  (Commit( pke, 'Issuer', n1 ) @ #i)
+ ∧
+  (∀ #k. (Alive( 'Issuer' ) @ #k) ⇒ ⊥) ∧
+  (∀ RevealEvent Entity #kr.
+    (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma oracle_auth_aliveness_issuer:
+  all-traces
+  "∀ pke curlyK1 #i.
+    (Commit( 'Issuer', pke, curlyK1 ) @ #i) ⇒
+    ((∃ Host2 #k. (Alive( Host2 ) @ #k) ∧ (Role( 'Platform' ) @ #k)) ∨
+     (∃ RevealEvent Entity #kr.
+       (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ pke curlyK1 #i.
+  (Commit( 'Issuer', pke, curlyK1 ) @ #i)
+ ∧
+  (∀ Host2 #k. (Alive( Host2 ) @ #k) ∧ (Role( 'Platform' ) @ #k) ⇒ ⊥) ∧
+  (∀ RevealEvent Entity #kr.
+    (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma oracle_auth_weak_agreement_host:
+  all-traces
+  "∀ TPM Host pke n1 #i.
+    ((Commit( pke, 'Issuer', n1 ) @ #i) ∧
+     (JoinCompleted( TPM, Host, pke ) @ #i)) ⇒
+    ((∃ n2 #j. Running( 'Issuer', pke, n2 ) @ #j) ∨
+     (∃ RevealEvent Entity #kr.
+       (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ TPM Host pke n1 #i.
+  (Commit( pke, 'Issuer', n1 ) @ #i) ∧
+  (JoinCompleted( TPM, Host, pke ) @ #i)
+ ∧
+  (∀ n2 #j. (Running( 'Issuer', pke, n2 ) @ #j) ⇒ ⊥) ∧
+  (∀ RevealEvent Entity #kr.
+    (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma oracle_auth_non_injective_agreement_host_issuer:
+  all-traces
+  "∀ pke n #i.
+    (Commit( pke, 'Issuer', n ) @ #i) ⇒
+    ((∃ #j. Running( 'Issuer', pke, n ) @ #j) ∨
+     (∃ RevealEvent Entity #kr.
+       (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ pke n #i.
+  (Commit( pke, 'Issuer', n ) @ #i)
+ ∧
+  (∀ #j. (Running( 'Issuer', pke, n ) @ #j) ⇒ ⊥) ∧
+  (∀ RevealEvent Entity #kr.
+    (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma oracle_auth_injective_agreement_host_issuer:
+  all-traces
+  "∀ pke n #i.
+    (Commit( pke, 'Issuer', n ) @ #i) ⇒
+    ((∃ #j.
+       ((Running( 'Issuer', pke, n ) @ #j) ∧ (#j < #i)) ∧
+       (¬(∃ pke2 #i2. (Commit( pke2, 'Issuer', n ) @ #i2) ∧ (¬(#i2 = #i))))) ∨
+     (∃ RevealEvent Entity #kr.
+       (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ pke n #i.
+  (Commit( pke, 'Issuer', n ) @ #i)
+ ∧
+  (∀ #j.
+    (Running( 'Issuer', pke, n ) @ #j)
+   ⇒
+    ((¬(#j < #i)) ∨
+     (∃ pke2 #i2. (Commit( pke2, 'Issuer', n ) @ #i2) ∧ ¬(#i2 = #i)))) ∧
+  (∀ RevealEvent Entity #kr.
+    (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma oracle_auth_secrecy_cre:
+  all-traces
+  "∀ pke cred #i.
+    (Secret( pke, 'Issuer', cred ) @ #i) ⇒
+    ((¬(∃ #k. K( cred ) @ #k)) ∨
+     (∃ RevealEvent Entity #kr.
+       (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ pke cred #i.
+  (Secret( pke, 'Issuer', cred ) @ #i)
+ ∧
+  (∃ #k. (K( cred ) @ #k)) ∧
+  (∀ RevealEvent Entity #kr.
+    (KeyReveal( RevealEvent, Entity ) @ #kr) ∧ (Honest( Entity ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma auto_SP2_UserControlledLinkability:
+  all-traces
+  "∀ bsn sigma1 sigma2 f1 f2 #t01 #t02 #t03.
+    ((((UnlinkedSignatures( sigma1, sigma2 ) @ #t01) ∧
+       (¬(sigma1 = sigma2))) ∧
+      (VerifiedQuotedPCRDeAnonymised( bsn, sigma1, f1 ) @ #t02)) ∧
+     (VerifiedQuotedPCRDeAnonymised( bsn, sigma2, f2 ) @ #t03)) ⇒
+    (¬(f1 = f2))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ bsn sigma1 sigma2 f1 f2 #t01 #t02 #t03.
+  (UnlinkedSignatures( sigma1, sigma2 ) @ #t01) ∧
+  (VerifiedQuotedPCRDeAnonymised( bsn, sigma1, f1 ) @ #t02) ∧
+  (VerifiedQuotedPCRDeAnonymised( bsn, sigma2, f2 ) @ #t03)
+ ∧
+  (¬(sigma1 = sigma2)) ∧ (f1 = f2)"
+*/
+by sorry
+
+lemma oracle_SP3_Unforgeability:
+  all-traces
+  "∀ TPM Host pke bsn f sigma #t01 #t02.
+    ((((((DeriveDAAKey( TPM, Host, pke, f ) @ #t01) ∧
+         (VerifiedQuotedPCRDeAnonymised( bsn, sigma, f ) @ #t02)) ∧
+        (¬(∃ Event #r1. KeyReveal( Event, TPM ) @ #r1))) ∧
+       (¬(∃ Event #r2. KeyReveal( Event, Host ) @ #r2))) ∧
+      (¬(∃ Event #r3. KeyReveal( Event, pke ) @ #r3))) ∧
+     (¬(∃ Event #ir. KeyReveal( Event, 'Issuer' ) @ #ir))) ⇒
+    (∃ #t03. Host_Sends_Quote( TPM, Host, pke, sigma ) @ #t03)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ TPM Host pke bsn f sigma #t01 #t02.
+  (DeriveDAAKey( TPM, Host, pke, f ) @ #t01) ∧
+  (VerifiedQuotedPCRDeAnonymised( bsn, sigma, f ) @ #t02)
+ ∧
+  (∀ Event #r1. (KeyReveal( Event, TPM ) @ #r1) ⇒ ⊥) ∧
+  (∀ Event #r2. (KeyReveal( Event, Host ) @ #r2) ⇒ ⊥) ∧
+  (∀ Event #r3. (KeyReveal( Event, pke ) @ #r3) ⇒ ⊥) ∧
+  (∀ Event #ir. (KeyReveal( Event, 'Issuer' ) @ #ir) ⇒ ⊥) ∧
+  (∀ #t03. (Host_Sends_Quote( TPM, Host, pke, sigma ) @ #t03) ⇒ ⊥)"
+*/
+by sorry
+
+lemma oracle_SP4_NonFrameability:
+  all-traces
+  "∀ bsn sigma1 sigma2 TPM Host pke #t01 #t02.
+    ((((((Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn, sigma1 ) @ #t01) ∧
+         (LinkedSignatures( bsn, sigma1, sigma2 ) @ #t02)) ∧
+        (¬(sigma1 = sigma2))) ∧
+       (¬(∃ RevealEvent #kr1. KeyReveal( RevealEvent, TPM ) @ #kr1))) ∧
+      (¬(∃ RevealEvent #kr2. KeyReveal( RevealEvent, Host ) @ #kr2))) ∧
+     (¬(∃ RevealEvent #kr3. KeyReveal( RevealEvent, pke ) @ #kr3))) ⇒
+    (∃ #t04.
+      Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn, sigma2 ) @ #t04)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ bsn sigma1 sigma2 TPM Host pke #t01 #t02.
+  (Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn, sigma1 ) @ #t01) ∧
+  (LinkedSignatures( bsn, sigma1, sigma2 ) @ #t02)
+ ∧
+  (¬(sigma1 = sigma2)) ∧
+  (∀ RevealEvent #kr1. (KeyReveal( RevealEvent, TPM ) @ #kr1) ⇒ ⊥) ∧
+  (∀ RevealEvent #kr2. (KeyReveal( RevealEvent, Host ) @ #kr2) ⇒ ⊥) ∧
+  (∀ RevealEvent #kr3. (KeyReveal( RevealEvent, pke ) @ #kr3) ⇒ ⊥) ∧
+  (∀ #t04.
+    (Host_Sends_Quote_With_BSN( TPM, Host, pke, bsn, sigma2 ) @ #t04) ⇒ ⊥)"
+*/
+by sorry
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+WARNING: the following wellformedness checks failed!
+
+Subterm Convergence Warning
+===========================
+
+  User-defined equations must be convergent and have the finite variant property. The following equations are not subterm convergent. If you are sure that the set of equations is nevertheless convergent and has the finite variant property, you can ignore this warning and continue 
+
+    calcE_S_quot(plus(r_cv1,
+                      multp(H_n_2(n_Q,
+                                  H_k_2(H_k_9(pcrData, R, S, T, W, J, K, L, E),
+                                        H_6(quotePCR(pcrset, pcrset_values)))),
+                            f)),
+                 multp(l, multp(y, multp(r, P1))),
+                 H_n_2(n_Q,
+                       H_k_2(H_k_9(pcrData, R, S, T, W, J, K, L, E),
+                             H_6(quotePCR(pcrset, pcrset_values)))),
+                 multp(l, multp(multp(r, y), multp(f, P1))))
+  = E_S(r_cv1, multp(l, multp(y, multp(r, P1))))
+    calcL_J_quot(plus(r_cv1,
+                      multp(H_n_2(n_Q,
+                                  H_k_2(H_k_9(pcrData, R, S, T, W, J, K, L, E),
+                                        H_6(quotePCR(pcrset, pcrset_values)))),
+                            f)),
+                 PointG1(H_p(F1(bsn)), F2(bsn)),
+                 H_n_2(n_Q,
+                       H_k_2(H_k_9(pcrData, R, S, T, W, J, K, L, E),
+                             H_6(quotePCR(pcrset, pcrset_values)))),
+                 multp(f, PointG1(H_p(F1(bsn)), F2(bsn))))
+  = L_J(r_cv1, PointG1(H_p(F1(bsn)), F2(bsn)))
+   
+ For more information, please refer to the manual : https://tamarin-prover.com/manual/master/book/010_modeling-issues.html 
+*/
+
+/*
+Generated from:
+Tamarin version 1.11.0
+Maude version 3.2 (unsupported)
+Git revision: df2fd84dbb3b3def8309c2a84c04d653d7c4db77 (with uncommited changes), branch: mergedAutomatedStrategies
+Compiled at: 2026-01-16 14:58:06.862219863 UTC
+*/
+
+end

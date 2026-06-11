@@ -1,0 +1,44 @@
+{
+  "task_id": "these_ls_chap3--aletheaD_vot_SmHh__escape--Tall_As_Rec_D_1--merged",
+  "warnings": [],
+  "tamarin_timing": 3077.33,
+  "wrapper_measures": {
+    "time": 3078.311517238617,
+    "avg_memory": 2998.2465647901336,
+    "peak_memory": 4299.11328125
+  },
+  "output_spthy": "result_strategiesBenchmark_cassis_2/proofs/these_ls_chap3--aletheaD_vot_SmHh__escape--Tall_As_Rec_D_1--merged.spthy",
+  "verified_lemma": {
+    "Tall_As_Rec_D_1": {
+      "steps": 5293,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "functional",
+    "indivVerif_v",
+    "indivVerif_b",
+    "vsFromBB",
+    "bsFromBB",
+    "vsFromAdversary",
+    "secretRandomness",
+    "secretSskD",
+    "ballotsFromVoters",
+    "Tall_As_Rec_D_2",
+    "Tall_As_Rec_D_3",
+    "Tall_As_Rec_D_4",
+    "Tall_As_Rec_D_5",
+    "Tall_As_Rec_D_6",
+    "Tall_As_Rec_D_7",
+    "Tall_As_Rec_D_8",
+    "EligVerif_1",
+    "EligVerif_2",
+    "EligVerif_3",
+    "EligVerif_4",
+    "EligVerif_5",
+    "EligVerif_6",
+    "EligVerif_7",
+    "EligVerif_8"
+  ]
+}

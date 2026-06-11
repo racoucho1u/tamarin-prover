@@ -1,0 +1,33 @@
+{
+  "task_id": "smartverif--pkcs11__backAndAvoid--no_key_is_enc_and_unwrap--merged",
+  "warnings": [
+    "9 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 2648.27,
+  "wrapper_measures": {
+    "time": 2650.0092198848724,
+    "avg_memory": 3677.0098101686285,
+    "peak_memory": 4237.31640625
+  },
+  "output_spthy": "result_strategiesBenchmark_2/proofs/smartverif--pkcs11__backAndAvoid--no_key_is_enc_and_unwrap--merged.spthy",
+  "verified_lemma": {
+    "no_key_is_enc_and_unwrap": {
+      "steps": 275,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "dec_limits",
+    "trusted_as_ut_impossible",
+    "untrusted_as_ut_impossible",
+    "untrusted_as_wt_impossible",
+    "trusted_as_wt_impossible",
+    "bad_keys",
+    "no_key_is_wrap_and_dec_or_unwrap_and_dec_ind",
+    "cannot_obtain_key_ind",
+    "cannot_obtain_key"
+  ]
+}

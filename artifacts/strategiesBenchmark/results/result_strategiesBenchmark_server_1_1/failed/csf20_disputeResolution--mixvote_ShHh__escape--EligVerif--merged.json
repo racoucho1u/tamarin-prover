@@ -1,0 +1,13 @@
+{
+  "task_id": "csf20_disputeResolution--mixvote_ShHh__escape--EligVerif--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 203.32652759552002,
+    "avg_memory": 19757.449078525642,
+    "peak_memory": 41137.4609375
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

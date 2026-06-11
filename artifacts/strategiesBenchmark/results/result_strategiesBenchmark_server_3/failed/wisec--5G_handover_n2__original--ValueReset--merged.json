@@ -1,0 +1,13 @@
+{
+  "task_id": "wisec--5G_handover_n2__original--ValueReset--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1184.5490729808807,
+    "avg_memory": 23951.090826978478,
+    "peak_memory": 41056.75390625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

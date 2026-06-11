@@ -1,0 +1,13 @@
+{
+  "task_id": "csf18_xor--LAK06_state__backAndAvoid--helpingUpdateKey--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.749757528305,
+    "avg_memory": 1405.7130832178875,
+    "peak_memory": 1620.2734375
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

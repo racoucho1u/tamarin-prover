@@ -1,0 +1,32 @@
+{
+  "task_id": "jcs19_xor--LD07__proba--helping_keys_disjoint_OutX--merged",
+  "warnings": [],
+  "tamarin_timing": 46.99,
+  "wrapper_measures": {
+    "time": 47.30777716636658,
+    "avg_memory": 308.03964428191483,
+    "peak_memory": 515.1640625
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/jcs19_xor--LD07__proba--helping_keys_disjoint_OutX--merged.spthy",
+  "verified_lemma": {
+    "helping_keys_disjoint_OutX": {
+      "steps": 376,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helping_reader_start",
+    "helping_tag_start",
+    "helping_keys_reader_are_secret",
+    "helping_keys_disjoint_challenge",
+    "helping_keys_disjoint_XX",
+    "helping_keys_disjoint_XS",
+    "helping_keys_disjoint_DD",
+    "alive_tag",
+    "recentalive_tag_bounded",
+    "WA_tag",
+    "recentalive_reader",
+    "executable"
+  ]
+}

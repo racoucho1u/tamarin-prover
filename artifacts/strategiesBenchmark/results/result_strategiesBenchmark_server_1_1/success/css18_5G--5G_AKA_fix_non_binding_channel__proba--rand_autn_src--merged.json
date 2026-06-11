@@ -1,0 +1,33 @@
+{
+  "task_id": "css18_5G--5G_AKA_fix_non_binding_channel__proba--rand_autn_src--merged",
+  "warnings": [],
+  "tamarin_timing": 4.56,
+  "wrapper_measures": {
+    "time": 4.741443634033203,
+    "avg_memory": 148.996875,
+    "peak_memory": 258.83203125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/css18_5G--5G_AKA_fix_non_binding_channel__proba--rand_autn_src--merged.spthy",
+  "verified_lemma": {
+    "rand_autn_src": {
+      "steps": 9,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "dummy",
+    "sqn_ue_invariance",
+    "sqn_hss_invariance",
+    "sqn_ue_src",
+    "sqn_hss_src",
+    "sqn_ue_nodecrease",
+    "sqn_ue_unique",
+    "executability_honest",
+    "executability_keyConf_honest",
+    "executability_desync",
+    "executability_resync",
+    "injectiveagreement_ue_hss_kseaf_noKeyRev",
+    "noninjectiveagreement_ue_hss_snname_noKeyRev"
+  ]
+}

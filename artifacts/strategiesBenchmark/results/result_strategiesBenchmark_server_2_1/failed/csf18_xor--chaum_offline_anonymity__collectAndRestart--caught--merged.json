@@ -1,0 +1,13 @@
+{
+  "task_id": "csf18_xor--chaum_offline_anonymity__collectAndRestart--caught--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.679762840271,
+    "avg_memory": 127.2445454565634,
+    "peak_memory": 158.171875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

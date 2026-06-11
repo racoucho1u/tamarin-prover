@@ -1,0 +1,22 @@
+{
+  "task_id": "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_noBSN__collectAndRestart--diff_signatures_no_verify--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 54.64,
+  "wrapper_measures": {
+    "time": 55.04158020019531,
+    "avg_memory": 409.01837384259255,
+    "peak_memory": 670.5625
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_noBSN__collectAndRestart--diff_signatures_no_verify--merged.spthy",
+  "verified_lemma": {
+    "diff_signatures_no_verify": {
+      "steps": 8,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

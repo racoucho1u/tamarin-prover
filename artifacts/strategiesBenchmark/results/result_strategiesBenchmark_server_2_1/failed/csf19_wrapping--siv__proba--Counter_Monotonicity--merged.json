@@ -1,0 +1,13 @@
+{
+  "task_id": "csf19_wrapping--siv__proba--Counter_Monotonicity--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 2083.8644559383392,
+    "avg_memory": 24192.771684422965,
+    "peak_memory": 41346.3828125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

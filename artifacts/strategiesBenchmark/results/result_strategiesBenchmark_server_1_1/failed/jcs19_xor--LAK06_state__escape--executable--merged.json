@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LAK06_state__escape--executable--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7202.593256235123,
+    "avg_memory": 11962.343235364453,
+    "peak_memory": 22591.265625
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

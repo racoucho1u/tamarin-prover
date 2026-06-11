@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LD07__proba--helping_keys_disjoint_DD--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 3213.5204813480377,
+    "avg_memory": 20042.89474404663,
+    "peak_memory": 41038.203125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

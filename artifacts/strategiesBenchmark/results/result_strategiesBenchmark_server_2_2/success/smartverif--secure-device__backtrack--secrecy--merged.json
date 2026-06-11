@@ -1,0 +1,23 @@
+{
+  "task_id": "smartverif--secure-device__backtrack--secrecy--merged",
+  "warnings": [
+    "2 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 61.55,
+  "wrapper_measures": {
+    "time": 61.79966950416565,
+    "avg_memory": 156.562243852459,
+    "peak_memory": 170.09375
+  },
+  "output_spthy": "result_strategiesBenchmark_2/proofs/smartverif--secure-device__backtrack--secrecy--merged.spthy",
+  "verified_lemma": {
+    "secrecy": {
+      "steps": 68,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

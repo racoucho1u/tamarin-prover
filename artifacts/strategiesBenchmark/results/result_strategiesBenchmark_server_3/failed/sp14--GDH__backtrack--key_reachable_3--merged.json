@@ -1,0 +1,13 @@
+{
+  "task_id": "sp14--GDH__backtrack--key_reachable_3--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.65815782547,
+    "avg_memory": 766.6688481904891,
+    "peak_memory": 920.24609375
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

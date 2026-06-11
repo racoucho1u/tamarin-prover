@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--canauth-withclock__original--wellformed_Received--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 2329.7480251789093,
+    "avg_memory": 22933.42227594987,
+    "peak_memory": 42422.26953125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "task_id": "csf20_disputeResolution--mixvote_ShHh_RF__escape--AuthP--merged",
+  "warnings": [],
+  "tamarin_timing": 4318.59,
+  "wrapper_measures": {
+    "time": 4323.177263498306,
+    "avg_memory": 15466.86603789623,
+    "peak_memory": 25283.6953125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf20_disputeResolution--mixvote_ShHh_RF__escape--AuthP--merged.spthy",
+  "verified_lemma": {
+    "AuthP": {
+      "steps": 10414,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "onlyonce1",
+    "onlyonce1",
+    "onlyonce2",
+    "onlyonce2",
+    "onlyonce3",
+    "onlyonce3",
+    "onlyonce4",
+    "onlyonce4",
+    "onlyonce5",
+    "onlyonce5",
+    "onlyonce6",
+    "onlyonce6",
+    "functional",
+    "functional",
+    "indivVerif",
+    "indivVerif",
+    "VoterC",
+    "VoterC",
+    "TimelyP",
+    "TimelyP",
+    "Uniqueness",
+    "Uniqueness"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "csf18_xor--chaum_offline_anonymity__original--coins--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1180.1316566467285,
+    "avg_memory": 19710.221287189383,
+    "peak_memory": 41198.16796875
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

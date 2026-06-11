@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LAK06_state__original--helpingSecrecy--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 2070.603775024414,
+    "avg_memory": 21245.12109181811,
+    "peak_memory": 41782.83203125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

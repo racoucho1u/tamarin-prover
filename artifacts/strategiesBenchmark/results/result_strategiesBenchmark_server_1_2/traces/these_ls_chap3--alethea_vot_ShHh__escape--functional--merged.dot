@@ -1,0 +1,130 @@
+digraph "trace_alethea_vot_ShHh_SL2-AS0-CL0-A1-C1-NB_functional1-H_1_case_1-ChanIn_S-H_1_case_2-ChanIn_S-Setup-Setup-Setup-ChanIn_A-ChanIn_A-ChanIn_A-ChanIn_A-ChanIn_A_case_1-H_3-H_2-ChanIn_A-H_3-H_2-ChanIn_A-split-split-split-split_case_2-split-split-split-ChanIn_A_case_1-ChanIn_A-ChanIn_A_case_1-ChanIn_A-ChanIn_S-ChanIn_S-H_2_case_1-H_2_case_2" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n5[shape="record",label="{{<n0> AgSt_H1( 'H1', \<'D1', 'BB', $v\> )|<n1> In_S( 'D1', 'H1', SG2 )}|{<n2> #i : H_2[Comm_H_vote( 'H1', $S, $v ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Comm_H_ballot( 'H1', $S, SG2 )]\l}|{<n3> AgSt_H2( 'H1', \<'D1', 'BB', $v, SG2\> )|<n4> Out( SG2 )}}",fillcolor="#d3d897",style="filled",fontcolor="black",role="Undefined"];
+n11[shape="record",label="{{<n6> AgSt_H1( 'H2', \<'D2', 'BB', $v2\> )|<n7> In_S( 'D2', 'H2', SG1 )}|{<n8> #j : H_2[Comm_H_vote( 'H2', $S, $v2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Comm_H_ballot( 'H2', $S, SG1 )]\l}|{<n9> AgSt_H2( 'H2', \<'D2', 'BB', $v2, SG1\> )|<n10> Out( SG1 )}}",fillcolor="#d3d897",style="filled",fontcolor="black",role="Undefined"];
+n22[shape="record",label="{{<n12> AgSt_BB0( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'S', 'spkDSG', UN3\>\l)\l|<n13> In_A( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'b', UN1\>\l)\l|<n14> In_A( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'bPrime', UN2\>\l)\l|<n15> In_A( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'v', ($v++$v2)\>\l)\l|<n16> In_A( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'zkp', ZK1\>\l)\l}|{<n17> #k : BB[BB_rec( 'BB', \<'b', UN1\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BB_woS( 'BB', \<'bPrime', UN2\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BB_tal( 'BB', \<'v', ($v++$v2)\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BB_zkp( 'BB', \<'zkp', ZK1\> )]\l}|{<n18> Out_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'b', UN1\>\l)\l|<n19> Out_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'bPrime', UN2\>\l)\l|<n20> Out_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'v', ($v++$v2)\>\l)\l|<n21> Out_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'zkp', ZK1\>\l)\l}}",fillcolor="#d2d897",style="filled",fontcolor="black",role="Undefined"];
+n26[shape="record",label="{{<n23> AgSt_H2( 'H1', \<'D1', 'BB', $v, SG2\> )|<n24> In_A( 'BB', \<'b', UN1\> )}|{<n25> #m : H_3[Verify( 'H1', SG2, UN1 )]}}",fillcolor="#d0d897",style="filled",fontcolor="black",role="Undefined"];
+n30[shape="record",label="{{<n27> AgSt_H2( 'H2', \<'D2', 'BB', $v2, SG1\> )|<n28> In_A( 'BB', \<'b', UN1\> )}|{<n29> #n : H_3[Verify( 'H2', SG1, UN1 )]}}",fillcolor="#d0d897",style="filled",fontcolor="black",role="Undefined"];
+n38[shape="record",label="{{<n31> AgSt_A0( 'A',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'S', 'BB', pk(~skS)\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l|<n32> In_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'b', UN1\>\l)\l|<n33> In_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'bPrime', UN2\>\l)\l|<n34> In_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'v', ($v++$v2)\>\l)\l|<n35> In_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'zkp', ZK1\>\l)\l|<n36> In_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'spkDSG', UN3\>\l)\l}|{<n37> #o : A_1[Learn_A_proof( 'A', \<'zkp', ZK1\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Learn_A_spkDSG( 'A', \<'spkDSG', UN3\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Learn_A_Vs( 'A', \<'v', ($v++$v2)\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Learn_A_Bs( 'A', \<'b', UN1\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Learn_A_bPrimes( 'A', \<'bPrime', UN2\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VerifyA2( 'A', verzkp(ZK1, \<EN2, EN1\>, \<$v, $v2\>, pk(~skS)) )]\l}}",fillcolor="#ced897",style="filled",fontcolor="black",role="Undefined"];
+n39[label="#vk : coerce[!KU( SG2 )]",shape="ellipse"];
+n44[shape="record",label="{{<n40> AgSt_H0( 'H1', \<'D1', 'BB', $v\> )}|{<n41> #vr : H_1[Vote( 'H1', $v )]}|{<n42> AgSt_H1( 'H1', \<'D1', 'BB', $v\> )|<n43> Out_S( 'H1', 'D1', $v )}}",fillcolor="#c3da98",style="filled",fontcolor="black",role="Undefined"];
+n45[label="#vk.1 : coerce[!KU( SG1 )]",shape="ellipse"];
+n58[shape="record",label="{{<n46> !Ltk( 'S', ~skS )|<n47> Fr( ~x1 )|<n48> Fr( ~x2 )}|{<n49> #vr.1 : Setup[Setup( ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BB_pskDs( 'BB', \<'spkDSG', UN3\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voter( 'H1' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voter( 'H2' )]\l}|{<n50> AgSt_H0( 'H1',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'D1', 'BB', $v\>\l)\l|<n51> AgSt_H0( 'H2',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'D2', 'BB', $v2\>\l)\l|<n52> AgSt_D0( 'D1',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'H1', 'S', \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pk(~skS), H3\>\l)\l|<n53> AgSt_D0( 'D2',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'H2', 'S', \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;pk(~skS), H4\>\l)\l|<n54> AgSt_A0( 'A',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'S', 'BB', pk(~skS)\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\>\l)\l|<n55> AgSt_BB0( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'S', 'spkDSG', UN3\>\l)\l|<n56> Out_A( 'BB',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'spkDSG', UN3\>\l)\l|<n57> AgSt_S0( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<~skS, (H3++H4)\>\l)\l}}",fillcolor="#c9d998",style="filled",fontcolor="black",role="Undefined"];
+n64[shape="record",label="{{<n59> Fr( ~skS )}|{<n60> #vr.2 : publickeyinfrastructure[LongtermKey( 'S', ~skS )]}|{<n61> !Ltk( 'S', ~skS )|<n62> !Pk( 'S', pk(~skS) )|<n63> Out( pk(~skS) )}}",fillcolor="#c8d998",style="filled",fontcolor="black",role="Undefined"];
+n68[shape="record",label="{{<n65> !Sec( 'D1', 'H1', SG2 )}|{<n66> #vr.3 : ChanIn_S[ChanIn_S( 'D1', 'H1', SG2 )]}|{<n67> In_S( 'D1', 'H1', SG2 )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n72[shape="record",label="{{<n69> Out_S( 'D1', 'H1', SG2 )}|{<n70> #vr.4 : ChanOut_S[ChanOut_S( 'D1', 'H1', SG2 )]}|{<n71> !Sec( 'D1', 'H1', SG2 )}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n73[label="#vf.5 : isend",shape="ellipse"];
+n79[shape="record",label="{{<n74> AgSt_D0( 'D1', \<'H1', 'S', pk(~skS), H3\> )|<n75> In_S( 'H1', 'D1', $v )|<n76> Fr( ~r )}|{<n77> #vr.5 : D_1}|{<n78> Out_S( 'D1', 'H1', SG2 )}}",fillcolor="#bfda99",style="filled",fontcolor="black",role="Undefined"];
+n80[label="#vf.6 : isend",shape="ellipse"];
+n85[shape="record",label="{{<n81> AgSt_H0( 'H2', \<'D2', 'BB', $v2\> )}|{<n82> #vr.6 : H_1[Vote( 'H2', $v2 )]}|{<n83> AgSt_H1( 'H2', \<'D2', 'BB', $v2\> )|<n84> Out_S( 'H2', 'D2', $v2 )}}",fillcolor="#c3da98",style="filled",fontcolor="black",role="Undefined"];
+n89[shape="record",label="{{<n86> !Sec( 'D2', 'H2', SG1 )}|{<n87> #vr.7 : ChanIn_S[ChanIn_S( 'D2', 'H2', SG1 )]}|{<n88> In_S( 'D2', 'H2', SG1 )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n93[shape="record",label="{{<n90> Out_S( 'D2', 'H2', SG1 )}|{<n91> #vr.8 : ChanOut_S[ChanOut_S( 'D2', 'H2', SG1 )]}|{<n92> !Sec( 'D2', 'H2', SG1 )}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n99[shape="record",label="{{<n94> AgSt_D0( 'D2', \<'H2', 'S', pk(~skS), H4\> )|<n95> In_S( 'H2', 'D2', $v2 )|<n96> Fr( ~r.1 )}|{<n97> #vr.9 : D_1}|{<n98> Out_S( 'D2', 'H2', SG1 )}}",fillcolor="#bfda99",style="filled",fontcolor="black",role="Undefined"];
+n103[shape="record",label="{{<n100> !Auth( 'BB', \<'b', UN1\> )}|{<n101> #vr.10 : ChanIn_A[ChanIn_A( 'BB', \<'b', UN1\> )]}|{<n102> In_A( 'BB', \<'b', UN1\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n108[shape="record",label="{{<n104> Out_A( 'BB', \<'b', UN1\> )}|{<n105> #vr.11 : ChanOut_A[ChanOut_A( 'BB', \<'b', UN1\> )]}|{<n106> !Auth( 'BB', \<'b', UN1\> )|<n107> Out( \<'BB', 'b', UN1\> )}}",fillcolor="#a5dd9a",style="filled",fontcolor="black",role="Undefined"];
+n112[shape="record",label="{{<n109> !Auth( 'BB', \<'bPrime', UN2\> )}|{<n110> #vr.12 : ChanIn_A[ChanIn_A( 'BB', \<'bPrime', UN2\> )]}|{<n111> In_A( 'BB', \<'bPrime', UN2\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n117[shape="record",label="{{<n113> Out_A( 'BB', \<'bPrime', UN2\> )}|{<n114> #vr.13 : ChanOut_A[ChanOut_A( 'BB', \<'bPrime', UN2\> )]}|{<n115> !Auth( 'BB', \<'bPrime', UN2\> )|<n116> Out( \<'BB', 'bPrime', UN2\> )}}",fillcolor="#a5dd9a",style="filled",fontcolor="black",role="Undefined"];
+n121[shape="record",label="{{<n118> !Auth( 'BB', \<'v', ($v++$v2)\> )}|{<n119> #vr.14 : ChanIn_A[ChanIn_A( 'BB', \<'v', ($v++$v2)\> )]}|{<n120> In_A( 'BB', \<'v', ($v++$v2)\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n126[shape="record",label="{{<n122> Out_A( 'BB', \<'v', ($v++$v2)\> )}|{<n123> #vr.15 : ChanOut_A[ChanOut_A( 'BB', \<'v', ($v++$v2)\> )]}|{<n124> !Auth( 'BB', \<'v', ($v++$v2)\> )|<n125> Out( \<'BB', 'v', ($v++$v2)\> )}}",fillcolor="#a5dd9a",style="filled",fontcolor="black",role="Undefined"];
+n130[shape="record",label="{{<n127> !Auth( 'BB', \<'zkp', ZK1\> )}|{<n128> #vr.16 : ChanIn_A[ChanIn_A( 'BB', \<'zkp', ZK1\> )]}|{<n129> In_A( 'BB', \<'zkp', ZK1\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n135[shape="record",label="{{<n131> Out_A( 'BB', \<'zkp', ZK1\> )}|{<n132> #vr.17 : ChanOut_A[ChanOut_A( 'BB', \<'zkp', ZK1\> )]}|{<n133> !Auth( 'BB', \<'zkp', ZK1\> )|<n134> Out( \<'BB', 'zkp', ZK1\> )}}",fillcolor="#a5dd9a",style="filled",fontcolor="black",role="Undefined"];
+n139[shape="record",label="{{<n136> !Auth( 'BB', \<'spkDSG', UN3\> )}|{<n137> #vr.18 : ChanIn_A[ChanIn_A( 'BB', \<'spkDSG', UN3\> )]}|{<n138> In_A( 'BB', \<'spkDSG', UN3\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n144[shape="record",label="{{<n140> Out_A( 'BB', \<'spkDSG', UN3\> )}|{<n141> #vr.19 : ChanOut_A[ChanOut_A( 'BB', \<'spkDSG', UN3\> )]}|{<n142> !Auth( 'BB', \<'spkDSG', UN3\> )|<n143> Out( \<'BB', 'spkDSG', UN3\> )}}",fillcolor="#a5dd9a",style="filled",fontcolor="black",role="Undefined"];
+n148[shape="record",label="{{<n145> !Auth( 'BB', \<'b', UN1\> )}|{<n146> #vr.20 : ChanIn_A[ChanIn_A( 'BB', \<'b', UN1\> )]}|{<n147> In_A( 'BB', \<'b', UN1\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n152[shape="record",label="{{<n149> !Auth( 'BB', \<'b', UN1\> )}|{<n150> #vr.21 : ChanIn_A[ChanIn_A( 'BB', \<'b', UN1\> )]}|{<n151> In_A( 'BB', \<'b', UN1\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n156[shape="record",label="{{<n153> !Auth( 'S', \<'b', UN1\> )}|{<n154> #vr.22 : ChanIn_A[ChanIn_A( 'S', \<'b', UN1\> )]}|{<n155> In_A( 'S', \<'b', UN1\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n161[shape="record",label="{{<n157> Out_A( 'S', \<'b', UN1\> )}|{<n158> #vr.23 : ChanOut_A[ChanOut_A( 'S', \<'b', UN1\> )]}|{<n159> !Auth( 'S', \<'b', UN1\> )|<n160> Out( \<'S', 'b', UN1\> )}}",fillcolor="#a5dd9a",style="filled",fontcolor="black",role="Undefined"];
+n171[shape="record",label="{{<n162> AgSt_S0( 'S', \<~skS, (H3++H4)\> )|<n163> In( SG2 )|<n164> In( SG1 )}|{<n165> #vr.24 : S_1[Learn_S_ballot( 'S', SG2 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Learn_S_ballot( 'S', SG1 )]\l}|{<n166> AgSt_S1( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<~skS, (H3++H4), UN1\>\l)\l|<n167> Out_A( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'b', UN1\>\l)\l|<n168> Out_A( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'bPrime', UN2\>\l)\l|<n169> Out_A( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'v', ($v++$v2)\>\l)\l|<n170> Out_A( 'S',\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'zkp', ZK1\>\l)\l}}",fillcolor="#acdc9a",style="filled",fontcolor="black",role="Undefined"];
+n175[shape="record",label="{{<n172> !Auth( 'S', \<'bPrime', UN2\> )}|{<n173> #vr.25 : ChanIn_A[ChanIn_A( 'S', \<'bPrime', UN2\> )]}|{<n174> In_A( 'S', \<'bPrime', UN2\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n180[shape="record",label="{{<n176> Out_A( 'S', \<'bPrime', UN2\> )}|{<n177> #vr.26 : ChanOut_A[ChanOut_A( 'S', \<'bPrime', UN2\> )]}|{<n178> !Auth( 'S', \<'bPrime', UN2\> )|<n179> Out( \<'S', 'bPrime', UN2\> )}}",fillcolor="#a5dd9a",style="filled",fontcolor="black",role="Undefined"];
+n184[shape="record",label="{{<n181> !Auth( 'S', \<'v', ($v++$v2)\> )}|{<n182> #vr.27 : ChanIn_A[ChanIn_A( 'S', \<'v', ($v++$v2)\> )]}|{<n183> In_A( 'S', \<'v', ($v++$v2)\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n189[shape="record",label="{{<n185> Out_A( 'S', \<'v', ($v++$v2)\> )}|{<n186> #vr.28 : ChanOut_A[ChanOut_A( 'S', \<'v', ($v++$v2)\> )]}|{<n187> !Auth( 'S', \<'v', ($v++$v2)\> )|<n188> Out( \<'S', 'v', ($v++$v2)\> )}}",fillcolor="#a5dd9a",style="filled",fontcolor="black",role="Undefined"];
+n193[shape="record",label="{{<n190> !Auth( 'S', \<'zkp', ZK1\> )}|{<n191> #vr.29 : ChanIn_A[ChanIn_A( 'S', \<'zkp', ZK1\> )]}|{<n192> In_A( 'S', \<'zkp', ZK1\> )}}",fillcolor="#a6dd9a",style="filled",fontcolor="black",role="Undefined"];
+n198[shape="record",label="{{<n194> Out_A( 'S', \<'zkp', ZK1\> )}|{<n195> #vr.30 : ChanOut_A[ChanOut_A( 'S', \<'zkp', ZK1\> )]}|{<n196> !Auth( 'S', \<'zkp', ZK1\> )|<n197> Out( \<'S', 'zkp', ZK1\> )}}",fillcolor="#a5dd9a",style="filled",fontcolor="black",role="Undefined"];
+n202[shape="record",label="{{<n199> !Sec( 'H1', 'D1', $v )}|{<n200> #vr.31 : ChanIn_S[ChanIn_S( 'H1', 'D1', $v )]}|{<n201> In_S( 'H1', 'D1', $v )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n206[shape="record",label="{{<n203> Out_S( 'H1', 'D1', $v )}|{<n204> #vr.32 : ChanOut_S[ChanOut_S( 'H1', 'D1', $v )]}|{<n205> !Sec( 'H1', 'D1', $v )}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n210[shape="record",label="{{<n207> !Sec( 'H2', 'D2', $v2 )}|{<n208> #vr.33 : ChanIn_S[ChanIn_S( 'H2', 'D2', $v2 )]}|{<n209> In_S( 'H2', 'D2', $v2 )}}",fillcolor="#a1dd9b",style="filled",fontcolor="black",role="Undefined"];
+n214[shape="record",label="{{<n211> Out_S( 'H2', 'D2', $v2 )}|{<n212> #vr.34 : ChanOut_S[ChanOut_S( 'H2', 'D2', $v2 )]}|{<n213> !Sec( 'H2', 'D2', $v2 )}}",fillcolor="#a0dd9b",style="filled",fontcolor="black",role="Undefined"];
+n5:n3 -> n26:n23[style="bold",weight="10.0"];
+n5:n4 -> n39[color="orangered2"];
+n11:n9 -> n30:n27[style="bold",weight="10.0"];
+n11:n10 -> n45[color="orangered2"];
+n22:n18 -> n108:n104[style="bold",weight="10.0"];
+n22:n19 -> n117:n113[style="bold",weight="10.0"];
+n22:n20 -> n126:n122[style="bold",weight="10.0"];
+n22:n21 -> n135:n131[style="bold",weight="10.0"];
+n44:n42 -> n5:n0[style="bold",weight="10.0"];
+n44:n43 -> n206:n203[style="bold",weight="10.0"];
+n58:n50 -> n44:n40[style="bold",weight="10.0"];
+n58:n51 -> n85:n81[style="bold",weight="10.0"];
+n58:n52 -> n79:n74[style="bold",weight="10.0"];
+n58:n53 -> n99:n94[style="bold",weight="10.0"];
+n58:n54 -> n38:n31[style="bold",weight="10.0"];
+n58:n55 -> n22:n12[style="bold",weight="10.0"];
+n58:n56 -> n144:n140[style="bold",weight="10.0"];
+n58:n57 -> n171:n162[style="bold",weight="10.0"];
+n64:n61 -> n58:n46[style="bold",weight="10.0",color="gray50"];
+n68:n67 -> n5:n1[style="bold",weight="10.0"];
+n72:n71 -> n68:n65[style="bold",weight="10.0",color="gray50"];
+n73 -> n171:n163[color="gray30"];
+n79:n78 -> n72:n69[style="bold",weight="10.0"];
+n80 -> n171:n164[color="gray30"];
+n85:n83 -> n11:n6[style="bold",weight="10.0"];
+n85:n84 -> n214:n211[style="bold",weight="10.0"];
+n89:n88 -> n11:n7[style="bold",weight="10.0"];
+n93:n92 -> n89:n86[style="bold",weight="10.0",color="gray50"];
+n99:n98 -> n93:n90[style="bold",weight="10.0"];
+n103:n102 -> n38:n32[style="bold",weight="10.0"];
+n108:n106 -> n103:n100[style="bold",weight="10.0",color="gray50"];
+n108:n106 -> n148:n145[style="bold",weight="10.0",color="gray50"];
+n108:n106 -> n152:n149[style="bold",weight="10.0",color="gray50"];
+n112:n111 -> n38:n33[style="bold",weight="10.0"];
+n117:n115 -> n112:n109[style="bold",weight="10.0",color="gray50"];
+n121:n120 -> n38:n34[style="bold",weight="10.0"];
+n126:n124 -> n121:n118[style="bold",weight="10.0",color="gray50"];
+n130:n129 -> n38:n35[style="bold",weight="10.0"];
+n135:n133 -> n130:n127[style="bold",weight="10.0",color="gray50"];
+n139:n138 -> n38:n36[style="bold",weight="10.0"];
+n144:n142 -> n139:n136[style="bold",weight="10.0",color="gray50"];
+n148:n147 -> n26:n24[style="bold",weight="10.0"];
+n152:n151 -> n30:n28[style="bold",weight="10.0"];
+n156:n155 -> n22:n13[style="bold",weight="10.0"];
+n161:n159 -> n156:n153[style="bold",weight="10.0",color="gray50"];
+n171:n167 -> n161:n157[style="bold",weight="10.0"];
+n171:n168 -> n180:n176[style="bold",weight="10.0"];
+n171:n169 -> n189:n185[style="bold",weight="10.0"];
+n171:n170 -> n198:n194[style="bold",weight="10.0"];
+n175:n174 -> n22:n14[style="bold",weight="10.0"];
+n180:n178 -> n175:n172[style="bold",weight="10.0",color="gray50"];
+n184:n183 -> n22:n15[style="bold",weight="10.0"];
+n189:n187 -> n184:n181[style="bold",weight="10.0",color="gray50"];
+n193:n192 -> n22:n16[style="bold",weight="10.0"];
+n198:n196 -> n193:n190[style="bold",weight="10.0",color="gray50"];
+n202:n201 -> n79:n75[style="bold",weight="10.0"];
+n206:n205 -> n202:n199[style="bold",weight="10.0",color="gray50"];
+n210:n209 -> n99:n95[style="bold",weight="10.0"];
+n214:n213 -> n210:n207[style="bold",weight="10.0",color="gray50"];
+n39 -> n73[color="red",style="dashed"];
+n45 -> n80[color="red",style="dashed"];
+{
+rank="sink";
+n215[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">EN1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">encp($v2, ~r.1, pk(~skS))</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">EN2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">encp($v, ~r, pk(~skS))</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h(&lt;'H1', ~x1&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H4</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h(&lt;'H2', ~x2&gt;)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SG1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sg(EN1, H4)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SG2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">sg(EN2, H3)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(SG2++SG1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN2</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(EN2++EN1)</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">UN3</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(pk(H3)++pk(H4))</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">ZK1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">zkp(&lt;EN2, EN1&gt;, &lt;$v, $v2&gt;, ~skS)</TD></TR></TABLE>>];
+
+}
+n26:n25 -> n215[style="invis"];
+n30:n29 -> n215[style="invis"];
+n38:n37 -> n215[style="invis"];
+
+}

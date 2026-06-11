@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LD07__backAndAvoid--helping_keys_disjoint_challenge--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.693395853043,
+    "avg_memory": 912.8733609090439,
+    "peak_memory": 1342.71875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

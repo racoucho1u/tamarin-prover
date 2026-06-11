@@ -1,0 +1,25 @@
+{
+  "task_id": "jcs19_xor--LAK06_state__collectAndRestart--noninjectiveagreementTAG--merged",
+  "warnings": [],
+  "tamarin_timing": 342.08,
+  "wrapper_measures": {
+    "time": 342.31662154197693,
+    "avg_memory": 203.95940540793413,
+    "peak_memory": 458.22265625
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/jcs19_xor--LAK06_state__collectAndRestart--noninjectiveagreementTAG--merged.spthy",
+  "verified_lemma": {
+    "noninjectiveagreementTAG": {
+      "steps": 707,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helpingUpdateKey",
+    "helpingStackHash",
+    "helpingSecrecy",
+    "executable",
+    "noninjectiveagreementREADER"
+  ]
+}

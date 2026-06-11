@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_fix_non_binding_channel__proba--sqn_ue_nodecrease--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1005.8459119796753,
+    "avg_memory": 19258.9568877551,
+    "peak_memory": 41698.46875
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

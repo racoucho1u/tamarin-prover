@@ -1,0 +1,13 @@
+{
+  "task_id": "wisec--5G_handover_xn__backtrack--executability_hkd_hkd_vkd--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.68772816658,
+    "avg_memory": 2919.3054683122623,
+    "peak_memory": 3033.51953125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

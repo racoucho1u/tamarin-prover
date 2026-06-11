@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LD07__original--helping_reader_start--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1974.7718789577484,
+    "avg_memory": 19541.81759370146,
+    "peak_memory": 41068.67578125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

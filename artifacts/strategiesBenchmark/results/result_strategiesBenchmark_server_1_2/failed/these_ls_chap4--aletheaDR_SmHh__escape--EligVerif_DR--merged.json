@@ -1,0 +1,13 @@
+{
+  "task_id": "these_ls_chap4--aletheaDR_SmHh__escape--EligVerif_DR--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 211.32944536209106,
+    "avg_memory": 23623.94030399134,
+    "peak_memory": 41949.16796875
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

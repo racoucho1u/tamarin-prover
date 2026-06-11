@@ -1,0 +1,23 @@
+{
+  "task_id": "these_ls_chap5--Phoolproof_MA__backAndAvoid--message_authentication--merged",
+  "warnings": [
+    "1 wellformedness check failed!"
+  ],
+  "tamarin_timing": 565.18,
+  "wrapper_measures": {
+    "time": 565.3784024715424,
+    "avg_memory": 242.50710356170603,
+    "peak_memory": 501.00390625
+  },
+  "output_spthy": "result_strategiesBenchmark_cassis_2/proofs/these_ls_chap5--Phoolproof_MA__backAndAvoid--message_authentication--merged.spthy",
+  "verified_lemma": {
+    "message_authentication": {
+      "steps": 154,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "functional"
+  ]
+}

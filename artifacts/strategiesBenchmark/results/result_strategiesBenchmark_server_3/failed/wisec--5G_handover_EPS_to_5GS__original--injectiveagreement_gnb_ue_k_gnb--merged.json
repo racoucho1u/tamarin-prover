@@ -1,0 +1,13 @@
+{
+  "task_id": "wisec--5G_handover_EPS_to_5GS__original--injectiveagreement_gnb_ue_k_gnb--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 625.0348489284515,
+    "avg_memory": 20619.72412899474,
+    "peak_memory": 42693.09765625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

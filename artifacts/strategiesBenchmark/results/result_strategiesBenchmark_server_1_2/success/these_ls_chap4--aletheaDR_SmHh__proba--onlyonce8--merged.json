@@ -1,0 +1,39 @@
+{
+  "task_id": "these_ls_chap4--aletheaDR_SmHh__proba--onlyonce8--merged",
+  "warnings": [],
+  "tamarin_timing": 0.99,
+  "wrapper_measures": {
+    "time": 1.1361498832702637,
+    "avg_memory": 45.208984375,
+    "peak_memory": 88.53125
+  },
+  "output_spthy": "result_strategiesBenchmark_cassis_2/proofs/these_ls_chap4--aletheaDR_SmHh__proba--onlyonce8--merged.spthy",
+  "verified_lemma": {
+    "onlyonce8": {
+      "steps": 10,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "onlyonce1",
+    "onlyonce2",
+    "onlyonce3",
+    "onlyonce4",
+    "onlyonce5",
+    "onlyonce6",
+    "onlyonce7",
+    "onlyonce9",
+    "onlyonce10",
+    "functional",
+    "indivVerif_v",
+    "indivVerif_b",
+    "DRvoterC",
+    "DRvoterT",
+    "Uniqueness",
+    "secretSskD",
+    "ballotsFromVoters",
+    "Tall_As_Rec_D",
+    "EligVerif_DR"
+  ]
+}

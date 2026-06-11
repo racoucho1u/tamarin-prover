@@ -1,0 +1,13 @@
+{
+  "task_id": "wisec--5G_handover_n2__proba--injectiveagreement_tran_ue_k_gnb_star--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1169.5074656009674,
+    "avg_memory": 21838.903765125306,
+    "peak_memory": 42196.87109375
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

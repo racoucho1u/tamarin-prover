@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LD07__original--recentalive_reader--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 2252.9611518383026,
+    "avg_memory": 23118.29381137891,
+    "peak_memory": 42301.578125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--tpm-bitlocker__escape--attestation--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1106.173125743866,
+    "avg_memory": 20974.1570494186,
+    "peak_memory": 41231.12109375
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

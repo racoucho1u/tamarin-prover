@@ -1,0 +1,19 @@
+{
+  "task_id": "sp14--STR__proba--key_reachable_5--merged",
+  "warnings": [],
+  "tamarin_timing": 2.21,
+  "wrapper_measures": {
+    "time": 2.3831818103790283,
+    "avg_memory": 79.74609375,
+    "peak_memory": 143.90625
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/sp14--STR__proba--key_reachable_5--merged.spthy",
+  "verified_lemma": {
+    "key_reachable_5": {
+      "steps": 31,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

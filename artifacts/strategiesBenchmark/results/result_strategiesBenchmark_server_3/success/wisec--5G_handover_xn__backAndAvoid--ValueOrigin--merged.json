@@ -1,0 +1,35 @@
+{
+  "task_id": "wisec--5G_handover_xn__backAndAvoid--ValueOrigin--merged",
+  "warnings": [],
+  "tamarin_timing": 4498.28,
+  "wrapper_measures": {
+    "time": 4498.902581453323,
+    "avg_memory": 3421.139641865747,
+    "peak_memory": 3794.46484375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/wisec--5G_handover_xn__backAndAvoid--ValueOrigin--merged.spthy",
+  "verified_lemma": {
+    "ValueOrigin": {
+      "steps": 20,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "GUTI_SRC",
+    "PDUorigin",
+    "PDUargsconstant",
+    "PDUidunique",
+    "ValueReset",
+    "executability_hkd",
+    "executability_hkd_vkd",
+    "executability_hkd_hkd",
+    "injectiveagreement_ue_tran_k_gnb",
+    "injectiveagreement_tran_ue_k_gnb",
+    "secret_supi",
+    "secret_k_seaf",
+    "secret_k_amf",
+    "secret_k_gnb",
+    "secret_k_gnb_star"
+  ]
+}

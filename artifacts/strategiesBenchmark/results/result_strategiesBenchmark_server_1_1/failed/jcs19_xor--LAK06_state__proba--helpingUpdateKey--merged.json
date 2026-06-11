@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LAK06_state__proba--helpingUpdateKey--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1890.5976150035858,
+    "avg_memory": 21279.12009654473,
+    "peak_memory": 41910.14453125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

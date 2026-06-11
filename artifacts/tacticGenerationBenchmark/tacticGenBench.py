@@ -2,13 +2,20 @@ import re
 import tacticGenerationMerged as mf
 import argparse
 import os
+import json
+
+def loadData(filename):
+    d = None
+    with open(filename) as f:
+        d = json.load(f)
+    return d
 
 def generateInputFile(filename, diff, lemmaFile, diir, benchmarkcase, constructedInput,log):
 	inputs = []
 	lemmas = []
 
-	fi = f"../files_to_benchmark/input_lemmas_tacticGen/{lemmaFile}"
-	# fi = f"../files_to_benchmark/input_lemmas_tacticGen/{lemmaFile}"
+	fi = f"files_to_benchmark/input_lemmas_tacticGen/{lemmaFile}"
+	# fi = f"files_to_benchmark/input_lemmas_tacticGen/{lemmaFile}"
 
 	with open(fi) as f:
 			lines = f.readlines()
@@ -33,34 +40,56 @@ if __name__ == "__main__":
     strategy = args.strategy
 
     benchmarkCase = "tacticGeneration/tamarin-prover"
-    # file = "../files_to_benchmark/input_lemmas_tacticGen.txt"
-    # constructedInput = "../files_to_benchmark/currentLemmaInput"
-    # log = "../files_to_benchmark/log"
+    # file = "files_to_benchmark/input_lemmas_tacticGen.txt"
+    # constructedInput = "files_to_benchmark/currentLemmaInput"
+    # log = "files_to_benchmark/log"
     file = "../files_to_benchmark/input_lemmas_tacticGen.txt"
     constructedInput = "../files_to_benchmark/currentLemmaInput"
     log = "../files_to_benchmark/log"
 
     parallel_input=[]
-    with open(file) as f:
-        lines = f.readlines()
-        inputsRough,inputs = [],[]
-        for line in lines:
-            if line[0] != "#":
-				#params = filename,setDiff,lemma,caseStudy,benchmarkCase,log
-                params = re.split(r'\t',line)
-                #print(parseAndRun((params[1], params[0], params[2][:-1], benchmarkCase, recapFile)))
-                inputsRough.append((params[1], params[0], params[2], params[3][:-1], benchmarkCase))
-                inputs = generateInputFile(params[1], params[0], params[2], params[3][:-1], benchmarkCase, constructedInput, log)
+    # with open(file) as f:
+    #     lines = f.readlines()
+    #     inputsRough,inputs = [],[]
+    #     for line in lines:
+    #         if line[0] != "#":
+	# 			#params = filename,setDiff,lemma,caseStudy,benchmarkCase,log
+    #             params = re.split(r'\t',line)
+    #             print(params)
+    #             #print(parseAndRun((params[1], params[0], params[2][:-1], benchmarkCase, recapFile)))
+    #             inputsRough.append((params[1], params[0], params[2], params[3][:-1], benchmarkCase))
+    #             inputs = generateInputFile(params[1], params[0], params[2], params[3][:-1], benchmarkCase, constructedInput, log)
 				
-                for i in inputs:
-                    diff = False
-                    filename,setDiff,lemma,caseStudy,benchmarkCase,log = i
-                    theoryfile = f"../files_to_benchmark/{caseStudy}/{filename}"
-                    # theoryfile = f"../files_to_benchmark/{caseStudy}/{filename}"
-                    if setDiff == "TRUE":
-                        diff = True
-                    parallel_input.append([theoryfile,lemma,"",strategy,3,"s",6000,diff])
-                    # print(theoryfile,lemma,bool(setDiff))
+    #             for i in inputs:
+    #                 diff = False
+    #                 filename,setDiff,lemma,caseStudy,benchmarkCase,log = i
+    #                 theoryfile = f"files_to_benchmark/{caseStudy}/{filename}"
+    #                 # theoryfile = f"files_to_benchmark/{caseStudy}/{filename}"
+    #                 if setDiff == "TRUE":
+    #                     diff = True
+    #                 parallel_input.append([theoryfile,lemma,"",strategy,3,"s",6000,diff])
+    #                 # print(theoryfile,lemma,bool(setDiff))
+
+    metaData = loadData("metaData.json")
+    lemmaToTactic = "lemmaToTactic.txt"
+    with open(lemmaToTactic) as f:
+        lines = f.readlines()
+        for line in lines:
+            fields = line.split("--")
+            theoryfile = fields[1].split("__")[0]
+            lemma = fields[2]
+            dirname = fields[0]
+            diff = False
+            macro = ""
+            for dicts in metaData["dicts"]:
+                if dicts["filename"] == theoryfile and dicts["dirname"] == dirname:
+                    diff = dicts["lemmas"][0]["diff"]
+                    if isinstance(dicts["lemmas"][0]["macro"],str):
+                        macro = dicts["lemmas"][0]["macro"]
+            # parallel_input.append([f"../files_to_benchmark/all/{theoryfile}.spthy",lemma,macro,strategy,3,"s",900,diff])
+            parallel_input.append([f"../files_to_benchmark/all/{theoryfile}.spthy",lemma,macro,strategy,3,"s",10,diff])            
+
+
 
     if not os.path.isdir('tacticGeneration'):
         os.mkdir('tacticGeneration')
@@ -71,6 +100,7 @@ if __name__ == "__main__":
     if not os.path.isdir('tacticGeneration/generatedTactics'):
         os.mkdir('tacticGeneration/generatedTactics')
 
-    mf.parallelProving(parallel_input,6)
+    mf.parallelProving(parallel_input,2)
+    #print(parallel_input)
                     # mf.proveUntil(theoryfile,lemma,diff=bool(setDiff))
 				

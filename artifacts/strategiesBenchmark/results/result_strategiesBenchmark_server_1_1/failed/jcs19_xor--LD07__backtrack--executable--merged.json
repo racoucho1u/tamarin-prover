@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LD07__backtrack--executable--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.375537395477,
+    "avg_memory": 105.87540491955001,
+    "peak_memory": 109.71484375
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

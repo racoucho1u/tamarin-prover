@@ -1,0 +1,762 @@
+theory LD07 begin
+
+// Function signature and definition of the equational theory E
+
+builtins: xor
+functions: fst/1, h/1, pair/2, snd/1
+equations: fst(<x.1, x.2>) = x.1, snd(<x.1, x.2>) = x.2
+
+tactic: executable_0
+presort: s
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~kp,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~kp)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~kp)]})"
+deprio: {id}
+  allGoal"ChainG(#vl,ConcIdx{getConcIdx=0})(#vk,PremIdx{getPremIdx=0})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=0})(Fact{factTag=ProtoFactLinearInitiated1,factAnnotations=fromList[],factTerms=[~r1]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~k1,~r1,~k))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~k)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~kp,~r1,~k))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~k,~kp,~r1))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~k]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~kp]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~k1]})"
+deprio: {id}
+  allGoal"ChainG(#vr,ConcIdx{getConcIdx=0})(#vk,PremIdx{getPremIdx=0})"
+
+
+tactic: executable_1
+presort: s
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~kp,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~kp)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~kp)]})"
+deprio: {id}
+  allGoal"ChainG(#vl,ConcIdx{getConcIdx=0})(#vk,PremIdx{getPremIdx=0})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=0})(Fact{factTag=ProtoFactLinearInitiated1,factAnnotations=fromList[],factTerms=[~r1]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~k1,~r1,~k))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~k)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~kp,~r1,~k))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~k,~kp,~r1))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~k]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~kp]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~k1]})"
+deprio: {id}
+  allGoal"ChainG(#vr,ConcIdx{getConcIdx=0})(#vk,PremIdx{getPremIdx=0})"
+
+
+tactic: executable_2
+presort: s
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~kp,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~kp)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~kp)]})"
+deprio: {id}
+  allGoal"ChainG(#vl,ConcIdx{getConcIdx=0})(#vk,PremIdx{getPremIdx=0})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=0})(Fact{factTag=ProtoFactLinearInitiated1,factAnnotations=fromList[],factTerms=[~r1]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~k1,~r1,~k))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~k)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~kp,~r1,~k))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~k,~kp,~r1))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~k]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~kp]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~k1]})"
+deprio: {id}
+  allGoal"ChainG(#vr,ConcIdx{getConcIdx=0})(#vk,PremIdx{getPremIdx=0})"
+
+
+tactic: executable_3
+presort: s
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~kp,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~kp)]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,Xor(y,r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~kp)]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,Xor(x,x)]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,Xor(z,r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~kp,x))]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearReader2,factAnnotations=fromList[],factTerms=[~k,~kp]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~k1)]})"
+deprio: {id}
+  allGoal"ChainG(#vl,ConcIdx{getConcIdx=0})(#vk,PremIdx{getPremIdx=0})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=0})(Fact{factTag=ProtoFactLinearInitiated1,factAnnotations=fromList[],factTerms=[~r1]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,Xor(newkey,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~k1,~r1,~k))]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,~k]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,Xor(~kp,newkey)]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,Xor(~kp,x)]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,~kp]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,newkey]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,~r1,x)]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,Xor(~kp,newkey,x)]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,zero]})"
+deprio: {id}
+  allGoal"PremiseG(#vr,PremIdx{getPremIdx=1})(Fact{factTag=ProtoFactLinearTag2,factAnnotations=fromList[],factTerms=[~k,x]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~k)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~x]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~r1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,x)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[Xor(~k1,~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(~r1)]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~kp,~r1,~k))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[h(Xor(~k,~kp,~r1))]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~k]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~kp]})"
+deprio: {id}
+  allGoal"ActionG#vk(Fact{factTag=KUFact,factAnnotations=fromList[],factTerms=[~k1]})"
+deprio: {id}
+  allGoal"ChainG(#vr,ConcIdx{getConcIdx=0})(#vk,PremIdx{getPremIdx=0})"
+
+
+
+
+
+
+
+/* looping facts with injective instances: Reader/2, Tag/2 */
+
+
+
+
+
+rule (modulo E) Setup:
+   [ Fr( ~k0 ), Fr( ~k1 ) ]
+  --[ Setup( ~k0 ), KeyS( ~k0 ), KeyS( ~k1 ), OnlyOnce( ) ]->
+   [ Reader( ~k0, ~k1 ), Tag( ~k0, (~k0⊕~k1) ) ]
+
+  /*
+  rule (modulo AC) Setup:
+     [ Fr( ~k0 ), Fr( ~k1 ) ]
+    --[ Setup( ~k0 ), KeyS( ~k0 ), KeyS( ~k1 ), OnlyOnce( ) ]->
+     [ Reader( ~k0, ~k1 ), Tag( ~k0, z ) ]
+    variants (modulo AC)
+    1. ~k0   = ~k0.4
+       ~k1   = ~k1.4
+       z     = (~k0.4⊕~k1.4)
+    
+    2. ~k0   = ~x.4
+       ~k1   = ~x.4
+       z     = zero
+  */
+
+rule (modulo E) reader1:
+   [ Fr( ~r1 ) ]
+  --[ ChallengeReader( ~r1 ), Ch( ~r1 ) ]->
+   [ Out( ~r1 ), Initiated( ~r1 ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tag1:
+   [ In( r1 ), Tag( ~k, x ) ]
+  --[
+  ResponseTag( ~k, x, r1 ), TagKey( ~k, x ), Response( ~k, 'Tag' ),
+  ChallengeTag( x ), Tag( ~k, x ), Running( ~k, 'Tag', x ), KeyTag( x ),
+  Tag1rule( ), InEq( r1, zero )
+  ]->
+   [ Out( h((r1⊕x)) ), Tag( ~k, x ), TagRunning( ~k, x ) ]
+
+  // loop breaker: [1]
+  /*
+  rule (modulo AC) tag1:
+     [ In( r1 ), Tag( ~k, x ) ]
+    --[
+    ResponseTag( ~k, x, r1 ), TagKey( ~k, x ), Response( ~k, 'Tag' ),
+    ChallengeTag( x ), Tag( ~k, x ), Running( ~k, 'Tag', x ), KeyTag( x ),
+    Tag1rule( ), InEq( r1, zero )
+    ]->
+     [ Out( h(z) ), Tag( ~k, x ), TagRunning( ~k, x ) ]
+    variants (modulo AC)
+    1. r1    = r1.6
+       x     = r1.6
+       z     = zero
+    
+    2. r1    = r1.6
+       x     = x.7
+       z     = (r1.6⊕x.7)
+    
+    3. r1    = r1.6
+       x     = zero
+       z     = r1.6
+    
+    4. r1    = r1.7
+       x     = (r1.7⊕z.9)
+       z     = z.9
+    
+    5. r1    = zero
+       x     = x.6
+       z     = x.6
+    
+    6. r1    = (x.7⊕z.8)
+       x     = x.7
+       z     = z.8
+    
+    7. r1    = (x.8⊕x.9)
+       x     = (x.8⊕x.10)
+       z     = (x.9⊕x.10)
+    // loop breaker: [1]
+  */
+
+rule (modulo E) reader2:
+   [ Initiated( ~r1 ), Reader( ~k, ~kp ), In( xoredhash ), Fr( ~k1 ) ]
+  --[
+  Reader( ~k, ~kp ), AliveTag( ~k, (~k⊕~kp), ~r1, (~kp⊕~r1) ),
+  Commit( ~k, 'Reader', ~kp ), Response( ~k, 'Reader' ),
+  Eq( xoredhash, h((~k⊕~kp⊕~r1)) ), KeyS( ~k ), KeyS( ~k1 ), KeyS( ~kp ),
+  KeyD( ~kp ), KeyX( (~kp⊕~r1) ), OutK( (~k1⊕~kp) ), Ch( ~r1 ),
+  Reader2rule( )
+  ]->
+   [ Out( <(~k1⊕~kp), h((~k⊕~k1))> ), Reader( ~k, ~k1 ) ]
+
+  // loop breaker: [1]
+  /*
+  rule (modulo AC) reader2:
+     [ Initiated( ~r1 ), Reader( ~k, ~kp ), In( xoredhash ), Fr( ~k1 ) ]
+    --[
+    Reader( ~k, ~kp ), AliveTag( ~k, z, ~r1, z.1 ),
+    Commit( ~k, 'Reader', ~kp ), Response( ~k, 'Reader' ),
+    Eq( xoredhash, h(z.2) ), KeyS( ~k ), KeyS( ~k1 ), KeyS( ~kp ),
+    KeyD( ~kp ), KeyX( z.1 ), OutK( (~x⊕~x.1) ), Ch( ~r1 ), Reader2rule( )
+    ]->
+     [ Out( <(~x⊕~x.1), h((~k⊕~k1))> ), Reader( ~k, ~k1 ) ]
+    variants (modulo AC)
+    1. ~k    = ~k.21
+       ~k1   = ~k1.22
+       ~kp   = ~k.21
+       ~r1   = ~k.21
+       ~x    = ~k.21
+       z     = zero
+       ~x.1  = ~k1.22
+       z.1   = zero
+       z.2   = ~k.21
+    
+    2. ~k    = ~k.22
+       ~k1   = ~k1.23
+       ~kp   = ~kp.24
+       ~r1   = ~k.22
+       ~x    = ~k1.23
+       z     = (~k.22⊕~kp.24)
+       ~x.1  = ~kp.24
+       z.1   = (~k.22⊕~kp.24)
+       z.2   = ~kp.24
+    
+    3. ~k    = ~k.22
+       ~k1   = ~k1.23
+       ~kp   = ~kp.24
+       ~r1   = ~kp.24
+       ~x    = ~kp.24
+       z     = (~k.22⊕~kp.24)
+       ~x.1  = ~k1.23
+       z.1   = zero
+       z.2   = ~k.22
+    
+    4. ~k    = ~k.23
+       ~k1   = ~k1.24
+       ~kp   = ~k.23
+       ~r1   = ~r1.26
+       ~x    = ~k.23
+       z     = zero
+       ~x.1  = ~k1.24
+       z.1   = (~k.23⊕~r1.26)
+       z.2   = ~r1.26
+    
+    5. ~k    = ~k.23
+       ~k1   = ~k1.24
+       ~kp   = ~kp.25
+       ~r1   = ~r1.26
+       ~x    = ~k1.24
+       z     = (~k.23⊕~kp.25)
+       ~x.1  = ~kp.25
+       z.1   = (~kp.25⊕~r1.26)
+       z.2   = (~k.23⊕~kp.25⊕~r1.26)
+    // loop breaker: [1]
+  */
+
+rule (modulo E) tag2:
+   [ In( <newkey, newhash> ), Tag( ~k, x ), TagRunning( ~k, x ) ]
+  --[
+  Update( ~k, (newkey⊕x), 'Tag' ), Eq( h((newkey⊕x)), newhash ),
+  AliveReader( ~k ), KeyTag( (newkey⊕x) )
+  ]->
+   [ Tag( ~k, (newkey⊕x) ) ]
+
+  // loop breaker: [1]
+  /*
+  rule (modulo AC) tag2:
+     [ In( <newkey, newhash> ), Tag( ~k, x ), TagRunning( ~k, x ) ]
+    --[
+    Update( ~k, z, 'Tag' ), Eq( h(z), newhash ), AliveReader( ~k ),
+    KeyTag( z )
+    ]->
+     [ Tag( ~k, z ) ]
+    variants (modulo AC)
+    1. newkey
+             = newkey.7
+       x     = newkey.7
+       z     = zero
+    
+    2. newkey
+             = newkey.7
+       x     = x.8
+       z     = (newkey.7⊕x.8)
+    
+    3. newkey
+             = newkey.7
+       x     = zero
+       z     = newkey.7
+    
+    4. newkey
+             = newkey.8
+       x     = (newkey.8⊕z.10)
+       z     = z.10
+    
+    5. newkey
+             = zero
+       x     = x.7
+       z     = x.7
+    
+    6. newkey
+             = (x.8⊕z.9)
+       x     = x.8
+       z     = z.9
+    
+    7. newkey
+             = (x.9⊕x.10)
+       x     = (x.9⊕x.11)
+       z     = (x.10⊕x.11)
+    // loop breaker: [1]
+  */
+
+rule (modulo E) desynchronized:
+   [ Reader( ~k, x ), Tag( ~k, y ) ]
+  --[ InEq( (~k⊕x), y ), Desynch( ~k ) ]->
+   [ ]
+
+  /*
+  rule (modulo AC) desynchronized:
+     [ Reader( ~k, x ), Tag( ~k, y ) ] --[ InEq( z, y ), Desynch( ~k ) ]-> [ ]
+    variants (modulo AC)
+    1. ~k    = ~k.5
+       x     = x.5
+       z     = (~k.5⊕x.5)
+    
+    2. ~k    = ~k.5
+       x     = zero
+       z     = ~k.5
+    
+    3. ~k    = ~x.5
+       x     = ~x.5
+       z     = zero
+    
+    4. ~k    = ~x.5
+       x     = (~x.5⊕x.6)
+       z     = x.6
+  */
+
+restriction equality:
+  "∀ x y #i. (Eq( x, y ) @ #i) ⇒ (x = y)"
+  // safety formula
+
+restriction inequality:
+  "∀ x #i. (InEq( x, x ) @ #i) ⇒ (⊥)"
+  // safety formula
+
+restriction unique:
+  "∀ #i #j. ((OnlyOnce( ) @ #i) ∧ (OnlyOnce( ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+lemma helping_reader_start [reuse, use_induction]:
+  all-traces
+  "∀ x y #k. (Reader( x, y ) @ #k) ⇒ (∃ #i. (Setup( x ) @ #i) ∧ (#i < #k))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ x y #k. (Reader( x, y ) @ #k) ∧ ∀ #i. (Setup( x ) @ #i) ⇒ ¬(#i < #k)"
+*/
+by sorry
+
+lemma helping_tag_start [reuse, use_induction]:
+  all-traces
+  "∀ x y #k. (Tag( x, y ) @ #k) ⇒ (∃ #i. (Setup( x ) @ #i) ∧ (#i < #k))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ x y #k. (Tag( x, y ) @ #k) ∧ ∀ #i. (Setup( x ) @ #i) ⇒ ¬(#i < #k)"
+*/
+by sorry
+
+lemma helping_keys_reader_are_secret [reuse, use_induction]:
+  all-traces "∀ x #i. (KeyS( x ) @ #i) ⇒ (¬(∃ #j. !KU( x ) @ #j))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ x #i. (KeyS( x ) @ #i) ∧ ∃ #j. (!KU( x ) @ #j)"
+*/
+by sorry
+
+lemma helping_keys_disjoint_challenge [reuse, use_induction]:
+  all-traces
+  "∀ x ch #i #j. ((KeyS( x ) @ #i) ∧ (Ch( ch ) @ #j)) ⇒ (¬(x = ch))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ x ch #i #j. (KeyS( x ) @ #i) ∧ (Ch( ch ) @ #j) ∧ x = ch"
+*/
+by sorry
+
+lemma helping_keys_disjoint_XX [reuse, use_induction]:
+  all-traces
+  "∀ x y #i #j.
+    ((KeyX( x ) @ #i) ∧ (KeyX( y ) @ #j)) ⇒ ((#i = #j) ∨ (¬(x = y)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ x y #i #j.
+  (KeyX( x ) @ #i) ∧ (KeyX( y ) @ #j) ∧ (¬(#i = #j)) ∧ (x = y)"
+*/
+by sorry
+
+lemma helping_keys_disjoint_XS [reuse, use_induction]:
+  all-traces
+  "∀ x y #i #j. ((KeyX( x ) @ #i) ∧ (KeyS( y ) @ #j)) ⇒ (¬(x = y))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ x y #i #j. (KeyX( x ) @ #i) ∧ (KeyS( y ) @ #j) ∧ x = y"
+*/
+by sorry
+
+lemma helping_keys_disjoint_DD [reuse, use_induction]:
+  all-traces
+  "∀ x y #i #j.
+    ((KeyD( x ) @ #i) ∧ (KeyD( y ) @ #j)) ⇒ ((#i = #j) ∨ (¬(x = y)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ x y #i #j.
+  (KeyD( x ) @ #i) ∧ (KeyD( y ) @ #j) ∧ (¬(#i = #j)) ∧ (x = y)"
+*/
+by sorry
+
+lemma helping_keys_disjoint_OutX [reuse, use_induction]:
+  all-traces
+  "∀ x y #i #j.
+    ((OutK( x ) @ #i) ∧ (KeyX( y ) @ #j)) ⇒ ((#i = #j) ∨ (¬(x = y)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ x y #i #j.
+  (OutK( x ) @ #i) ∧ (KeyX( y ) @ #j) ∧ (¬(#i = #j)) ∧ (x = y)"
+*/
+by sorry
+
+lemma alive_tag [use_induction]:
+  all-traces
+  "∀ k1 kp r kpr #i.
+    (AliveTag( k1, kp, r, kpr ) @ #i) ⇒ (∃ #j. Response( k1, 'Tag' ) @ #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ k1 kp r kpr #i.
+  (AliveTag( k1, kp, r, kpr ) @ #i)
+ ∧
+  ∀ #j. (Response( k1, 'Tag' ) @ #j) ⇒ ⊥"
+*/
+induction
+  case empty_trace
+  by contradiction /* from formulas */
+next
+  case non_empty_trace
+  solve( (last(#i))  ∥ (∃ #j. (Response( ~k, 'Tag' ) @ #j) ∧ ¬(last(#j))) )
+    case case_1
+    solve( Initiated( ~r1 ) ▶₀ #i )
+      case reader1
+      solve( splitEqs(1) )
+        case split
+        solve( !KU( h(z) ) @ #vk )
+          case c_h
+          solve( splitEqs(0) )
+            case split_case_1
+            solve( !KU( ~r1 ) @ #vk.1 )
+              case reader1
+              by solve( Reader( ~k, ~k ) ▶₁ #i )
+            next
+              case reader2_case_1
+              by contradiction /* from formulas */
+            next
+              case reader2_case_2
+              by contradiction /* from formulas */
+            qed
+          next
+            case split_case_2
+            by contradiction /* from formulas */
+          next
+            case split_case_3
+            solve( !KU( (~k⊕~kp⊕~r1) ) @ #vk.1 )
+              case c_xor_case_1
+              by contradiction /* from formulas */
+            next
+              case c_xor_case_2
+              by contradiction /* from formulas */
+            next
+              case c_xor_case_3
+              solve( !KU( ~r1 ) @ #vk.2 )
+                case reader1
+                solve( !KU( (~k⊕~kp) ) @ #vk.3 )
+                  case c_xor
+                  by contradiction /* from formulas */
+                next
+                  case coerce
+                  solve( !KD( (~k⊕~kp) ) ▶₀ #vk.3 )
+                    case reader1
+                    by contradiction /* impossible chain */
+                  next
+                    case reader2
+                    by contradiction /* from formulas */
+                  next
+                    case tag1
+                    by contradiction /* from formulas */
+                  qed
+                qed
+              next
+                case reader2_case_1
+                by contradiction /* from formulas */
+              next
+                case reader2_case_2
+                by contradiction /* from formulas */
+              qed
+            next
+              case coerce
+              solve( !KD( (~k⊕~kp⊕~r1) ) ▶₀ #vk.1 )
+                case reader1
+                by contradiction /* impossible chain */
+              next
+                case reader2
+                by contradiction /* from formulas */
+              next
+                case tag1
+                by contradiction /* from formulas */
+              qed
+            qed
+          qed
+        next
+          case tag1
+          by contradiction /* from formulas */
+        qed
+      qed
+    qed
+  next
+    case case_2
+    by contradiction /* from formulas */
+  qed
+qed
+
+lemma recentalive_tag_bounded [use_induction]:
+  all-traces
+  "((∀ #t1 #t2 #t3.
+      (((Tag1rule( ) @ #t1) ∧ (Tag1rule( ) @ #t2)) ∧ (Tag1rule( ) @ #t3)) ⇒
+      (((#t1 = #t2) ∨ (#t1 = #t3)) ∨ (#t2 = #t3))) ∧
+    (∀ #t1 #t2 #t3.
+      (((Reader2rule( ) @ #t1) ∧ (Reader2rule( ) @ #t2)) ∧
+       (Reader2rule( ) @ #t3)) ⇒
+      (((#t1 = #t2) ∨ (#t1 = #t3)) ∨ (#t2 = #t3)))) ⇒
+   (∀ k1 kp r kpr #i.
+     (AliveTag( k1, kp, r, kpr ) @ #i) ⇒
+     (∃ #j #k.
+       (((ChallengeReader( r ) @ #k) ∧ (Response( k1, 'Tag' ) @ #j)) ∧
+        (#k < #j)) ∧
+       (#j < #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"(∀ #t1 #t2 #t3.
+   (Tag1rule( ) @ #t1) ∧ (Tag1rule( ) @ #t2) ∧ (Tag1rule( ) @ #t3)
+  ⇒
+   ((#t1 = #t2) ∨ (#t1 = #t3) ∨ (#t2 = #t3))) ∧
+ (∀ #t1 #t2 #t3.
+   (Reader2rule( ) @ #t1) ∧ (Reader2rule( ) @ #t2) ∧ (Reader2rule( ) @ #t3)
+  ⇒
+   ((#t1 = #t2) ∨ (#t1 = #t3) ∨ (#t2 = #t3))) ∧
+ (∃ k1 kp r kpr #i.
+   (AliveTag( k1, kp, r, kpr ) @ #i)
+  ∧
+   ∀ #j #k.
+    (ChallengeReader( r ) @ #k) ∧ (Response( k1, 'Tag' ) @ #j)
+   ⇒
+    ((¬(#k < #j)) ∨ (¬(#j < #i))))"
+*/
+by sorry
+
+lemma WA_tag [use_induction]:
+  all-traces
+  "∀ k1 kp r kpr #i.
+    (AliveTag( k1, kp, r, kpr ) @ #i) ⇒
+    (∃ #j. ResponseTag( k1, kp, r ) @ #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ k1 kp r kpr #i.
+  (AliveTag( k1, kp, r, kpr ) @ #i)
+ ∧
+  ∀ #j. (ResponseTag( k1, kp, r ) @ #j) ⇒ ⊥"
+*/
+by sorry
+
+lemma recentalive_reader:
+  all-traces
+  "∀ x #i.
+    (AliveReader( x ) @ #i) ⇒
+    (∃ y #j #k.
+      (((ChallengeTag( y ) @ #k) ∧ (Response( x, 'Reader' ) @ #j)) ∧
+       (#k < #j)) ∧
+      (#j < #i))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ x #i.
+  (AliveReader( x ) @ #i)
+ ∧
+  ∀ y #j #k.
+   (ChallengeTag( y ) @ #k) ∧ (Response( x, 'Reader' ) @ #j)
+  ⇒
+   ((¬(#k < #j)) ∨ (¬(#j < #i)))"
+*/
+by sorry
+
+lemma executable:
+  exists-trace
+  "∃ x k r kr y #i #j #k.1.
+    (((AliveTag( x, k, r, kr ) @ #i) ∧ (Response( x, 'Tag' ) @ #j)) ∧
+     (Update( x, y, 'Tag' ) @ #k.1)) ∧
+    (¬(∃ #l. (Response( x, 'Tag' ) @ #l) ∧ (¬(#j = #l))))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x k r kr y #i #j #k.1.
+  (AliveTag( x, k, r, kr ) @ #i) ∧
+  (Response( x, 'Tag' ) @ #j) ∧
+  (Update( x, y, 'Tag' ) @ #k.1)
+ ∧
+  ∀ #l. (Response( x, 'Tag' ) @ #l) ⇒ #j = #l"
+*/
+by sorry
+
+
+
+
+
+
+
+
+
+/* All wellformedness checks were successful. */
+
+/*
+Generated from:
+Tamarin version 1.11.0
+Maude version 2.7.1
+Git revision: df2fd84dbb3b3def8309c2a84c04d653d7c4db77 (with uncommited changes), branch: mergedAutomatedStrategies
+Compiled at: 2026-01-16 14:58:06.862219863 UTC
+*/
+
+end

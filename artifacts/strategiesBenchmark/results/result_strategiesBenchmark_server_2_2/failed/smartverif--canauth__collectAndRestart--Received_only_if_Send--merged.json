@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--canauth__collectAndRestart--Received_only_if_Send--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.68371629715,
+    "avg_memory": 214.58952539312077,
+    "peak_memory": 228.1953125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

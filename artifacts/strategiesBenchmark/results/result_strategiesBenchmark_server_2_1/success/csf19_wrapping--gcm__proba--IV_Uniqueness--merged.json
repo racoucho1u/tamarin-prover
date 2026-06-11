@@ -1,0 +1,28 @@
+{
+  "task_id": "csf19_wrapping--gcm__proba--IV_Uniqueness--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 30.1,
+  "wrapper_measures": {
+    "time": 30.482673168182373,
+    "avg_memory": 344.09361979166664,
+    "peak_memory": 654.2265625
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf19_wrapping--gcm__proba--IV_Uniqueness--merged.spthy",
+  "verified_lemma": {
+    "IV_Uniqueness": {
+      "steps": 766,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "origin",
+    "Counter_Monotonicity",
+    "Key_UsageImpliesInitialization",
+    "Key_IntegrityAndConfidentiality",
+    "Key_UniqueLevelandHandle"
+  ]
+}

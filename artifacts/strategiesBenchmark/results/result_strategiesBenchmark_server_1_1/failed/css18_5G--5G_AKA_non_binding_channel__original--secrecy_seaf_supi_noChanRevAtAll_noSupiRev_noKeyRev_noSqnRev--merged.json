@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_non_binding_channel__original--secrecy_seaf_supi_noChanRevAtAll_noSupiRev_noKeyRev_noSqnRev--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 3740.6896262168884,
+    "avg_memory": 19391.45655391438,
+    "peak_memory": 41670.94140625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

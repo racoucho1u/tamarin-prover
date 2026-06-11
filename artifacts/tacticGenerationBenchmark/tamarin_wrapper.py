@@ -225,8 +225,8 @@ def main(parsed_args):
         query_dict = parse_arguments(parsed_args)
 
     fulltable = []
-    # if not os.path.exists('results'):
-    #     os.makedirs('results')
+    if not os.path.exists('results'):
+        os.makedirs('results')
     for model in query_dict.keys():
         flags = query_dict[model]["flags"]
         commands = create_commands(model,

@@ -1,0 +1,23 @@
+{
+  "task_id": "these_ls_chap5--Phoolproof_MA__collectAndRestart--functional--merged",
+  "warnings": [
+    "1 wellformedness check failed!"
+  ],
+  "tamarin_timing": 127.79,
+  "wrapper_measures": {
+    "time": 127.93237066268921,
+    "avg_memory": 125.80428125,
+    "peak_memory": 206.015625
+  },
+  "output_spthy": "result_strategiesBenchmark_cassis_2/proofs/these_ls_chap5--Phoolproof_MA__collectAndRestart--functional--merged.spthy",
+  "verified_lemma": {
+    "functional": {
+      "steps": 11,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "message_authentication"
+  ]
+}

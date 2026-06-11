@@ -1,0 +1,1493 @@
+theory 5G_xn_handover begin
+
+// Function signature and definition of the equational theory E
+
+builtins: multiset
+functions: KDF/2, fst/1, pair/2, sdec/2, senc/2, snd/1
+equations:
+    fst(<x.1, x.2>) = x.1,
+    sdec(senc(x.1, x.2), x.2) = x.1,
+    snd(<x.1, x.2>) = x.2
+
+
+
+
+
+
+
+/* looping facts with injective instances: PDU_Session/4 */
+
+
+
+
+
+rule (modulo E) send_secure:
+   [ SndS( ~cid, A, B, m ) ] --> [ Sec( ~cid, A, B, m ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) receive_secure:
+   [ Sec( ~cid, A, B, m ) ] --> [ RcvS( ~cid, A, B, m ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) secureChannel_compromised_in:
+   [ In( <~cid, A, B, x> ) ]
+  --[ Rev( A, 'secureChannel' ), Injected( x ) ]->
+   [ Sec( ~cid, A, B, x ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) secureChannel_compromised_out:
+   [ Sec( ~cid, A, B, m ) ]
+  --[ Rev( B, 'secureChannel' ) ]->
+   [ Out( <~cid, m> ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_CN:
+   [ Fr( ~CN_ID ) ]
+  --[ CoreNetwork( ~CN_ID ) ]->
+   [ !CN( ~CN_ID ), Out( ~CN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_RAN:
+   [ Fr( ~RAN_ID ) ]
+  --[ RadioAccessNetwork( ~RAN_ID ) ]->
+   [ !NG_RAN( ~RAN_ID ), Out( ~RAN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) create_UE:
+   [ Fr( ~SUPI ), !CN( ~CN_ID ) ]
+  --[ UserEquipment( ~SUPI ) ]->
+   [ !UE( ~SUPI, ~CN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_UE:
+   [
+   !UE( ~SUPI, ~CN_ID ), !CN( ~CN_ID ), !NG_RAN( ~SRAN_ID ), Fr( ~K_SEAF ),
+   Fr( ~C_RNTI ), Fr( ~5G_GUTI ), Fr( ~PDU_SESSION_ID )
+   ]
+  --[
+  Subscribe( ~SUPI, ~SRAN_ID ),
+  CreateValues( <~SUPI, ~5G_GUTI, ~K_SEAF, KDF(~K_SEAF, ~SUPI)> ),
+  CreatePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~SRAN_ID> ),
+  KeyDerived( <'K_AMF', KDF(~K_SEAF, ~SUPI)>, ~K_SEAF, KDF(~K_SEAF, ~SUPI),
+              ~SUPI
+  ),
+  KeyDerived( <'K_gNB', KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')>,
+              ~K_SEAF, KDF(~K_SEAF, ~SUPI), ~SUPI
+  ),
+  Init( 'K_gNB', KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT') ),
+  Init( 'K_SEAF', ~K_SEAF ), GUTI( ~5G_GUTI ), SEAF( ~K_SEAF ),
+  SUPI( ~SUPI )
+  ]->
+   [
+   !Ltk_sym( ~SUPI, ~CN_ID, <'K_SEAF', ~K_SEAF> ),
+   Session_key( ~SUPI, ~CN_ID, <'K_AMF', KDF(~K_SEAF, ~SUPI)> ),
+   Session_key( ~SUPI, ~SRAN_ID,
+                <'K_gNB', KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')>
+   ),
+   Intermediate_key( ~SUPI, ~SRAN_ID, ~CN_ID,
+                     <'NH', 
+                      KDF(KDF(~K_SEAF, ~SUPI), KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'))>
+   ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   St_1_SRAN( ~SRAN_ID, KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), ~C_RNTI,
+              '0', '0', ~PDU_SESSION_ID
+   ),
+   St_1_UE( ~SUPI, ~5G_GUTI, ~K_SEAF, ~K_SEAF, KDF(~K_SEAF, ~SUPI),
+            KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'),
+            KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), '0', ~SRAN_ID
+   ),
+   St_1_CN( ~CN_ID, ~K_SEAF, KDF(~K_SEAF, ~SUPI), ~PDU_SESSION_ID,
+            KDF(KDF(~K_SEAF, ~SUPI), KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')), '0',
+            ~SRAN_ID
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) connect_networks_Xn:
+   [ !NG_RAN( ~SRAN_ID ), !NG_RAN( ~TRAN_ID ) ]
+  --[
+  InEq( ~SRAN_ID, ~TRAN_ID ), Connect( ~SRAN_ID, ~TRAN_ID ),
+  Connect( ~TRAN_ID, ~SRAN_ID ), OnlyOnce( ~SRAN_ID, ~TRAN_ID ),
+  OnlyOnce( ~TRAN_ID, ~SRAN_ID )
+  ]->
+   [ !Xn( ~SRAN_ID, ~TRAN_ID ), !Xn( ~TRAN_ID, ~SRAN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) connect_networks_N2_N3:
+   [ !NG_RAN( ~RAN_ID ), !CN( ~CN_ID ), Fr( ~cid_N2 ), Fr( ~cid_N3 ) ]
+  --[ OnlyOnce( ~RAN_ID, ~CN_ID ) ]->
+   [ !N2( ~cid_N2, ~RAN_ID, ~CN_ID ), !N3( ~cid_N3, ~RAN_ID, ~CN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_supi:
+   [ !Ltk_sym( ~SUPI, ~CN_ID, <'K_SEAF', ~K_SEAF> ) ]
+  --[ Rev( ~SUPI, <'SUPI', ~SUPI> ), Rev( ~CN_ID, <'SUPI', ~SUPI> ) ]->
+   [ Out( ~SUPI ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_ltk_k_seaf:
+   [ !Ltk_sym( ~SUPI, ~CN_ID, <'K_SEAF', ~K_SEAF> ) ]
+  --[ Rev( ~SUPI, <'K_SEAF', ~K_SEAF> ), Rev( ~CN_ID, <'K_SEAF', ~K_SEAF> )
+  ]->
+   [ Out( ~K_SEAF ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_session_key_k_amf:
+   [ Session_key( ~SUPI, ~CN_ID, <'K_AMF', K_AMF> ) ]
+  --[ Rev( ~SUPI, <'K_AMF', K_AMF> ), Rev( ~CN_ID, <'K_AMF', K_AMF> ) ]->
+   [ Out( K_AMF ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_session_key_k_gnb:
+   [ Session_key( ~SUPI, ~RAN_ID, <'K_gNB', K_gNB> ) ]
+  --[ Rev( ~SUPI, <'K_gNB', K_gNB> ), Rev( ~RAN_ID, <'K_gNB', K_gNB> ) ]->
+   [ Out( K_gNB ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_intermediate_key_nh:
+   [ Intermediate_key( ~SUPI, ~RAN_ID, ~CN_ID, <'NH', NH> ) ]
+  --[
+  Rev( ~SUPI, <'NH', NH> ), Rev( ~RAN_ID, <'NH', NH> ),
+  Rev( ~CN_ID, <'NH', NH> )
+  ]->
+   [ Out( NH ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) sran_snd_ho_req_hkd:
+   [
+   St_1_SRAN( ~SRAN_ID, K_gNB, ~C_RNTI, NH, NCC, ~PDU_SESSION_ID ),
+   !Xn( ~SRAN_ID, ~TRAN_ID ), Fr( ~cid_Xn ), In( NCC )
+   ]
+  --[
+  HorizontalSRAN( KDF(K_gNB, ~TRAN_ID) ),
+  SessionHandover( <~SRAN_ID, ~TRAN_ID>, K_gNB, KDF(K_gNB, ~TRAN_ID) )
+  ]->
+   [
+   St_2_SRAN( ~SRAN_ID, K_gNB, KDF(K_gNB, ~TRAN_ID), ~TRAN_ID, ~C_RNTI, NCC,
+              ~cid_Xn
+   ),
+   SndS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID,
+         <'ho_req', ~TRAN_ID, KDF(K_gNB, ~TRAN_ID), NCC, ~C_RNTI, ~PDU_SESSION_ID>
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) sran_snd_ho_req_vkd:
+   [
+   St_1_SRAN( ~SRAN_ID, K_gNB, ~C_RNTI, NH, NCC, ~PDU_SESSION_ID ),
+   !Xn( ~SRAN_ID, ~TRAN_ID ), Fr( ~cid_Xn ), In( NCC )
+   ]
+  --[
+  VerticalSRAN( KDF(NH, ~TRAN_ID) ),
+  SessionHandover( <~SRAN_ID, ~TRAN_ID>, K_gNB, KDF(NH, ~TRAN_ID) ),
+  InEq( NH, '0' )
+  ]->
+   [
+   St_2_SRAN( ~SRAN_ID, K_gNB, KDF(NH, ~TRAN_ID), ~TRAN_ID, ~C_RNTI,
+              ('1'++NCC), ~cid_Xn
+   ),
+   SndS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID,
+         <'ho_req', ~TRAN_ID, KDF(NH, ~TRAN_ID), ('1'++NCC), ~C_RNTI, 
+          ~PDU_SESSION_ID>
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tran_rcv_ho_req_snd_ack:
+   [
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   !Xn( ~SRAN_ID, ~TRAN_ID ), Fr( ~C_RNTI_new ),
+   RcvS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID,
+         <'ho_req', ~TRAN_ID, K_gNB_star, NCC, ~C_RNTI_current, ~PDU_SESSION_ID>
+   ),
+   In( NCC )
+   ]
+  --[
+  Running( ~TRAN_ID, ~SUPI, <'UE', 'TRAN', 'K_gNB_star', K_gNB_star> ),
+  UsePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~SRAN_ID> )
+  ]->
+   [
+   St_1_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI_new, ~PDU_SESSION_ID,
+              NCC, ~cid_Xn
+   ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   SndS( ~cid_Xn, ~TRAN_ID, ~SRAN_ID,
+         <'ho_req_ack', NCC, ~C_RNTI_current, ~C_RNTI_new>
+   )
+   ]
+
+  // loop breakers: [0,3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) sran_rcv_ho_req_ack:
+   [
+   St_2_SRAN( ~SRAN_ID, K_gNB, K_gNB_star, ~TRAN_ID, ~C_RNTI, NCC, ~cid_Xn
+   ),
+   RcvS( ~cid_Xn, ~TRAN_ID, ~SRAN_ID,
+         <'ho_req_ack', NCC, ~C_RNTI, ~C_RNTI_new>
+   )
+   ]
+  --[ HandoverPreparationDone( K_gNB_star ) ]->
+   [
+   St_3_SRAN( ~SRAN_ID, K_gNB, K_gNB_star, ~TRAN_ID, ~C_RNTI_new, NCC,
+              ~cid_Xn
+   )
+   ]
+
+  // loop breaker: [1]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) sran_snd_ran_init_and_sn_status_transfer:
+   [
+   St_3_SRAN( ~SRAN_ID, K_gNB, K_gNB_star, ~TRAN_ID, ~C_RNTI_new, NCC,
+              ~cid_Xn
+   )
+   ]
+  -->
+   [
+   St_4_SRAN( ~SRAN_ID, K_gNB, K_gNB_star, ~TRAN_ID, ~cid_Xn ),
+   Out( senc(<'ho_init', ~TRAN_ID, NCC, ~C_RNTI_new>, K_gNB) ),
+   SndS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID, 'sn_status_transfer' )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_ran_init_hkd:
+   [
+   St_1_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB, NH,
+            NCC, ~SRAN_ID
+   ),
+   !UE( ~SUPI, ~CN_ID ),
+   In( senc(<'ho_init', ~TRAN_ID, NCC, C_RNTI_new>, K_gNB) )
+   ]
+  --[
+  HorizontalUE( KDF(K_gNB, ~TRAN_ID) ),
+  KeyDerived( <'K_gNB_star', KDF(K_gNB, ~TRAN_ID)>, ~K_SEAF, K_AMF, ~SUPI
+  ),
+  Bind( <'K_gNB_star', KDF(K_gNB, ~TRAN_ID)>, K_gNB ),
+  Running( ~SUPI, ~TRAN_ID,
+           <'TRAN', 'UE', 'K_gNB_star', KDF(K_gNB, ~TRAN_ID)>
+  ),
+  Commit( ~SUPI, ~TRAN_ID,
+          <'UE', 'TRAN', 'K_gNB_star', KDF(K_gNB, ~TRAN_ID)>
+  ),
+  Honest( ~TRAN_ID ), Honest( ~SRAN_ID ), Honest( ~SUPI ),
+  Honest( ~CN_ID ), Secret( <'K_gNB', K_gNB> ), GUTI( ~5G_GUTI ),
+  SEAF( ~K_SEAF ), SUPI( ~SUPI )
+  ]->
+   [
+   St_2_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF,
+            KDF(K_gNB, ~TRAN_ID), NH, NCC, ~SRAN_ID, ~TRAN_ID
+   ),
+   Session_key( ~SUPI, ~TRAN_ID, <'K_gNB', KDF(K_gNB, ~TRAN_ID)> )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_ran_init_vkd:
+   [
+   St_1_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB, NH,
+            NCC, ~SRAN_ID
+   ),
+   !UE( ~SUPI, ~CN_ID ),
+   In( senc(<'ho_init', ~TRAN_ID, ('1'++NCC), C_RNTI_new>, K_gNB) )
+   ]
+  --[
+  VerticalUE( KDF(KDF(K_AMF, NH), ~TRAN_ID) ),
+  KeyDerived( <'K_gNB_star', KDF(KDF(K_AMF, NH), ~TRAN_ID)>, ~K_SEAF,
+              K_AMF, ~SUPI
+  ),
+  Bind( <'K_gNB_star', KDF(KDF(K_AMF, NH), ~TRAN_ID)>, KDF(K_AMF, NH) ),
+  Running( ~SUPI, ~TRAN_ID,
+           <'TRAN', 'UE', 'K_gNB_star', KDF(KDF(K_AMF, NH), ~TRAN_ID)>
+  ),
+  Commit( ~SUPI, ~TRAN_ID,
+          <'UE', 'TRAN', 'K_gNB_star', KDF(KDF(K_AMF, NH), ~TRAN_ID)>
+  ),
+  Honest( ~TRAN_ID ), Honest( ~SRAN_ID ), Honest( ~SUPI ),
+  Honest( ~CN_ID ), Secret( <'K_gNB', K_gNB> ), GUTI( ~5G_GUTI ),
+  SEAF( ~K_SEAF ), SUPI( ~SUPI )
+  ]->
+   [
+   St_2_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF,
+            KDF(KDF(K_AMF, NH), ~TRAN_ID), KDF(K_AMF, NH), ('1'++NCC), ~SRAN_ID,
+            ~TRAN_ID
+   ),
+   Session_key( ~SUPI, ~TRAN_ID, <'K_gNB', KDF(KDF(K_AMF, NH), ~TRAN_ID)> )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_snd_ran_completion:
+   [
+   St_2_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~SRAN_ID, ~TRAN_ID
+   )
+   ]
+  --[ GUTI( ~5G_GUTI ), SEAF( ~K_SEAF ), SUPI( ~SUPI ) ]->
+   [
+   St_3_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~SRAN_ID, ~TRAN_ID
+   ),
+   Out( senc('RRCReconfigurationComplete', K_gNB_star) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tran_rcv_sn_status_transfer_and_ran_completion:
+   [
+   St_1_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI, ~PDU_SESSION_ID, NCC,
+              ~cid_Xn
+   ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   RcvS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID, 'sn_status_transfer' ),
+   In( senc('RRCReconfigurationComplete', K_gNB_star) )
+   ]
+  --[
+  HandoverExecutionDone( K_gNB_star ),
+  Commit( ~TRAN_ID, ~SUPI, <'TRAN', 'UE', 'K_gNB_star', K_gNB_star> ),
+  Honest( ~TRAN_ID ), Honest( ~SRAN_ID ), Honest( ~SUPI ),
+  Honest( ~CN_ID ),
+  UsePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~SRAN_ID> )
+  ]->
+   [
+   St_2_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI, ~PDU_SESSION_ID, NCC,
+              ~cid_Xn
+   ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID )
+   ]
+
+  // loop breakers: [1,2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tran_snd_n2_path_switch_req:
+   [
+   St_2_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI, ~PDU_SESSION_ID, NCC,
+              ~cid_Xn
+   ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID )
+   ]
+  -->
+   [
+   St_3_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI, NCC, ~cid_Xn ),
+   SndS( ~cid_N2, ~TRAN_ID, ~CN_ID, <'n2_path_switch_req', ~PDU_SESSION_ID>
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_n2_path_switch_req_snd_n3_end_marker:
+   [
+   St_1_CN( ~CN_ID, ~K_SEAF, K_AMF, ~PDU_SESSION_ID, NH, NCC, ~SRAN_ID ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ), !N3( ~cid_N3, ~SRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~TRAN_ID, ~CN_ID, <'n2_path_switch_req', ~PDU_SESSION_ID>
+   )
+   ]
+  --[ UsePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~SRAN_ID> ) ]->
+   [
+   St_2_CN( ~CN_ID, ~K_SEAF, K_AMF, ~PDU_SESSION_ID, NH, NCC, ~SRAN_ID ),
+   SndS( ~cid_N3, ~CN_ID, ~SRAN_ID, 'n3_end_marker' ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID )
+   ]
+
+  // loop breakers: [0,1,4]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) sran_fwd_n3_end_marker:
+   [
+   St_4_SRAN( ~SRAN_ID, K_gNB, K_gNB_star, ~TRAN_ID, ~cid_Xn ),
+   !N3( ~cid_N3, ~SRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N3, ~CN_ID, ~SRAN_ID, 'n3_end_marker' )
+   ]
+  -->
+   [
+   St_5_SRAN( ~SRAN_ID, K_gNB, K_gNB_star, ~TRAN_ID, ~cid_Xn ),
+   SndS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID, 'n3_end_marker' )
+   ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_snd_n2_path_switch_req_ack:
+   [
+   St_2_CN( ~CN_ID, ~K_SEAF, K_AMF, ~PDU_SESSION_ID, NH, NCC, ~SRAN_ID ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   Intermediate_key( ~SUPI, ~SRAN_ID, ~CN_ID, <'NH', NH> ), In( NCC ),
+   Fr( ~PDU_SESSION_ID_new )
+   ]
+  --[
+  CreatePDUSession( ~PDU_SESSION_ID_new, <~CN_ID, ~SUPI, ~TRAN_ID> ),
+  UsePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~SRAN_ID> )
+  ]->
+   [
+   St_3_CN( ~CN_ID, ~K_SEAF, K_AMF, ~PDU_SESSION_ID_new, KDF(K_AMF, NH),
+            ('1'++NCC), ~TRAN_ID
+   ),
+   Intermediate_key( ~SUPI, ~TRAN_ID, ~CN_ID, <'NH', KDF(K_AMF, NH)> ),
+   PDU_Session( ~PDU_SESSION_ID_new, ~CN_ID, ~SUPI, ~TRAN_ID ),
+   SndS( ~cid_N2, ~CN_ID, ~TRAN_ID,
+         <'n2_path_switch_req_ack', KDF(K_AMF, NH), ('1'++NCC)>
+   )
+   ]
+
+  // loop breakers: [2,3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tran_rcv_n3_end_marker_and_n2_path_switch_ack_snd_relsease_resources:
+   [
+   St_3_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI, NCC, ~cid_Xn ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   RcvS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID, 'n3_end_marker' ),
+   RcvS( ~cid_N2, ~CN_ID, ~TRAN_ID,
+         <'n2_path_switch_req_ack', NH_fresh, NCC_inc>
+   )
+   ]
+  -->
+   [
+   St_4_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI, NH_fresh, NCC_inc,
+              ~cid_Xn
+   ),
+   SndS( ~cid_Xn, ~TRAN_ID, ~SRAN_ID, 'release_resources' )
+   ]
+
+  // loop breakers: [2,3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) sran_receve_release_resources:
+   [
+   St_5_SRAN( ~SRAN_ID, K_gNB, K_gNB_star, ~TRAN_ID, ~cid_Xn ),
+   RcvS( ~cid_Xn, ~TRAN_ID, ~SRAN_ID, 'release_resources' )
+   ]
+  --[ HandoverCompletionDone( K_gNB_star ) ]->
+   [ ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_snd_registration_req:
+   [
+   St_3_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~SRAN_ID, ~TRAN_ID
+   )
+   ]
+  --[
+  GUTI( ~5G_GUTI ), SEAF( ~K_SEAF ), SUPI( ~SUPI ), GUTI_SND( ~5G_GUTI )
+  ]->
+   [
+   St_4_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~SRAN_ID, ~TRAN_ID
+   ),
+   Out( senc(<'MRU', ~5G_GUTI>, K_gNB_star) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tran_fwd_registration_req:
+   [
+   St_4_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI, NH, NCC, ~cid_Xn ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   In( senc(<'MRU', 5G_GUTI>, K_gNB_star) )
+   ]
+  --[ GUTI_RCV( 5G_GUTI ) ]->
+   [
+   St_5_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI ),
+   SndS( ~cid_N2, ~TRAN_ID, ~CN_ID, <'MRU', 5G_GUTI> )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_registration_req_registration_accept:
+   [
+   St_3_CN( ~CN_ID, ~K_SEAF, K_AMF, ~PDU_SESSION_ID, NH, NCC, ~TRAN_ID ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~TRAN_ID, ~CN_ID, <'MRU', 5G_GUTI> )
+   ]
+  --[ GUTI_RCV( 5G_GUTI ) ]->
+   [
+   St_4_CN( ~CN_ID, ~PDU_SESSION_ID, ~TRAN_ID ),
+   Out( senc('registration_accept', K_AMF) )
+   ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_registration_accept:
+   [
+   St_4_UE( ~SUPI, 5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star, NH,
+            NCC, ~SRAN_ID, ~TRAN_ID
+   ),
+   !UE( ~SUPI, ~CN_ID ), In( senc('registration_accept', K_AMF) )
+   ]
+  --[
+  MobilityRegistrationUpdateDone( K_gNB_star ),
+  UseValues( <~SUPI, 5G_GUTI, ~K_SEAF, K_AMF> ),
+  Secret( <'K_SEAF', ~K_SEAF> ), Secret( <'K_AMF', K_AMF> ),
+  Secret( <'K_gNB_star', K_gNB_star> ), Secret( <'SUPI', ~SUPI> ),
+  Honest( ~TRAN_ID ), Honest( ~SRAN_ID ), Honest( ~SUPI ),
+  Honest( ~CN_ID ), GUTI( 5G_GUTI ), SEAF( ~K_SEAF ), SUPI( ~SUPI )
+  ]->
+   [ St_5_UE( ~SUPI, 5G_GUTI, ~K_SEAF_initial, ~TRAN_ID, ~CN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_next_handover:
+   [
+   St_5_TRAN( ~TRAN_ID, ~SRAN_ID, K_gNB_star, ~C_RNTI ),
+   St_5_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~TRAN_ID, ~CN_ID ),
+   St_4_CN( ~CN_ID, ~PDU_SESSION_ID, ~TRAN_ID ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~TRAN_ID ), Fr( ~K_SEAF )
+   ]
+  --[
+  HandoverInit( <~SRAN_ID, ~TRAN_ID>, K_gNB_star,
+                KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')
+  ),
+  ResetValues( <~SUPI, ~5G_GUTI, ~K_SEAF, KDF(~K_SEAF, ~SUPI)> ),
+  Reset( 'K_SEAF', ~K_SEAF_initial ),
+  UsePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~TRAN_ID> ),
+  KeyDerived( <'K_AMF', KDF(~K_SEAF, ~SUPI)>, ~K_SEAF, KDF(~K_SEAF, ~SUPI),
+              ~SUPI
+  ),
+  KeyDerived( <'K_gNB', KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')>,
+              ~K_SEAF, KDF(~K_SEAF, ~SUPI), ~SUPI
+  ),
+  GUTI( ~5G_GUTI ), SEAF( ~K_SEAF ), SUPI( ~SUPI )
+  ]->
+   [
+   !Ltk_sym( ~SUPI, ~CN_ID, <'K_SEAF', ~K_SEAF> ),
+   Session_key( ~SUPI, ~CN_ID, <'K_AMF', KDF(~K_SEAF, ~SUPI)> ),
+   Session_key( ~SUPI, ~TRAN_ID,
+                <'K_gNB', KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')>
+   ),
+   Intermediate_key( ~SUPI, ~TRAN_ID, ~CN_ID,
+                     <'NH', 
+                      KDF(KDF(~K_SEAF, ~SUPI), KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'))>
+   ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~TRAN_ID ),
+   St_1_SRAN( ~TRAN_ID, KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), ~C_RNTI,
+              KDF(KDF(~K_SEAF, ~SUPI), KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')), '0',
+              ~PDU_SESSION_ID
+   ),
+   St_1_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, KDF(~K_SEAF, ~SUPI),
+            KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'),
+            KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), '0', ~TRAN_ID
+   ),
+   St_1_CN( ~CN_ID, ~K_SEAF, KDF(~K_SEAF, ~SUPI), ~PDU_SESSION_ID,
+            KDF(KDF(~K_SEAF, ~SUPI), KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')), '0',
+            ~TRAN_ID
+   )
+   ]
+
+  // loop breaker: [3]
+  /* has exactly the trivial AC variant */
+
+lemma GUTI_SRC [sources]:
+  all-traces
+  "∀ g #i.
+    (GUTI_RCV( g ) @ #i) ⇒
+    ((∃ #j. (GUTI_SND( g ) @ #j) ∧ (#j < #i)) ∨
+     (∃ #k. (!KU( g ) @ #k) ∧ (#k < #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ g #i.
+  (GUTI_RCV( g ) @ #i)
+ ∧
+  (∀ #j. (GUTI_SND( g ) @ #j) ⇒ ¬(#j < #i)) ∧
+  (∀ #k. (!KU( g ) @ #k) ⇒ ¬(#k < #i))"
+*/
+by sorry
+
+restriction Inequality:
+  "∀ p q #i. (InEq( p, q ) @ #i) ⇒ (¬(p = q))"
+  // safety formula
+
+restriction OnlyOnce:
+  "∀ p q #i #j.
+    ((OnlyOnce( p, q ) @ #i) ∧ (OnlyOnce( p, q ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+restriction GUTInotSEAF:
+  "∀ p #i #j. ((GUTI( p ) @ #i) ∧ (SEAF( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+restriction GUTInotSUPI:
+  "∀ p #i #j. ((GUTI( p ) @ #i) ∧ (SUPI( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+lemma PDUorigin [use_induction, reuse]:
+  all-traces
+  "∀ p q #i.
+    (UsePDUSession( p, q ) @ #i) ⇒ (∃ #j. CreatePDUSession( p, q ) @ #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q #i.
+  (UsePDUSession( p, q ) @ #i) ∧ ∀ #j. (CreatePDUSession( p, q ) @ #j) ⇒ ⊥"
+*/
+by sorry
+
+lemma PDUargsconstant [use_induction, reuse]:
+  all-traces
+  "∀ p q r #i #j.
+    ((UsePDUSession( p, q ) @ #i) ∧ (UsePDUSession( p, r ) @ #j)) ⇒ (q = r)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q r #i #j.
+  (UsePDUSession( p, q ) @ #i) ∧ (UsePDUSession( p, r ) @ #j) ∧ ¬(q = r)"
+*/
+by sorry
+
+lemma PDUidunique [use_induction, reuse]:
+  all-traces
+  "∀ p q r #i #j.
+    ((CreatePDUSession( p, q ) @ #i) ∧ (CreatePDUSession( p, r ) @ #j)) ⇒
+    (q = r)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q r #i #j.
+  (CreatePDUSession( p, q ) @ #i) ∧ (CreatePDUSession( p, r ) @ #j)
+ ∧
+  ¬(q = r)"
+*/
+by sorry
+
+lemma ValueOrigin [use_induction, reuse]:
+  all-traces
+  "∀ p #i.
+    (UseValues( p ) @ #i) ⇒
+    ((∃ #j. CreateValues( p ) @ #j) ∨ (∃ #j. ResetValues( p ) @ #j))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p #i.
+  (UseValues( p ) @ #i)
+ ∧
+  (∀ #j. (CreateValues( p ) @ #j) ⇒ ⊥) ∧
+  (∀ #j. (ResetValues( p ) @ #j) ⇒ ⊥)"
+*/
+by sorry
+
+lemma ValueReset [use_induction, reuse]:
+  all-traces
+  "∀ p #i. (Reset( 'K_SEAF', p ) @ #i) ⇒ (∃ #j. Init( 'K_SEAF', p ) @ #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p #i.
+  (Reset( 'K_SEAF', p ) @ #i) ∧ ∀ #j. (Init( 'K_SEAF', p ) @ #j) ⇒ ⊥"
+*/
+by sorry
+
+lemma executability_hkd:
+  exists-trace
+  "∃ x0 x1 s t #i1 #i2 #i3 #j1 #j2 #j3 #j4 #j5 #j6.
+    (((((((((((((((((((((((((Init( 'K_gNB', x0 ) @ #i1) ∧
+                            (Connect( s, t ) @ #i2)) ∧
+                           (Connect( t, s ) @ #i2)) ∧
+                          (SessionHandover( <s, t>, x0, x1 ) @ #i3)) ∧
+                         (HorizontalSRAN( x1 ) @ #j1)) ∧
+                        (HandoverPreparationDone( x1 ) @ #j2)) ∧
+                       (HorizontalUE( x1 ) @ #j3)) ∧
+                      (HandoverExecutionDone( x1 ) @ #j4)) ∧
+                     (HandoverCompletionDone( x1 ) @ #j5)) ∧
+                    (MobilityRegistrationUpdateDone( x1 ) @ #j6)) ∧
+                   (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                  (¬(∃ a #k. VerticalSRAN( a ) @ #k))) ∧
+                 (¬(∃ a #k. VerticalUE( a ) @ #k))) ∧
+                (¬(∃ a b c #k. HandoverInit( a, b, c ) @ #k))) ∧
+               (∀ a #k. (Init( 'K_gNB', a ) @ #k) ⇒ (#k = #i1))) ∧
+              (∀ a b #k. (Connect( a, b ) @ #k) ⇒ (#k = #i2))) ∧
+             (∀ a b c #k. (SessionHandover( a, b, c ) @ #k) ⇒ (#k = #i3))) ∧
+            (∀ a #k. (HorizontalSRAN( a ) @ #k) ⇒ (#k = #j1))) ∧
+           (∀ a #k. (HandoverPreparationDone( a ) @ #k) ⇒ (#k = #j2))) ∧
+          (∀ a #k. (HorizontalUE( a ) @ #k) ⇒ (#k = #j3))) ∧
+         (∀ a #k. (HandoverExecutionDone( a ) @ #k) ⇒ (#k = #j4))) ∧
+        (∀ a #k. (HandoverCompletionDone( a ) @ #k) ⇒ (#k = #j5))) ∧
+       (∀ a #k. (MobilityRegistrationUpdateDone( a ) @ #k) ⇒ (#k = #j6))) ∧
+      (∀ a b #k1 #k2.
+        ((CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a b #k1 #k2.
+       ((UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a b c d #k1 #k2.
+      ((Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2)) ⇒ (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x0 x1 s t #i1 #i2 #i3 #j1 #j2 #j3 #j4 #j5 #j6.
+  (Init( 'K_gNB', x0 ) @ #i1) ∧
+  (Connect( s, t ) @ #i2) ∧
+  (Connect( t, s ) @ #i2) ∧
+  (SessionHandover( <s, t>, x0, x1 ) @ #i3) ∧
+  (HorizontalSRAN( x1 ) @ #j1) ∧
+  (HandoverPreparationDone( x1 ) @ #j2) ∧
+  (HorizontalUE( x1 ) @ #j3) ∧
+  (HandoverExecutionDone( x1 ) @ #j4) ∧
+  (HandoverCompletionDone( x1 ) @ #j5) ∧
+  (MobilityRegistrationUpdateDone( x1 ) @ #j6)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (∀ a #k. (VerticalSRAN( a ) @ #k) ⇒ ⊥) ∧
+  (∀ a #k. (VerticalUE( a ) @ #k) ⇒ ⊥) ∧
+  (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ ⊥) ∧
+  (∀ a #k. (Init( 'K_gNB', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a b #k. (Connect( a, b ) @ #k) ⇒ #k = #i2) ∧
+  (∀ a b c #k. (SessionHandover( a, b, c ) @ #k) ⇒ #k = #i3) ∧
+  (∀ a #k. (HorizontalSRAN( a ) @ #k) ⇒ #k = #j1) ∧
+  (∀ a #k. (HandoverPreparationDone( a ) @ #k) ⇒ #k = #j2) ∧
+  (∀ a #k. (HorizontalUE( a ) @ #k) ⇒ #k = #j3) ∧
+  (∀ a #k. (HandoverExecutionDone( a ) @ #k) ⇒ #k = #j4) ∧
+  (∀ a #k. (HandoverCompletionDone( a ) @ #k) ⇒ #k = #j5) ∧
+  (∀ a #k. (MobilityRegistrationUpdateDone( a ) @ #k) ⇒ #k = #j6) ∧
+  (∀ a b #k1 #k2.
+    (CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b c d #k1 #k2.
+    (Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2) ⇒ #k1 = #k2)"
+*/
+simplify
+solve( (∃ #j.
+         (CreateValues( <~SUPI.2, 5G_GUTI.1, ~K_SEAF.1, K_AMF.1> ) @ #j))  ∥
+       (∃ #j. (ResetValues( <~SUPI.2, 5G_GUTI.1, ~K_SEAF.1, K_AMF.1> ) @ #j)) )
+  case case_1
+  solve( St_1_SRAN( ~SRAN_ID.1, K_gNB, ~C_RNTI.1, NH, NCC,
+                    ~PDU_SESSION_ID.1
+         ) ▶₀ #i3 )
+    case init_UE
+    solve( !Xn( ~SRAN_ID, ~TRAN_ID ) ▶₁ #i3 )
+      case connect_networks_Xn_case_1
+      solve( St_2_SRAN( ~SRAN_ID.1, K_gNB,
+                        KDF(KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), ~TRAN_ID), ~TRAN_ID.1,
+                        ~C_RNTI.1, NCC, ~cid_Xn.1
+             ) ▶₀ #j2 )
+        case sran_snd_ho_req_hkd
+        solve( !UE( ~SUPI.1, ~CN_ID.1 ) ▶₁ #j3 )
+          case create_UE
+          solve( St_1_TRAN( ~TRAN_ID.1, ~SRAN_ID.2,
+                            KDF(KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), ~TRAN_ID), ~C_RNTI.1,
+                            ~PDU_SESSION_ID.1, NCC.1, ~cid_Xn.1
+                 ) ▶₀ #j4 )
+            case tran_rcv_ho_req_snd_ack_case_1
+            solve( St_5_SRAN( ~SRAN_ID.2, K_gNB,
+                              KDF(KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), ~TRAN_ID), ~TRAN_ID.1,
+                              ~cid_Xn.2
+                   ) ▶₀ #j5 )
+              case sran_fwd_n3_end_marker
+              solve( RcvS( ~cid_Xn, ~TRAN_ID, ~SRAN_ID, 'release_resources' ) ▶₁ #j5 )
+                case receive_secure_case_1
+                solve( St_4_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial.1, ~K_SEAF,
+                                KDF(~K_SEAF, ~SUPI),
+                                KDF(KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), ~TRAN_ID), NH.1, NCC.2,
+                                ~SRAN_ID.2, ~TRAN_ID.1
+                       ) ▶₀ #j6 )
+                  case ue_snd_registration_req_case_1
+                  solve( !UE( ~SUPI, ~CN_ID.2 ) ▶₁ #j6 )
+                    case create_UE
+                    solve( Init( 'K_gNB', x0 ) @ #i1 )
+                      case init_UE
+                      solve( Connect( s, t ) @ #i2 )
+                        case connect_networks_Xn_case_1
+                        solve( Connect( ~TRAN_ID, ~SRAN_ID ) @ #i2 )
+                          case connect_networks_Xn
+                          solve( SessionHandover( <~SRAN_ID, ~TRAN_ID>,
+                                                  KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'),
+                                                  KDF(KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), ~TRAN_ID)
+                                 ) @ #i3 )
+                            case sran_snd_ho_req_hkd
+                            solve( CreatePDUSession( ~PDU_SESSION_ID.1, <~CN_ID.1, ~SUPI.1, ~SRAN_ID>
+                                   ) @ #j )
+                              case init_UE
+                              solve( !KU( senc(<'ho_init', ~TRAN_ID, NCC, C_RNTI_new.1>,
+                                               KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'))
+                                     ) @ #vk.1 )
+                                case sran_snd_ran_init_and_sn_status_transfer
+                                solve( !KU( senc('registration_accept', KDF(~K_SEAF, ~SUPI)) ) @ #vk.3 )
+                                  case cn_rcv_registration_req_registration_accept
+                                  solve( RcvS( ~cid_Xn, ~TRAN_ID, ~SRAN_ID,
+                                               <'ho_req_ack', '0', ~C_RNTI, ~C_RNTI_new>
+                                         ) ▶₁ #j2 )
+                                    case receive_secure_case_1
+                                    solve( St_1_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF,
+                                                    KDF(~K_SEAF, ~SUPI),
+                                                    KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), NH, '0',
+                                                    ~SRAN_ID.1
+                                           ) ▶₀ #j3 )
+                                      case init_UE
+                                      solve( PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ) ▶₁ #j4 )
+                                        case tran_rcv_ho_req_snd_ack_case_1
+                                        solve( RcvS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID, 'sn_status_transfer'
+                                               ) ▶₂ #j4 )
+                                          case receive_secure_case_1
+                                          solve( PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID
+                                                 ) ▶₀ #vr.4 )
+                                            case init_UE
+                                            solve( RcvS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID,
+                                                         <'ho_req', ~TRAN_ID, 
+                                                          KDF(KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'),
+                                                              ~TRAN_ID), 
+                                                          NCC, ~C_RNTI_current, ~PDU_SESSION_ID>
+                                                   ) ▶₃ #vr.4 )
+                                              case receive_secure_case_1
+                                              solve( RcvS( ~cid_N3, ~CN_ID, ~SRAN_ID, 'n3_end_marker'
+                                                     ) ▶₂ #vr.5 )
+                                                case receive_secure_case_1
+                                                solve( RcvS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID, 'n3_end_marker'
+                                                       ) ▶₂ #vr.10 )
+                                                  case receive_secure_case_1
+                                                  solve( RcvS( ~cid_N2.1, ~CN_ID, ~TRAN_ID,
+                                                               <'n2_path_switch_req_ack', NH_fresh, NCC_inc>
+                                                         ) ▶₃ #vr.10 )
+                                                    case receive_secure_case_1
+                                                    solve( RcvS( ~cid_N2.2, ~TRAN_ID.1, ~CN_ID,
+                                                                 <'MRU', 5G_GUTI.1>
+                                                           ) ▶₂ #vr.15 )
+                                                      case receive_secure_case_1
+                                                      solve( !KU( senc(<'MRU', 5G_GUTI.1>,
+                                                                       KDF(KDF(KDF(~K_SEAF, ~SUPI),
+                                                                               'MAX_NAS_COUNT'),
+                                                                           ~TRAN_ID))
+                                                             ) @ #vk.7 )
+                                                        case ue_snd_registration_req_case_1
+                                                        solve( PDU_Session( ~PDU_SESSION_ID.2, ~CN_ID,
+                                                                            ~SUPI.1, ~SRAN_ID.1
+                                                               ) ▶₂ #vr.16 )
+                                                          case cn_rcv_n2_path_switch_req_snd_n3_end_marker
+                                                          solve( Intermediate_key( ~SUPI.1, ~SRAN_ID.1,
+                                                                                   ~CN_ID, <'NH', NH.1>
+                                                                 ) ▶₃ #vr.16 )
+                                                            case init_UE
+                                                            solve( St_1_CN( ~CN_ID, ~K_SEAF.1,
+                                                                            KDF(~K_SEAF, ~SUPI),
+                                                                            ~PDU_SESSION_ID.2,
+                                                                            KDF(KDF(~K_SEAF, ~SUPI),
+                                                                                KDF(KDF(~K_SEAF, ~SUPI),
+                                                                                    'MAX_NAS_COUNT')),
+                                                                            NCC.1, ~SRAN_ID
+                                                                   ) ▶₀ #vr.17 )
+                                                              case init_UE
+                                                              solve( PDU_Session( ~PDU_SESSION_ID, ~CN_ID,
+                                                                                  ~SUPI, ~SRAN_ID
+                                                                     ) ▶₁ #vr.17 )
+                                                                case tran_rcv_sn_status_transfer_and_ran_completion
+                                                                solve( RcvS( ~cid_N2.2, ~TRAN_ID.1, ~CN_ID,
+                                                                             <'n2_path_switch_req', 
+                                                                              ~PDU_SESSION_ID>
+                                                                       ) ▶₄ #vr.17 )
+                                                                  case receive_secure_case_1
+                                                                  solve( RcvS( ~cid_Xn, ~SRAN_ID, ~TRAN_ID,
+                                                                               <'ho_req', ~TRAN_ID, 
+                                                                                K_gNB_star, '0', ~C_RNTI, 
+                                                                                ~PDU_SESSION_ID.2>
+                                                                         ) ▶₃ #vr.20 )
+                                                                    case receive_secure_case_1
+                                                                    solve( RcvS( ~cid_Xn.1, ~SRAN_ID,
+                                                                                 ~TRAN_ID,
+                                                                                 <'ho_req', ~TRAN_ID, 
+                                                                                  K_gNB_star, NCC.1, 
+                                                                                  ~C_RNTI_current, 
+                                                                                  ~PDU_SESSION_ID>
+                                                                           ) ▶₃ #vr.20 )
+                                                                      case receive_secure_case_1
+                                                                      solve( St_1_CN( ~CN_ID, ~K_SEAF.1,
+                                                                                      K_AMF.1,
+                                                                                      ~PDU_SESSION_ID.2, NH.1,
+                                                                                      NCC.1, ~SRAN_ID
+                                                                             ) ▶₀ #vr.26 )
+                                                                        case init_UE
+                                                                        solve( !KU( senc('RRCReconfigurationComplete',
+                                                                                         KDF(KDF(KDF(~K_SEAF,
+                                                                                                     ~SUPI),
+                                                                                                 'MAX_NAS_COUNT'),
+                                                                                             ~TRAN_ID))
+                                                                               ) @ #vk.4 )
+                                                                          case ue_snd_ran_completion_case_1
+                                                                          solve( CreatePDUSession( ~PDU_SESSION_ID,
+                                                                                                   <~CN_ID, 
+                                                                                                    ~SUPI, 
+                                                                                                    ~SRAN_ID>
+                                                                                 ) @ #j )
+                                                                          /* in loop (dpth: 1, it: 1) */
+                                                                            case init_UE
+                                                                            solve( CreatePDUSession( ~PDU_SESSION_ID,
+                                                                                                     <~CN_ID, 
+                                                                                                      ~SUPI, 
+                                                                                                      ~SRAN_ID
+                                                                                                     >
+                                                                                   ) @ #j.1 )
+                                                                            /* in loop (dpth: 1, it: 2) */
+                                                                              case init_UE
+                                                                              solve( CreatePDUSession( ~PDU_SESSION_ID,
+                                                                                                       <
+                                                                                                        ~CN_ID, 
+                                                                                                        ~SUPI, 
+                                                                                                        ~SRAN_ID
+                                                                                                       >
+                                                                                     ) @ #j.1 )
+                                                                              /* in loop (dpth: 1, it: 3) */
+                                                                                case init_UE
+                                                                                solve( CreatePDUSession( ~PDU_SESSION_ID,
+                                                                                                         <
+                                                                                                          ~CN_ID, 
+                                                                                                          ~SUPI, 
+                                                                                                          ~SRAN_ID
+                                                                                                         >
+                                                                                       ) @ #j.1 )
+                                                                                /* in loop (dpth: 1, it: 4) */
+                                                                                  case init_UE
+                                                                                  solve( CreatePDUSession( ~PDU_SESSION_ID,
+                                                                                                           <
+                                                                                                            ~CN_ID, 
+                                                                                                            ~SUPI, 
+                                                                                                            ~SRAN_ID
+                                                                                                           >
+                                                                                         ) @ #j.1 )
+                                                                                  /* in loop (dpth: 1, it: 5)
+                                                                                  */
+                                                                                    case init_UE
+                                                                                    solve( CreatePDUSession( ~PDU_SESSION_ID.2,
+                                                                                                             <
+                                                                                                              ~CN_ID, 
+                                                                                                              ~SUPI.1, 
+                                                                                                              ~SRAN_ID.1
+                                                                                                             >
+                                                                                           ) @ #j.1 )
+                                                                                    /*
+                                                                                    in loop (dpth: 1, it: 6)
+                                                                                    */
+                                                                                      case init_UE
+                                                                                      solve( CreatePDUSession( ~PDU_SESSION_ID,
+                                                                                                               <
+                                                                                                                ~CN_ID, 
+                                                                                                                ~SUPI, 
+                                                                                                                ~SRAN_ID
+                                                                                                               >
+                                                                                             ) @ #j.1 )
+                                                                                      /*
+                                                                                      in loop (dpth: 1, it: 7)
+                                                                                      */
+                                                                                        case init_UE
+                                                                                        solve( CreatePDUSession( ~PDU_SESSION_ID,
+                                                                                                                 <
+                                                                                                                  ~CN_ID, 
+                                                                                                                  ~SUPI, 
+                                                                                                                  ~SRAN_ID
+                                                                                                                 >
+                                                                                               ) @ #j.1 )
+                                                                                        /*
+                                                                                        in loop (dpth: 1, it: 8)
+                                                                                        */
+                                                                                          case init_UE
+                                                                                          solve( PDU_Session( ~PDU_SESSION_ID,
+                                                                                                              ~CN_ID,
+                                                                                                              ~SUPI,
+                                                                                                              ~SRAN_ID
+                                                                                                 ) ▶₂ #vr.30 )
+                                                                                          /*
+                                                                                          in loop (dpth: 1, it: 9)
+                                                                                          */
+                                                                                            case cn_rcv_n2_path_switch_req_snd_n3_end_marker
+                                                                                            solve( Intermediate_key( ~SUPI,
+                                                                                                                     ~SRAN_ID,
+                                                                                                                     ~CN_ID,
+                                                                                                                     <
+                                                                                                                      'NH', 
+                                                                                                                      NH
+                                                                                                                     >
+                                                                                                   ) ▶₃ #vr.30 )
+                                                                                            /*
+                                                                                            in loop (dpth: 1, it: 10)
+                                                                                            */
+                                                                                              case init_UE
+                                                                                              solve( St_1_CN( ~CN_ID,
+                                                                                                              ~K_SEAF.1,
+                                                                                                              K_AMF,
+                                                                                                              ~PDU_SESSION_ID,
+                                                                                                              NH,
+                                                                                                              NCC,
+                                                                                                              ~SRAN_ID
+                                                                                                     ) ▶₀ #vr.33 )
+                                                                                              /*
+                                                                                              in loop (dpth: 1, it: 11)
+                                                                                              */
+                                                                                                case init_UE
+                                                                                                SOLVED // trace found
+                                                                                              qed
+                                                                                            qed
+                                                                                          qed
+                                                                                        qed
+                                                                                      qed
+                                                                                    qed
+                                                                                  qed
+                                                                                qed
+                                                                              qed
+                                                                            qed
+                                                                          qed
+                                                                        qed
+                                                                      qed
+                                                                    qed
+                                                                  qed
+                                                                qed
+                                                              qed
+                                                            qed
+                                                          qed
+                                                        qed
+                                                      qed
+                                                    qed
+                                                  qed
+                                                qed
+                                              qed
+                                            qed
+                                          qed
+                                        qed
+                                      qed
+                                    qed
+                                  qed
+                                qed
+                              qed
+                            qed
+                          qed
+                        qed
+                      qed
+                    qed
+                  qed
+                qed
+              qed
+            qed
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+lemma executability_hkd_vkd:
+  exists-trace
+  "∃ x0 x1 x2 x3 s t #i1 #i2 #i3 #i4 #i5 #j1 #j2 #j3 #j4 #j5 #j6 #l1 #l2
+     #l3 #l4 #l5 #l6.
+    ((((((((((((((((((((((((((((((((((((((((((Init( 'K_gNB', x0 ) @ #i1) ∧
+                                             (Connect( s, t ) @ #i2)) ∧
+                                            (Connect( t, s ) @ #i2)) ∧
+                                           (SessionHandover( <s, t>, x0, x1 ) @ #i3)) ∧
+                                          (HandoverInit( <s, t>, x1, x2 ) @ #i4)) ∧
+                                         (SessionHandover( <t, s>, x2, x3 ) @ #i5)) ∧
+                                        (HorizontalSRAN( x1 ) @ #j1)) ∧
+                                       (HandoverPreparationDone( x1 ) @ #j2)) ∧
+                                      (HorizontalUE( x1 ) @ #j3)) ∧
+                                     (HandoverExecutionDone( x1 ) @ #j4)) ∧
+                                    (HandoverCompletionDone( x1 ) @ #j5)) ∧
+                                   (MobilityRegistrationUpdateDone( x1 ) @ #j6)) ∧
+                                  (VerticalSRAN( x3 ) @ #l1)) ∧
+                                 (HandoverPreparationDone( x3 ) @ #l2)) ∧
+                                (VerticalUE( x3 ) @ #l3)) ∧
+                               (HandoverExecutionDone( x3 ) @ #l4)) ∧
+                              (HandoverCompletionDone( x3 ) @ #l5)) ∧
+                             (MobilityRegistrationUpdateDone( x3 ) @ #l6)) ∧
+                            (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                           (¬(x1 = x3))) ∧
+                          (#i3 < #i4)) ∧
+                         (#i4 < #i5)) ∧
+                        (#j1 < #l1)) ∧
+                       (#j2 < #l2)) ∧
+                      (#j3 < #l3)) ∧
+                     (#j4 < #l4)) ∧
+                    (#j5 < #l5)) ∧
+                   (#j6 < #l6)) ∧
+                  (∀ a #k. (Init( 'K_gNB', a ) @ #k) ⇒ (#k = #i1))) ∧
+                 (∀ a b #k. (Connect( a, b ) @ #k) ⇒ (#k = #i2))) ∧
+                (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ (#k = #i4))) ∧
+               (∀ a b c #k.
+                 (SessionHandover( a, b, c ) @ #k) ⇒ ((#k = #i3) ∨ (#k = #i5)))) ∧
+              (∀ a #k. (HorizontalSRAN( a ) @ #k) ⇒ (#k = #j1))) ∧
+             (∀ a #k. (VerticalSRAN( a ) @ #k) ⇒ (#k = #l1))) ∧
+            (∀ a #k.
+              (HandoverPreparationDone( a ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2)))) ∧
+           (∀ a #k. (HorizontalUE( a ) @ #k) ⇒ (#k = #j3))) ∧
+          (∀ a #k. (VerticalUE( a ) @ #k) ⇒ (#k = #l3))) ∧
+         (∀ a #k.
+           (HandoverExecutionDone( a ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4)))) ∧
+        (∀ a #k.
+          (HandoverCompletionDone( a ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5)))) ∧
+       (∀ a #k.
+         (MobilityRegistrationUpdateDone( a ) @ #k) ⇒
+         ((#k = #j6) ∨ (#k = #l6)))) ∧
+      (∀ a b #k1 #k2.
+        ((CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a b #k1 #k2.
+       ((UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a b c d #k1 #k2.
+      ((Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2)) ⇒ (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x0 x1 x2 x3 s t #i1 #i2 #i3 #i4 #i5 #j1 #j2 #j3 #j4 #j5 #j6 #l1 #l2
+   #l3 #l4 #l5 #l6.
+  (Init( 'K_gNB', x0 ) @ #i1) ∧
+  (Connect( s, t ) @ #i2) ∧
+  (Connect( t, s ) @ #i2) ∧
+  (SessionHandover( <s, t>, x0, x1 ) @ #i3) ∧
+  (HandoverInit( <s, t>, x1, x2 ) @ #i4) ∧
+  (SessionHandover( <t, s>, x2, x3 ) @ #i5) ∧
+  (HorizontalSRAN( x1 ) @ #j1) ∧
+  (HandoverPreparationDone( x1 ) @ #j2) ∧
+  (HorizontalUE( x1 ) @ #j3) ∧
+  (HandoverExecutionDone( x1 ) @ #j4) ∧
+  (HandoverCompletionDone( x1 ) @ #j5) ∧
+  (MobilityRegistrationUpdateDone( x1 ) @ #j6) ∧
+  (VerticalSRAN( x3 ) @ #l1) ∧
+  (HandoverPreparationDone( x3 ) @ #l2) ∧
+  (VerticalUE( x3 ) @ #l3) ∧
+  (HandoverExecutionDone( x3 ) @ #l4) ∧
+  (HandoverCompletionDone( x3 ) @ #l5) ∧
+  (MobilityRegistrationUpdateDone( x3 ) @ #l6)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (¬(x1 = x3)) ∧
+  (#i3 < #i4) ∧
+  (#i4 < #i5) ∧
+  (#j1 < #l1) ∧
+  (#j2 < #l2) ∧
+  (#j3 < #l3) ∧
+  (#j4 < #l4) ∧
+  (#j5 < #l5) ∧
+  (#j6 < #l6) ∧
+  (∀ a #k. (Init( 'K_gNB', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a b #k. (Connect( a, b ) @ #k) ⇒ #k = #i2) ∧
+  (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ #k = #i4) ∧
+  (∀ a b c #k.
+    (SessionHandover( a, b, c ) @ #k) ⇒ ((#k = #i3) ∨ (#k = #i5))) ∧
+  (∀ a #k. (HorizontalSRAN( a ) @ #k) ⇒ #k = #j1) ∧
+  (∀ a #k. (VerticalSRAN( a ) @ #k) ⇒ #k = #l1) ∧
+  (∀ a #k.
+    (HandoverPreparationDone( a ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2))) ∧
+  (∀ a #k. (HorizontalUE( a ) @ #k) ⇒ #k = #j3) ∧
+  (∀ a #k. (VerticalUE( a ) @ #k) ⇒ #k = #l3) ∧
+  (∀ a #k. (HandoverExecutionDone( a ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4))) ∧
+  (∀ a #k.
+    (HandoverCompletionDone( a ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5))) ∧
+  (∀ a #k.
+    (MobilityRegistrationUpdateDone( a ) @ #k) ⇒ ((#k = #j6) ∨ (#k = #l6))) ∧
+  (∀ a b #k1 #k2.
+    (CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b c d #k1 #k2.
+    (Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma executability_hkd_hkd:
+  exists-trace
+  "∃ x0 x1 x2 x3 s t #i1 #i2 #i3 #i4 #i5 #j1 #j2 #j3 #j4 #j5 #j6 #l1 #l2
+     #l3 #l4 #l5 #l6.
+    (((((((((((((((((((((((((((((((((((((((((((Init( 'K_gNB', x0 ) @ #i1) ∧
+                                              (Connect( s, t ) @ #i2)) ∧
+                                             (Connect( t, s ) @ #i2)) ∧
+                                            (SessionHandover( <s, t>, x0, x1 ) @ #i3)) ∧
+                                           (HandoverInit( <s, t>, x1, x2 ) @ #i4)) ∧
+                                          (SessionHandover( <t, s>, x2, x3 ) @ #i5)) ∧
+                                         (HorizontalSRAN( x1 ) @ #j1)) ∧
+                                        (HandoverPreparationDone( x1 ) @ #j2)) ∧
+                                       (HorizontalUE( x1 ) @ #j3)) ∧
+                                      (HandoverExecutionDone( x1 ) @ #j4)) ∧
+                                     (HandoverCompletionDone( x1 ) @ #j5)) ∧
+                                    (MobilityRegistrationUpdateDone( x1 ) @ #j6)) ∧
+                                   (HorizontalSRAN( x3 ) @ #l1)) ∧
+                                  (HandoverPreparationDone( x3 ) @ #l2)) ∧
+                                 (HorizontalUE( x3 ) @ #l3)) ∧
+                                (HandoverExecutionDone( x3 ) @ #l4)) ∧
+                               (HandoverCompletionDone( x3 ) @ #l5)) ∧
+                              (MobilityRegistrationUpdateDone( x3 ) @ #l6)) ∧
+                             (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                            (¬(∃ a #k. VerticalSRAN( a ) @ #k))) ∧
+                           (¬(∃ a #k. VerticalUE( a ) @ #k))) ∧
+                          (¬(x1 = x2))) ∧
+                         (¬(x2 = x3))) ∧
+                        (#i3 < #i4)) ∧
+                       (#i4 < #i5)) ∧
+                      (#j1 < #l1)) ∧
+                     (#j2 < #l2)) ∧
+                    (#j3 < #l3)) ∧
+                   (#j4 < #l4)) ∧
+                  (#j5 < #l5)) ∧
+                 (#j6 < #l6)) ∧
+                (∀ a #k. (Init( 'K_gNB', a ) @ #k) ⇒ (#k = #i1))) ∧
+               (∀ a b #k. (Connect( a, b ) @ #k) ⇒ (#k = #i2))) ∧
+              (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ (#k = #i4))) ∧
+             (∀ a b c #k.
+               (SessionHandover( a, b, c ) @ #k) ⇒ ((#k = #i3) ∨ (#k = #i5)))) ∧
+            (∀ a #k. (HorizontalSRAN( a ) @ #k) ⇒ ((#k = #j1) ∨ (#k = #l1)))) ∧
+           (∀ a #k.
+             (HandoverPreparationDone( a ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2)))) ∧
+          (∀ a #k. (HorizontalUE( a ) @ #k) ⇒ ((#k = #j3) ∨ (#k = #l3)))) ∧
+         (∀ a #k.
+           (HandoverExecutionDone( a ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4)))) ∧
+        (∀ a #k.
+          (HandoverCompletionDone( a ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5)))) ∧
+       (∀ a #k.
+         (MobilityRegistrationUpdateDone( a ) @ #k) ⇒
+         ((#k = #j6) ∨ (#k = #l6)))) ∧
+      (∀ a b #k1 #k2.
+        ((CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a b #k1 #k2.
+       ((UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a b c d #k1 #k2.
+      ((Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2)) ⇒ (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x0 x1 x2 x3 s t #i1 #i2 #i3 #i4 #i5 #j1 #j2 #j3 #j4 #j5 #j6 #l1 #l2
+   #l3 #l4 #l5 #l6.
+  (Init( 'K_gNB', x0 ) @ #i1) ∧
+  (Connect( s, t ) @ #i2) ∧
+  (Connect( t, s ) @ #i2) ∧
+  (SessionHandover( <s, t>, x0, x1 ) @ #i3) ∧
+  (HandoverInit( <s, t>, x1, x2 ) @ #i4) ∧
+  (SessionHandover( <t, s>, x2, x3 ) @ #i5) ∧
+  (HorizontalSRAN( x1 ) @ #j1) ∧
+  (HandoverPreparationDone( x1 ) @ #j2) ∧
+  (HorizontalUE( x1 ) @ #j3) ∧
+  (HandoverExecutionDone( x1 ) @ #j4) ∧
+  (HandoverCompletionDone( x1 ) @ #j5) ∧
+  (MobilityRegistrationUpdateDone( x1 ) @ #j6) ∧
+  (HorizontalSRAN( x3 ) @ #l1) ∧
+  (HandoverPreparationDone( x3 ) @ #l2) ∧
+  (HorizontalUE( x3 ) @ #l3) ∧
+  (HandoverExecutionDone( x3 ) @ #l4) ∧
+  (HandoverCompletionDone( x3 ) @ #l5) ∧
+  (MobilityRegistrationUpdateDone( x3 ) @ #l6)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (∀ a #k. (VerticalSRAN( a ) @ #k) ⇒ ⊥) ∧
+  (∀ a #k. (VerticalUE( a ) @ #k) ⇒ ⊥) ∧
+  (¬(x1 = x2)) ∧
+  (¬(x2 = x3)) ∧
+  (#i3 < #i4) ∧
+  (#i4 < #i5) ∧
+  (#j1 < #l1) ∧
+  (#j2 < #l2) ∧
+  (#j3 < #l3) ∧
+  (#j4 < #l4) ∧
+  (#j5 < #l5) ∧
+  (#j6 < #l6) ∧
+  (∀ a #k. (Init( 'K_gNB', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a b #k. (Connect( a, b ) @ #k) ⇒ #k = #i2) ∧
+  (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ #k = #i4) ∧
+  (∀ a b c #k.
+    (SessionHandover( a, b, c ) @ #k) ⇒ ((#k = #i3) ∨ (#k = #i5))) ∧
+  (∀ a #k. (HorizontalSRAN( a ) @ #k) ⇒ ((#k = #j1) ∨ (#k = #l1))) ∧
+  (∀ a #k.
+    (HandoverPreparationDone( a ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2))) ∧
+  (∀ a #k. (HorizontalUE( a ) @ #k) ⇒ ((#k = #j3) ∨ (#k = #l3))) ∧
+  (∀ a #k. (HandoverExecutionDone( a ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4))) ∧
+  (∀ a #k.
+    (HandoverCompletionDone( a ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5))) ∧
+  (∀ a #k.
+    (MobilityRegistrationUpdateDone( a ) @ #k) ⇒ ((#k = #j6) ∨ (#k = #l6))) ∧
+  (∀ a b #k1 #k2.
+    (CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b c d #k1 #k2.
+    (Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma injectiveagreement_ue_tran_k_gnb:
+  all-traces
+  "∀ a b r #i.
+    (Commit( a, b, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #i) ⇒
+    ((∃ #j.
+       (Running( b, a, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #j) ∧
+       (¬(∃ a2 b2 #i2.
+           (Commit( a2, b2, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #i2) ∧
+           (¬(#i2 = #i))))) ∨
+     (∃ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ a b r #i.
+  (Commit( a, b, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #i)
+ ∧
+  (∀ #j.
+    (Running( b, a, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #j)
+   ⇒
+    ∃ a2 b2 #i2.
+     (Commit( a2, b2, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #i2)
+    ∧
+     ¬(#i2 = #i)) ∧
+  (∀ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma injectiveagreement_tran_ue_k_gnb:
+  all-traces
+  "∀ a b r #i.
+    (Commit( a, b, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #i) ⇒
+    ((∃ #j.
+       (Running( b, a, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #j) ∧
+       (¬(∃ a2 b2 #i2.
+           (Commit( a2, b2, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #i2) ∧
+           (¬(#i2 = #i))))) ∨
+     (∃ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ a b r #i.
+  (Commit( a, b, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #i)
+ ∧
+  (∀ #j.
+    (Running( b, a, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #j)
+   ⇒
+    ∃ a2 b2 #i2.
+     (Commit( a2, b2, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #i2)
+    ∧
+     ¬(#i2 = #i)) ∧
+  (∀ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_supi:
+  all-traces
+  "∀ s #i.
+    (Secret( <'SUPI', s> ) @ #i) ⇒
+    ((¬(∃ #j. K( s ) @ #j)) ∨
+     (∃ X #j. (Rev( X, <'SUPI', s> ) @ #j) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ s #i.
+  (Secret( <'SUPI', s> ) @ #i)
+ ∧
+  (∃ #j. (K( s ) @ #j)) ∧
+  (∀ X #j. (Rev( X, <'SUPI', s> ) @ #j) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_k_seaf:
+  all-traces
+  "∀ p #i.
+    (Secret( <'K_SEAF', p> ) @ #i) ⇒
+    ((¬(∃ #j. K( p ) @ #j)) ∨
+     (∃ X #j. (Rev( X, <'K_SEAF', p> ) @ #j) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p #i.
+  (Secret( <'K_SEAF', p> ) @ #i)
+ ∧
+  (∃ #j. (K( p ) @ #j)) ∧
+  (∀ X #j. (Rev( X, <'K_SEAF', p> ) @ #j) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_k_amf:
+  all-traces
+  "∀ p q s #i #j.
+    ((Secret( <'K_AMF', q> ) @ #i) ∧
+     (KeyDerived( <'K_AMF', q>, p, q, s ) @ #j)) ⇒
+    (((¬(∃ #k. K( q ) @ #k)) ∨
+      (∃ X #k. (Rev( X, <'K_AMF', q> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+     ((∃ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i)) ∧
+      (∃ X #k. (Rev( X, <'SUPI', s> ) @ #k) ∧ (Honest( X ) @ #i))))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q s #i #j.
+  (Secret( <'K_AMF', q> ) @ #i) ∧
+  (KeyDerived( <'K_AMF', q>, p, q, s ) @ #j)
+ ∧
+  (∃ #k. (K( q ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_AMF', q> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (((∀ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∨
+    (∀ X #k. (Rev( X, <'SUPI', s> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)))"
+*/
+by sorry
+
+lemma secret_k_gnb:
+  all-traces
+  "∀ p q r s #i #j.
+    ((Secret( <'K_gNB', r> ) @ #i) ∧
+     (KeyDerived( <'K_gNB', r>, p, q, s ) @ #j)) ⇒
+    ((((¬(∃ #k. K( r ) @ #k)) ∨
+       (∃ X #k. (Rev( X, <'K_gNB', r> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+      (∃ X #k. (Rev( X, <'K_AMF', q> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+     ((∃ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i)) ∧
+      (∃ X #k. (Rev( X, <'SUPI', s> ) @ #k) ∧ (Honest( X ) @ #i))))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q r s #i #j.
+  (Secret( <'K_gNB', r> ) @ #i) ∧
+  (KeyDerived( <'K_gNB', r>, p, q, s ) @ #j)
+ ∧
+  (∃ #k. (K( r ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_gNB', r> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, <'K_AMF', q> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (((∀ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∨
+    (∀ X #k. (Rev( X, <'SUPI', s> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)))"
+*/
+by sorry
+
+lemma secret_k_gnb_star:
+  all-traces
+  "∀ p q r s t #i #j.
+    (((Secret( <'K_gNB_star', r> ) @ #i) ∧
+      (KeyDerived( <'K_gNB_star', r>, p, q, s ) @ #j)) ∧
+     (Bind( <'K_gNB_star', r>, t ) @ #j)) ⇒
+    ((((((¬(∃ #k. K( r ) @ #k)) ∨
+         (∃ X #k. (Rev( X, <'K_gNB', r> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+        (∃ X #k. (Rev( X, <'K_AMF', q> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+       ((∃ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i)) ∧
+        (∃ X #k. (Rev( X, <'SUPI', s> ) @ #k) ∧ (Honest( X ) @ #i)))) ∨
+      (∃ X n #k. (Rev( X, <n, t> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+     (∃ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q r s t #i #j.
+  (Secret( <'K_gNB_star', r> ) @ #i) ∧
+  (KeyDerived( <'K_gNB_star', r>, p, q, s ) @ #j) ∧
+  (Bind( <'K_gNB_star', r>, t ) @ #j)
+ ∧
+  (∃ #k. (K( r ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_gNB', r> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, <'K_AMF', q> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (((∀ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∨
+    (∀ X #k. (Rev( X, <'SUPI', s> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥))) ∧
+  (∀ X n #k. (Rev( X, <n, t> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* All wellformedness checks were successful. */
+
+/*
+Generated from:
+Tamarin version 1.11.0
+Maude version 3.4
+Git revision: df2fd84dbb3b3def8309c2a84c04d653d7c4db77 (with uncommited changes), branch: mergedAutomatedStrategies
+Compiled at: 2026-01-16 14:58:06.862219863 UTC
+*/
+
+end

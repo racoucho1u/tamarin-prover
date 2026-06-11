@@ -1,0 +1,25 @@
+{
+  "task_id": "jcs19_xor--LAK06_state__proba--helpingStackHash--merged",
+  "warnings": [],
+  "tamarin_timing": 4.48,
+  "wrapper_measures": {
+    "time": 4.609610319137573,
+    "avg_memory": 48.46171875,
+    "peak_memory": 68.52734375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/jcs19_xor--LAK06_state__proba--helpingStackHash--merged.spthy",
+  "verified_lemma": {
+    "helpingStackHash": {
+      "steps": 13,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helpingUpdateKey",
+    "helpingSecrecy",
+    "executable",
+    "noninjectiveagreementTAG",
+    "noninjectiveagreementREADER"
+  ]
+}

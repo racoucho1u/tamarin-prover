@@ -1,0 +1,2723 @@
+theory PKCS11_siv begin
+
+// Function signature and definition of the equational theory E
+
+builtins: multiset
+functions: epsilon/0, fst/1, getIV/1, getTag/1, kdf/2, pair/2, sdec/4,
+           sdecSuc/4, senc/4, snd/1, true/0
+equations:
+    fst(<x.1, x.2>) = x.1,
+    getIV(senc(k, iv, t, m)) = iv,
+    getTag(senc(k, iv, t, m)) = t,
+    sdec(k, iv, t, senc(k, iv, t, m)) = m,
+    sdecSuc(k, iv, t, senc(k, iv, t, m)) = true,
+    snd(<x.1, x.2>) = x.2
+
+
+
+
+
+
+
+/* looping facts with injective instances: DCtr/2 */
+
+
+
+restriction UniqueInteger:
+  "∀ n #i #j. ((IsInteger( n ) @ #i) ∧ (IsInteger( n ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+restriction Lesser:
+  "∀ x y #i. (LessThan( x, y ) @ #i) ⇒ (∃ z. (x++z) = y)"
+
+restriction TrueIsTrue:
+  "∀ x #i. (IsTrue( x ) @ #i) ⇒ (x = true)"
+  // safety formula
+
+restriction Equality:
+  "∀ x y #i. (Eq( x, y ) @ #i) ⇒ (x = y)"
+  // safety formula
+
+restriction Inequality:
+  "∀ x #i. (Neq( x, x ) @ #i) ⇒ (⊥)"
+  // safety formula
+
+rule (modulo E) One[color=#aaaaee]:
+   [ ] --[ IsInteger( '1' ) ]-> [ !Integer( '1' ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Suc[color=#ccccff]:
+   [ !Integer( n ), In( n ) ]
+  --[ IsInteger( ('1'++n) ) ]->
+   [ !Integer( ('1'++n) ) ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Device[color=#ffccff]:
+   [ Fr( ~device ), !Integer( '1' ) ]
+  --[ CreateDevice( ~device ), DCtrIs( ~device, '1' ) ]->
+   [ !Device( ~device ), DCtr( ~device, '1' ), Out( <~device, '1'> ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Key[color=#ccff99]:
+   [ !Device( device ), !Integer( lvl ), Fr( ~key ), Fr( ~handle ) ]
+  --[
+  CreateKey( ~key, ~handle, lvl ), InitKey( device, ~key, ~handle, lvl )
+  ]->
+   [ !Store( device, ~handle, ~key, lvl ), Out( <~handle, lvl> ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) SharedKey[color=#ccff99]:
+   [
+   !Integer( lvl ), !Device( ~device ), !Device( ~ecived ), Fr( ~key ),
+   Fr( ~h )
+   ]
+  --[
+  CreateKey( ~key, ~h, lvl ), ShareKey( ~key, lvl ),
+  InitKey( ~device, ~key, ~h, lvl ), InitKey( ~ecived, ~key, ~h, lvl ),
+  LessThan( ('1'++'1'++'1'), lvl )
+  ]->
+   [
+   !Store( ~device, ~h, ~key, lvl ), !Store( ~ecived, ~h, ~key, lvl ),
+   Out( <~h, lvl> ), Out( <~h, lvl> )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Encrypt[color=#ffcc99]:
+   [
+   !Integer( ('1'++ctr) ), !Device( device ), !Store( device, H, key, lvl ),
+   DCtr( device, ctr ), In( msg )
+   ]
+  --[
+  UseKey( device, key, H, lvl ), DCtrIs( device, ('1'++ctr) ),
+  IV( <'1', 'none', device, ctr> )
+  ]->
+   [
+   DCtr( device, ('1'++ctr) ),
+   Out( senc(key, <'1', 'none', device, ctr>, epsilon, msg) )
+   ]
+
+  // loop breaker: [3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Wrap[color=#ff9999]:
+   [
+   !Integer( ('1'++ctr) ), !Device( device ), !Store( device, h, wk, wl ),
+   !Store( device, ~eh, ek, el ), DCtr( device, ctr )
+   ]
+  --[
+  UseKey( device, wk, h, wl ), DCtrIs( device, ('1'++ctr) ),
+  IV( <el, ~eh, device, ctr> ), LessThan( el, wl )
+  ]->
+   [
+   DCtr( device, ('1'++ctr) ),
+   Out( senc(wk, <el, ~eh, device, ctr>, epsilon, ek) )
+   ]
+
+  // loop breaker: [4]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) Decrypt[color=#ffcc99]:
+   [ !Device( device ), !Store( device, H, key, lvl ), In( c ) ]
+  --[
+  UseKey( device, key, H, lvl ),
+  Decrypt( sdec(key, getIV(c), epsilon, c) ),
+  IsTrue( sdecSuc(key, getIV(c), epsilon, c) ), Eq( fst(getIV(c)), '1' ),
+  Eq( fst(snd(getIV(c))), 'none' )
+  ]->
+   [ Out( sdec(key, getIV(c), epsilon, c) ) ]
+
+  /*
+  rule (modulo AC) Decrypt[color=#ffcc99]:
+     [ !Device( device ), !Store( device, H, key, lvl ), In( c ) ]
+    --[
+    UseKey( device, key, H, lvl ), Decrypt( z ), IsTrue( z.1 ),
+    Eq( z.2, '1' ), Eq( z.3, 'none' )
+    ]->
+     [ Out( z ) ]
+    variants (modulo AC)
+    1. c     = c.14
+       key   = key.16
+       z     = sdec(key.16, getIV(c.14), epsilon, c.14)
+       z.1   = sdecSuc(key.16, getIV(c.14), epsilon, c.14)
+       z.2   = fst(getIV(c.14))
+       z.3   = fst(snd(getIV(c.14)))
+    
+    2. c     = senc(key.21, x.37, epsilon, z.23)
+       key   = key.21
+       z     = z.23
+       z.1   = true
+       z.2   = fst(x.37)
+       z.3   = fst(snd(x.37))
+    
+    3. c     = senc(key.22, <z.26, x.39>, epsilon, z.24)
+       key   = key.22
+       z     = z.24
+       z.1   = true
+       z.2   = z.26
+       z.3   = fst(x.39)
+    
+    4. c     = senc(key.23, <z.27, z.29, x.41>, epsilon, z.25)
+       key   = key.23
+       z     = z.25
+       z.1   = true
+       z.2   = z.27
+       z.3   = z.29
+    
+    5. c     = senc(x.38, x.39, x.40, x.41)
+       key   = key.23
+       z     = sdec(key.23, x.39, epsilon, senc(x.38, x.39, x.40, x.41))
+       z.1   = sdecSuc(key.23, x.39, epsilon, senc(x.38, x.39, x.40, x.41))
+       z.2   = fst(x.39)
+       z.3   = fst(snd(x.39))
+    
+    6. c     = senc(x.39, <z.28, x.41>, x.42, x.43)
+       key   = key.24
+       z     = sdec(key.24, <z.28, x.41>, epsilon,
+                    senc(x.39, <z.28, x.41>, x.42, x.43))
+       z.1   = sdecSuc(key.24, <z.28, x.41>, epsilon,
+                       senc(x.39, <z.28, x.41>, x.42, x.43))
+       z.2   = z.28
+       z.3   = fst(x.41)
+    
+    7. c     = senc(x.40, <z.29, z.31, x.43>, x.44, x.45)
+       key   = key.25
+       z     = sdec(key.25, <z.29, z.31, x.43>, epsilon,
+                    senc(x.40, <z.29, z.31, x.43>, x.44, x.45))
+       z.1   = sdecSuc(key.25, <z.29, z.31, x.43>, epsilon,
+                       senc(x.40, <z.29, z.31, x.43>, x.44, x.45))
+       z.2   = z.29
+       z.3   = z.31
+  */
+
+rule (modulo E) Unwrap[color=#ff9999]:
+   [
+   !Integer( fst(getIV(c)) ), !Device( device ),
+   !Store( device, h, wk, wl ), In( c )
+   ]
+  --[
+  UseKey( device, wk, h, wl ),
+  ImportKey( device, sdec(wk, getIV(c), epsilon, c), fst(getIV(c)),
+             fst(snd(getIV(c)))
+  ),
+  InitKey( device, sdec(wk, getIV(c), epsilon, c), fst(snd(getIV(c))),
+           fst(getIV(c))
+  ),
+  IsTrue( sdecSuc(wk, getIV(c), epsilon, c) ), Neq( fst(getIV(c)), '1' )
+  ]->
+   [
+   !Store( device, fst(snd(getIV(c))), sdec(wk, getIV(c), epsilon, c),
+           fst(getIV(c))
+   )
+   ]
+
+  // loop breaker: [2]
+  /*
+  rule (modulo AC) Unwrap[color=#ff9999]:
+     [ !Integer( z ), !Device( device ), !Store( device, h, wk, wl ), In( c )
+     ]
+    --[
+    UseKey( device, wk, h, wl ), ImportKey( device, z.2, z, z.1 ),
+    InitKey( device, z.2, z.1, z ), IsTrue( z.3 ), Neq( z, '1' )
+    ]->
+     [ !Store( device, z.1, z.2, z ) ]
+    variants (modulo AC)
+    1. c     = c.11
+       wk    = wk.14
+       z     = fst(getIV(c.11))
+       z.1   = fst(snd(getIV(c.11)))
+       z.2   = sdec(wk.14, getIV(c.11), epsilon, c.11)
+       z.3   = sdecSuc(wk.14, getIV(c.11), epsilon, c.11)
+    
+    2. c     = senc(wk.13, x.20, epsilon, z.17)
+       wk    = wk.13
+       z     = fst(x.20)
+       z.1   = fst(snd(x.20))
+       z.2   = z.17
+       z.3   = true
+    
+    3. c     = senc(wk.14, <z.16, x.22>, epsilon, z.18)
+       wk    = wk.14
+       z     = z.16
+       z.1   = fst(x.22)
+       z.2   = z.18
+       z.3   = true
+    
+    4. c     = senc(wk.15, <z.17, z.18, x.24>, epsilon, z.19)
+       wk    = wk.15
+       z     = z.17
+       z.1   = z.18
+       z.2   = z.19
+       z.3   = true
+    
+    5. c     = senc(x.21, x.22, x.23, x.24)
+       wk    = wk.15
+       z     = fst(x.22)
+       z.1   = fst(snd(x.22))
+       z.2   = sdec(wk.15, x.22, epsilon, senc(x.21, x.22, x.23, x.24))
+       z.3   = sdecSuc(wk.15, x.22, epsilon, senc(x.21, x.22, x.23, x.24))
+    
+    6. c     = senc(x.22, <z.18, x.24>, x.25, x.26)
+       wk    = wk.16
+       z     = z.18
+       z.1   = fst(x.24)
+       z.2   = sdec(wk.16, <z.18, x.24>, epsilon,
+                    senc(x.22, <z.18, x.24>, x.25, x.26))
+       z.3   = sdecSuc(wk.16, <z.18, x.24>, epsilon,
+                       senc(x.22, <z.18, x.24>, x.25, x.26))
+    
+    7. c     = senc(x.23, <z.19, z.20, x.26>, x.27, x.28)
+       wk    = wk.17
+       z     = z.19
+       z.1   = z.20
+       z.2   = sdec(wk.17, <z.19, z.20, x.26>, epsilon,
+                    senc(x.23, <z.19, z.20, x.26>, x.27, x.28))
+       z.3   = sdecSuc(wk.17, <z.19, z.20, x.26>, epsilon,
+                       senc(x.23, <z.19, z.20, x.26>, x.27, x.28))
+    // loop breaker: [2]
+  */
+
+rule (modulo E) Derive[color=#ff9990]:
+   [
+   !Device( device ), !Store( device, h, k, ('1'++'1') ), Fr( r ), Fr( nh )
+   ]
+  --[
+  UseKey( device, k, h, ('1'++'1') ),
+  InitKey( device, kdf(k, r), nh, ('1'++'1') ),
+  CreateKey( kdf(k, r), nh, ('1'++'1') )
+  ]->
+   [ !Store( device, nh, kdf(k, r), ('1'++'1') ), Out( nh ) ]
+
+  // loop breaker: [1]
+  /* has exactly the trivial AC variant */
+
+lemma origin [sources]:
+  all-traces
+  "(∀ m #decrypt.
+     (Decrypt( m ) @ #decrypt) ⇒
+     (∃ #mKU. (!KU( m ) @ #mKU) ∧ (#mKU < #decrypt))) ∧
+   (∀ d k l h #keyImport.
+     (ImportKey( d, k, l, h ) @ #keyImport) ⇒
+     ((∃ #keyCreate.
+        (CreateKey( k, h, l ) @ #keyCreate) ∧ (#keyCreate < #keyImport)) ∨
+      (∃ #keyKU. (!KU( k ) @ #keyKU) ∧ (#keyKU < #keyImport))))"
+/*
+guarded formula characterizing all counter-examples:
+"((∃ m #decrypt.
+    (Decrypt( m ) @ #decrypt)
+   ∧
+    ∀ #mKU. (!KU( m ) @ #mKU) ⇒ ¬(#mKU < #decrypt)) ∨
+  (∃ d k l h #keyImport.
+    (ImportKey( d, k, l, h ) @ #keyImport)
+   ∧
+    (∀ #keyCreate.
+      (CreateKey( k, h, l ) @ #keyCreate) ⇒ ¬(#keyCreate < #keyImport)) ∧
+    (∀ #keyKU. (!KU( k ) @ #keyKU) ⇒ ¬(#keyKU < #keyImport))))"
+*/
+by sorry
+
+lemma Counter_Monotonicity [use_induction, reuse]:
+  all-traces
+  "∀ d c C #before #later.
+    (((DCtrIs( d, c ) @ #before) ∧ (DCtrIs( d, C ) @ #later)) ∧
+     (#before < #later)) ⇒
+    (∃ z. C = (c++z))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ d c C #before #later.
+  (DCtrIs( d, c ) @ #before) ∧ (DCtrIs( d, C ) @ #later)
+ ∧
+  (#before < #later) ∧ (∀ z. (C = (c++z)) ⇒ ⊥)"
+*/
+by sorry
+
+lemma IV_Uniqueness:
+  all-traces
+  "∀ iv #before #later.
+    ((IV( iv ) @ #before) ∧ (IV( iv ) @ #later)) ⇒ (#later = #before)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ iv #before #later.
+  (IV( iv ) @ #before) ∧ (IV( iv ) @ #later) ∧ ¬(#later = #before)"
+*/
+simplify
+solve( (#later < #before)  ∥ (#before < #later) )
+  case case_1
+  solve( IV( iv ) @ #before )
+    case Encrypt
+    solve( !Integer( ('1'++ctr) ) ▶₀ #before )
+      case Suc
+      solve( !Device( device ) ▶₁ #before )
+        case Device
+        solve( !Store( ~device, H, key, lvl ) ▶₂ #before )
+          case Derive
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case Key_case_1
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case Key_case_2
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case SharedKey_case_1
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case SharedKey_case_2
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case Unwrap
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        qed
+      qed
+    qed
+  next
+    case Wrap
+    solve( !Integer( ('1'++ctr) ) ▶₀ #before )
+      case Suc
+      solve( !Device( device ) ▶₁ #before )
+        case Device
+        solve( !Store( ~device, h, wk, (el++z) ) ▶₂ #before )
+          case Derive
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Key_case_1
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Key_case_2
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Key_case_3
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Key_case_4
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_01
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_02
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++z) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_03
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_04
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_05
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_06
+          solve( !Store( ~device, ~eh, ek, ('1'++'1') ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_07
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++x.1) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_08
+          solve( !Store( ~device, ~eh, ek, ('1'++z) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_09
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_10
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++z) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_11
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++'1') ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_12
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++'1'++x) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_13
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_14
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_15
+          solve( !Store( ~device, ~eh, ek, ('1'++'1') ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_16
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++x.1) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_17
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_18
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++z) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_19
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_20
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_21
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_22
+          solve( !Store( ~device, ~eh, ek, ('1'++'1') ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_23
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++x.1) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_24
+          solve( !Store( ~device, ~eh, ek, ('1'++z) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_25
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_26
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++z) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_27
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++'1') ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_28
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++'1'++x) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_29
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_30
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_31
+          solve( !Store( ~device, ~eh, ek, ('1'++'1') ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_32
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++x.1) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Unwrap_case_1
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Unwrap_case_2
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Unwrap_case_3
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Unwrap_case_4
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        qed
+      qed
+    qed
+  qed
+next
+  case case_2
+  solve( IV( iv ) @ #before )
+    case Encrypt
+    solve( !Integer( ('1'++ctr) ) ▶₀ #before )
+      case Suc
+      solve( !Device( device ) ▶₁ #before )
+        case Device
+        solve( !Store( ~device, H, key, lvl ) ▶₂ #before )
+          case Derive
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case Key_case_1
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case Key_case_2
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case SharedKey_case_1
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case SharedKey_case_2
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        next
+          case Unwrap
+          solve( IV( <'1', 'none', ~device, ctr> ) @ #later )
+            case Encrypt
+            by contradiction /* cyclic */
+          qed
+        qed
+      qed
+    qed
+  next
+    case Wrap
+    solve( !Integer( ('1'++ctr) ) ▶₀ #before )
+      case Suc
+      solve( !Device( device ) ▶₁ #before )
+        case Device
+        solve( !Store( ~device, h, wk, (el++z) ) ▶₂ #before )
+          case Derive
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Key_case_1
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Key_case_2
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Key_case_3
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Key_case_4
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_01
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_02
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++z) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_03
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_04
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_05
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_06
+          solve( !Store( ~device, ~eh, ek, ('1'++'1') ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_07
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++x.1) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_08
+          solve( !Store( ~device, ~eh, ek, ('1'++z) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_09
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_10
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++z) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_11
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++'1') ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_12
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++'1'++x) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_13
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_14
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_15
+          solve( !Store( ~device, ~eh, ek, ('1'++'1') ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_16
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++x.1) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_17
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_18
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++z) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_19
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_20
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_21
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_22
+          solve( !Store( ~device, ~eh, ek, ('1'++'1') ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_23
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++x.1) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_24
+          solve( !Store( ~device, ~eh, ek, ('1'++z) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_25
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_26
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++z) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_27
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++'1') ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_28
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++'1'++x) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++'1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_29
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_30
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_31
+          solve( !Store( ~device, ~eh, ek, ('1'++'1') ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case SharedKey_case_32
+          solve( !Store( ~device, ~eh, ek, ('1'++'1'++x.1) ) ▶₃ #before )
+            case Key
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++'1'++x.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Unwrap_case_1
+          solve( !Store( ~device, ~eh, ek, '1' ) ▶₃ #before )
+            case Key
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Unwrap_case_2
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Unwrap_case_3
+          solve( !Store( ~device, ~eh, ek, el ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_1
+            solve( IV( <'1', ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key_case_2
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++n), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        next
+          case Unwrap_case_4
+          solve( !Store( ~device, ~eh, ek, ('1'++x) ) ▶₃ #before )
+            case Derive
+            solve( IV( <('1'++'1'), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Key
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_1
+            solve( IV( <('1'++'1'++'1'++z.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case SharedKey_case_2
+            solve( IV( <('1'++'1'++'1'++z.1), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          next
+            case Unwrap
+            solve( IV( <('1'++x), ~eh, ~device, ctr> ) @ #later )
+              case Wrap
+              by contradiction /* cyclic */
+            qed
+          qed
+        qed
+      qed
+    qed
+  qed
+qed
+
+lemma Key_UsageImpliesInitialization:
+  all-traces
+  "∀ d k l h #keyUse.
+    (UseKey( d, k, h, l ) @ #keyUse) ⇒
+    (∃ #keyInit. (InitKey( d, k, h, l ) @ #keyInit) ∧ (#keyInit < #keyUse))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ d k l h #keyUse.
+  (UseKey( d, k, h, l ) @ #keyUse)
+ ∧
+  ∀ #keyInit. (InitKey( d, k, h, l ) @ #keyInit) ⇒ ¬(#keyInit < #keyUse)"
+*/
+by sorry
+
+lemma Key_IntegrityAndConfidentiality [use_induction, reuse]:
+  all-traces
+  "(¬(∃ k l h #keyCreate #keyKU.
+       (CreateKey( k, h, l ) @ #keyCreate) ∧ (!KU( k ) @ #keyKU))) ∧
+   (∀ d k l h #keyImport.
+     (ImportKey( d, k, l, h ) @ #keyImport) ⇒
+     (∃ #keyCreate.
+       (CreateKey( k, h, l ) @ #keyCreate) ∧ (#keyCreate < #keyImport)))"
+/*
+guarded formula characterizing all counter-examples:
+"((∃ k l h #keyCreate #keyKU.
+    (CreateKey( k, h, l ) @ #keyCreate) ∧ (!KU( k ) @ #keyKU)) ∨
+  (∃ d k l h #keyImport.
+    (ImportKey( d, k, l, h ) @ #keyImport)
+   ∧
+    ∀ #keyCreate.
+     (CreateKey( k, h, l ) @ #keyCreate) ⇒ ¬(#keyCreate < #keyImport)))"
+*/
+by sorry
+
+lemma Key_UniqueLevelandHandle [reuse]:
+  all-traces
+  "∀ d D k l L h H #i #j.
+    ((InitKey( d, k, h, l ) @ #i) ∧ (InitKey( D, k, H, L ) @ #j)) ⇒
+    ((l = L) ∧ (h = H))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ d D k l L h H #i #j.
+  (InitKey( d, k, h, l ) @ #i) ∧ (InitKey( D, k, H, L ) @ #j)
+ ∧
+  ((¬(l = L)) ∨ (¬(h = H)))"
+*/
+by sorry
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* All wellformedness checks were successful. */
+
+/*
+Generated from:
+Tamarin version 1.11.0
+Maude version 3.2 (unsupported)
+Git revision: df2fd84dbb3b3def8309c2a84c04d653d7c4db77 (with uncommited changes), branch: mergedAutomatedStrategies
+Compiled at: 2026-01-16 14:58:06.862219863 UTC
+*/
+
+end

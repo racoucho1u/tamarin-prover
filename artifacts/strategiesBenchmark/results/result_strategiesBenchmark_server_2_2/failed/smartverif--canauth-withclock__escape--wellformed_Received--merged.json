@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--canauth-withclock__escape--wellformed_Received--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7204.5834946632385,
+    "avg_memory": 15180.45180605701,
+    "peak_memory": 28512.86328125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

@@ -1,0 +1,108 @@
+All
+\textbf{Only} & 0 & 8 & 8 & 0 & 0 & 0\\
+\textbf{Faster} & 19 & 20 & 4 & 5 & 20 & 4\\
+\textbf{Total time (s)} & 483.1 & 492.29 & 10294.0 & 10323.99 & 483.29 & 10245.7\\
+
+\textbf{Only} & 17 & 1 & 16 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+\textbf{Faster} & 36 & 37 & 10 & 64 & 9 & 65 & 31 & 42 & 9 & 65 \\
+{\small \textbf{How much faster}} & 1.05 & 1.06 & 1.04 & 8.42 & 1.05 & 8.42 & 1.06 & 1.05 & 1.03 & 9.01 \\
+
+Classic
+\textbf{Only} & 0 & 8 & 8 & 0 & 0 & 0\\
+\textbf{Faster} & 7 & 6 & 2 & 2 & 7 & 0\\
+\textbf{Total time (s)} & 244.32 & 253.08 & 3995.99 & 4013.57 & 239.18 & 3962.28\\
+
+\textbf{Only} & 17 & 1 & 16 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+\textbf{Faster} & 12 & 13 & 3 & 23 & 2 & 24 & 11 & 14 & 1 & 25 \\
+{\small \textbf{How much faster}} & 1.04 & 1.06 & 1.03 & 4.44 & 1.06 & 4.37 & 1.07 & 1.05 & 1.0 & 5.55 \\
+
+Exists
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Faster} & 3 & 2 & 0 & 0 & 3 & 0\\
+\textbf{Total time (s)} & 105.87 & 106.3 & 5445.65 & 5478.4 & 110.4 & 5394.23\\
+
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\textbf{Faster} & 5 & 3 & 0 & 8 & 0 & 8 & 4 & 4 & 0 & 8 \\
+{\small \textbf{How much faster}} & 1.06 & 1.04 & - & 42.72 & - & 43.58 & 1.08 & 1.07 & - & 43.93 \\
+
+Source
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Faster} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Total time (s)} & 0 & 0 & 0 & 0 & 0 & 0\\
+
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\textbf{Faster} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+{\small \textbf{How much faster}} & - & - & - & - & - & - & - & - & - & - \\
+
+Reuse
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Faster} & 9 & 12 & 2 & 3 & 10 & 4\\
+\textbf{Total time (s)} & 132.92 & 132.91 & 852.35 & 832.02 & 133.71 & 889.18\\
+
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\textbf{Faster} & 19 & 21 & 7 & 33 & 7 & 33 & 16 & 24 & 8 & 32 \\
+{\small \textbf{How much faster}} & 1.05 & 1.06 & 1.05 & 2.89 & 1.05 & 2.85 & 1.05 & 1.04 & 1.03 & 2.99 \\
+
+Induction
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Faster} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Total time (s)} & 0 & 0 & 0 & 0 & 0 & 0\\
+
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\textbf{Faster} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+{\small \textbf{How much faster}} & - & - & - & - & - & - & - & - & - & - \\
+
+All
+\textbf{Only} & 0 & 8 & 8 & 0 & 0 & 0\\
+\textbf{Faster} & 19 & 20 & 4 & 5 & 20 & 4\\
+\textbf{Total time (s)} & 483.1 & 492.29 & 10294.0 & 10323.99 & 483.29 & 10245.7\\
+
+\textbf{Only} & 17 & 1 & 16 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+\textbf{Faster} & 36 & 37 & 10 & 64 & 9 & 65 & 31 & 42 & 9 & 65 \\
+{\small \textbf{How much faster}} & 1.05 & 1.06 & 1.04 & 8.42 & 1.05 & 8.42 & 1.06 & 1.05 & 1.03 & 9.01 \\
+
+Classic
+\textbf{Only} & 0 & 8 & 8 & 0 & 0 & 0\\
+\textbf{Faster} & 7 & 6 & 2 & 2 & 7 & 0\\
+\textbf{Total time (s)} & 244.32 & 253.08 & 3995.99 & 4013.57 & 239.18 & 3962.28\\
+
+\textbf{Only} & 17 & 1 & 16 & 0 & 1 & 0 & 0 & 1 & 0 & 0 \\
+\textbf{Faster} & 12 & 13 & 3 & 23 & 2 & 24 & 11 & 14 & 1 & 25 \\
+{\small \textbf{How much faster}} & 1.04 & 1.06 & 1.03 & 4.44 & 1.06 & 4.37 & 1.07 & 1.05 & 1.0 & 5.55 \\
+
+Exists
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Faster} & 3 & 2 & 0 & 0 & 3 & 0\\
+\textbf{Total time (s)} & 105.87 & 106.3 & 5445.65 & 5478.4 & 110.4 & 5394.23\\
+
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\textbf{Faster} & 5 & 3 & 0 & 8 & 0 & 8 & 4 & 4 & 0 & 8 \\
+{\small \textbf{How much faster}} & 1.06 & 1.04 & - & 42.72 & - & 43.58 & 1.08 & 1.07 & - & 43.93 \\
+
+Source
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Faster} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Total time (s)} & 0 & 0 & 0 & 0 & 0 & 0\\
+
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\textbf{Faster} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+{\small \textbf{How much faster}} & - & - & - & - & - & - & - & - & - & - \\
+
+Reuse
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Faster} & 9 & 12 & 2 & 3 & 10 & 4\\
+\textbf{Total time (s)} & 132.92 & 132.91 & 852.35 & 832.02 & 133.71 & 889.18\\
+
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\textbf{Faster} & 19 & 21 & 7 & 33 & 7 & 33 & 16 & 24 & 8 & 32 \\
+{\small \textbf{How much faster}} & 1.05 & 1.06 & 1.05 & 2.89 & 1.05 & 2.85 & 1.05 & 1.04 & 1.03 & 2.99 \\
+
+Induction
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Faster} & 0 & 0 & 0 & 0 & 0 & 0\\
+\textbf{Total time (s)} & 0 & 0 & 0 & 0 & 0 & 0\\
+
+\textbf{Only} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\textbf{Faster} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+{\small \textbf{How much faster}} & - & - & - & - & - & - & - & - & - & - \\
+

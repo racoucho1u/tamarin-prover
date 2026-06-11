@@ -1,0 +1,19 @@
+{
+  "task_id": "sp14--STR__backAndAvoid--key_reachable_4--merged",
+  "warnings": [],
+  "tamarin_timing": 2279.28,
+  "wrapper_measures": {
+    "time": 2279.6426560878754,
+    "avg_memory": 3398.0038162920714,
+    "peak_memory": 3496.90234375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/sp14--STR__backAndAvoid--key_reachable_4--merged.spthy",
+  "verified_lemma": {
+    "key_reachable_4": {
+      "steps": 23,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

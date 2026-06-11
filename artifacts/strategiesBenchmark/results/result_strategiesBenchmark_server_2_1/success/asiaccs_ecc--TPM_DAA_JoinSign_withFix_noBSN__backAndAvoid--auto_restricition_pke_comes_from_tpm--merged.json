@@ -1,0 +1,42 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__backAndAvoid--auto_restricition_pke_comes_from_tpm--merged",
+  "warnings": [
+    "1 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 38.08,
+  "wrapper_measures": {
+    "time": 38.5959734916687,
+    "avg_memory": 783.7466077302631,
+    "peak_memory": 1537.56640625
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/asiaccs_ecc--TPM_DAA_JoinSign_withFix_noBSN__backAndAvoid--auto_restricition_pke_comes_from_tpm--merged.spthy",
+  "verified_lemma": {
+    "auto_restricition_pke_comes_from_tpm": {
+      "steps": 5,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "auto_bind_restriction",
+    "auto_restriction_one_host_per_tpm",
+    "auto_restriction_one_tpm_per_host",
+    "auto_restriction_single_issuer",
+    "auto_verify_multiple_pkes",
+    "oracle_correctness_two_sigs_same_credentials",
+    "oracle_correctness_two_sigs_different_credentials",
+    "oracle_correctness_join_only",
+    "oracle_correctness_no_verify",
+    "oracle_correctness_with_verify",
+    "oracle_auth_aliveness_host_very_weak",
+    "oracle_auth_aliveness_host",
+    "oracle_auth_aliveness_issuer",
+    "oracle_auth_weak_agreement_host",
+    "oracle_auth_non_injective_agreement_host_issuer",
+    "oracle_auth_injective_agreement_host_issuer",
+    "oracle_auth_secrecy_cre",
+    "oracle_SP3_Unforgeability"
+  ]
+}

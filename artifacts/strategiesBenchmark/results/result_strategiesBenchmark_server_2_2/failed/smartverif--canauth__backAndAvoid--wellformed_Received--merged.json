@@ -1,0 +1,22 @@
+{
+  "task_id": "smartverif--canauth__backAndAvoid--wellformed_Received--merged",
+  "error_description": "An unexpected error occurred, see stderr output below for details.",
+  "wrapper_measures": {
+    "time": 3.3023054599761963,
+    "avg_memory": 154.4150390625,
+    "peak_memory": 218.42578125
+  },
+  "return_code": 1,
+  "last_stderr_lines": [
+    " stdin:   ",
+    " stdout:  3.2",
+    "",
+    " stderr:  ",
+    " checking installation: OK.",
+    "[Theory CANauth] Theory loaded",
+    "[Theory CANauth] Theory translated",
+    "[Theory CANauth] Theory closed",
+    "[Saturating Sources] Step 1 (Max 5)",
+    "tamarin-prover-1.4.1-2468-g300638b4: <<loop>>"
+  ]
+}

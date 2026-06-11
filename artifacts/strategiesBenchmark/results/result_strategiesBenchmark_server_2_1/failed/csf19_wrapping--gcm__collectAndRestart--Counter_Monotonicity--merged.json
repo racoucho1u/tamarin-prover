@@ -1,0 +1,13 @@
+{
+  "task_id": "csf19_wrapping--gcm__collectAndRestart--Counter_Monotonicity--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.822178840637,
+    "avg_memory": 1220.8898774082886,
+    "peak_memory": 1267.69140625
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

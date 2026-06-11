@@ -1,0 +1,13 @@
+{
+  "task_id": "csf18_xor--LAK06_state__escape--noninjectiveagreementTAG--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7203.295284986496,
+    "avg_memory": 12053.772037806726,
+    "peak_memory": 23302.68359375
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

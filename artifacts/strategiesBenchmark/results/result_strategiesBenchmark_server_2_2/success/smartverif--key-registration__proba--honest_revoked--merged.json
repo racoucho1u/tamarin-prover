@@ -1,0 +1,23 @@
+{
+  "task_id": "smartverif--key-registration__proba--honest_revoked--merged",
+  "warnings": [
+    "3 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 208.62,
+  "wrapper_measures": {
+    "time": 209.70424365997314,
+    "avg_memory": 1713.5178544207322,
+    "peak_memory": 3118.10546875
+  },
+  "output_spthy": "result_strategiesBenchmark_2/proofs/smartverif--key-registration__proba--honest_revoked--merged.spthy",
+  "verified_lemma": {
+    "honest_revoked": {
+      "steps": 731,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

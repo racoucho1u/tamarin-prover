@@ -14,18 +14,20 @@ MIN_TIMEOUT = 10
 
 # tactic = "tactic: sqn_ue_nodecrease\ndeprio:\n\tallGoal \"ActionG#vk(Fact{factTag=KUFact factAnnotations=fromList[] factTerms=[f1(~k pair(SqnHSS RAND))]}\"\ndeprio:\n\tallGoal \"ActionG#vk(Fact{factTag=KUFact factAnnotations=fromList[] factTerms=[f1(~k pair(Union(SqnUE dif) RAND))]}\"\ndeprio:\n\tallGoal \"ActionG#vk(Fact{factTag=KUFact factAnnotations=fromList[] factTerms=[Xor(f5(~k RAND) Union(SqnUE dif))]}\"\n\n"
 
-def add_tactic_to_file(filename,tacticFile,tactic):
-    # inserTactic = "\n#include \""+tacticFile+"\"\n"
+def add_tactic_to_file(filename,tacticFile):
+    inserTactic = "\n#include \""+tacticFile+"\"\n"
     with open(filename, "r") as f:
         contents = f.readlines()
 
     last_line = len(contents)-1
     while (not 'end' in contents[last_line]) and (last_line>0):
+        if ("tacticGeneration/generatedTactics/" in contents[last_line]):
+            contents.remove(contents[last_line])
         last_line -= 1
         
-    contents.insert(last_line-1, tactic)
+    contents.insert(last_line-1, inserTactic)
 
-    with open(tacticFile, "w") as f:
+    with open(filename, "w") as f:
         contents = "".join(contents)
         f.write(contents)
 
@@ -44,15 +46,15 @@ def tamarin_wrapper_call(arg_list, time_out=6000):
         stderr=subprocess.PIPE,
     ).communicate()
 
-def prove_with_tactic(q,filename,fileUpdated,lemma_name,macro,strategy,heuristic,tactic_nb,diff,timeout=6000):
+def prove_with_tactic(q,filename,lemma_name,macro,strategy,heuristic,tactic_nb,diff,timeout=6000):
 
     outputFile = filename.split("/")[-1]
     lemma_name_file = lemma_name.split(" ")[0]
     diffFlag = ""
     if diff != False:
         diffFlag = "--diff"
-    out, err = tamarin_wrapper_call([fileUpdated, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"],timeout)
-    tacticFile = fileUpdated
+    print([filename, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"])
+    out, err = tamarin_wrapper_call([filename, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"],timeout)
     if err:
         print(
             "Sanity check failed for: "
@@ -85,10 +87,11 @@ def prove_with_tactic(q,filename,fileUpdated,lemma_name,macro,strategy,heuristic
                 tacticRough = tactic.split("tactic:")[1]
                 deprios = tacticRough.replace("---","\n")
                 tactic = "\ntactic: "+lemma_name_file+"_"+str(tactic_nb)+"\n"+deprios+"\n\n"
-                tacticLogFile = f"tacticGeneration/generatedTactics/log/{strategy}_{lemma_name_file}_{outputFile}"
-                tacticFile = f"tacticGeneration/generatedTactics/{strategy}_{lemma_name_file}_{outputFile}"
-                add_tactic_to_file(filename,tacticFile,tactic)
-                with open (tacticLogFile,'a') as f:
+                print(tactic)
+                tacticFile = f"../tacticGenerationBenchmarkServer/tacticGeneration/generatedTactics/{strategy}_{lemma_name_file}_{outputFile}"
+                if not os.path.isfile(tacticFile):
+                    add_tactic_to_file(filename,tacticFile)
+                with open (tacticFile,'a') as f:
                     f.write(tactic)
                     f.write("\n")
 
@@ -97,24 +100,24 @@ def prove_with_tactic(q,filename,fileUpdated,lemma_name,macro,strategy,heuristic
                 df.write(f"Tactic generation error: {filename}\n")
             tactic = "Error in generation"
 
-        return(data[:4],tactic,tacticFile)
+        return(data[:4],tactic)
 
     
     
 def proveUntil(file_path, lemma, macro, strategy, q, bound=3, heuristic="s", timeout=15, diff=False):
+    print("Prove unit")
     tactic,tactic_updated, heuristic_old = "","new","old"
     proof_attempt = 0
     proved = False
-    fileUpdated = file_path
     while proof_attempt<bound and tactic_updated != "Error in generation":
         if tactic == tactic_updated and tactic != "":
             break 
         if tactic_updated == "":
             heuristic = heuristic_old
+        timeout *= 2
         print(f"Proving {lemma} ({file_path}) with heuristic: {heuristic}, timeout: {timeout}")
         tactic = tactic_updated
-        status, tactic_updated, fileUpdated = prove_with_tactic(q,file_path,fileUpdated,lemma,macro,strategy,heuristic,proof_attempt,diff,timeout)
-        timeout *= 2
+        status, tactic_updated = prove_with_tactic(q,file_path,lemma,macro,strategy,heuristic,proof_attempt,diff,timeout)
         if 'True' in status or 'False' in status:
             proved = True
             print(f"Prove lemma {lemma} (file:{file_path}) with heuristic: {heuristic}.\n")
@@ -160,7 +163,7 @@ def parallelInput(inputs,q):
     strategy = inputs[3]
     bound= inputs[4]
     heuristic= inputs[5]
-    timeout= 10 #inputs[6]
+    timeout= inputs[6]
     diff= inputs[7]
 
     splitLemma = lemma.split(" ")
@@ -184,7 +187,6 @@ def listener(q):
             f.flush()
 
 def parallelProving(inputs_parallel,N=5):
-
     #https://stackoverflow.com/questions/13446445/python-multiprocessing-safely-writing-to-a-file
     manager = multiprocessing.Manager()
     q = manager.Queue()
@@ -246,7 +248,5 @@ if __name__ == '__main__':
         os.mkdir('tacticGeneration/tacticBatch')
     if not os.path.isdir('tacticGeneration/generatedTactics'):
         os.mkdir('tacticGeneration/generatedTactics')
-    if not os.path.isdir('tacticGeneration/generatedTactics/log'):
-        os.mkdir('tacticGeneration/generatedTactics/log')
     
     parallelProving([[file_path, lemma, macro, strategy, bound, heuristic, timeout, diff]])

@@ -1,0 +1,42 @@
+{
+  "task_id": "wisec--5G_handover_n2__escape--GUTI_SRC--merged",
+  "warnings": [],
+  "tamarin_timing": 27.54,
+  "wrapper_measures": {
+    "time": 28.13429284095764,
+    "avg_memory": 3582.5259486607138,
+    "peak_memory": 5365.1015625
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/wisec--5G_handover_n2__escape--GUTI_SRC--merged.spthy",
+  "verified_lemma": {
+    "GUTI_SRC": {
+      "steps": 41,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "PDUorigin",
+    "PDUargsconstant",
+    "PDUidunique",
+    "ValueOrigin",
+    "ValueReset",
+    "executability_old_kamf_no_id_req",
+    "executability_old_kamf_id_req",
+    "executability_new_kamf_no_id_req",
+    "executability_new_kamf_id_req",
+    "executability_old_kamf_old_kamf_no_id_req",
+    "executability_old_kamf_new_kamf_no_id_req",
+    "executability_new_kamf_new_kamf_no_id_req",
+    "executability_new_kamf_old_kamf_no_id_req",
+    "injectiveagreement_ue_cn_k_amf",
+    "injectiveagreement_cn_ue_k_amf",
+    "injectiveagreement_ue_tran_k_gnb_star",
+    "injectiveagreement_tran_ue_k_gnb_star",
+    "secret_supi",
+    "secret_k_seaf",
+    "secret_k_amf",
+    "secret_k_gnb",
+    "secret_k_gnb_star"
+  ]
+}

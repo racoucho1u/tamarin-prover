@@ -1,0 +1,27 @@
+{
+  "task_id": "wisec--5G_handover_5GS_to_EPS__original--NH_SRC--merged",
+  "warnings": [],
+  "tamarin_timing": 3.19,
+  "wrapper_measures": {
+    "time": 3.3861546516418457,
+    "avg_memory": 118.9609375,
+    "peak_memory": 161.0859375
+  },
+  "output_spthy": "result_strategiesBenchmark_cassis_2/proofs/wisec--5G_handover_5GS_to_EPS__original--NH_SRC--merged.spthy",
+  "verified_lemma": {
+    "NH_SRC": {
+      "steps": 18,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "executability",
+    "injectiveagreement_ue_enb_k_enb",
+    "injectiveagreement_enb_ue_k_enb",
+    "secret_k_amf",
+    "secret_k_asme",
+    "secret_k_gnb",
+    "secret_k_enb_star"
+  ]
+}

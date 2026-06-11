@@ -1,0 +1,2686 @@
+theory 5G_n2_handover begin
+
+// Function signature and definition of the equational theory E
+
+builtins: multiset
+functions: KDF/2, adec/2, aenc/2, fst/1, pair/2, pk/1, sdec/2, senc/2,
+           snd/1
+equations:
+    adec(aenc(x.1, pk(x.2)), x.2) = x.1,
+    fst(<x.1, x.2>) = x.1,
+    sdec(senc(x.1, x.2), x.2) = x.1,
+    snd(<x.1, x.2>) = x.2
+
+
+
+
+
+
+
+/* looping facts with injective instances: PDU_Session/4 */
+
+
+
+
+
+
+
+rule (modulo E) send_secure:
+   [ SndS( ~cid, A, B, m ) ] --> [ Sec( ~cid, A, B, m ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) receive_secure:
+   [ Sec( ~cid, A, B, m ) ] --> [ RcvS( ~cid, A, B, m ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) secureChannel_compromised_in:
+   [ In( <~cid, A, B, x> ) ]
+  --[ Rev( A, 'secureChannel' ), Rev( B, 'secureChannel' ), Injected( x )
+  ]->
+   [ Sec( ~cid, A, B, x ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) secureChannel_compromised_out:
+   [ Sec( ~cid, A, B, m ) ]
+  --[ Rev( B, 'secureChannel' ), Rev( A, 'secureChannel' ) ]->
+   [ Out( <~cid, m> ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_CN:
+   [ Fr( ~CN_ID ) ]
+  --[ CoreNetwork( ~CN_ID ) ]->
+   [ !CN( ~CN_ID ), Out( ~CN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_HN:
+   [ Fr( ~sk_HN ), Fr( ~HN_ID ) ]
+  --[ HomeNetwork( ~HN_ID ), SKHN( ~sk_HN ) ]->
+   [
+   !HSS( ~HN_ID, ~sk_HN ), !Pk( ~HN_ID, pk(~sk_HN) ),
+   Out( <~HN_ID, pk(~sk_HN)> )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_RAN:
+   [ Fr( ~RAN_ID ) ]
+  --[ RadioAccessNetwork( ~RAN_ID ) ]->
+   [ !NG_RAN( ~RAN_ID ), Out( ~RAN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) create_UE:
+   [ Fr( ~SUPI ), Fr( ~PEI ), !CN( ~CN_ID ) ]
+  --[ UserEquipment( ~SUPI ) ]->
+   [ !UE( ~SUPI, ~PEI, ~CN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_UE:
+   [
+   !UE( ~SUPI, ~PEI, ~CN_ID ), !CN( ~CN_ID ), !HSS( ~HN_ID, ~sk_HN ),
+   !NG_RAN( ~SRAN_ID ), !NG_RAN( ~TRAN_ID ), Fr( ~K_SEAF ), Fr( ~5G_GUTI ),
+   Fr( ~PDU_SESSION_ID )
+   ]
+  --[
+  Subscribe( ~SUPI, ~SRAN_ID ), HomeNet( ~SUPI, ~HN_ID ),
+  CreateValues( <~SUPI, ~K_SEAF, KDF(~K_SEAF, ~SUPI)> ),
+  CreatePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~SRAN_ID> ),
+  KeyDerived( <'K_AMF', KDF(~K_SEAF, ~SUPI)>, ~K_SEAF, KDF(~K_SEAF, ~SUPI),
+              ~SUPI
+  ),
+  KeyDerived( <'K_gNB', KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')>,
+              ~K_SEAF, KDF(~K_SEAF, ~SUPI), ~SUPI
+  ),
+  Init( 'K_SEAF', ~K_SEAF ), Init( 'K_AMF', KDF(~K_SEAF, ~SUPI) ),
+  Init( 'SUPI', ~SUPI ), GUTI( ~5G_GUTI ), HN( ~HN_ID ), SEAF( ~K_SEAF ),
+  SUPI( ~SUPI ), PDU( ~PDU_SESSION_ID )
+  ]->
+   [
+   !Ltk_sym( ~SUPI, ~CN_ID, <'K_SEAF', ~K_SEAF> ),
+   Session_key( ~SUPI, ~CN_ID, <'K_AMF', KDF(~K_SEAF, ~SUPI)> ),
+   Session_key( ~SUPI, ~SRAN_ID,
+                <'K_gNB', KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')>
+   ),
+   Intermediate_key( ~SUPI, ~SRAN_ID, ~CN_ID,
+                     <'NH', 
+                      KDF(KDF(~K_SEAF, ~SUPI), KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'))>
+   ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   St_1_SRAN( ~SRAN_ID, KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'),
+              ~PDU_SESSION_ID, ~TRAN_ID
+   ),
+   St_1_UE( ~SUPI, ~5G_GUTI, ~K_SEAF, ~K_SEAF, KDF(~K_SEAF, ~SUPI),
+            KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'),
+            KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), '0', ~SRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   St_1_CN( ~CN_ID, ~K_SEAF, KDF(~K_SEAF, ~SUPI), ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID,
+            KDF(KDF(~K_SEAF, ~SUPI), KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')), '0',
+            ~HN_ID
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) connect_networks_N2:
+   [ !NG_RAN( ~RAN_ID ), !CN( ~CN_ID ), Fr( ~cid_N2 ) ]
+  --[ OnlyOnce( ~RAN_ID, ~CN_ID ), CID( ~cid_N2 ) ]->
+   [ !N2( ~cid_N2, ~RAN_ID, ~CN_ID ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_sk_HN:
+   [ !HSS( ~HN_ID, ~sk_HN ) ]
+  --[ Rev( ~HN_ID, <'SK_HN', ~sk_HN> ) ]->
+   [ Out( ~sk_HN ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_supi:
+   [ !Ltk_sym( ~SUPI, ~CN_ID, <'K_SEAF', ~K_SEAF> ) ]
+  --[ Rev( ~SUPI, <'SUPI', ~SUPI> ), Rev( ~CN_ID, <'SUPI', ~SUPI> ) ]->
+   [ Out( ~SUPI ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_ltk_k_seaf:
+   [ !Ltk_sym( ~SUPI, ~CN_ID, <'K_SEAF', ~K_SEAF> ) ]
+  --[ Rev( ~SUPI, <'K_SEAF', ~K_SEAF> ), Rev( ~CN_ID, <'K_SEAF', ~K_SEAF> )
+  ]->
+   [ Out( ~K_SEAF ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_session_key_k_amf:
+   [ Session_key( ~SUPI, ~CN_ID, <'K_AMF', K_AMF> ) ]
+  --[ Rev( ~SUPI, <'K_AMF', K_AMF> ), Rev( ~CN_ID, <'K_AMF', K_AMF> ) ]->
+   [ Out( K_AMF ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_session_key_k_gnb:
+   [ Session_key( ~SUPI, ~RAN_ID, <'K_gNB', K_gNB> ) ]
+  --[ Rev( ~SUPI, <'K_gNB', K_gNB> ), Rev( ~RAN_ID, <'K_gNB', K_gNB> ) ]->
+   [ Out( K_gNB ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) reveal_intermediate_key_nh:
+   [ Intermediate_key( ~SUPI, ~RAN_ID, ~CN_ID, <'NH', NH> ) ]
+  --[
+  Rev( ~SUPI, <'NH', NH> ), Rev( ~RAN_ID, <'NH', NH> ),
+  Rev( ~CN_ID, <'NH', NH> )
+  ]->
+   [ Out( NH ) ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) sran_snd_ho_req:
+   [
+   St_1_SRAN( ~SRAN_ID, K_gNB, ~PDU_SESSION_ID, ~TRAN_ID ),
+   !N2( ~cid_N2, ~SRAN_ID, ~CN_ID )
+   ]
+  -->
+   [
+   St_2_SRAN( ~SRAN_ID, K_gNB, ~TRAN_ID, ~PDU_SESSION_ID ),
+   SndS( ~cid_N2, ~SRAN_ID, ~CN_ID,
+         <'ho_req', ~TRAN_ID, <'SRAN', ~SRAN_ID>, ~PDU_SESSION_ID>
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_fwd_ho_req_hkd_old_kamf:
+   [
+   St_1_CN( ~CN_ID, ~K_SEAF, K_AMF, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, NH, NCC, ~HN_ID
+   ),
+   !N2( ~cid_N2_SRAN, ~SRAN_ID, ~CN_ID ),
+   !N2( ~cid_N2_TRAN, ~TRAN_ID, ~CN_ID ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   Fr( ~PDU_SESSION_ID_TRAN ),
+   RcvS( ~cid_N2_SRAN, ~SRAN_ID, ~CN_ID,
+         <'ho_req', ~TRAN_ID, <'SRAN', ~SRAN_ID>, ~PDU_SESSION_ID_SRAN>
+   ),
+   In( NCC )
+   ]
+  --[
+  SessionHandover( <~SRAN_ID, ~TRAN_ID>, K_AMF, K_AMF,
+                   KDF(KDF(K_AMF, NH), ~TRAN_ID)
+  ),
+  NoRekeyingCN( K_AMF, KDF(KDF(K_AMF, NH), ~TRAN_ID) ),
+  Running( ~CN_ID, ~SUPI, <'UE', 'CN', 'K_AMF', K_AMF> ),
+  UsePDUSession( ~PDU_SESSION_ID_SRAN, <~CN_ID, ~SUPI, ~SRAN_ID> ),
+  CreatePDUSession( ~PDU_SESSION_ID_TRAN, <~CN_ID, ~SUPI, ~TRAN_ID> ),
+  PDU( ~PDU_SESSION_ID_TRAN )
+  ]->
+   [
+   St_2_CN( ~CN_ID, ~K_SEAF, K_AMF, KDF(KDF(K_AMF, NH), ~TRAN_ID), ~SRAN_ID,
+            ~TRAN_ID, <'NASC', '0'>, ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN,
+            KDF(K_AMF, NH), ('1'++NCC), ~HN_ID
+   ),
+   Intermediate_key( ~SUPI, ~TRAN_ID, ~CN_ID, <'NH', KDF(K_AMF, NH)> ),
+   Session_key( ~SUPI, ~TRAN_ID, <'K_gNB', KDF(KDF(K_AMF, NH), ~TRAN_ID)> ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   PDU_Session( ~PDU_SESSION_ID_TRAN, ~CN_ID, ~SUPI, ~TRAN_ID ),
+   SndS( ~cid_N2_TRAN, ~CN_ID, ~TRAN_ID,
+         <'ho_req', KDF(K_AMF, NH), ('1'++NCC), <'NASC', '0'>, 
+          <'SRAN', ~SRAN_ID>, ~PDU_SESSION_ID_SRAN>
+   )
+   ]
+
+  // loop breakers: [0,3,5]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_fwd_ho_req_hkd_new_kamf:
+   [
+   St_1_CN( ~CN_ID, ~K_SEAF, K_AMF, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, NH, NCC, ~HN_ID
+   ),
+   !UE( ~SUPI, ~PEI, ~CN_ID ), !N2( ~cid_N2_SRAN, ~SRAN_ID, ~CN_ID ),
+   !N2( ~cid_N2_TRAN, ~TRAN_ID, ~CN_ID ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   Fr( ~PDU_SESSION_ID_TRAN ),
+   RcvS( ~cid_N2_SRAN, ~SRAN_ID, ~CN_ID,
+         <'ho_req', ~TRAN_ID, <'SRAN', ~SRAN_ID>, ~PDU_SESSION_ID_SRAN>
+   ),
+   In( NCC )
+   ]
+  --[
+  SessionHandover( <~SRAN_ID, ~TRAN_ID>, K_AMF, KDF(K_AMF, '0x01'),
+                   KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID)
+  ),
+  RekeyingCN( KDF(K_AMF, '0x01'),
+              KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID)
+  ),
+  KeyDerived( <'K_AMF', KDF(K_AMF, '0x01')>, ~K_SEAF, K_AMF, ~SUPI ),
+  Running( ~CN_ID, ~SUPI, <'UE', 'CN', 'K_AMF', KDF(K_AMF, '0x01')> ),
+  UsePDUSession( ~PDU_SESSION_ID_SRAN, <~CN_ID, ~SUPI, ~SRAN_ID> ),
+  CreatePDUSession( ~PDU_SESSION_ID_TRAN, <~CN_ID, ~SUPI, ~TRAN_ID> ),
+  CreateValues( <~SUPI, ~K_SEAF, KDF(K_AMF, '0x01')> )
+  ]->
+   [
+   St_2_CN( ~CN_ID, ~K_SEAF, KDF(K_AMF, '0x01'),
+            KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID), ~SRAN_ID,
+            ~TRAN_ID, <'NASC', '1'>, ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN,
+            KDF(KDF(K_AMF, '0x01'), KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT')), '0',
+            ~HN_ID
+   ),
+   Intermediate_key( ~SUPI, ~TRAN_ID, ~CN_ID,
+                     <'NH', KDF(KDF(K_AMF, '0x01'), KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'))>
+   ),
+   Intermediate_key( ~SUPI, ~TRAN_ID, ~CN_ID,
+                     <'NH', KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT')>
+   ),
+   Session_key( ~SUPI, ~CN_ID, <'K_AMF', KDF(K_AMF, '0x01')> ),
+   Session_key( ~SUPI, ~TRAN_ID,
+                <'K_gNB', KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID)>
+   ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   PDU_Session( ~PDU_SESSION_ID_TRAN, ~CN_ID, ~SUPI, ~TRAN_ID ),
+   SndS( ~cid_N2_TRAN, ~CN_ID, ~TRAN_ID,
+         <'ho_req', KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), '0', <'NASC', '1'>, 
+          <'SRAN', ~SRAN_ID>, ~PDU_SESSION_ID_SRAN>
+   )
+   ]
+
+  // loop breakers: [0,4,6]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tran_rcv_ho_req_snd_ack:
+   [
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~CN_ID, ~TRAN_ID,
+         <'ho_req', NH, NCC, <'NASC', K_AMF_change_flag>, S2TTC, ~PDU_SESSION_ID>
+   ),
+   In( K_AMF_change_flag ), In( NCC )
+   ]
+  --[
+  Running( ~TRAN_ID, ~SUPI, <'UE', 'TRAN', 'K_gNB_star', KDF(NH, ~TRAN_ID)>
+  ),
+  UsePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~SRAN_ID> )
+  ]->
+   [
+   St_1_TRAN( ~TRAN_ID, KDF(NH, ~TRAN_ID), ~SRAN_ID, ~PDU_SESSION_ID ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   SndS( ~cid_N2, ~TRAN_ID, ~CN_ID,
+         <'ho_req_ack', NCC, <'NASC', K_AMF_change_flag>, <'TRAN', ~TRAN_ID>, 
+          ~PDU_SESSION_ID>
+   )
+   ]
+
+  // loop breakers: [0,2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_ho_req_ack:
+   [
+   St_2_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID, NASC,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~TRAN_ID, ~CN_ID,
+         <'ho_req_ack', NCC, NASC, T2STC, ~PDU_SESSION_ID_SRAN>
+   )
+   ]
+  --[ HandoverPreparationDone( K_AMF, K_gNB_star ) ]->
+   [
+   St_3_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID, T2STC,
+            NASC, ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   )
+   ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_snd_ho_cmd:
+   [
+   St_3_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID,
+            <'TRAN', ~TRAN_ID>, <'NASC', K_AMF_change_flag>, ~PDU_SESSION_ID_SRAN,
+            ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   !N2( ~cid_N2, ~SRAN_ID, ~CN_ID ), In( K_AMF_change_flag ), In( NCC )
+   ]
+  --[ UsePDUSession( ~PDU_SESSION_ID_SRAN, <~CN_ID, ~SUPI, ~SRAN_ID> ) ]->
+   [
+   St_4_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   SndS( ~cid_N2, ~CN_ID, ~SRAN_ID,
+         <'ho_cmd', NCC, <'NASC', K_AMF_change_flag>, <'TRAN', ~TRAN_ID>, 
+          ~PDU_SESSION_ID_SRAN>
+   )
+   ]
+
+  // loop breaker: [1]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) sran_fwd_ho_cmd_snd_uplink_ran_status_transfer:
+   [
+   St_2_SRAN( ~SRAN_ID, K_gNB, ~TRAN_ID, ~PDU_SESSION_ID ),
+   !N2( ~cid_N2, ~SRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~CN_ID, ~SRAN_ID,
+         <'ho_cmd', NCC, <'NASC', K_AMF_change_flag>, T2STC, ~PDU_SESSION_ID>
+   ),
+   In( K_AMF_change_flag ), In( NCC )
+   ]
+  -->
+   [
+   St_3_SRAN( ~SRAN_ID, K_gNB ),
+   Out( senc(<'ho_cmd', NCC, <'NASC', K_AMF_change_flag>, 'TRAN', ~TRAN_ID>,
+             K_gNB)
+   ),
+   SndS( ~cid_N2, ~SRAN_ID, ~CN_ID, 'uplink_ran_status_transfer' )
+   ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_ho_cmd_old_kamf:
+   [
+   St_1_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB, NH,
+            NCC, ~SRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   !UE( ~SUPI, ~PEI, ~CN_ID ),
+   In( senc(<'ho_cmd', ('1'++NCC), <'NASC', '0'>, 'TRAN', ~TRAN_ID>, K_gNB)
+   )
+   ]
+  --[
+  NoRekeyingUE( K_AMF, KDF(KDF(K_AMF, KDF(K_AMF, NH)), ~TRAN_ID) ),
+  KeyDerived( <'K_gNB_star', KDF(KDF(K_AMF, KDF(K_AMF, NH)), ~TRAN_ID)>,
+              ~K_SEAF, K_AMF, ~SUPI
+  ),
+  Bind( <'K_gNB_star', KDF(KDF(K_AMF, KDF(K_AMF, NH)), ~TRAN_ID)>,
+        KDF(K_AMF, KDF(K_AMF, NH))
+  ),
+  Running( ~SUPI, ~CN_ID, <'CN', 'UE', 'K_AMF', K_AMF> ),
+  Commit( ~SUPI, ~CN_ID, <'UE', 'CN', 'K_AMF', K_AMF> ),
+  Running( ~SUPI, ~TRAN_ID,
+           <'TRAN', 'UE', 'K_gNB_star', KDF(KDF(K_AMF, KDF(K_AMF, NH)), ~TRAN_ID)>
+  ),
+  Commit( ~SUPI, ~TRAN_ID,
+          <'UE', 'TRAN', 'K_gNB_star', KDF(KDF(K_AMF, KDF(K_AMF, NH)), ~TRAN_ID)>
+  ),
+  Honest( ~TRAN_ID ), Honest( ~SRAN_ID ), Honest( ~SUPI ),
+  Honest( ~CN_ID ), Secret( <'K_gNB', K_gNB> ), GUTI( ~5G_GUTI ),
+  HN( ~HN_ID ), SEAF( ~K_SEAF ), SUPI( ~SUPI ),
+  UseValues( <~SUPI, ~K_SEAF, K_AMF> )
+  ]->
+   [
+   St_2_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF,
+            KDF(KDF(K_AMF, KDF(K_AMF, NH)), ~TRAN_ID), KDF(K_AMF, KDF(K_AMF, NH)),
+            ('1'++NCC), ~TRAN_ID, ~CN_ID, ~HN_ID
+   )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_ho_cmd_new_kamf:
+   [
+   St_1_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB, NH,
+            NCC, ~SRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   !UE( ~SUPI, ~PEI, ~CN_ID ),
+   In( senc(<'ho_cmd', '0', <'NASC', '1'>, 'TRAN', ~TRAN_ID>, K_gNB) )
+   ]
+  --[
+  RekeyingUE( KDF(K_AMF, '0x01'),
+              KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID)
+  ),
+  KeyDerived( <'K_AMF', KDF(K_AMF, '0x01')>, ~K_SEAF, K_AMF, ~SUPI ),
+  KeyDerived( <'K_gNB_star', 
+               KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID)>,
+              ~K_SEAF, KDF(K_AMF, '0x01'), ~SUPI
+  ),
+  Bind( <'K_gNB_star', 
+         KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID)>,
+        KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT')
+  ),
+  Running( ~SUPI, ~CN_ID, <'CN', 'UE', 'K_AMF', KDF(K_AMF, '0x01')> ),
+  Commit( ~SUPI, ~CN_ID, <'UE', 'CN', 'K_AMF', KDF(K_AMF, '0x01')> ),
+  Running( ~SUPI, ~TRAN_ID,
+           <'TRAN', 'UE', 'K_gNB_star', 
+            KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID)>
+  ),
+  Commit( ~SUPI, ~TRAN_ID,
+          <'UE', 'TRAN', 'K_gNB_star', 
+           KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID)>
+  ),
+  Honest( ~TRAN_ID ), Honest( ~SRAN_ID ), Honest( ~SUPI ),
+  Honest( ~CN_ID ), Secret( <'K_gNB', K_gNB> ), GUTI( ~5G_GUTI ),
+  HN( ~HN_ID ), SEAF( ~K_SEAF ), SUPI( ~SUPI ),
+  UseValues( <~SUPI, ~K_SEAF, K_AMF> )
+  ]->
+   [
+   St_2_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, KDF(K_AMF, '0x01'),
+            KDF(KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT'), ~TRAN_ID),
+            KDF(KDF(K_AMF, '0x01'), KDF(KDF(K_AMF, '0x01'), 'MAX_NAS_COUNT')), '0',
+            ~TRAN_ID, ~CN_ID, ~HN_ID
+   )
+   ]
+
+  // loop breaker: [0]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_upnlink_ran_status_transfer_snd_downlink_ran_status_transfer:
+   [
+   St_4_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   !N2( ~cid_N2_SRAN, ~SRAN_ID, ~CN_ID ),
+   !N2( ~cid_N2_TRAN, ~TRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2_SRAN, ~SRAN_ID, ~CN_ID, 'uplink_ran_status_transfer' )
+   ]
+  -->
+   [
+   St_5_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   SndS( ~cid_N2_TRAN, ~CN_ID, ~TRAN_ID, 'downlink_ran_status_transfer' )
+   ]
+
+  // loop breaker: [3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_snd_ho_confirm:
+   [
+   St_2_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   )
+   ]
+  -->
+   [
+   St_3_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   Out( senc('handover_confirm', K_gNB_star) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tran_rcv_ran_status_transfer_and_ho_confirm_snd_ho_notify:
+   [
+   St_1_TRAN( ~TRAN_ID, K_gNB_star, ~SRAN_ID, ~PDU_SESSION_ID ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   RcvS( ~cid_N2, ~CN_ID, ~TRAN_ID, 'downlink_ran_status_transfer' ),
+   In( senc('handover_confirm', K_gNB_star) )
+   ]
+  --[
+  Commit( ~TRAN_ID, ~SUPI, <'TRAN', 'UE', 'K_gNB_star', K_gNB_star> ),
+  Honest( ~TRAN_ID ), Honest( ~SRAN_ID ), Honest( ~SUPI ),
+  Honest( ~CN_ID ),
+  UsePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~SRAN_ID> )
+  ]->
+   [
+   St_2_TRAN( ~TRAN_ID, K_gNB_star, ~SRAN_ID ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   SndS( ~cid_N2, ~TRAN_ID, ~CN_ID, 'handover_notify' )
+   ]
+
+  // loop breakers: [2,3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_ho_notify:
+   [
+   St_5_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~TRAN_ID, ~CN_ID, 'handover_notify' )
+   ]
+  --[ HandoverExecutionDone( '1', K_AMF, K_gNB_star ) ]->
+   [
+   St_6_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   )
+   ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_snd_registration_req:
+   [
+   St_3_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   )
+   ]
+  --[ GUTI_SND( ~5G_GUTI ) ]->
+   [
+   St_4_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   Out( senc(<'MRU', ~5G_GUTI>, K_gNB_star) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tran_fwd_registration_req:
+   [
+   St_2_TRAN( ~TRAN_ID, K_gNB_star, ~SRAN_ID ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   In( senc(<'MRU', 5G_GUTI>, K_gNB_star) )
+   ]
+  --[ GUTI_RCV( 5G_GUTI ) ]->
+   [
+   St_3_TRAN( ~TRAN_ID, K_gNB_star, ~SRAN_ID ),
+   SndS( ~cid_N2, ~TRAN_ID, ~CN_ID, <'MRU', 5G_GUTI> )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_registration_req_snd_registration_accept:
+   [
+   St_6_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~TRAN_ID, ~CN_ID, <'MRU', 5G_GUTI> )
+   ]
+  --[ GUTI_RCV( 5G_GUTI ) ]->
+   [
+   St_7_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   Out( senc('registration_accept', K_AMF) )
+   ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_snd_identity_req_suci:
+   [
+   St_6_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~TRAN_ID, ~CN_ID, <'MRU', 5G_GUTI> )
+   ]
+  --[ IdentityRequestSUCI( K_AMF, K_gNB_star ), GUTI_RCV( 5G_GUTI ) ]->
+   [
+   St_6a_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID,
+             ~TRAN_ID, ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   Out( senc(<'identity_request', 'suci'>, K_AMF) )
+   ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_identity_req_suci_snd_rsp:
+   [
+   St_4_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   !HSS( ~HN_ID, ~sk_HN ), !Pk( ~HN_ID, pk_HN ), Fr( ~R ),
+   In( senc(<'identity_request', 'suci'>, K_AMF) )
+   ]
+  --[ SendSUCI( ~SUPI, ~sk_HN ) ]->
+   [
+   St_4a_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+             NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   Out( senc(<'identity_response', aenc(<~SUPI, ~R>, pk_HN), ~HN_ID>, K_AMF)
+   )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_identity_rsp_suci_snd_identity_req_pei:
+   [
+   St_6a_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID,
+             ~TRAN_ID, ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   In( senc(<'identity_response', conc_supi, ~HN_ID>, K_AMF) )
+   ]
+  --[
+  IdentityResponseSUCI( K_AMF, K_gNB_star ),
+  IdentityRequestPEI( K_AMF, K_gNB_star )
+  ]->
+   [
+   St_6b_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID,
+             ~TRAN_ID, ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   Out( senc(<'identity_request', 'pei'>, K_AMF) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_identity_req_pei_snd_rsp:
+   [
+   St_4a_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+             NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   !UE( ~SUPI, ~PEI, ~CN_ID ),
+   In( senc(<'identity_request', 'pei'>, K_AMF) )
+   ]
+  -->
+   [
+   St_4b_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+             NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   Out( senc(<'identity_response', ~PEI>, K_AMF) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_identity_rsp_pei_snd_registration_accept:
+   [
+   St_6b_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID,
+             ~TRAN_ID, ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   In( senc(<'identity_response', PEI>, K_AMF) )
+   ]
+  --[ IdentityResponsePEI( K_AMF, K_gNB_star ) ]->
+   [
+   St_7_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   Out( senc('registration_accept', K_AMF) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_registration_accept_snd_registration_complete_1:
+   [
+   St_4b_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+             NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   In( senc('registration_accept', K_AMF) )
+   ]
+  --[ IdentityRequestsDone( K_AMF, K_gNB_star ) ]->
+   [
+   St_5_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~TRAN_ID, ~CN_ID, ~HN_ID ),
+   Out( senc('registration_complete', K_AMF) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) ue_rcv_registration_accept_snd_registration_complete_2:
+   [
+   St_4_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, K_AMF, K_gNB_star,
+            NH, NCC, ~TRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   In( senc('registration_accept', K_AMF) )
+   ]
+  --[ NoIdentityRequests( K_AMF, K_gNB_star ) ]->
+   [
+   St_5_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~TRAN_ID, ~CN_ID, ~HN_ID ),
+   Out( senc('registration_complete', K_AMF) )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_registration_complete_snd_rrc_iai:
+   [
+   St_7_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   In( senc('registration_complete', K_AMF) )
+   ]
+  --[
+  MobilityRegistrationUpdateDone( K_AMF, K_gNB_star ),
+  Commit( ~CN_ID, ~SUPI, <'CN', 'UE', 'K_AMF', K_AMF> ),
+  Honest( ~TRAN_ID ), Honest( ~SRAN_ID ), Honest( ~SUPI ),
+  Honest( ~CN_ID ),
+  UsePDUSession( ~PDU_SESSION_ID_SRAN, <~CN_ID, ~SUPI, ~SRAN_ID> )
+  ]->
+   [
+   St_8_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   SndS( ~cid_N2, ~CN_ID, ~TRAN_ID, 'rrc_inactive_assistance_information' )
+   ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) tran_rcv_rrc_iai:
+   [
+   St_3_TRAN( ~TRAN_ID, K_gNB_star, ~SRAN_ID ),
+   !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~CN_ID, ~TRAN_ID, 'rrc_inactive_assistance_information' )
+   ]
+  -->
+   [ St_4_TRAN( ~TRAN_ID, ~SRAN_ID ) ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_snd_ue_context_release_cmd:
+   [
+   St_8_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   !N2( ~cid_N2, ~SRAN_ID, ~CN_ID )
+   ]
+  -->
+   [
+   St_9_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   SndS( ~cid_N2, ~CN_ID, ~SRAN_ID, 'ue_context_release_command' )
+   ]
+
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) sran_rcv_ue_context_release_cmd_snd_complete:
+   [
+   St_3_SRAN( ~SRAN_ID, K_gNB ), !N2( ~cid_N2, ~SRAN_ID, ~CN_ID ),
+   RcvS( ~cid_N2, ~CN_ID, ~SRAN_ID, 'ue_context_release_command' )
+   ]
+  -->
+   [ SndS( ~cid_N2, ~SRAN_ID, ~CN_ID, 'ue_context_release_complete' ) ]
+
+  // loop breaker: [2]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) cn_rcv_ue_context_release_complete:
+   [
+   St_9_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID, ~TRAN_ID,
+            ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+   ),
+   !N2( ~cid_N2, ~SRAN_ID, ~CN_ID ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID ),
+   RcvS( ~cid_N2, ~SRAN_ID, ~CN_ID, 'ue_context_release_complete' )
+   ]
+  --[
+  HandoverExecutionDone( '2', K_AMF, K_gNB_star ),
+  UseValues( <~SUPI, ~K_SEAF, K_AMF> ), Secret( <'K_SEAF', ~K_SEAF> ),
+  Secret( <'K_AMF', K_AMF> ), Secret( <'K_gNB_star', K_gNB_star> ),
+  Secret( <'SUPI', ~SUPI> ), Honest( ~TRAN_ID ), Honest( ~SRAN_ID ),
+  Honest( ~SUPI ), Honest( ~CN_ID ), Honest( ~HN_ID ),
+  UsePDUSession( ~PDU_SESSION_ID_SRAN, <~CN_ID, ~SUPI, ~SRAN_ID> )
+  ]->
+   [
+   St_10_CN( ~CN_ID, K_AMF, ~SRAN_ID, ~TRAN_ID, ~PDU_SESSION_ID_TRAN, ~HN_ID
+   ),
+   PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI, ~SRAN_ID )
+   ]
+
+  // loop breakers: [2,3]
+  /* has exactly the trivial AC variant */
+
+rule (modulo E) init_next_handover:
+   [
+   St_4_TRAN( ~TRAN_ID, ~SRAN_ID ),
+   St_5_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~TRAN_ID, ~CN_ID, ~HN_ID ),
+   St_10_CN( ~CN_ID, K_AMF_OLD, ~SRAN_ID, ~TRAN_ID, ~PDU_SESSION_ID, ~HN_ID
+   ),
+   !NG_RAN( ~RAN_ID ), !UE( ~SUPI, ~PEI, ~CN_ID ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~TRAN_ID ), Fr( ~K_SEAF )
+   ]
+  --[
+  HandoverInit( <~SRAN_ID, ~TRAN_ID>, K_AMF_OLD, KDF(~K_SEAF, ~SUPI) ),
+  ResetValues( <~SUPI, ~K_SEAF, KDF(~K_SEAF, ~SUPI)> ),
+  Reset( ~K_SEAF_initial, ~SUPI ),
+  UsePDUSession( ~PDU_SESSION_ID, <~CN_ID, ~SUPI, ~TRAN_ID> ),
+  KeyDerived( <'K_AMF', KDF(~K_SEAF, ~SUPI)>, ~K_SEAF, KDF(~K_SEAF, ~SUPI),
+              ~SUPI
+  ),
+  KeyDerived( <'K_gNB', KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')>,
+              ~K_SEAF, KDF(~K_SEAF, ~SUPI), ~SUPI
+  ),
+  GUTI( ~5G_GUTI ), SEAF( ~K_SEAF ), SUPI( ~SUPI )
+  ]->
+   [
+   !Ltk_sym( ~SUPI, ~CN_ID, <'K_SEAF', ~K_SEAF> ),
+   Session_key( ~SUPI, ~CN_ID, <'K_AMF', KDF(~K_SEAF, ~SUPI)> ),
+   Session_key( ~SUPI, ~TRAN_ID,
+                <'K_gNB', KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')>
+   ),
+   Intermediate_key( ~SUPI, ~TRAN_ID, ~CN_ID,
+                     <'NH', 
+                      KDF(KDF(~K_SEAF, ~SUPI), KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'))>
+   ),
+   PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~TRAN_ID ),
+   St_1_SRAN( ~TRAN_ID, KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'),
+              ~PDU_SESSION_ID, ~RAN_ID
+   ),
+   St_1_UE( ~SUPI, ~5G_GUTI, ~K_SEAF_initial, ~K_SEAF, KDF(~K_SEAF, ~SUPI),
+            KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'),
+            KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT'), '0', ~TRAN_ID, ~CN_ID, ~HN_ID
+   ),
+   St_1_CN( ~CN_ID, ~K_SEAF, KDF(~K_SEAF, ~SUPI), ~TRAN_ID, ~RAN_ID,
+            ~PDU_SESSION_ID,
+            KDF(KDF(~K_SEAF, ~SUPI), KDF(KDF(~K_SEAF, ~SUPI), 'MAX_NAS_COUNT')), '0',
+            ~HN_ID
+   )
+   ]
+
+  // loop breaker: [5]
+  /* has exactly the trivial AC variant */
+
+lemma GUTI_SRC [sources]:
+  all-traces
+  "∀ g #i.
+    (GUTI_RCV( g ) @ #i) ⇒
+    ((∃ #j. (GUTI_SND( g ) @ #j) ∧ (#j < #i)) ∨
+     (∃ #k. (!KU( g ) @ #k) ∧ (#k < #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ g #i.
+  (GUTI_RCV( g ) @ #i)
+ ∧
+  (∀ #j. (GUTI_SND( g ) @ #j) ⇒ ¬(#j < #i)) ∧
+  (∀ #k. (!KU( g ) @ #k) ⇒ ¬(#k < #i))"
+*/
+by sorry
+
+restriction OnlyOnce:
+  "∀ p q #i #j.
+    ((OnlyOnce( p, q ) @ #i) ∧ (OnlyOnce( p, q ) @ #j)) ⇒ (#i = #j)"
+  // safety formula
+
+restriction GUTInotSEAF:
+  "∀ p #i #j. ((GUTI( p ) @ #i) ∧ (SEAF( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+restriction GUTInotSUPI:
+  "∀ p #i #j. ((GUTI( p ) @ #i) ∧ (SUPI( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+restriction GUTInotSKHN:
+  "∀ p #i #j. ((GUTI( p ) @ #i) ∧ (SKHN( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+restriction SEAFnotSUPI:
+  "∀ p #i #j. ((SEAF( p ) @ #i) ∧ (SUPI( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+restriction SEAFnotHN:
+  "∀ p #i #j. ((SEAF( p ) @ #i) ∧ (HN( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+restriction CIDnotSUPI:
+  "∀ p #i #j. ((CID( p ) @ #i) ∧ (SUPI( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+restriction PDUnotSUPI:
+  "∀ p #i #j. ((PDU( p ) @ #i) ∧ (SUPI( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+restriction SKHNnotSUPI:
+  "∀ p #i #j. ((SKHN( p ) @ #i) ∧ (SUPI( p ) @ #j)) ⇒ (⊥)"
+  // safety formula
+
+lemma PDUorigin [use_induction, reuse]:
+  all-traces
+  "∀ p q #i.
+    (UsePDUSession( p, q ) @ #i) ⇒ (∃ #j. CreatePDUSession( p, q ) @ #j)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q #i.
+  (UsePDUSession( p, q ) @ #i) ∧ ∀ #j. (CreatePDUSession( p, q ) @ #j) ⇒ ⊥"
+*/
+induction
+  case empty_trace
+  by contradiction /* from formulas */
+next
+  case non_empty_trace
+  solve( (last(#i))  ∥
+         (∃ #j. (CreatePDUSession( p, q ) @ #j) ∧ ¬(last(#j))) )
+    case case_1
+    solve( UsePDUSession( p, q ) @ #i )
+      case cn_fwd_ho_req_hkd_new_kamf
+      solve( !UE( ~SUPI, ~PEI, ~CN_ID ) ▶₁ #i )
+        case create_UE
+        solve( !N2( ~cid_N2_SRAN, ~SRAN_ID, ~CN_ID ) ▶₂ #i )
+          case connect_networks_N2
+          solve( !N2( ~cid_N2_TRAN, ~TRAN_ID, ~CN_ID ) ▶₃ #i )
+            case connect_networks_N2
+            solve( St_1_CN( ~CN_ID, ~K_SEAF, K_AMF, ~SRAN_ID, ~TRAN_ID,
+                            ~PDU_SESSION_ID_SRAN, NH, NCC, ~HN_ID
+                   ) ▶₀ #i )
+              case init_UE
+              solve( PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI.1, ~SRAN_ID
+                     ) ▶₄ #i )
+                case cn_fwd_ho_req_hkd_new_kamf
+                by contradiction /* from formulas */
+              next
+                case cn_fwd_ho_req_hkd_old_kamf
+                by contradiction /* from formulas */
+              next
+                case cn_rcv_registration_complete_snd_rrc_iai_case_1
+                by contradiction /* from formulas */
+              next
+                case cn_rcv_registration_complete_snd_rrc_iai_case_2
+                by contradiction /* from formulas */
+              next
+                case cn_rcv_registration_complete_snd_rrc_iai_case_3
+                by contradiction /* from formulas */
+              next
+                case cn_rcv_registration_complete_snd_rrc_iai_case_4
+                by contradiction /* from formulas */
+              next
+                case cn_rcv_ue_context_release_complete_case_1
+                by contradiction /* from formulas */
+              next
+                case cn_rcv_ue_context_release_complete_case_2
+                by contradiction /* from formulas */
+              next
+                case cn_rcv_ue_context_release_complete_case_3
+                by contradiction /* from formulas */
+              next
+                case cn_rcv_ue_context_release_complete_case_4
+                by contradiction /* from formulas */
+              next
+                case cn_snd_ho_cmd_case_1
+                by contradiction /* from formulas */
+              next
+                case cn_snd_ho_cmd_case_2
+                by contradiction /* from formulas */
+              next
+                case init_UE
+                by contradiction /* from formulas */
+              next
+                case tran_rcv_ho_req_snd_ack
+                by contradiction /* from formulas */
+              next
+                case tran_rcv_ran_status_transfer_and_ho_confirm_snd_ho_notify
+                by contradiction /* from formulas */
+              qed
+            next
+              case init_next_handover_case_01
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_02
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_03
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_04
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_05
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_06
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_07
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_08
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_09
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_10
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_11
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_12
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_13
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_14
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_15
+              by contradiction /* from formulas */
+            next
+              case init_next_handover_case_16
+              by contradiction /* from formulas */
+            qed
+          qed
+        qed
+      qed
+    next
+      case cn_fwd_ho_req_hkd_old_kamf
+      solve( !N2( ~cid_N2_SRAN, ~SRAN_ID, ~CN_ID ) ▶₁ #i )
+        case connect_networks_N2
+        solve( !N2( ~cid_N2_TRAN, ~TRAN_ID, ~CN_ID ) ▶₂ #i )
+          case connect_networks_N2
+          solve( St_1_CN( ~CN_ID, ~K_SEAF, K_AMF, ~SRAN_ID, ~TRAN_ID,
+                          ~PDU_SESSION_ID_SRAN, NH, NCC, ~HN_ID
+                 ) ▶₀ #i )
+            case init_UE
+            solve( PDU_Session( ~PDU_SESSION_ID_SRAN, ~CN_ID, ~SUPI.1, ~SRAN_ID
+                   ) ▶₃ #i )
+              case cn_fwd_ho_req_hkd_new_kamf
+              by contradiction /* from formulas */
+            next
+              case cn_fwd_ho_req_hkd_old_kamf
+              by contradiction /* from formulas */
+            next
+              case cn_rcv_registration_complete_snd_rrc_iai_case_1
+              by contradiction /* from formulas */
+            next
+              case cn_rcv_registration_complete_snd_rrc_iai_case_2
+              by contradiction /* from formulas */
+            next
+              case cn_rcv_registration_complete_snd_rrc_iai_case_3
+              by contradiction /* from formulas */
+            next
+              case cn_rcv_registration_complete_snd_rrc_iai_case_4
+              by contradiction /* from formulas */
+            next
+              case cn_rcv_ue_context_release_complete_case_1
+              by contradiction /* from formulas */
+            next
+              case cn_rcv_ue_context_release_complete_case_2
+              by contradiction /* from formulas */
+            next
+              case cn_rcv_ue_context_release_complete_case_3
+              by contradiction /* from formulas */
+            next
+              case cn_rcv_ue_context_release_complete_case_4
+              by contradiction /* from formulas */
+            next
+              case cn_snd_ho_cmd_case_1
+              by contradiction /* from formulas */
+            next
+              case cn_snd_ho_cmd_case_2
+              by contradiction /* from formulas */
+            next
+              case init_UE
+              by contradiction /* from formulas */
+            next
+              case tran_rcv_ho_req_snd_ack
+              by contradiction /* from formulas */
+            next
+              case tran_rcv_ran_status_transfer_and_ho_confirm_snd_ho_notify
+              by contradiction /* from formulas */
+            qed
+          next
+            case init_next_handover_case_01
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_02
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_03
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_04
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_05
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_06
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_07
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_08
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_09
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_10
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_11
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_12
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_13
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_14
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_15
+            by contradiction /* from formulas */
+          next
+            case init_next_handover_case_16
+            by contradiction /* from formulas */
+          qed
+        qed
+      qed
+    next
+      case cn_rcv_registration_complete_snd_rrc_iai
+      solve( St_7_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID,
+                      ~TRAN_ID, ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+             ) ▶₀ #i )
+        case cn_rcv_identity_rsp_pei_snd_registration_accept_case_1
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_identity_rsp_pei_snd_registration_accept_case_2
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_registration_req_snd_registration_accept_case_1
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_registration_req_snd_registration_accept_case_2
+        by contradiction /* from formulas */
+      qed
+    next
+      case cn_rcv_ue_context_release_complete
+      solve( St_9_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, 5G_GUTI, ~SRAN_ID,
+                      ~TRAN_ID, ~PDU_SESSION_ID_SRAN, ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+             ) ▶₀ #i )
+        case cn_snd_ue_context_release_cmd_case_1
+        by contradiction /* from formulas */
+      next
+        case cn_snd_ue_context_release_cmd_case_2
+        by contradiction /* from formulas */
+      next
+        case cn_snd_ue_context_release_cmd_case_3
+        by contradiction /* from formulas */
+      next
+        case cn_snd_ue_context_release_cmd_case_4
+        by contradiction /* from formulas */
+      qed
+    next
+      case cn_snd_ho_cmd
+      solve( St_3_CN( ~CN_ID, ~K_SEAF, K_AMF, K_gNB_star, ~SRAN_ID, ~TRAN_ID,
+                      <'TRAN', ~TRAN_ID>, <'NASC', K_AMF_change_flag>, ~PDU_SESSION_ID_SRAN,
+                      ~PDU_SESSION_ID_TRAN, NH, NCC, ~HN_ID
+             ) ▶₀ #i )
+        case cn_rcv_ho_req_ack_case_1
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_ho_req_ack_case_2
+        by contradiction /* from formulas */
+      qed
+    next
+      case init_next_handover
+      solve( PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~TRAN_ID ) ▶₅ #i )
+        case cn_fwd_ho_req_hkd_new_kamf_case_1
+        by contradiction /* from formulas */
+      next
+        case cn_fwd_ho_req_hkd_new_kamf_case_2
+        by contradiction /* from formulas */
+      next
+        case cn_fwd_ho_req_hkd_old_kamf_case_1
+        by contradiction /* from formulas */
+      next
+        case cn_fwd_ho_req_hkd_old_kamf_case_2
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_registration_complete_snd_rrc_iai_case_1
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_registration_complete_snd_rrc_iai_case_2
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_registration_complete_snd_rrc_iai_case_3
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_registration_complete_snd_rrc_iai_case_4
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_ue_context_release_complete_case_1
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_ue_context_release_complete_case_2
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_ue_context_release_complete_case_3
+        by contradiction /* from formulas */
+      next
+        case cn_rcv_ue_context_release_complete_case_4
+        by contradiction /* from formulas */
+      next
+        case cn_snd_ho_cmd_case_1
+        by contradiction /* from formulas */
+      next
+        case cn_snd_ho_cmd_case_2
+        by contradiction /* from formulas */
+      next
+        case init_UE
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_01
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_02
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_03
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_04
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_05
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_06
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_07
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_08
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_09
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_10
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_11
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_12
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_13
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_14
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_15
+        by contradiction /* from formulas */
+      next
+        case init_next_handover_case_16
+        by contradiction /* from formulas */
+      next
+        case tran_rcv_ho_req_snd_ack
+        by contradiction /* from formulas */
+      next
+        case tran_rcv_ran_status_transfer_and_ho_confirm_snd_ho_notify
+        by contradiction /* from formulas */
+      qed
+    next
+      case tran_rcv_ho_req_snd_ack
+      solve( !N2( ~cid_N2, ~TRAN_ID, ~CN_ID ) ▶₁ #i )
+        case connect_networks_N2
+        solve( PDU_Session( ~PDU_SESSION_ID, ~CN_ID, ~SUPI, ~SRAN_ID ) ▶₀ #i )
+          case cn_fwd_ho_req_hkd_new_kamf_case_1
+          by contradiction /* from formulas */
+        next
+          case cn_fwd_ho_req_hkd_new_kamf_case_2
+          by contradiction /* from formulas */
+        next
+          case cn_fwd_ho_req_hkd_old_kamf_case_1
+          by contradiction /* from formulas */
+        next
+          case cn_fwd_ho_req_hkd_old_kamf_case_2
+          by contradiction /* from formulas */
+        next
+          case cn_rcv_registration_complete_snd_rrc_iai_case_1
+          by contradiction /* from formulas */
+        next
+          case cn_rcv_registration_complete_snd_rrc_iai_case_2
+          by contradiction /* from formulas */
+        next
+          case cn_rcv_registration_complete_snd_rrc_iai_case_3
+          by contradiction /* from formulas */
+        next
+          case cn_rcv_registration_complete_snd_rrc_iai_case_4
+          by contradiction /* from formulas */
+        next
+          case cn_rcv_ue_context_release_complete_case_1
+          by contradiction /* from formulas */
+        next
+          case cn_rcv_ue_context_release_complete_case_2
+          by contradiction /* from formulas */
+        next
+          case cn_rcv_ue_context_release_complete_case_3
+          by contradiction /* from formulas */
+        next
+          case cn_rcv_ue_context_release_complete_case_4
+          by contradiction /* from formulas */
+        next
+          case cn_snd_ho_cmd_case_1
+          by contradiction /* from formulas */
+        next
+          case cn_snd_ho_cmd_case_2
+          by contradiction /* from formulas */
+        next
+          case init_UE
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_01
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_02
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_03
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_04
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_05
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_06
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_07
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_08
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_09
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_10
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_11
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_12
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_13
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_14
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_15
+          by contradiction /* from formulas */
+        next
+          case init_next_handover_case_16
+          by contradiction /* from formulas */
+        next
+          case tran_rcv_ho_req_snd_ack
+          by contradiction /* from formulas */
+        next
+          case tran_rcv_ran_status_transfer_and_ho_confirm_snd_ho_notify
+          by contradiction /* from formulas */
+        qed
+      qed
+    next
+      case tran_rcv_ran_status_transfer_and_ho_confirm_snd_ho_notify
+      solve( St_1_TRAN( ~TRAN_ID, K_gNB_star, ~SRAN_ID, ~PDU_SESSION_ID
+             ) ▶₀ #i )
+        case tran_rcv_ho_req_snd_ack
+        by contradiction /* from formulas */
+      qed
+    qed
+  next
+    case case_2
+    by contradiction /* from formulas */
+  qed
+qed
+
+lemma PDUargsconstant [use_induction, reuse]:
+  all-traces
+  "∀ p q r #i #j.
+    ((UsePDUSession( p, q ) @ #i) ∧ (UsePDUSession( p, r ) @ #j)) ⇒ (q = r)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q r #i #j.
+  (UsePDUSession( p, q ) @ #i) ∧ (UsePDUSession( p, r ) @ #j) ∧ ¬(q = r)"
+*/
+by sorry
+
+lemma PDUidunique [use_induction, reuse]:
+  all-traces
+  "∀ p q r #i #j.
+    ((CreatePDUSession( p, q ) @ #i) ∧ (CreatePDUSession( p, r ) @ #j)) ⇒
+    (q = r)"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q r #i #j.
+  (CreatePDUSession( p, q ) @ #i) ∧ (CreatePDUSession( p, r ) @ #j)
+ ∧
+  ¬(q = r)"
+*/
+by sorry
+
+lemma ValueOrigin [use_induction, reuse]:
+  all-traces
+  "∀ p #i.
+    (UseValues( p ) @ #i) ⇒
+    ((∃ #j. CreateValues( p ) @ #j) ∨ (∃ #j. ResetValues( p ) @ #j))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p #i.
+  (UseValues( p ) @ #i)
+ ∧
+  (∀ #j. (CreateValues( p ) @ #j) ⇒ ⊥) ∧
+  (∀ #j. (ResetValues( p ) @ #j) ⇒ ⊥)"
+*/
+by sorry
+
+lemma ValueReset [use_induction, reuse]:
+  all-traces
+  "∀ p s #i.
+    (Reset( p, s ) @ #i) ⇒
+    (∃ #j. (Init( 'K_SEAF', p ) @ #j) ∧ (Init( 'SUPI', s ) @ #j))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p s #i.
+  (Reset( p, s ) @ #i)
+ ∧
+  ∀ #j. (Init( 'K_SEAF', p ) @ #j) ∧ (Init( 'SUPI', s ) @ #j) ⇒ ⊥"
+*/
+by sorry
+
+lemma executability_old_kamf_no_id_req:
+  exists-trace
+  "∃ x y s t #i1 #i2 #i3 #i4 #j1 #j2 #j3 #j4 #j5 #j6 #j7.
+    ((((((((((((((((((((((((((((((((Init( 'K_AMF', x ) @ #i1) ∧
+                                   (RadioAccessNetwork( s ) @ #i2)) ∧
+                                  (RadioAccessNetwork( t ) @ #i3)) ∧
+                                 (SessionHandover( <s, t>, x, x, y ) @ #i4)) ∧
+                                (NoRekeyingCN( x, y ) @ #j1)) ∧
+                               (HandoverPreparationDone( x, y ) @ #j2)) ∧
+                              (NoRekeyingUE( x, y ) @ #j3)) ∧
+                             (HandoverExecutionDone( '1', x, y ) @ #j4)) ∧
+                            (NoIdentityRequests( x, y ) @ #j5)) ∧
+                           (MobilityRegistrationUpdateDone( x, y ) @ #j6)) ∧
+                          (HandoverExecutionDone( '2', x, y ) @ #j7)) ∧
+                         (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                        (¬(∃ a b #k. IdentityRequestSUCI( a, b ) @ #k))) ∧
+                       (¬(∃ a b #k. IdentityResponseSUCI( a, b ) @ #k))) ∧
+                      (¬(∃ a b #k. IdentityRequestPEI( a, b ) @ #k))) ∧
+                     (¬(∃ a b #k. IdentityResponsePEI( a, b ) @ #k))) ∧
+                    (¬(∃ a b #k. RekeyingCN( a, b ) @ #k))) ∧
+                   (¬(∃ a b #k. RekeyingUE( a, b ) @ #k))) ∧
+                  (¬(∃ a b #k. IdentityRequestsDone( a, b ) @ #k))) ∧
+                 (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ (#k = #i1))) ∧
+                (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3)))) ∧
+               (∀ a b c d #k. (SessionHandover( a, b, c, d ) @ #k) ⇒ (#k = #i4))) ∧
+              (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ (#k = #j1))) ∧
+             (∀ a b #k. (HandoverPreparationDone( a, b ) @ #k) ⇒ (#k = #j2))) ∧
+            (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ (#k = #j3))) ∧
+           (∀ a b #k. (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ (#k = #j4))) ∧
+          (∀ a b #k. (NoIdentityRequests( a, b ) @ #k) ⇒ (#k = #j5))) ∧
+         (∀ a b #k. (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒ (#k = #j6))) ∧
+        (∀ a b #k. (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ (#k = #j7))) ∧
+       (∀ a b #k1 #k2.
+         ((CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+      (∀ a b #k1 #k2.
+        ((HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a b #k1 #k2.
+       ((UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a b c d #k1 #k2.
+      ((Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2)) ⇒ (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x y s t #i1 #i2 #i3 #i4 #j1 #j2 #j3 #j4 #j5 #j6 #j7.
+  (Init( 'K_AMF', x ) @ #i1) ∧
+  (RadioAccessNetwork( s ) @ #i2) ∧
+  (RadioAccessNetwork( t ) @ #i3) ∧
+  (SessionHandover( <s, t>, x, x, y ) @ #i4) ∧
+  (NoRekeyingCN( x, y ) @ #j1) ∧
+  (HandoverPreparationDone( x, y ) @ #j2) ∧
+  (NoRekeyingUE( x, y ) @ #j3) ∧
+  (HandoverExecutionDone( '1', x, y ) @ #j4) ∧
+  (NoIdentityRequests( x, y ) @ #j5) ∧
+  (MobilityRegistrationUpdateDone( x, y ) @ #j6) ∧
+  (HandoverExecutionDone( '2', x, y ) @ #j7)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3))) ∧
+  (∀ a b c d #k. (SessionHandover( a, b, c, d ) @ #k) ⇒ #k = #i4) ∧
+  (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ #k = #j1) ∧
+  (∀ a b #k. (HandoverPreparationDone( a, b ) @ #k) ⇒ #k = #j2) ∧
+  (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ #k = #j3) ∧
+  (∀ a b #k. (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ #k = #j4) ∧
+  (∀ a b #k. (NoIdentityRequests( a, b ) @ #k) ⇒ #k = #j5) ∧
+  (∀ a b #k. (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒ #k = #j6) ∧
+  (∀ a b #k. (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ #k = #j7) ∧
+  (∀ a b #k1 #k2.
+    (CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b c d #k1 #k2.
+    (Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma executability_old_kamf_id_req:
+  exists-trace
+  "∃ x y s t #i1 #i2 #i3 #i4 #j1 #j2 #j3 #j4 #j5 #j6 #j7 #j8 #j9 #j10 #j11.
+    ((((((((((((((((((((((((((((((((((((Init( 'K_AMF', x ) @ #i1) ∧
+                                       (RadioAccessNetwork( s ) @ #i2)) ∧
+                                      (RadioAccessNetwork( t ) @ #i3)) ∧
+                                     (SessionHandover( <s, t>, x, x, y ) @ #i4)) ∧
+                                    (NoRekeyingCN( x, y ) @ #j1)) ∧
+                                   (HandoverPreparationDone( x, y ) @ #j2)) ∧
+                                  (NoRekeyingUE( x, y ) @ #j3)) ∧
+                                 (HandoverExecutionDone( '1', x, y ) @ #j4)) ∧
+                                (IdentityRequestSUCI( x, y ) @ #j5)) ∧
+                               (IdentityResponseSUCI( x, y ) @ #j6)) ∧
+                              (IdentityRequestPEI( x, y ) @ #j7)) ∧
+                             (IdentityResponsePEI( x, y ) @ #j8)) ∧
+                            (IdentityRequestsDone( x, y ) @ #j9)) ∧
+                           (MobilityRegistrationUpdateDone( x, y ) @ #j10)) ∧
+                          (HandoverExecutionDone( '2', x, y ) @ #j11)) ∧
+                         (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                        (¬(∃ a b #k. RekeyingCN( a, b ) @ #k))) ∧
+                       (¬(∃ a b #k. RekeyingUE( a, b ) @ #k))) ∧
+                      (¬(∃ a b #k. NoIdentityRequests( a, b ) @ #k))) ∧
+                     (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ (#k = #i1))) ∧
+                    (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3)))) ∧
+                   (∀ a1 a2 a3 a4 #k.
+                     (SessionHandover( a1, a2, a3, a4 ) @ #k) ⇒ (#k = #i4))) ∧
+                  (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ (#k = #j1))) ∧
+                 (∀ a b #k. (HandoverPreparationDone( a, b ) @ #k) ⇒ (#k = #j2))) ∧
+                (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ (#k = #j3))) ∧
+               (∀ a b #k. (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ (#k = #j4))) ∧
+              (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ (#k = #j5))) ∧
+             (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ (#k = #j6))) ∧
+            (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ (#k = #j7))) ∧
+           (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ (#k = #j8))) ∧
+          (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ (#k = #j9))) ∧
+         (∀ a b #k.
+           (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒ (#k = #j10))) ∧
+        (∀ a b #k. (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ (#k = #j11))) ∧
+       (∀ a1 a2 #k1 #k2.
+         ((CoreNetwork( a1 ) @ #k1) ∧ (CoreNetwork( a2 ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+      (∀ a1 a2 #k1 #k2.
+        ((HomeNetwork( a1 ) @ #k1) ∧ (HomeNetwork( a2 ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a1 a2 #k1 #k2.
+       ((UserEquipment( a1 ) @ #k1) ∧ (UserEquipment( a2 ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a1 a2 a3 a4 #k1 #k2.
+      ((Subscribe( a1, a2 ) @ #k1) ∧ (Subscribe( a3, a4 ) @ #k2)) ⇒
+      (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x y s t #i1 #i2 #i3 #i4 #j1 #j2 #j3 #j4 #j5 #j6 #j7 #j8 #j9 #j10 #j11.
+  (Init( 'K_AMF', x ) @ #i1) ∧
+  (RadioAccessNetwork( s ) @ #i2) ∧
+  (RadioAccessNetwork( t ) @ #i3) ∧
+  (SessionHandover( <s, t>, x, x, y ) @ #i4) ∧
+  (NoRekeyingCN( x, y ) @ #j1) ∧
+  (HandoverPreparationDone( x, y ) @ #j2) ∧
+  (NoRekeyingUE( x, y ) @ #j3) ∧
+  (HandoverExecutionDone( '1', x, y ) @ #j4) ∧
+  (IdentityRequestSUCI( x, y ) @ #j5) ∧
+  (IdentityResponseSUCI( x, y ) @ #j6) ∧
+  (IdentityRequestPEI( x, y ) @ #j7) ∧
+  (IdentityResponsePEI( x, y ) @ #j8) ∧
+  (IdentityRequestsDone( x, y ) @ #j9) ∧
+  (MobilityRegistrationUpdateDone( x, y ) @ #j10) ∧
+  (HandoverExecutionDone( '2', x, y ) @ #j11)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (NoIdentityRequests( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3))) ∧
+  (∀ a1 a2 a3 a4 #k. (SessionHandover( a1, a2, a3, a4 ) @ #k) ⇒ #k = #i4) ∧
+  (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ #k = #j1) ∧
+  (∀ a b #k. (HandoverPreparationDone( a, b ) @ #k) ⇒ #k = #j2) ∧
+  (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ #k = #j3) ∧
+  (∀ a b #k. (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ #k = #j4) ∧
+  (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ #k = #j5) ∧
+  (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ #k = #j6) ∧
+  (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ #k = #j7) ∧
+  (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ #k = #j8) ∧
+  (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ #k = #j9) ∧
+  (∀ a b #k. (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒ #k = #j10) ∧
+  (∀ a b #k. (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ #k = #j11) ∧
+  (∀ a1 a2 #k1 #k2.
+    (CoreNetwork( a1 ) @ #k1) ∧ (CoreNetwork( a2 ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a1 a2 #k1 #k2.
+    (HomeNetwork( a1 ) @ #k1) ∧ (HomeNetwork( a2 ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a1 a2 #k1 #k2.
+    (UserEquipment( a1 ) @ #k1) ∧ (UserEquipment( a2 ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a1 a2 a3 a4 #k1 #k2.
+    (Subscribe( a1, a2 ) @ #k1) ∧ (Subscribe( a3, a4 ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma executability_new_kamf_no_id_req:
+  exists-trace
+  "∃ x0 x1 y1 s t #i1 #i2 #i3 #i4 #j1 #j2 #j3 #j4 #j5 #j6 #j7.
+    (((((((((((((((((((((((((((((((((Init( 'K_AMF', x0 ) @ #i1) ∧
+                                    (RadioAccessNetwork( s ) @ #i2)) ∧
+                                   (RadioAccessNetwork( t ) @ #i3)) ∧
+                                  (SessionHandover( <s, t>, x0, x1, y1 ) @ #i4)) ∧
+                                 (RekeyingCN( x1, y1 ) @ #j1)) ∧
+                                (HandoverPreparationDone( x1, y1 ) @ #j2)) ∧
+                               (RekeyingUE( x1, y1 ) @ #j3)) ∧
+                              (HandoverExecutionDone( '1', x1, y1 ) @ #j4)) ∧
+                             (NoIdentityRequests( x1, y1 ) @ #j5)) ∧
+                            (MobilityRegistrationUpdateDone( x1, y1 ) @ #j6)) ∧
+                           (HandoverExecutionDone( '2', x1, y1 ) @ #j7)) ∧
+                          (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                         (¬(∃ a b #k. IdentityRequestSUCI( a, b ) @ #k))) ∧
+                        (¬(∃ a b #k. IdentityResponseSUCI( a, b ) @ #k))) ∧
+                       (¬(∃ a b #k. IdentityRequestPEI( a, b ) @ #k))) ∧
+                      (¬(∃ a b #k. IdentityResponsePEI( a, b ) @ #k))) ∧
+                     (¬(∃ a b #k. NoRekeyingCN( a, b ) @ #k))) ∧
+                    (¬(∃ a b #k. NoRekeyingUE( a, b ) @ #k))) ∧
+                   (¬(∃ a b #k. IdentityRequestsDone( a, b ) @ #k))) ∧
+                  (¬(x0 = x1))) ∧
+                 (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ (#k = #i1))) ∧
+                (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3)))) ∧
+               (∀ a1 a2 a3 a4 #k.
+                 (SessionHandover( a1, a2, a3, a4 ) @ #k) ⇒ (#k = #i4))) ∧
+              (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ (#k = #j1))) ∧
+             (∀ a b #k. (HandoverPreparationDone( a, b ) @ #k) ⇒ (#k = #j2))) ∧
+            (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ (#k = #j3))) ∧
+           (∀ a b #k. (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ (#k = #j4))) ∧
+          (∀ a b #k. (NoIdentityRequests( a, b ) @ #k) ⇒ (#k = #j5))) ∧
+         (∀ a b #k. (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒ (#k = #j6))) ∧
+        (∀ a b #k. (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ (#k = #j7))) ∧
+       (∀ a1 a2 #k1 #k2.
+         ((CoreNetwork( a1 ) @ #k1) ∧ (CoreNetwork( a2 ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+      (∀ a1 a2 #k1 #k2.
+        ((HomeNetwork( a1 ) @ #k1) ∧ (HomeNetwork( a2 ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a1 a2 #k1 #k2.
+       ((UserEquipment( a1 ) @ #k1) ∧ (UserEquipment( a2 ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a1 a2 a3 a4 #k1 #k2.
+      ((Subscribe( a1, a2 ) @ #k1) ∧ (Subscribe( a3, a4 ) @ #k2)) ⇒
+      (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x0 x1 y1 s t #i1 #i2 #i3 #i4 #j1 #j2 #j3 #j4 #j5 #j6 #j7.
+  (Init( 'K_AMF', x0 ) @ #i1) ∧
+  (RadioAccessNetwork( s ) @ #i2) ∧
+  (RadioAccessNetwork( t ) @ #i3) ∧
+  (SessionHandover( <s, t>, x0, x1, y1 ) @ #i4) ∧
+  (RekeyingCN( x1, y1 ) @ #j1) ∧
+  (HandoverPreparationDone( x1, y1 ) @ #j2) ∧
+  (RekeyingUE( x1, y1 ) @ #j3) ∧
+  (HandoverExecutionDone( '1', x1, y1 ) @ #j4) ∧
+  (NoIdentityRequests( x1, y1 ) @ #j5) ∧
+  (MobilityRegistrationUpdateDone( x1, y1 ) @ #j6) ∧
+  (HandoverExecutionDone( '2', x1, y1 ) @ #j7)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ ⊥) ∧
+  (¬(x0 = x1)) ∧
+  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3))) ∧
+  (∀ a1 a2 a3 a4 #k. (SessionHandover( a1, a2, a3, a4 ) @ #k) ⇒ #k = #i4) ∧
+  (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ #k = #j1) ∧
+  (∀ a b #k. (HandoverPreparationDone( a, b ) @ #k) ⇒ #k = #j2) ∧
+  (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ #k = #j3) ∧
+  (∀ a b #k. (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ #k = #j4) ∧
+  (∀ a b #k. (NoIdentityRequests( a, b ) @ #k) ⇒ #k = #j5) ∧
+  (∀ a b #k. (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒ #k = #j6) ∧
+  (∀ a b #k. (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ #k = #j7) ∧
+  (∀ a1 a2 #k1 #k2.
+    (CoreNetwork( a1 ) @ #k1) ∧ (CoreNetwork( a2 ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a1 a2 #k1 #k2.
+    (HomeNetwork( a1 ) @ #k1) ∧ (HomeNetwork( a2 ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a1 a2 #k1 #k2.
+    (UserEquipment( a1 ) @ #k1) ∧ (UserEquipment( a2 ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a1 a2 a3 a4 #k1 #k2.
+    (Subscribe( a1, a2 ) @ #k1) ∧ (Subscribe( a3, a4 ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma executability_new_kamf_id_req:
+  exists-trace
+  "∃ x0 x1 y1 s t #i1 #i2 #i3 #i4 #j1 #j2 #j3 #j4 #j5 #j6 #j7 #j8 #j9 #j10
+     #j11.
+    (((((((((((((((((((((((((((((((((((((Init( 'K_AMF', x0 ) @ #i1) ∧
+                                        (RadioAccessNetwork( s ) @ #i2)) ∧
+                                       (RadioAccessNetwork( t ) @ #i3)) ∧
+                                      (SessionHandover( <s, t>, x0, x1, y1 ) @ #i4)) ∧
+                                     (RekeyingCN( x1, y1 ) @ #j1)) ∧
+                                    (HandoverPreparationDone( x1, y1 ) @ #j2)) ∧
+                                   (RekeyingUE( x1, y1 ) @ #j3)) ∧
+                                  (HandoverExecutionDone( '1', x1, y1 ) @ #j4)) ∧
+                                 (IdentityRequestSUCI( x1, y1 ) @ #j5)) ∧
+                                (IdentityResponseSUCI( x1, y1 ) @ #j6)) ∧
+                               (IdentityRequestPEI( x1, y1 ) @ #j7)) ∧
+                              (IdentityResponsePEI( x1, y1 ) @ #j8)) ∧
+                             (IdentityRequestsDone( x1, y1 ) @ #j9)) ∧
+                            (MobilityRegistrationUpdateDone( x1, y1 ) @ #j10)) ∧
+                           (HandoverExecutionDone( '2', x1, y1 ) @ #j11)) ∧
+                          (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                         (¬(∃ a b #k. NoRekeyingCN( a, b ) @ #k))) ∧
+                        (¬(∃ a b #k. NoRekeyingUE( a, b ) @ #k))) ∧
+                       (¬(∃ a b #k. NoIdentityRequests( a, b ) @ #k))) ∧
+                      (¬(x0 = x1))) ∧
+                     (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ (#k = #i1))) ∧
+                    (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3)))) ∧
+                   (∀ a1 a2 a3 a4 #k.
+                     (SessionHandover( a1, a2, a3, a4 ) @ #k) ⇒ (#k = #i4))) ∧
+                  (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ (#k = #j1))) ∧
+                 (∀ a b #k. (HandoverPreparationDone( a, b ) @ #k) ⇒ (#k = #j2))) ∧
+                (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ (#k = #j3))) ∧
+               (∀ a b #k. (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ (#k = #j4))) ∧
+              (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ (#k = #j5))) ∧
+             (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ (#k = #j6))) ∧
+            (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ (#k = #j7))) ∧
+           (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ (#k = #j8))) ∧
+          (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ (#k = #j9))) ∧
+         (∀ a b #k.
+           (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒ (#k = #j10))) ∧
+        (∀ a b #k. (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ (#k = #j11))) ∧
+       (∀ a1 a2 #k1 #k2.
+         ((CoreNetwork( a1 ) @ #k1) ∧ (CoreNetwork( a2 ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+      (∀ a1 a2 #k1 #k2.
+        ((HomeNetwork( a1 ) @ #k1) ∧ (HomeNetwork( a2 ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a1 a2 #k1 #k2.
+       ((UserEquipment( a1 ) @ #k1) ∧ (UserEquipment( a2 ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a1 a2 a3 a4 #k1 #k2.
+      ((Subscribe( a1, a2 ) @ #k1) ∧ (Subscribe( a3, a4 ) @ #k2)) ⇒
+      (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x0 x1 y1 s t #i1 #i2 #i3 #i4 #j1 #j2 #j3 #j4 #j5 #j6 #j7 #j8 #j9 #j10
+   #j11.
+  (Init( 'K_AMF', x0 ) @ #i1) ∧
+  (RadioAccessNetwork( s ) @ #i2) ∧
+  (RadioAccessNetwork( t ) @ #i3) ∧
+  (SessionHandover( <s, t>, x0, x1, y1 ) @ #i4) ∧
+  (RekeyingCN( x1, y1 ) @ #j1) ∧
+  (HandoverPreparationDone( x1, y1 ) @ #j2) ∧
+  (RekeyingUE( x1, y1 ) @ #j3) ∧
+  (HandoverExecutionDone( '1', x1, y1 ) @ #j4) ∧
+  (IdentityRequestSUCI( x1, y1 ) @ #j5) ∧
+  (IdentityResponseSUCI( x1, y1 ) @ #j6) ∧
+  (IdentityRequestPEI( x1, y1 ) @ #j7) ∧
+  (IdentityResponsePEI( x1, y1 ) @ #j8) ∧
+  (IdentityRequestsDone( x1, y1 ) @ #j9) ∧
+  (MobilityRegistrationUpdateDone( x1, y1 ) @ #j10) ∧
+  (HandoverExecutionDone( '2', x1, y1 ) @ #j11)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (NoIdentityRequests( a, b ) @ #k) ⇒ ⊥) ∧
+  (¬(x0 = x1)) ∧
+  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3))) ∧
+  (∀ a1 a2 a3 a4 #k. (SessionHandover( a1, a2, a3, a4 ) @ #k) ⇒ #k = #i4) ∧
+  (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ #k = #j1) ∧
+  (∀ a b #k. (HandoverPreparationDone( a, b ) @ #k) ⇒ #k = #j2) ∧
+  (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ #k = #j3) ∧
+  (∀ a b #k. (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ #k = #j4) ∧
+  (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ #k = #j5) ∧
+  (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ #k = #j6) ∧
+  (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ #k = #j7) ∧
+  (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ #k = #j8) ∧
+  (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ #k = #j9) ∧
+  (∀ a b #k. (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒ #k = #j10) ∧
+  (∀ a b #k. (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ #k = #j11) ∧
+  (∀ a1 a2 #k1 #k2.
+    (CoreNetwork( a1 ) @ #k1) ∧ (CoreNetwork( a2 ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a1 a2 #k1 #k2.
+    (HomeNetwork( a1 ) @ #k1) ∧ (HomeNetwork( a2 ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a1 a2 #k1 #k2.
+    (UserEquipment( a1 ) @ #k1) ∧ (UserEquipment( a2 ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a1 a2 a3 a4 #k1 #k2.
+    (Subscribe( a1, a2 ) @ #k1) ∧ (Subscribe( a3, a4 ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma executability_old_kamf_old_kamf_no_id_req:
+  exists-trace
+  "∃ x1 x2 y1 y2 s t #i1 #i2 #i3 #i4 #i5 #i6 #j1 #j2 #j3 #j4 #j5 #j6 #j7
+     #l1 #l2 #l3 #l4 #l5 #l6 #l7.
+    ((((((((((((((((((((((((((((((((((((((((((((((((((((Init( 'K_AMF', x1
+                                                        ) @ #i1) ∧
+                                                       (RadioAccessNetwork( s ) @ #i2)) ∧
+                                                      (RadioAccessNetwork( t ) @ #i3)) ∧
+                                                     (SessionHandover( <s, t>, x1, x1, y1 ) @ #i4)) ∧
+                                                    (HandoverInit( <s, t>, x1, x2 ) @ #i5)) ∧
+                                                   (SessionHandover( <t, s>, x2, x2, y2 ) @ #i6)) ∧
+                                                  (NoRekeyingCN( x1, y1 ) @ #j1)) ∧
+                                                 (HandoverPreparationDone( x1, y1 ) @ #j2)) ∧
+                                                (NoRekeyingUE( x1, y1 ) @ #j3)) ∧
+                                               (HandoverExecutionDone( '1', x1, y1 ) @ #j4)) ∧
+                                              (NoIdentityRequests( x1, y1 ) @ #j5)) ∧
+                                             (MobilityRegistrationUpdateDone( x1, y1 ) @ #j6)) ∧
+                                            (HandoverExecutionDone( '2', x1, y1 ) @ #j7)) ∧
+                                           (NoRekeyingCN( x2, y2 ) @ #l1)) ∧
+                                          (HandoverPreparationDone( x2, y2 ) @ #l2)) ∧
+                                         (NoRekeyingUE( x2, y2 ) @ #l3)) ∧
+                                        (HandoverExecutionDone( '1', x2, y2 ) @ #l4)) ∧
+                                       (NoIdentityRequests( x2, y2 ) @ #l5)) ∧
+                                      (MobilityRegistrationUpdateDone( x2, y2 ) @ #l6)) ∧
+                                     (HandoverExecutionDone( '2', x2, y2 ) @ #l7)) ∧
+                                    (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                                   (¬(y1 = y2))) ∧
+                                  (¬(∃ a b #k. IdentityRequestSUCI( a, b ) @ #k))) ∧
+                                 (¬(∃ a b #k. IdentityResponseSUCI( a, b ) @ #k))) ∧
+                                (¬(∃ a b #k. IdentityRequestPEI( a, b ) @ #k))) ∧
+                               (¬(∃ a b #k. IdentityResponsePEI( a, b ) @ #k))) ∧
+                              (¬(∃ a b #k. RekeyingCN( a, b ) @ #k))) ∧
+                             (¬(∃ a b #k. RekeyingUE( a, b ) @ #k))) ∧
+                            (¬(∃ a b #k. IdentityRequestsDone( a, b ) @ #k))) ∧
+                           (#i4 < #i5)) ∧
+                          (#i5 < #i6)) ∧
+                         (#j1 < #l1)) ∧
+                        (#j2 < #l2)) ∧
+                       (#j3 < #l3)) ∧
+                      (#j4 < #l4)) ∧
+                     (#j5 < #l5)) ∧
+                    (#j6 < #l6)) ∧
+                   (#j7 < #l7)) ∧
+                  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ (#k = #i1))) ∧
+                 (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3)))) ∧
+                (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ (#k = #i5))) ∧
+               (∀ a b c d #k.
+                 (SessionHandover( a, b, c, d ) @ #k) ⇒ ((#k = #i4) ∨ (#k = #i6)))) ∧
+              (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ ((#k = #j1) ∨ (#k = #l1)))) ∧
+             (∀ a b #k.
+               (HandoverPreparationDone( a, b ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2)))) ∧
+            (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ ((#k = #j3) ∨ (#k = #l3)))) ∧
+           (∀ a b #k.
+             (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4)))) ∧
+          (∀ a b #k.
+            (NoIdentityRequests( a, b ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5)))) ∧
+         (∀ a b #k.
+           (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒
+           ((#k = #j6) ∨ (#k = #l6)))) ∧
+        (∀ a b #k.
+          (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ ((#k = #j7) ∨ (#k = #l7)))) ∧
+       (∀ a b #k1 #k2.
+         ((CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+      (∀ a b #k1 #k2.
+        ((HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a b #k1 #k2.
+       ((UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a b c d #k1 #k2.
+      ((Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2)) ⇒ (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x1 x2 y1 y2 s t #i1 #i2 #i3 #i4 #i5 #i6 #j1 #j2 #j3 #j4 #j5 #j6 #j7
+   #l1 #l2 #l3 #l4 #l5 #l6 #l7.
+  (Init( 'K_AMF', x1 ) @ #i1) ∧
+  (RadioAccessNetwork( s ) @ #i2) ∧
+  (RadioAccessNetwork( t ) @ #i3) ∧
+  (SessionHandover( <s, t>, x1, x1, y1 ) @ #i4) ∧
+  (HandoverInit( <s, t>, x1, x2 ) @ #i5) ∧
+  (SessionHandover( <t, s>, x2, x2, y2 ) @ #i6) ∧
+  (NoRekeyingCN( x1, y1 ) @ #j1) ∧
+  (HandoverPreparationDone( x1, y1 ) @ #j2) ∧
+  (NoRekeyingUE( x1, y1 ) @ #j3) ∧
+  (HandoverExecutionDone( '1', x1, y1 ) @ #j4) ∧
+  (NoIdentityRequests( x1, y1 ) @ #j5) ∧
+  (MobilityRegistrationUpdateDone( x1, y1 ) @ #j6) ∧
+  (HandoverExecutionDone( '2', x1, y1 ) @ #j7) ∧
+  (NoRekeyingCN( x2, y2 ) @ #l1) ∧
+  (HandoverPreparationDone( x2, y2 ) @ #l2) ∧
+  (NoRekeyingUE( x2, y2 ) @ #l3) ∧
+  (HandoverExecutionDone( '1', x2, y2 ) @ #l4) ∧
+  (NoIdentityRequests( x2, y2 ) @ #l5) ∧
+  (MobilityRegistrationUpdateDone( x2, y2 ) @ #l6) ∧
+  (HandoverExecutionDone( '2', x2, y2 ) @ #l7)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (¬(y1 = y2)) ∧
+  (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ ⊥) ∧
+  (#i4 < #i5) ∧
+  (#i5 < #i6) ∧
+  (#j1 < #l1) ∧
+  (#j2 < #l2) ∧
+  (#j3 < #l3) ∧
+  (#j4 < #l4) ∧
+  (#j5 < #l5) ∧
+  (#j6 < #l6) ∧
+  (#j7 < #l7) ∧
+  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3))) ∧
+  (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ #k = #i5) ∧
+  (∀ a b c d #k.
+    (SessionHandover( a, b, c, d ) @ #k) ⇒ ((#k = #i4) ∨ (#k = #i6))) ∧
+  (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ ((#k = #j1) ∨ (#k = #l1))) ∧
+  (∀ a b #k.
+    (HandoverPreparationDone( a, b ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2))) ∧
+  (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ ((#k = #j3) ∨ (#k = #l3))) ∧
+  (∀ a b #k.
+    (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4))) ∧
+  (∀ a b #k.
+    (NoIdentityRequests( a, b ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5))) ∧
+  (∀ a b #k.
+    (MobilityRegistrationUpdateDone( a, b ) @ #k)
+   ⇒
+    ((#k = #j6) ∨ (#k = #l6))) ∧
+  (∀ a b #k.
+    (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ ((#k = #j7) ∨ (#k = #l7))) ∧
+  (∀ a b #k1 #k2.
+    (CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b c d #k1 #k2.
+    (Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma executability_old_kamf_new_kamf_no_id_req:
+  exists-trace
+  "∃ x1 x2 x3 y1 y2 s t #i1 #i2 #i3 #i4 #i5 #i6 #j1 #j2 #j3 #j4 #j5 #j6 #j7
+     #l1 #l2 #l3 #l4 #l5 #l6 #l7.
+    ((((((((((((((((((((((((((((((((((((((((((((((((((((Init( 'K_AMF', x1
+                                                        ) @ #i1) ∧
+                                                       (RadioAccessNetwork( s ) @ #i2)) ∧
+                                                      (RadioAccessNetwork( t ) @ #i3)) ∧
+                                                     (SessionHandover( <s, t>, x1, x1, y1 ) @ #i4)) ∧
+                                                    (HandoverInit( <s, t>, x1, x2 ) @ #i5)) ∧
+                                                   (SessionHandover( <t, s>, x2, x3, y2 ) @ #i6)) ∧
+                                                  (NoRekeyingCN( x1, y1 ) @ #j1)) ∧
+                                                 (HandoverPreparationDone( x1, y1 ) @ #j2)) ∧
+                                                (NoRekeyingUE( x1, y1 ) @ #j3)) ∧
+                                               (HandoverExecutionDone( '1', x1, y1 ) @ #j4)) ∧
+                                              (NoIdentityRequests( x1, y1 ) @ #j5)) ∧
+                                             (MobilityRegistrationUpdateDone( x1, y1 ) @ #j6)) ∧
+                                            (HandoverExecutionDone( '2', x1, y1 ) @ #j7)) ∧
+                                           (RekeyingCN( x3, y2 ) @ #l1)) ∧
+                                          (HandoverPreparationDone( x3, y2 ) @ #l2)) ∧
+                                         (RekeyingUE( x3, y2 ) @ #l3)) ∧
+                                        (HandoverExecutionDone( '1', x3, y2 ) @ #l4)) ∧
+                                       (NoIdentityRequests( x3, y2 ) @ #l5)) ∧
+                                      (MobilityRegistrationUpdateDone( x3, y2 ) @ #l6)) ∧
+                                     (HandoverExecutionDone( '2', x3, y2 ) @ #l7)) ∧
+                                    (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                                   (¬(y1 = y2))) ∧
+                                  (¬(∃ a b #k. IdentityRequestSUCI( a, b ) @ #k))) ∧
+                                 (¬(∃ a b #k. IdentityResponseSUCI( a, b ) @ #k))) ∧
+                                (¬(∃ a b #k. IdentityRequestPEI( a, b ) @ #k))) ∧
+                               (¬(∃ a b #k. IdentityResponsePEI( a, b ) @ #k))) ∧
+                              (¬(∃ a b #k. IdentityRequestsDone( a, b ) @ #k))) ∧
+                             (#i4 < #i5)) ∧
+                            (#i5 < #i6)) ∧
+                           (#j1 < #l1)) ∧
+                          (#j2 < #l2)) ∧
+                         (#j3 < #l3)) ∧
+                        (#j4 < #l4)) ∧
+                       (#j5 < #l5)) ∧
+                      (#j6 < #l6)) ∧
+                     (#j7 < #l7)) ∧
+                    (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ (#k = #i1))) ∧
+                   (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3)))) ∧
+                  (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ (#k = #i5))) ∧
+                 (∀ a b c d #k.
+                   (SessionHandover( a, b, c, d ) @ #k) ⇒ ((#k = #i4) ∨ (#k = #i6)))) ∧
+                (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ (#k = #j1))) ∧
+               (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ (#k = #l1))) ∧
+              (∀ a b #k.
+                (HandoverPreparationDone( a, b ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2)))) ∧
+             (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ (#k = #j3))) ∧
+            (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ (#k = #l3))) ∧
+           (∀ a b #k.
+             (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4)))) ∧
+          (∀ a b #k.
+            (NoIdentityRequests( a, b ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5)))) ∧
+         (∀ a b #k.
+           (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒
+           ((#k = #j6) ∨ (#k = #l6)))) ∧
+        (∀ a b #k.
+          (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ ((#k = #j7) ∨ (#k = #l7)))) ∧
+       (∀ a b #k1 #k2.
+         ((CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+      (∀ a b #k1 #k2.
+        ((HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a b #k1 #k2.
+       ((UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a b c d #k1 #k2.
+      ((Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2)) ⇒ (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x1 x2 x3 y1 y2 s t #i1 #i2 #i3 #i4 #i5 #i6 #j1 #j2 #j3 #j4 #j5 #j6 #j7
+   #l1 #l2 #l3 #l4 #l5 #l6 #l7.
+  (Init( 'K_AMF', x1 ) @ #i1) ∧
+  (RadioAccessNetwork( s ) @ #i2) ∧
+  (RadioAccessNetwork( t ) @ #i3) ∧
+  (SessionHandover( <s, t>, x1, x1, y1 ) @ #i4) ∧
+  (HandoverInit( <s, t>, x1, x2 ) @ #i5) ∧
+  (SessionHandover( <t, s>, x2, x3, y2 ) @ #i6) ∧
+  (NoRekeyingCN( x1, y1 ) @ #j1) ∧
+  (HandoverPreparationDone( x1, y1 ) @ #j2) ∧
+  (NoRekeyingUE( x1, y1 ) @ #j3) ∧
+  (HandoverExecutionDone( '1', x1, y1 ) @ #j4) ∧
+  (NoIdentityRequests( x1, y1 ) @ #j5) ∧
+  (MobilityRegistrationUpdateDone( x1, y1 ) @ #j6) ∧
+  (HandoverExecutionDone( '2', x1, y1 ) @ #j7) ∧
+  (RekeyingCN( x3, y2 ) @ #l1) ∧
+  (HandoverPreparationDone( x3, y2 ) @ #l2) ∧
+  (RekeyingUE( x3, y2 ) @ #l3) ∧
+  (HandoverExecutionDone( '1', x3, y2 ) @ #l4) ∧
+  (NoIdentityRequests( x3, y2 ) @ #l5) ∧
+  (MobilityRegistrationUpdateDone( x3, y2 ) @ #l6) ∧
+  (HandoverExecutionDone( '2', x3, y2 ) @ #l7)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (¬(y1 = y2)) ∧
+  (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ ⊥) ∧
+  (#i4 < #i5) ∧
+  (#i5 < #i6) ∧
+  (#j1 < #l1) ∧
+  (#j2 < #l2) ∧
+  (#j3 < #l3) ∧
+  (#j4 < #l4) ∧
+  (#j5 < #l5) ∧
+  (#j6 < #l6) ∧
+  (#j7 < #l7) ∧
+  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3))) ∧
+  (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ #k = #i5) ∧
+  (∀ a b c d #k.
+    (SessionHandover( a, b, c, d ) @ #k) ⇒ ((#k = #i4) ∨ (#k = #i6))) ∧
+  (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ #k = #j1) ∧
+  (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ #k = #l1) ∧
+  (∀ a b #k.
+    (HandoverPreparationDone( a, b ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2))) ∧
+  (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ #k = #j3) ∧
+  (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ #k = #l3) ∧
+  (∀ a b #k.
+    (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4))) ∧
+  (∀ a b #k.
+    (NoIdentityRequests( a, b ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5))) ∧
+  (∀ a b #k.
+    (MobilityRegistrationUpdateDone( a, b ) @ #k)
+   ⇒
+    ((#k = #j6) ∨ (#k = #l6))) ∧
+  (∀ a b #k.
+    (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ ((#k = #j7) ∨ (#k = #l7))) ∧
+  (∀ a b #k1 #k2.
+    (CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b c d #k1 #k2.
+    (Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma executability_new_kamf_new_kamf_no_id_req:
+  exists-trace
+  "∃ x1 x2 x3 x4 y1 y2 s t #i1 #i2 #i3 #i4 #i5 #i6 #j1 #j2 #j3 #j4 #j5 #j6
+     #j7 #l1 #l2 #l3 #l4 #l5 #l6 #l7.
+    ((((((((((((((((((((((((((((((((((((((((((((((((((Init( 'K_AMF', x1
+                                                      ) @ #i1) ∧
+                                                     (RadioAccessNetwork( s ) @ #i2)) ∧
+                                                    (RadioAccessNetwork( t ) @ #i3)) ∧
+                                                   (SessionHandover( <s, t>, x1, x2, y1 ) @ #i4)) ∧
+                                                  (HandoverInit( <s, t>, x2, x3 ) @ #i5)) ∧
+                                                 (SessionHandover( <t, s>, x3, x4, y2 ) @ #i6)) ∧
+                                                (RekeyingCN( x2, y1 ) @ #j1)) ∧
+                                               (HandoverPreparationDone( x2, y1 ) @ #j2)) ∧
+                                              (RekeyingUE( x2, y1 ) @ #j3)) ∧
+                                             (HandoverExecutionDone( '1', x2, y1 ) @ #j4)) ∧
+                                            (NoIdentityRequests( x2, y1 ) @ #j5)) ∧
+                                           (MobilityRegistrationUpdateDone( x2, y1 ) @ #j6)) ∧
+                                          (HandoverExecutionDone( '2', x2, y1 ) @ #j7)) ∧
+                                         (RekeyingCN( x4, y2 ) @ #l1)) ∧
+                                        (HandoverPreparationDone( x4, y2 ) @ #l2)) ∧
+                                       (RekeyingUE( x4, y2 ) @ #l3)) ∧
+                                      (HandoverExecutionDone( '1', x4, y2 ) @ #l4)) ∧
+                                     (NoIdentityRequests( x4, y2 ) @ #l5)) ∧
+                                    (MobilityRegistrationUpdateDone( x4, y2 ) @ #l6)) ∧
+                                   (HandoverExecutionDone( '2', x4, y2 ) @ #l7)) ∧
+                                  (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                                 (¬(y1 = y2))) ∧
+                                (¬(∃ a b #k. IdentityRequestSUCI( a, b ) @ #k))) ∧
+                               (¬(∃ a b #k. IdentityResponseSUCI( a, b ) @ #k))) ∧
+                              (¬(∃ a b #k. IdentityRequestPEI( a, b ) @ #k))) ∧
+                             (¬(∃ a b #k. IdentityResponsePEI( a, b ) @ #k))) ∧
+                            (¬(∃ a b #k. IdentityRequestsDone( a, b ) @ #k))) ∧
+                           (#i4 < #i5)) ∧
+                          (#i5 < #i6)) ∧
+                         (#j1 < #l1)) ∧
+                        (#j2 < #l2)) ∧
+                       (#j3 < #l3)) ∧
+                      (#j4 < #l4)) ∧
+                     (#j5 < #l5)) ∧
+                    (#j6 < #l6)) ∧
+                   (#j7 < #l7)) ∧
+                  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ (#k = #i1))) ∧
+                 (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3)))) ∧
+                (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ (#k = #i5))) ∧
+               (∀ a b c d #k.
+                 (SessionHandover( a, b, c, d ) @ #k) ⇒ ((#k = #i4) ∨ (#k = #i6)))) ∧
+              (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ ((#k = #j1) ∨ (#k = #l1)))) ∧
+             (∀ a b #k.
+               (HandoverPreparationDone( a, b ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2)))) ∧
+            (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ ((#k = #j3) ∨ (#k = #l3)))) ∧
+           (∀ a b #k.
+             (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4)))) ∧
+          (∀ a b #k.
+            (NoIdentityRequests( a, b ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5)))) ∧
+         (∀ a b #k.
+           (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒
+           ((#k = #j6) ∨ (#k = #l6)))) ∧
+        (∀ a b #k.
+          (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ ((#k = #j7) ∨ (#k = #l7)))) ∧
+       (∀ a b #k1 #k2.
+         ((CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+      (∀ a b #k1 #k2.
+        ((HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a b #k1 #k2.
+       ((UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a b c d #k1 #k2.
+      ((Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2)) ⇒ (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x1 x2 x3 x4 y1 y2 s t #i1 #i2 #i3 #i4 #i5 #i6 #j1 #j2 #j3 #j4 #j5 #j6
+   #j7 #l1 #l2 #l3 #l4 #l5 #l6 #l7.
+  (Init( 'K_AMF', x1 ) @ #i1) ∧
+  (RadioAccessNetwork( s ) @ #i2) ∧
+  (RadioAccessNetwork( t ) @ #i3) ∧
+  (SessionHandover( <s, t>, x1, x2, y1 ) @ #i4) ∧
+  (HandoverInit( <s, t>, x2, x3 ) @ #i5) ∧
+  (SessionHandover( <t, s>, x3, x4, y2 ) @ #i6) ∧
+  (RekeyingCN( x2, y1 ) @ #j1) ∧
+  (HandoverPreparationDone( x2, y1 ) @ #j2) ∧
+  (RekeyingUE( x2, y1 ) @ #j3) ∧
+  (HandoverExecutionDone( '1', x2, y1 ) @ #j4) ∧
+  (NoIdentityRequests( x2, y1 ) @ #j5) ∧
+  (MobilityRegistrationUpdateDone( x2, y1 ) @ #j6) ∧
+  (HandoverExecutionDone( '2', x2, y1 ) @ #j7) ∧
+  (RekeyingCN( x4, y2 ) @ #l1) ∧
+  (HandoverPreparationDone( x4, y2 ) @ #l2) ∧
+  (RekeyingUE( x4, y2 ) @ #l3) ∧
+  (HandoverExecutionDone( '1', x4, y2 ) @ #l4) ∧
+  (NoIdentityRequests( x4, y2 ) @ #l5) ∧
+  (MobilityRegistrationUpdateDone( x4, y2 ) @ #l6) ∧
+  (HandoverExecutionDone( '2', x4, y2 ) @ #l7)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (¬(y1 = y2)) ∧
+  (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ ⊥) ∧
+  (#i4 < #i5) ∧
+  (#i5 < #i6) ∧
+  (#j1 < #l1) ∧
+  (#j2 < #l2) ∧
+  (#j3 < #l3) ∧
+  (#j4 < #l4) ∧
+  (#j5 < #l5) ∧
+  (#j6 < #l6) ∧
+  (#j7 < #l7) ∧
+  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3))) ∧
+  (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ #k = #i5) ∧
+  (∀ a b c d #k.
+    (SessionHandover( a, b, c, d ) @ #k) ⇒ ((#k = #i4) ∨ (#k = #i6))) ∧
+  (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ ((#k = #j1) ∨ (#k = #l1))) ∧
+  (∀ a b #k.
+    (HandoverPreparationDone( a, b ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2))) ∧
+  (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ ((#k = #j3) ∨ (#k = #l3))) ∧
+  (∀ a b #k.
+    (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4))) ∧
+  (∀ a b #k.
+    (NoIdentityRequests( a, b ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5))) ∧
+  (∀ a b #k.
+    (MobilityRegistrationUpdateDone( a, b ) @ #k)
+   ⇒
+    ((#k = #j6) ∨ (#k = #l6))) ∧
+  (∀ a b #k.
+    (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ ((#k = #j7) ∨ (#k = #l7))) ∧
+  (∀ a b #k1 #k2.
+    (CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b c d #k1 #k2.
+    (Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma executability_new_kamf_old_kamf_no_id_req:
+  exists-trace
+  "∃ x1 x2 x3 y1 y2 s t #i1 #i2 #i3 #i4 #i5 #i6 #j1 #j2 #j3 #j4 #j5 #j6 #j7
+     #l1 #l2 #l3 #l4 #l5 #l6 #l7.
+    ((((((((((((((((((((((((((((((((((((((((((((((((((((Init( 'K_AMF', x1
+                                                        ) @ #i1) ∧
+                                                       (RadioAccessNetwork( s ) @ #i2)) ∧
+                                                      (RadioAccessNetwork( t ) @ #i3)) ∧
+                                                     (SessionHandover( <s, t>, x1, x2, y1 ) @ #i4)) ∧
+                                                    (HandoverInit( <s, t>, x2, x3 ) @ #i5)) ∧
+                                                   (SessionHandover( <t, s>, x3, x3, y2 ) @ #i6)) ∧
+                                                  (RekeyingCN( x2, y1 ) @ #j1)) ∧
+                                                 (HandoverPreparationDone( x2, y1 ) @ #j2)) ∧
+                                                (RekeyingUE( x2, y1 ) @ #j3)) ∧
+                                               (HandoverExecutionDone( '1', x2, y1 ) @ #j4)) ∧
+                                              (NoIdentityRequests( x2, y1 ) @ #j5)) ∧
+                                             (MobilityRegistrationUpdateDone( x2, y1 ) @ #j6)) ∧
+                                            (HandoverExecutionDone( '2', x2, y1 ) @ #j7)) ∧
+                                           (NoRekeyingCN( x3, y2 ) @ #l1)) ∧
+                                          (HandoverPreparationDone( x3, y2 ) @ #l2)) ∧
+                                         (NoRekeyingUE( x3, y2 ) @ #l3)) ∧
+                                        (HandoverExecutionDone( '1', x3, y2 ) @ #l4)) ∧
+                                       (NoIdentityRequests( x3, y2 ) @ #l5)) ∧
+                                      (MobilityRegistrationUpdateDone( x3, y2 ) @ #l6)) ∧
+                                     (HandoverExecutionDone( '2', x3, y2 ) @ #l7)) ∧
+                                    (¬(∃ X data #r. Rev( X, data ) @ #r))) ∧
+                                   (¬(y1 = y2))) ∧
+                                  (¬(∃ a b #k. IdentityRequestSUCI( a, b ) @ #k))) ∧
+                                 (¬(∃ a b #k. IdentityResponseSUCI( a, b ) @ #k))) ∧
+                                (¬(∃ a b #k. IdentityRequestPEI( a, b ) @ #k))) ∧
+                               (¬(∃ a b #k. IdentityResponsePEI( a, b ) @ #k))) ∧
+                              (¬(∃ a b #k. IdentityRequestsDone( a, b ) @ #k))) ∧
+                             (#i4 < #i5)) ∧
+                            (#i5 < #i6)) ∧
+                           (#j1 < #l1)) ∧
+                          (#j2 < #l2)) ∧
+                         (#j3 < #l3)) ∧
+                        (#j4 < #l4)) ∧
+                       (#j5 < #l5)) ∧
+                      (#j6 < #l6)) ∧
+                     (#j7 < #l7)) ∧
+                    (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ (#k = #i1))) ∧
+                   (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3)))) ∧
+                  (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ (#k = #i5))) ∧
+                 (∀ a b c d #k.
+                   (SessionHandover( a, b, c, d ) @ #k) ⇒ ((#k = #i4) ∨ (#k = #i6)))) ∧
+                (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ (#k = #l1))) ∧
+               (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ (#k = #j1))) ∧
+              (∀ a b #k.
+                (HandoverPreparationDone( a, b ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2)))) ∧
+             (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ (#k = #j3))) ∧
+            (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ (#k = #l3))) ∧
+           (∀ a b #k.
+             (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4)))) ∧
+          (∀ a b #k.
+            (NoIdentityRequests( a, b ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5)))) ∧
+         (∀ a b #k.
+           (MobilityRegistrationUpdateDone( a, b ) @ #k) ⇒
+           ((#k = #j6) ∨ (#k = #l6)))) ∧
+        (∀ a b #k.
+          (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ ((#k = #j7) ∨ (#k = #l7)))) ∧
+       (∀ a b #k1 #k2.
+         ((CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+      (∀ a b #k1 #k2.
+        ((HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2)) ⇒ (#k1 = #k2))) ∧
+     (∀ a b #k1 #k2.
+       ((UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2)) ⇒
+       (#k1 = #k2))) ∧
+    (∀ a b c d #k1 #k2.
+      ((Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2)) ⇒ (#k1 = #k2))"
+/*
+guarded formula characterizing all satisfying traces:
+"∃ x1 x2 x3 y1 y2 s t #i1 #i2 #i3 #i4 #i5 #i6 #j1 #j2 #j3 #j4 #j5 #j6 #j7
+   #l1 #l2 #l3 #l4 #l5 #l6 #l7.
+  (Init( 'K_AMF', x1 ) @ #i1) ∧
+  (RadioAccessNetwork( s ) @ #i2) ∧
+  (RadioAccessNetwork( t ) @ #i3) ∧
+  (SessionHandover( <s, t>, x1, x2, y1 ) @ #i4) ∧
+  (HandoverInit( <s, t>, x2, x3 ) @ #i5) ∧
+  (SessionHandover( <t, s>, x3, x3, y2 ) @ #i6) ∧
+  (RekeyingCN( x2, y1 ) @ #j1) ∧
+  (HandoverPreparationDone( x2, y1 ) @ #j2) ∧
+  (RekeyingUE( x2, y1 ) @ #j3) ∧
+  (HandoverExecutionDone( '1', x2, y1 ) @ #j4) ∧
+  (NoIdentityRequests( x2, y1 ) @ #j5) ∧
+  (MobilityRegistrationUpdateDone( x2, y1 ) @ #j6) ∧
+  (HandoverExecutionDone( '2', x2, y1 ) @ #j7) ∧
+  (NoRekeyingCN( x3, y2 ) @ #l1) ∧
+  (HandoverPreparationDone( x3, y2 ) @ #l2) ∧
+  (NoRekeyingUE( x3, y2 ) @ #l3) ∧
+  (HandoverExecutionDone( '1', x3, y2 ) @ #l4) ∧
+  (NoIdentityRequests( x3, y2 ) @ #l5) ∧
+  (MobilityRegistrationUpdateDone( x3, y2 ) @ #l6) ∧
+  (HandoverExecutionDone( '2', x3, y2 ) @ #l7)
+ ∧
+  (∀ X data #r. (Rev( X, data ) @ #r) ⇒ ⊥) ∧
+  (¬(y1 = y2)) ∧
+  (∀ a b #k. (IdentityRequestSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponseSUCI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestPEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityResponsePEI( a, b ) @ #k) ⇒ ⊥) ∧
+  (∀ a b #k. (IdentityRequestsDone( a, b ) @ #k) ⇒ ⊥) ∧
+  (#i4 < #i5) ∧
+  (#i5 < #i6) ∧
+  (#j1 < #l1) ∧
+  (#j2 < #l2) ∧
+  (#j3 < #l3) ∧
+  (#j4 < #l4) ∧
+  (#j5 < #l5) ∧
+  (#j6 < #l6) ∧
+  (#j7 < #l7) ∧
+  (∀ a #k. (Init( 'K_AMF', a ) @ #k) ⇒ #k = #i1) ∧
+  (∀ a #k. (RadioAccessNetwork( a ) @ #k) ⇒ ((#k = #i2) ∨ (#k = #i3))) ∧
+  (∀ a b c #k. (HandoverInit( a, b, c ) @ #k) ⇒ #k = #i5) ∧
+  (∀ a b c d #k.
+    (SessionHandover( a, b, c, d ) @ #k) ⇒ ((#k = #i4) ∨ (#k = #i6))) ∧
+  (∀ a b #k. (NoRekeyingCN( a, b ) @ #k) ⇒ #k = #l1) ∧
+  (∀ a b #k. (RekeyingCN( a, b ) @ #k) ⇒ #k = #j1) ∧
+  (∀ a b #k.
+    (HandoverPreparationDone( a, b ) @ #k) ⇒ ((#k = #j2) ∨ (#k = #l2))) ∧
+  (∀ a b #k. (RekeyingUE( a, b ) @ #k) ⇒ #k = #j3) ∧
+  (∀ a b #k. (NoRekeyingUE( a, b ) @ #k) ⇒ #k = #l3) ∧
+  (∀ a b #k.
+    (HandoverExecutionDone( '1', a, b ) @ #k) ⇒ ((#k = #j4) ∨ (#k = #l4))) ∧
+  (∀ a b #k.
+    (NoIdentityRequests( a, b ) @ #k) ⇒ ((#k = #j5) ∨ (#k = #l5))) ∧
+  (∀ a b #k.
+    (MobilityRegistrationUpdateDone( a, b ) @ #k)
+   ⇒
+    ((#k = #j6) ∨ (#k = #l6))) ∧
+  (∀ a b #k.
+    (HandoverExecutionDone( '2', a, b ) @ #k) ⇒ ((#k = #j7) ∨ (#k = #l7))) ∧
+  (∀ a b #k1 #k2.
+    (CoreNetwork( a ) @ #k1) ∧ (CoreNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (HomeNetwork( a ) @ #k1) ∧ (HomeNetwork( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b #k1 #k2.
+    (UserEquipment( a ) @ #k1) ∧ (UserEquipment( b ) @ #k2) ⇒ #k1 = #k2) ∧
+  (∀ a b c d #k1 #k2.
+    (Subscribe( a, b ) @ #k1) ∧ (Subscribe( c, d ) @ #k2) ⇒ #k1 = #k2)"
+*/
+by sorry
+
+lemma injectiveagreement_ue_cn_k_amf:
+  all-traces
+  "∀ a b q #i.
+    (Commit( a, b, <'UE', 'CN', 'K_AMF', q> ) @ #i) ⇒
+    ((∃ #j.
+       (Running( b, a, <'UE', 'CN', 'K_AMF', q> ) @ #j) ∧
+       (¬(∃ a2 b2 #i2.
+           (Commit( a2, b2, <'UE', 'CN', 'K_AMF', q> ) @ #i2) ∧ (¬(#i2 = #i))))) ∨
+     (∃ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ a b q #i.
+  (Commit( a, b, <'UE', 'CN', 'K_AMF', q> ) @ #i)
+ ∧
+  (∀ #j.
+    (Running( b, a, <'UE', 'CN', 'K_AMF', q> ) @ #j)
+   ⇒
+    ∃ a2 b2 #i2.
+     (Commit( a2, b2, <'UE', 'CN', 'K_AMF', q> ) @ #i2) ∧ ¬(#i2 = #i)) ∧
+  (∀ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma injectiveagreement_cn_ue_k_amf:
+  all-traces
+  "∀ a b q #i.
+    (Commit( a, b, <'CN', 'UE', 'K_AMF', q> ) @ #i) ⇒
+    ((∃ #j.
+       (Running( b, a, <'CN', 'UE', 'K_AMF', q> ) @ #j) ∧
+       (¬(∃ a2 b2 #i2.
+           (Commit( a2, b2, <'CN', 'UE', 'K_AMF', q> ) @ #i2) ∧ (¬(#i2 = #i))))) ∨
+     (∃ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ a b q #i.
+  (Commit( a, b, <'CN', 'UE', 'K_AMF', q> ) @ #i)
+ ∧
+  (∀ #j.
+    (Running( b, a, <'CN', 'UE', 'K_AMF', q> ) @ #j)
+   ⇒
+    ∃ a2 b2 #i2.
+     (Commit( a2, b2, <'CN', 'UE', 'K_AMF', q> ) @ #i2) ∧ ¬(#i2 = #i)) ∧
+  (∀ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma injectiveagreement_ue_tran_k_gnb_star:
+  all-traces
+  "∀ a b r #i.
+    (Commit( a, b, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #i) ⇒
+    ((∃ #j.
+       (Running( b, a, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #j) ∧
+       (¬(∃ a2 b2 #i2.
+           (Commit( a2, b2, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #i2) ∧
+           (¬(#i2 = #i))))) ∨
+     (∃ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ a b r #i.
+  (Commit( a, b, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #i)
+ ∧
+  (∀ #j.
+    (Running( b, a, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #j)
+   ⇒
+    ∃ a2 b2 #i2.
+     (Commit( a2, b2, <'UE', 'TRAN', 'K_gNB_star', r> ) @ #i2)
+    ∧
+     ¬(#i2 = #i)) ∧
+  (∀ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma injectiveagreement_tran_ue_k_gnb_star:
+  all-traces
+  "∀ a b r #i.
+    (Commit( a, b, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #i) ⇒
+    ((∃ #j.
+       (Running( b, a, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #j) ∧
+       (¬(∃ a2 b2 #i2.
+           (Commit( a2, b2, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #i2) ∧
+           (¬(#i2 = #i))))) ∨
+     (∃ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ a b r #i.
+  (Commit( a, b, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #i)
+ ∧
+  (∀ #j.
+    (Running( b, a, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #j)
+   ⇒
+    ∃ a2 b2 #i2.
+     (Commit( a2, b2, <'TRAN', 'UE', 'K_gNB_star', r> ) @ #i2)
+    ∧
+     ¬(#i2 = #i)) ∧
+  (∀ X data #k. (Rev( X, data ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_supi:
+  all-traces
+  "∀ s #i.
+    (Secret( <'SUPI', s> ) @ #i) ⇒
+    (((¬(∃ #j. K( s ) @ #j)) ∨
+      (∃ X #j. (Rev( X, <'SUPI', s> ) @ #j) ∧ (Honest( X ) @ #i))) ∨
+     (∃ p #j.
+       (SendSUCI( s, p ) @ #j) ∧ (∃ X #k. Rev( X, <'SK_HN', p> ) @ #k)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ s #i.
+  (Secret( <'SUPI', s> ) @ #i)
+ ∧
+  (∃ #j. (K( s ) @ #j)) ∧
+  (∀ X #j. (Rev( X, <'SUPI', s> ) @ #j) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ p #j.
+    (SendSUCI( s, p ) @ #j) ⇒ ∀ X #k. (Rev( X, <'SK_HN', p> ) @ #k) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_k_seaf:
+  all-traces
+  "∀ p #i.
+    (Secret( <'K_SEAF', p> ) @ #i) ⇒
+    ((¬(∃ #j. K( p ) @ #j)) ∨
+     (∃ X #j. (Rev( X, <'K_SEAF', p> ) @ #j) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p #i.
+  (Secret( <'K_SEAF', p> ) @ #i)
+ ∧
+  (∃ #j. (K( p ) @ #j)) ∧
+  (∀ X #j. (Rev( X, <'K_SEAF', p> ) @ #j) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+lemma secret_k_amf:
+  all-traces
+  "∀ p q r s #i #j.
+    ((Secret( <'K_AMF', q> ) @ #i) ∧
+     (KeyDerived( <'K_AMF', q>, p, r, s ) @ #j)) ⇒
+    ((((¬(∃ #k. K( q ) @ #k)) ∨
+       (∃ X #k. (Rev( X, <'K_AMF', q> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+      (∃ X #k. (Rev( X, <'K_AMF', r> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+     ((∃ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i)) ∧
+      ((∃ X #j.1. (Rev( X, <'SUPI', s> ) @ #j.1) ∧ (Honest( X ) @ #i)) ∨
+       (∃ t #j.1.
+         (SendSUCI( s, t ) @ #j.1) ∧ (∃ X #k. Rev( X, <'SK_HN', t> ) @ #k)))))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q r s #i #j.
+  (Secret( <'K_AMF', q> ) @ #i) ∧
+  (KeyDerived( <'K_AMF', q>, p, r, s ) @ #j)
+ ∧
+  (∃ #k. (K( q ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_AMF', q> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, <'K_AMF', r> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (((∀ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∨
+    ((∀ X #j.1. (Rev( X, <'SUPI', s> ) @ #j.1) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+     (∀ t #j.1.
+       (SendSUCI( s, t ) @ #j.1)
+      ⇒
+       ∀ X #k. (Rev( X, <'SK_HN', t> ) @ #k) ⇒ ⊥))))"
+*/
+by sorry
+
+lemma secret_k_gnb:
+  all-traces
+  "∀ p q r s #i #j.
+    ((Secret( <'K_gNB', r> ) @ #i) ∧
+     (KeyDerived( <'K_gNB', r>, p, q, s ) @ #j)) ⇒
+    ((((¬(∃ #k. K( r ) @ #k)) ∨
+       (∃ X #k. (Rev( X, <'K_gNB', r> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+      (∃ a b c #k.
+        (KeyDerived( <'K_AMF', q>, a, b, c ) @ #k) ∧
+        ((∃ X #k.1. (Rev( X, <'K_AMF', q> ) @ #k.1) ∧ (Honest( X ) @ #i)) ∨
+         (∃ X #k.1. (Rev( X, <'K_AMF', b> ) @ #k.1) ∧ (Honest( X ) @ #i))))) ∨
+     ((∃ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i)) ∧
+      ((∃ X #j.1. (Rev( X, <'SUPI', s> ) @ #j.1) ∧ (Honest( X ) @ #i)) ∨
+       (∃ d #j.1.
+         (SendSUCI( s, d ) @ #j.1) ∧ (∃ X #k. Rev( X, <'SK_HN', d> ) @ #k)))))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q r s #i #j.
+  (Secret( <'K_gNB', r> ) @ #i) ∧
+  (KeyDerived( <'K_gNB', r>, p, q, s ) @ #j)
+ ∧
+  (∃ #k. (K( r ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_gNB', r> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ a b c #k.
+    (KeyDerived( <'K_AMF', q>, a, b, c ) @ #k)
+   ⇒
+    (∀ X #k.1. (Rev( X, <'K_AMF', q> ) @ #k.1) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+    (∀ X #k.1. (Rev( X, <'K_AMF', b> ) @ #k.1) ∧ (Honest( X ) @ #i) ⇒ ⊥)) ∧
+  (((∀ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∨
+    ((∀ X #j.1. (Rev( X, <'SUPI', s> ) @ #j.1) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+     (∀ d #j.1.
+       (SendSUCI( s, d ) @ #j.1)
+      ⇒
+       ∀ X #k. (Rev( X, <'SK_HN', d> ) @ #k) ⇒ ⊥))))"
+*/
+by sorry
+
+lemma secret_k_gnb_star:
+  all-traces
+  "∀ p q r s t #i #j.
+    (((Secret( <'K_gNB_star', r> ) @ #i) ∧
+      (KeyDerived( <'K_gNB_star', r>, p, q, s ) @ #j)) ∧
+     (Bind( <'K_gNB_star', r>, t ) @ #j)) ⇒
+    ((((((¬(∃ #k. K( r ) @ #k)) ∨
+         (∃ X #k. (Rev( X, <'K_gNB', r> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+        (∃ a b c #k.
+          (KeyDerived( <'K_AMF', q>, a, b, c ) @ #k) ∧
+          ((∃ X #k.1. (Rev( X, <'K_AMF', q> ) @ #k.1) ∧ (Honest( X ) @ #i)) ∨
+           (∃ X #k.1. (Rev( X, <'K_AMF', b> ) @ #k.1) ∧ (Honest( X ) @ #i))))) ∨
+       ((∃ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i)) ∧
+        ((∃ X #j.1. (Rev( X, <'SUPI', s> ) @ #j.1) ∧ (Honest( X ) @ #i)) ∨
+         (∃ d #j.1.
+           (SendSUCI( s, d ) @ #j.1) ∧ (∃ X #k. Rev( X, <'SK_HN', d> ) @ #k))))) ∨
+      (∃ X #k. (Rev( X, <'NH', t> ) @ #k) ∧ (Honest( X ) @ #i))) ∨
+     (∃ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i)))"
+/*
+guarded formula characterizing all counter-examples:
+"∃ p q r s t #i #j.
+  (Secret( <'K_gNB_star', r> ) @ #i) ∧
+  (KeyDerived( <'K_gNB_star', r>, p, q, s ) @ #j) ∧
+  (Bind( <'K_gNB_star', r>, t ) @ #j)
+ ∧
+  (∃ #k. (K( r ) @ #k)) ∧
+  (∀ X #k. (Rev( X, <'K_gNB', r> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ a b c #k.
+    (KeyDerived( <'K_AMF', q>, a, b, c ) @ #k)
+   ⇒
+    (∀ X #k.1. (Rev( X, <'K_AMF', q> ) @ #k.1) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+    (∀ X #k.1. (Rev( X, <'K_AMF', b> ) @ #k.1) ∧ (Honest( X ) @ #i) ⇒ ⊥)) ∧
+  (((∀ X #k. (Rev( X, <'K_SEAF', p> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∨
+    ((∀ X #j.1. (Rev( X, <'SUPI', s> ) @ #j.1) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+     (∀ d #j.1.
+       (SendSUCI( s, d ) @ #j.1)
+      ⇒
+       ∀ X #k. (Rev( X, <'SK_HN', d> ) @ #k) ⇒ ⊥)))) ∧
+  (∀ X #k. (Rev( X, <'NH', t> ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥) ∧
+  (∀ X #k. (Rev( X, 'secureChannel' ) @ #k) ∧ (Honest( X ) @ #i) ⇒ ⊥)"
+*/
+by sorry
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* All wellformedness checks were successful. */
+
+/*
+Generated from:
+Tamarin version 1.11.0
+Maude version 3.4
+Git revision: df2fd84dbb3b3def8309c2a84c04d653d7c4db77 (with uncommited changes), branch: mergedAutomatedStrategies
+Compiled at: 2026-01-16 14:58:06.862219863 UTC
+*/
+
+end

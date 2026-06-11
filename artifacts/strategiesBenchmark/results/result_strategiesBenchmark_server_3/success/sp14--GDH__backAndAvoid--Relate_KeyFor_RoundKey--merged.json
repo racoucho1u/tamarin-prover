@@ -1,0 +1,36 @@
+{
+  "task_id": "sp14--GDH__backAndAvoid--Relate_KeyFor_RoundKey--merged",
+  "warnings": [
+    "5 wellformedness check failed!"
+  ],
+  "tamarin_timing": 43.66,
+  "wrapper_measures": {
+    "time": 43.84636187553406,
+    "avg_memory": 292.15225497159076,
+    "peak_memory": 307.7421875
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/sp14--GDH__backAndAvoid--Relate_KeyFor_RoundKey--merged.spthy",
+  "verified_lemma": {
+    "Relate_KeyFor_RoundKey": {
+      "steps": 261,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "No_Inv_exp",
+    "Esk_secret",
+    "Esk_fresh_name",
+    "ExpKeyFor_one",
+    "Exp_subterm",
+    "Exp_earlier_Esk",
+    "Exp_earlier_Esk_2",
+    "roundkey_keyfor_different",
+    "Exp_nonce_or_product2",
+    "Exp_factor_secret",
+    "Exp_name_secret",
+    "Esk_Exp_same_gid",
+    "key_secret_last",
+    "key_secret"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--OTYT06__backtrack--WA_tag--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.832377195358,
+    "avg_memory": 2187.4411892979206,
+    "peak_memory": 3225.73828125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LD07__backAndAvoid--recentalive_reader--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7201.377628087997,
+    "avg_memory": 5439.145807213865,
+    "peak_memory": 9143.671875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

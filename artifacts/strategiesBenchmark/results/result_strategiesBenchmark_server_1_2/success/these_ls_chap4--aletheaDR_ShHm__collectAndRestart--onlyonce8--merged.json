@@ -1,0 +1,30 @@
+{
+  "task_id": "these_ls_chap4--aletheaDR_ShHm__collectAndRestart--onlyonce8--merged",
+  "warnings": [
+    "1 wellformedness check failed!"
+  ],
+  "tamarin_timing": 1.35,
+  "wrapper_measures": {
+    "time": 1.486684799194336,
+    "avg_memory": 48.783203125,
+    "peak_memory": 96.39453125
+  },
+  "output_spthy": "result_strategiesBenchmark_cassis_2/proofs/these_ls_chap4--aletheaDR_ShHm__collectAndRestart--onlyonce8--merged.spthy",
+  "verified_lemma": {
+    "onlyonce8": {
+      "steps": 10,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "onlyonce5",
+    "onlyonce6",
+    "onlyonce7",
+    "onlyonce9",
+    "onlyonce10",
+    "functional",
+    "DRauth",
+    "secretSskD"
+  ]
+}

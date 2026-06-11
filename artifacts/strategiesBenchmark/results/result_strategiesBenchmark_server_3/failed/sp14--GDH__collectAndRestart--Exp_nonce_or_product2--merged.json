@@ -1,0 +1,13 @@
+{
+  "task_id": "sp14--GDH__collectAndRestart--Exp_nonce_or_product2--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7201.4063766002655,
+    "avg_memory": 2857.022261959985,
+    "peak_memory": 20454.71875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LD07__backtrack--helping_reader_start--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.112580537796,
+    "avg_memory": 155.51130258777198,
+    "peak_memory": 181.69140625
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

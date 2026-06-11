@@ -1,0 +1,28 @@
+{
+  "task_id": "csf19_wrapping--gcm__backAndAvoid--origin--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 590.14,
+  "wrapper_measures": {
+    "time": 590.5452868938446,
+    "avg_memory": 421.58795820717995,
+    "peak_memory": 824.78125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf19_wrapping--gcm__backAndAvoid--origin--merged.spthy",
+  "verified_lemma": {
+    "origin": {
+      "steps": 1572,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "Counter_Monotonicity",
+    "IV_Uniqueness",
+    "Key_UsageImpliesInitialization",
+    "Key_IntegrityAndConfidentiality",
+    "Key_UniqueLevelandHandle"
+  ]
+}

@@ -68,8 +68,8 @@ def completeMetaData(metaData,version):
                     finalDict[s]["lemmas"][fullName]["lemma_type"] = str(l["type"])
                     finalDict[s]["lemmas"][fullName]["oracleStatus"] = l["oracleStatus"]
                     finalDict[s]["lemmas"][fullName]["target"] = targetLemma
-                else:
-                    debugPrint(f"lemma {fullName} not found in finalDict",2)
+                # else:
+                #     debugPrint(f"lemma {fullName} not found in finalDict",2)
 
             
 
@@ -98,4 +98,5 @@ if __name__ == '__main__':
     resultFile = f"{'.'.join(filename.split('.')[:-1])}_extracted.json"
     with open(resultFile,"w") as f:
         json.dump(finalDict, f)
+        print(json.dumps(finalDict, indent=4))
     print(f"Results extracted in {resultFile}")

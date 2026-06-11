@@ -1,0 +1,36 @@
+{
+  "task_id": "sp14--GDH__backtrack--Exp_nonce_or_product2--merged",
+  "warnings": [
+    "5 wellformedness check failed!"
+  ],
+  "tamarin_timing": 132.6,
+  "wrapper_measures": {
+    "time": 132.77893590927124,
+    "avg_memory": 262.30637428977275,
+    "peak_memory": 348.81640625
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/sp14--GDH__backtrack--Exp_nonce_or_product2--merged.spthy",
+  "verified_lemma": {
+    "Exp_nonce_or_product2": {
+      "steps": 270,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "No_Inv_exp",
+    "Esk_secret",
+    "Esk_fresh_name",
+    "ExpKeyFor_one",
+    "Relate_KeyFor_RoundKey",
+    "Exp_subterm",
+    "Exp_earlier_Esk",
+    "Exp_earlier_Esk_2",
+    "roundkey_keyfor_different",
+    "Exp_factor_secret",
+    "Exp_name_secret",
+    "Esk_Exp_same_gid",
+    "key_secret_last",
+    "key_secret"
+  ]
+}

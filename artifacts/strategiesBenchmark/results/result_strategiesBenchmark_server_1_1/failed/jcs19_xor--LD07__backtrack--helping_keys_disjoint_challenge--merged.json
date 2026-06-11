@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LD07__backtrack--helping_keys_disjoint_challenge--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.452316045761,
+    "avg_memory": 163.49282899070613,
+    "peak_memory": 210.6640625
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

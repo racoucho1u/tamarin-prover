@@ -1,0 +1,2959 @@
+{
+    "graphs": [
+        {
+            "jgAbbrevs": [
+                {
+                    "jgaAbbrev": {
+                        "jgnConst": "SE1"
+                    },
+                    "jgaExpansion": {
+                        "jgnConst": "'secureChannel'"
+                    },
+                    "jgaTerm": {
+                        "jgnConst": "'secureChannel'"
+                    }
+                },
+                {
+                    "jgaAbbrev": {
+                        "jgnConst": "SH1"
+                    },
+                    "jgaExpansion": {
+                        "jgnFunct": "SHA256",
+                        "jgnParams": [
+                            {
+                                "jgnConst": "RES_star"
+                            },
+                            {
+                                "jgnConst": "~RAND"
+                            }
+                        ],
+                        "jgnShow": "SHA256(RES_star,~RAND)"
+                    },
+                    "jgaTerm": {
+                        "jgnFunct": "SHA256",
+                        "jgnParams": [
+                            {
+                                "jgnConst": "RES_star"
+                            },
+                            {
+                                "jgnConst": "~RAND"
+                            }
+                        ],
+                        "jgnShow": "SHA256(RES_star,~RAND)"
+                    }
+                }
+            ],
+            "jgClusters": [],
+            "jgDirected": true,
+            "jgEdges": [
+                {
+                    "jgeRelation": "default",
+                    "jgeSource": "#vf:c0",
+                    "jgeTarget": "#vr:p1"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#vr:c0",
+                    "jgeTarget": "#i:p0"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#vr.1:c0",
+                    "jgeTarget": "#vr:p0"
+                },
+                {
+                    "jgeRelation": "default",
+                    "jgeSource": "#vf.2:c0",
+                    "jgeTarget": "#vr.2:p2"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#vr.2:c0",
+                    "jgeTarget": "#vr.1:p0"
+                },
+                {
+                    "jgeRelation": "PersistentFact",
+                    "jgeSource": "#vr.3:c0",
+                    "jgeTarget": "#vr.2:p0"
+                },
+                {
+                    "jgeRelation": "KFact",
+                    "jgeSource": "#vr.3:c1",
+                    "jgeTarget": "#vk.2:p0"
+                },
+                {
+                    "jgeRelation": "default",
+                    "jgeSource": "#vf.4:c0",
+                    "jgeTarget": "#vr.5:p0"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#vr.4:c0",
+                    "jgeTarget": "#i:p1"
+                },
+                {
+                    "jgeRelation": "default",
+                    "jgeSource": "#vf.5:c0",
+                    "jgeTarget": "#vr.7:p0"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#vr.5:c0",
+                    "jgeTarget": "#vr.4:p0"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#vr.6:c0",
+                    "jgeTarget": "#vr.1:p1"
+                },
+                {
+                    "jgeRelation": "ProtoFact",
+                    "jgeSource": "#vr.7:c0",
+                    "jgeTarget": "#vr.6:p0"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk",
+                    "jgeTarget": "#vk.1"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.1",
+                    "jgeTarget": "#vf.5"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.2",
+                    "jgeTarget": "#vf.4"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.2",
+                    "jgeTarget": "#vf.5"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.6",
+                    "jgeTarget": "#vf"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.6",
+                    "jgeTarget": "#vk.1"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.8",
+                    "jgeTarget": "#vf.2"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.9",
+                    "jgeTarget": "#vf.2"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.9",
+                    "jgeTarget": "#vf.4"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.9",
+                    "jgeTarget": "#vf.5"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.18",
+                    "jgeTarget": "#vf.4"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.21",
+                    "jgeTarget": "#vf.5"
+                },
+                {
+                    "jgeRelation": "LessAtoms",
+                    "jgeSource": "#vk.22",
+                    "jgeTarget": "#vf.5"
+                }
+            ],
+            "jgLabel": "trace_5G_aka_SL2-AS0-CL0-A1-C1-NB_weakagreement_seaf_hss_noAsyKeyRev_noSupiRev_noSqnRev_noKeyRev-seaf_receive_aca_case_1-seaf_receive_authResp_send_ac-receive_secure_case_2-receive_secure_case_2-fresh-c_SHA256-init_servNet",
+            "jgNodes": [
+                {
+                    "jgnId": "#i",
+                    "jgnLabel": "seaf_receive_aca",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "SEAF_End",
+                                "jgnFactShow": "SEAF_End( )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": []
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Running",
+                                "jgnFactShow": "Running( ~idSN, supi, <'UE', 'SEAF', 'K_seaf', K_seaf> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "supi"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'UE'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'SEAF'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'K_seaf'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "K_seaf"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('K_seaf',K_seaf)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('SEAF',pair('K_seaf',K_seaf))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('UE',pair('SEAF',pair('K_seaf',K_seaf)))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Running",
+                                "jgnFactShow": "Running( ~idSN, b, <'HSS', 'SEAF', 'supi', supi> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'HSS'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'SEAF'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'supi'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "supi"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('supi',supi)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('SEAF',pair('supi',supi))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('HSS',pair('SEAF',pair('supi',supi)))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Secret",
+                                "jgnFactShow": "Secret( <'SEAF', ~idSN>, 'key', K_seaf )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'SEAF'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('SEAF',~idSN)"
+                                    },
+                                    {
+                                        "jgnConst": "'key'"
+                                    },
+                                    {
+                                        "jgnConst": "K_seaf"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Secret",
+                                "jgnFactShow": "Secret( <'SEAF', ~idSN>, 'supi', supi )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'SEAF'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('SEAF',~idSN)"
+                                    },
+                                    {
+                                        "jgnConst": "'supi'"
+                                    },
+                                    {
+                                        "jgnConst": "supi"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Commit",
+                                "jgnFactShow": "Commit( ~idSN, b, <'SEAF', 'HSS', 'K_seaf', K_seaf> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'SEAF'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'HSS'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'K_seaf'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "K_seaf"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('K_seaf',K_seaf)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('HSS',pair('K_seaf',K_seaf))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('SEAF',pair('HSS',pair('K_seaf',K_seaf)))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Commit",
+                                "jgnFactShow": "Commit( ~idSN, b, <'SEAF', 'HSS', 'supi', supi> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'SEAF'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'HSS'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'supi'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "supi"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('supi',supi)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('HSS',pair('supi',supi))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('SEAF',pair('HSS',pair('supi',supi)))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Commit",
+                                "jgnFactShow": "Commit( ~idSN, b, <'SEAF', 'HSS', 'RES_star', RES_star> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'SEAF'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'HSS'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'RES_star'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "RES_star"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('RES_star',RES_star)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('HSS',pair('RES_star',RES_star))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('SEAF',pair('HSS',pair('RES_star',RES_star)))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Commit",
+                                "jgnFactShow": "Commit( ~idSN, supi, <'SEAF', 'UE', 'K_seaf', K_seaf> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "supi"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'SEAF'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'UE'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'K_seaf'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "K_seaf"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('K_seaf',K_seaf)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('UE',pair('K_seaf',K_seaf))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('SEAF',pair('UE',pair('K_seaf',K_seaf)))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Commit",
+                                "jgnFactShow": "Commit( ~idSN, supi, <'SEAF', 'UE', 'supi', supi> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "supi"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'SEAF'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'UE'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'supi'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "supi"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('supi',supi)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('UE',pair('supi',supi))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('SEAF',pair('UE',pair('supi',supi)))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Commit",
+                                "jgnFactShow": "Commit( ~idSN, supi, <'SEAF', 'UE', 'RES_star', RES_star> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "supi"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'SEAF'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'UE'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'RES_star'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "RES_star"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('RES_star',RES_star)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('UE',pair('RES_star',RES_star))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('SEAF',pair('UE',pair('RES_star',RES_star)))"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Honest",
+                                "jgnFactShow": "Honest( supi )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "supi"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Honest",
+                                "jgnFactShow": "Honest( b )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Honest",
+                                "jgnFactShow": "Honest( ~idSN )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#i:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "St_4_SEAF",
+                                "jgnFactShow": "St_4_SEAF( ~tid, ~idSN, <'5G', ~idSN>, conc_supi, b, ~RAND, RES_star, K_seaf, supi)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~tid"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    },
+                                    {
+                                        "jgnConst": "conc_supi"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~RAND"
+                                    },
+                                    {
+                                        "jgnConst": "RES_star"
+                                    },
+                                    {
+                                        "jgnConst": "K_seaf"
+                                    },
+                                    {
+                                        "jgnConst": "supi"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#i:c1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Out",
+                                "jgnFactShow": "Out( f1(K_seaf, 'SEAF') )",
+                                "jgnFactTag": "OutFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "f1",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "K_seaf"
+                                            },
+                                            {
+                                                "jgnConst": "'SEAF'"
+                                            }
+                                        ],
+                                        "jgnShow": "f1(K_seaf,'SEAF')"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#i:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "St_3_SEAF",
+                                "jgnFactShow": "St_3_SEAF( ~tid, ~idSN, <'5G', ~idSN>, conc_supi, b, ~RAND, RES_star, K_seaf)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~tid"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    },
+                                    {
+                                        "jgnConst": "conc_supi"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~RAND"
+                                    },
+                                    {
+                                        "jgnConst": "RES_star"
+                                    },
+                                    {
+                                        "jgnConst": "K_seaf"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#i:p1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "RcvS",
+                                "jgnFactShow": "RcvS( b, ~idSN, <'aca', 'confirm', supi> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aca'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'confirm'"
+                                                    },
+                                                    {
+                                                        "jgnConst": "supi"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('confirm',supi)"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aca',pair('confirm',supi))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vf",
+                    "jgnLabel": "Send",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "K",
+                                "jgnFactShow": "K( RES_star )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "RES_star"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vf:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( RES_star )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "RES_star"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vf:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( RES_star )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "RES_star"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vk",
+                    "jgnLabel": "FreshConstr",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~RAND )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~RAND"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vk:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~RAND )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~RAND"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vk:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Fr",
+                                "jgnFactShow": "Fr( ~RAND )",
+                                "jgnFactTag": "FreshFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~RAND"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vr",
+                    "jgnLabel": "seaf_receive_authResp_send_ac",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Running",
+                                "jgnFactShow": "Running( ~idSN, b, <'HSS', 'SEAF', 'RES_star', RES_star> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'HSS'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'SEAF'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'RES_star'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "RES_star"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('RES_star',RES_star)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('SEAF',pair('RES_star',RES_star))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('HSS',pair('SEAF',pair('RES_star',RES_star)))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "St_3_SEAF",
+                                "jgnFactShow": "St_3_SEAF( ~tid, ~idSN, <'5G', ~idSN>, conc_supi, b, ~RAND, RES_star, K_seaf)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~tid"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    },
+                                    {
+                                        "jgnConst": "conc_supi"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~RAND"
+                                    },
+                                    {
+                                        "jgnConst": "RES_star"
+                                    },
+                                    {
+                                        "jgnConst": "K_seaf"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr:c1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "SndS",
+                                "jgnFactShow": "SndS( ~idSN, b, <'ac', RES_star, <conc_supi, b>, '5G', ~idSN> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'ac'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "RES_star"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "conc_supi"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "b"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(conc_supi,b)"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "'5G'"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "~idSN"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair('5G',~idSN)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(pair(conc_supi,b),pair('5G',~idSN))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(RES_star,pair(pair(conc_supi,b),pair('5G',~idSN)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('ac',pair(RES_star,pair(pair(conc_supi,b),pair('5G',~idSN))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "St_2_SEAF",
+                                "jgnFactShow": "St_2_SEAF( ~tid, ~idSN, <'5G', ~idSN>, conc_supi, b, ~RAND, SHA256(RES_star, ~RAND), K_seaf)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~tid"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    },
+                                    {
+                                        "jgnConst": "conc_supi"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~RAND"
+                                    },
+                                    {
+                                        "jgnFunct": "SHA256",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "RES_star"
+                                            },
+                                            {
+                                                "jgnConst": "~RAND"
+                                            }
+                                        ],
+                                        "jgnShow": "SHA256(RES_star,~RAND)"
+                                    },
+                                    {
+                                        "jgnConst": "K_seaf"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr:p1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( RES_star )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "RES_star"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vk.1",
+                    "jgnLabel": "Constrc_SHA256",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( SHA256(RES_star, ~RAND) )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "SHA256",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "RES_star"
+                                            },
+                                            {
+                                                "jgnConst": "~RAND"
+                                            }
+                                        ],
+                                        "jgnShow": "SHA256(RES_star,~RAND)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vk.1:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( SHA256(RES_star, ~RAND) )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "SHA256",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "RES_star"
+                                            },
+                                            {
+                                                "jgnConst": "~RAND"
+                                            }
+                                        ],
+                                        "jgnShow": "SHA256(RES_star,~RAND)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vk.1:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( RES_star )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "RES_star"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vk.1:p1",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~RAND )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~RAND"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vr.1",
+                    "jgnLabel": "seaf_receive_aia_send_authReq",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Out_Src",
+                                "jgnFactShow": "Out_Src( ~RAND, AUTN )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~RAND"
+                                    },
+                                    {
+                                        "jgnConst": "AUTN"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Running",
+                                "jgnFactShow": "Running( ~idSN, b, <'HSS', 'SEAF', 'K_seaf', K_seaf> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'HSS'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'SEAF'"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'K_seaf'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "K_seaf"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('K_seaf',K_seaf)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('SEAF',pair('K_seaf',K_seaf))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('HSS',pair('SEAF',pair('K_seaf',K_seaf)))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr.1:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "St_2_SEAF",
+                                "jgnFactShow": "St_2_SEAF( ~tid, ~idSN, <'5G', ~idSN>, conc_supi, b, ~RAND, SHA256(RES_star, ~RAND), K_seaf)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~tid"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    },
+                                    {
+                                        "jgnConst": "conc_supi"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~RAND"
+                                    },
+                                    {
+                                        "jgnFunct": "SHA256",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "RES_star"
+                                            },
+                                            {
+                                                "jgnConst": "~RAND"
+                                            }
+                                        ],
+                                        "jgnShow": "SHA256(RES_star,~RAND)"
+                                    },
+                                    {
+                                        "jgnConst": "K_seaf"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.1:c1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Out",
+                                "jgnFactShow": "Out( <~RAND, AUTN, '5G', ~idSN> )",
+                                "jgnFactTag": "OutFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "~RAND"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "AUTN"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'5G'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "~idSN"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('5G',~idSN)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(AUTN,pair('5G',~idSN))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(~RAND,pair(AUTN,pair('5G',~idSN)))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr.1:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "St_1_SEAF",
+                                "jgnFactShow": "St_1_SEAF( ~tid, ~idSN, <'5G', ~idSN>, conc_supi, b )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~tid"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    },
+                                    {
+                                        "jgnConst": "conc_supi"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.1:p1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "RcvS",
+                                "jgnFactShow": "RcvS( b, ~idSN, <'aia', ~RAND, SHA256(RES_star, ~RAND), K_seaf, AUTN>)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aia'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~RAND"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "SHA256",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "RES_star"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "~RAND"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "SHA256(RES_star,~RAND)"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "K_seaf"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "AUTN"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(K_seaf,AUTN)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vf.2",
+                    "jgnLabel": "Send",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "K",
+                                "jgnFactShow": "K( <conc_supi, b> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "conc_supi"
+                                            },
+                                            {
+                                                "jgnConst": "b"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(conc_supi,b)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vf.2:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( <conc_supi, b> )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "conc_supi"
+                                            },
+                                            {
+                                                "jgnConst": "b"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(conc_supi,b)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vf.2:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( <conc_supi, b> )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "conc_supi"
+                                            },
+                                            {
+                                                "jgnConst": "b"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(conc_supi,b)"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vk.2",
+                    "jgnLabel": "Coerce",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~idSN )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vk.2:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( ~idSN )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vk.2:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KD",
+                                "jgnFactShow": "!KD( ~idSN )",
+                                "jgnFactTag": "KDFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vr.2",
+                    "jgnLabel": "seaf_receive_attachReq_send_air",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Start_SEAF_Session",
+                                "jgnFactShow": "Start_SEAF_Session( ~idSN )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr.2:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "St_1_SEAF",
+                                "jgnFactShow": "St_1_SEAF( ~tid, ~idSN, <'5G', ~idSN>, conc_supi, b )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~tid"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    },
+                                    {
+                                        "jgnConst": "conc_supi"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.2:c1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "SndS",
+                                "jgnFactShow": "SndS( ~idSN, b, <'air', <conc_supi, b>, '5G', ~idSN> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'air'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "conc_supi"
+                                                            },
+                                                            {
+                                                                "jgnConst": "b"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(conc_supi,b)"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'5G'"
+                                                            },
+                                                            {
+                                                                "jgnConst": "~idSN"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('5G',~idSN)"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(pair(conc_supi,b),pair('5G',~idSN))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('air',pair(pair(conc_supi,b),pair('5G',~idSN)))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr.2:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!SEAF",
+                                "jgnFactShow": "!SEAF( ~idSN, <'5G', ~idSN> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.2:p1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Fr",
+                                "jgnFactShow": "Fr( ~tid )",
+                                "jgnFactTag": "FreshFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~tid"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.2:p2",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( <conc_supi, b> )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "conc_supi"
+                                            },
+                                            {
+                                                "jgnConst": "b"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(conc_supi,b)"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vr.3",
+                    "jgnLabel": "init_servNet",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "ServNet",
+                                "jgnFactShow": "ServNet( ~idSN )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr.3:c0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!SEAF",
+                                "jgnFactShow": "!SEAF( ~idSN, <'5G', ~idSN> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "#vr.3:c1",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Out",
+                                "jgnFactShow": "Out( <'5G', ~idSN> )",
+                                "jgnFactTag": "OutFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'5G'"
+                                            },
+                                            {
+                                                "jgnConst": "~idSN"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('5G',~idSN)"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr.3:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Fr",
+                                "jgnFactShow": "Fr( ~idSN )",
+                                "jgnFactTag": "FreshFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "~idSN"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vf.4",
+                    "jgnLabel": "Send",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "K",
+                                "jgnFactShow": "K( <b, ~idSN, 'aca', 'confirm', supi> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "b"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~idSN"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'aca'"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "'confirm'"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "supi"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair('confirm',supi)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('aca',pair('confirm',supi))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~idSN,pair('aca',pair('confirm',supi)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(b,pair(~idSN,pair('aca',pair('confirm',supi))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vf.4:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( <b, ~idSN, 'aca', 'confirm', supi> )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "b"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~idSN"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'aca'"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "'confirm'"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "supi"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair('confirm',supi)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('aca',pair('confirm',supi))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~idSN,pair('aca',pair('confirm',supi)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(b,pair(~idSN,pair('aca',pair('confirm',supi))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vf.4:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( <b, ~idSN, 'aca', 'confirm', supi> )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "b"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~idSN"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'aca'"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "'confirm'"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "supi"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair('confirm',supi)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('aca',pair('confirm',supi))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~idSN,pair('aca',pair('confirm',supi)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(b,pair(~idSN,pair('aca',pair('confirm',supi))))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vr.4",
+                    "jgnLabel": "receive_secure",
+                    "jgnMetadata": {
+                        "jgnActs": [],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr.4:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "RcvS",
+                                "jgnFactShow": "RcvS( b, ~idSN, <'aca', 'confirm', supi> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aca'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'confirm'"
+                                                    },
+                                                    {
+                                                        "jgnConst": "supi"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('confirm',supi)"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aca',pair('confirm',supi))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr.4:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Sec",
+                                "jgnFactShow": "Sec( b, ~idSN, <'aca', 'confirm', supi> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aca'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'confirm'"
+                                                    },
+                                                    {
+                                                        "jgnConst": "supi"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('confirm',supi)"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aca',pair('confirm',supi))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vf.5",
+                    "jgnLabel": "Send",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "K",
+                                "jgnFactShow": "K( <b, ~idSN, 'aia', ~RAND, SHA256(RES_star, ~RAND), K_seaf, AUTN>)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "b"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~idSN"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'aia'"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~RAND"
+                                                                    },
+                                                                    {
+                                                                        "jgnFunct": "pair",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnFunct": "SHA256",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "RES_star"
+                                                                                    },
+                                                                                    {
+                                                                                        "jgnConst": "~RAND"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "SHA256(RES_star,~RAND)"
+                                                                            },
+                                                                            {
+                                                                                "jgnFunct": "pair",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "K_seaf"
+                                                                                    },
+                                                                                    {
+                                                                                        "jgnConst": "AUTN"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "pair(K_seaf,AUTN)"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~idSN,pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(b,pair(~idSN,pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vf.5:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( <b, ~idSN, 'aia', ~RAND, SHA256(RES_star, ~RAND), K_seaf, AUTN>)",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "b"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~idSN"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'aia'"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~RAND"
+                                                                    },
+                                                                    {
+                                                                        "jgnFunct": "pair",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnFunct": "SHA256",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "RES_star"
+                                                                                    },
+                                                                                    {
+                                                                                        "jgnConst": "~RAND"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "SHA256(RES_star,~RAND)"
+                                                                            },
+                                                                            {
+                                                                                "jgnFunct": "pair",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "K_seaf"
+                                                                                    },
+                                                                                    {
+                                                                                        "jgnConst": "AUTN"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "pair(K_seaf,AUTN)"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~idSN,pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(b,pair(~idSN,pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vf.5:p0",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( <b, ~idSN, 'aia', ~RAND, SHA256(RES_star, ~RAND), K_seaf, AUTN >)",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "b"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~idSN"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'aia'"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~RAND"
+                                                                    },
+                                                                    {
+                                                                        "jgnFunct": "pair",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnFunct": "SHA256",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "RES_star"
+                                                                                    },
+                                                                                    {
+                                                                                        "jgnConst": "~RAND"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "SHA256(RES_star,~RAND)"
+                                                                            },
+                                                                            {
+                                                                                "jgnFunct": "pair",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "K_seaf"
+                                                                                    },
+                                                                                    {
+                                                                                        "jgnConst": "AUTN"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "pair(K_seaf,AUTN)"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~idSN,pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(b,pair(~idSN,pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isIntruderRule"
+                },
+                {
+                    "jgnId": "#vr.5",
+                    "jgnLabel": "secureChannel_compromised_in",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Rev",
+                                "jgnFactShow": "Rev( b, 'secureChannel' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "'secureChannel'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Injected",
+                                "jgnFactShow": "Injected( <'aca', 'confirm', supi> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aca'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'confirm'"
+                                                    },
+                                                    {
+                                                        "jgnConst": "supi"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('confirm',supi)"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aca',pair('confirm',supi))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr.5:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Sec",
+                                "jgnFactShow": "Sec( b, ~idSN, <'aca', 'confirm', supi> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aca'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "'confirm'"
+                                                    },
+                                                    {
+                                                        "jgnConst": "supi"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair('confirm',supi)"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aca',pair('confirm',supi))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr.5:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( <b, ~idSN, 'aca', 'confirm', supi> )",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "b"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~idSN"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'aca'"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "'confirm'"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "supi"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair('confirm',supi)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('aca',pair('confirm',supi))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~idSN,pair('aca',pair('confirm',supi)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(b,pair(~idSN,pair('aca',pair('confirm',supi))))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vr.6",
+                    "jgnLabel": "receive_secure",
+                    "jgnMetadata": {
+                        "jgnActs": [],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr.6:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "RcvS",
+                                "jgnFactShow": "RcvS( b, ~idSN, <'aia', ~RAND, SHA256(RES_star, ~RAND), K_seaf, AUTN>)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aia'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~RAND"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "SHA256",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "RES_star"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "~RAND"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "SHA256(RES_star,~RAND)"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "K_seaf"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "AUTN"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(K_seaf,AUTN)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr.6:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Sec",
+                                "jgnFactShow": "Sec( b, ~idSN, <'aia', ~RAND, SHA256(RES_star, ~RAND), K_seaf, AUTN>)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aia'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~RAND"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "SHA256",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "RES_star"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "~RAND"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "SHA256(RES_star,~RAND)"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "K_seaf"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "AUTN"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(K_seaf,AUTN)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vr.7",
+                    "jgnLabel": "secureChannel_compromised_in",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Rev",
+                                "jgnFactShow": "Rev( b, 'secureChannel' )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "'secureChannel'"
+                                    }
+                                ]
+                            },
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Injected",
+                                "jgnFactShow": "Injected( <'aia', ~RAND, SHA256(RES_star, ~RAND), K_seaf, AUTN> )",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aia'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~RAND"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "SHA256",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "RES_star"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "~RAND"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "SHA256(RES_star,~RAND)"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "K_seaf"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "AUTN"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(K_seaf,AUTN)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [
+                            {
+                                "jgnFactId": "#vr.7:c0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "Sec",
+                                "jgnFactShow": "Sec( b, ~idSN, <'aia', ~RAND, SHA256(RES_star, ~RAND), K_seaf, AUTN>)",
+                                "jgnFactTag": "ProtoFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    },
+                                    {
+                                        "jgnConst": "~idSN"
+                                    },
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "'aia'"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~RAND"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnFunct": "SHA256",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "RES_star"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "~RAND"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "SHA256(RES_star,~RAND)"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "K_seaf"
+                                                                    },
+                                                                    {
+                                                                        "jgnConst": "AUTN"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(K_seaf,AUTN)"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnPrems": [
+                            {
+                                "jgnFactId": "#vr.7:p0",
+                                "jgnFactMult": "",
+                                "jgnFactName": "In",
+                                "jgnFactShow": "In( <b, ~idSN, 'aia', ~RAND, SHA256(RES_star, ~RAND), K_seaf, AUTN>)",
+                                "jgnFactTag": "InFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnFunct": "pair",
+                                        "jgnParams": [
+                                            {
+                                                "jgnConst": "b"
+                                            },
+                                            {
+                                                "jgnFunct": "pair",
+                                                "jgnParams": [
+                                                    {
+                                                        "jgnConst": "~idSN"
+                                                    },
+                                                    {
+                                                        "jgnFunct": "pair",
+                                                        "jgnParams": [
+                                                            {
+                                                                "jgnConst": "'aia'"
+                                                            },
+                                                            {
+                                                                "jgnFunct": "pair",
+                                                                "jgnParams": [
+                                                                    {
+                                                                        "jgnConst": "~RAND"
+                                                                    },
+                                                                    {
+                                                                        "jgnFunct": "pair",
+                                                                        "jgnParams": [
+                                                                            {
+                                                                                "jgnFunct": "SHA256",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "RES_star"
+                                                                                    },
+                                                                                    {
+                                                                                        "jgnConst": "~RAND"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "SHA256(RES_star,~RAND)"
+                                                                            },
+                                                                            {
+                                                                                "jgnFunct": "pair",
+                                                                                "jgnParams": [
+                                                                                    {
+                                                                                        "jgnConst": "K_seaf"
+                                                                                    },
+                                                                                    {
+                                                                                        "jgnConst": "AUTN"
+                                                                                    }
+                                                                                ],
+                                                                                "jgnShow": "pair(K_seaf,AUTN)"
+                                                                            }
+                                                                        ],
+                                                                        "jgnShow": "pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))"
+                                                                    }
+                                                                ],
+                                                                "jgnShow": "pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))"
+                                                            }
+                                                        ],
+                                                        "jgnShow": "pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))"
+                                                    }
+                                                ],
+                                                "jgnShow": "pair(~idSN,pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN)))))"
+                                            }
+                                        ],
+                                        "jgnShow": "pair(b,pair(~idSN,pair('aia',pair(~RAND,pair(SHA256(RES_star,~RAND),pair(K_seaf,AUTN))))))"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "jgnType": "isProtocolRule"
+                },
+                {
+                    "jgnId": "#vk.6",
+                    "jgnLabel": "!KU( RES_star )",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( RES_star )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "RES_star"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [],
+                        "jgnPrems": []
+                    },
+                    "jgnType": "unsolvedActionAtom"
+                },
+                {
+                    "jgnId": "#vk.8",
+                    "jgnLabel": "!KU( conc_supi )",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( conc_supi )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "conc_supi"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [],
+                        "jgnPrems": []
+                    },
+                    "jgnType": "unsolvedActionAtom"
+                },
+                {
+                    "jgnId": "#vk.9",
+                    "jgnLabel": "!KU( b )",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( b )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "b"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [],
+                        "jgnPrems": []
+                    },
+                    "jgnType": "unsolvedActionAtom"
+                },
+                {
+                    "jgnId": "#vk.18",
+                    "jgnLabel": "!KU( supi )",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( supi )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "supi"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [],
+                        "jgnPrems": []
+                    },
+                    "jgnType": "unsolvedActionAtom"
+                },
+                {
+                    "jgnId": "#vk.21",
+                    "jgnLabel": "!KU( K_seaf )",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( K_seaf )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "K_seaf"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [],
+                        "jgnPrems": []
+                    },
+                    "jgnType": "unsolvedActionAtom"
+                },
+                {
+                    "jgnId": "#vk.22",
+                    "jgnLabel": "!KU( AUTN )",
+                    "jgnMetadata": {
+                        "jgnActs": [
+                            {
+                                "jgnFactId": "action",
+                                "jgnFactMult": "!",
+                                "jgnFactName": "!KU",
+                                "jgnFactShow": "!KU( AUTN )",
+                                "jgnFactTag": "KUFact",
+                                "jgnFactTerms": [
+                                    {
+                                        "jgnConst": "AUTN"
+                                    }
+                                ]
+                            }
+                        ],
+                        "jgnConcs": [],
+                        "jgnPrems": []
+                    },
+                    "jgnType": "unsolvedActionAtom"
+                }
+            ],
+            "jgType": "Tamarin prover constraint system"
+        }
+    ]
+}

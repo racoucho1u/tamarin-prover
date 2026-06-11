@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--LD07__escape--recentalive_tag_bounded--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 2647.7709968090057,
+    "avg_memory": 19979.0363683785,
+    "peak_memory": 41253.80078125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

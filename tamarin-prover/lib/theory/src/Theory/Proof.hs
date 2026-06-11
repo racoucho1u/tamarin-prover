@@ -1156,15 +1156,15 @@ backtrackProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
           explore :: [(ProofMethod, (M.Map CaseName System,String))] -> (ProofMethod, M.Map CaseName System) -> [Int] -> Proof (Maybe System)
           explore [] (method0, cases0) igG = node method0 cases0 (depth:igG) 
           explore ((InLoop (n,i,g), (cases, _expl)):_) _ igG = 
-              if (depth-n) `elem` igG
+              if (depth-n) `elem` igG --Going back to this root would never make sense, we know every options at this level are loops
                 then node (InLoop (n,i,g)) cases igG 
-                else node (InLoop (n,i,g)) M.empty igG --else 
-          explore ((method, (cases, _expl)):suite) (method0, cases0) igG = case propagatedMethod of --
-              InLoop (0,_,_) -> explore suite (method0,cases0) igG --
+                else node (InLoop (n,i,g)) M.empty igG 
+          explore ((method, (cases, _expl)):suite) (method0, cases0) igG = case propagatedMethod of 
+              InLoop (0,_,_) -> explore suite (method0,cases0) igG 
               InLoop (n,i,g) ->
                   if (depth-n) `elem` igG
                     then node (InLoop (n,i,g)) cases igG 
-                    else node (InLoop (n,i,g)) M.empty igG   --
+                    else node (InLoop (n,i,g)) M.empty igG 
               _            -> node method cases igG
             where
                 propagatedMethod = propagateMethod cases method igG
@@ -1244,7 +1244,7 @@ backAndAvoidProveSystemDFS exportGoals heuristic tactics ctxt d0 sys0 =
             _ -> Nothing
 
           node :: ProofMethod -> M.Map CaseName System -> [Int] -> [Maybe Goal] -> Proof(Maybe System)
-          node methodOrigin casesOrigin igG _blacklist =  trace (show nodule) nodule
+          node methodOrigin casesOrigin igG _blacklist =  nodule --trace (show nodule) nodule
             where
                 successors = M.map (prove (succ depth) igG _blacklist) casesOrigin
                 nodule = LNode (ProofStep methodOrigin _blacklist (Just sys)) successors

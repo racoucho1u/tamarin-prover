@@ -1,0 +1,33 @@
+{
+  "task_id": "jcs19_xor--OTYT06__proba--executable--merged",
+  "warnings": [],
+  "tamarin_timing": 1.9,
+  "wrapper_measures": {
+    "time": 2.0560712814331055,
+    "avg_memory": 37.28125,
+    "peak_memory": 73.90234375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/jcs19_xor--OTYT06__proba--executable--merged.spthy",
+  "verified_lemma": {
+    "executable": {
+      "steps": 13,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "helping_reader_start",
+    "helping_tag_start",
+    "helping_keys_reader_are_secret",
+    "helping_keys_disjoint_challenge",
+    "helping_keys_disjoint_XX",
+    "helping_keys_disjoint_XS",
+    "helping_keys_disjoint_DD",
+    "helping_keys_disjoint_OutX",
+    "alive_tag",
+    "recentalive_tag_bounded",
+    "WA_tag",
+    "alive_reader",
+    "desynch_impossible"
+  ]
+}

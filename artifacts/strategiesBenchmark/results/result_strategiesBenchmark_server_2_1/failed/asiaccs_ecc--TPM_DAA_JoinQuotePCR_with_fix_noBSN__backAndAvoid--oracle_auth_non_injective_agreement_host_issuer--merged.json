@@ -1,0 +1,13 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinQuotePCR_with_fix_noBSN__backAndAvoid--oracle_auth_non_injective_agreement_host_issuer--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7201.344364643097,
+    "avg_memory": 4021.761693784621,
+    "peak_memory": 5565.90234375
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

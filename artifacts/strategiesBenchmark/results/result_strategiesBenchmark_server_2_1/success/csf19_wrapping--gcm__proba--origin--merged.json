@@ -1,0 +1,28 @@
+{
+  "task_id": "csf19_wrapping--gcm__proba--origin--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 43.01,
+  "wrapper_measures": {
+    "time": 43.42799425125122,
+    "avg_memory": 459.0224382267442,
+    "peak_memory": 811.125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf19_wrapping--gcm__proba--origin--merged.spthy",
+  "verified_lemma": {
+    "origin": {
+      "steps": 1587,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "Counter_Monotonicity",
+    "IV_Uniqueness",
+    "Key_UsageImpliesInitialization",
+    "Key_IntegrityAndConfidentiality",
+    "Key_UniqueLevelandHandle"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "task_id": "sp14--GDH__original--Exp_earlier_Esk--merged",
+  "warnings": [
+    "5 wellformedness check failed!"
+  ],
+  "tamarin_timing": 5.38,
+  "wrapper_measures": {
+    "time": 5.53572154045105,
+    "avg_memory": 171.52799479166666,
+    "peak_memory": 262.828125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/sp14--GDH__original--Exp_earlier_Esk--merged.spthy",
+  "verified_lemma": {
+    "Exp_earlier_Esk": {
+      "steps": 145,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "No_Inv_exp",
+    "Esk_secret",
+    "Esk_fresh_name",
+    "ExpKeyFor_one",
+    "Relate_KeyFor_RoundKey",
+    "Exp_subterm",
+    "Exp_earlier_Esk_2",
+    "roundkey_keyfor_different",
+    "Exp_nonce_or_product2",
+    "Exp_factor_secret",
+    "Exp_name_secret",
+    "Esk_Exp_same_gid",
+    "key_secret_last",
+    "key_secret"
+  ]
+}

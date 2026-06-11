@@ -1,0 +1,13 @@
+{
+  "task_id": "css18_5G--5G_AKA_priv__collectAndRestart--original_replayed_autn--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.794035434723,
+    "avg_memory": 1126.1564119026907,
+    "peak_memory": 1901.8046875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

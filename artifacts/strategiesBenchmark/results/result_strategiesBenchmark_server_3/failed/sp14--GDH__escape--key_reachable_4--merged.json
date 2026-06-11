@@ -1,0 +1,13 @@
+{
+  "task_id": "sp14--GDH__escape--key_reachable_4--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1214.6185598373413,
+    "avg_memory": 20077.851705609904,
+    "peak_memory": 41538.890625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "wisec--5G_handover_n2__collectAndRestart--executability_old_kamf_id_req--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.363283872604,
+    "avg_memory": 4310.610899176597,
+    "peak_memory": 4318.60546875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

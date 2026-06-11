@@ -1,0 +1,13 @@
+{
+  "task_id": "csf18_xor--LAK06_state__original--helpingUpdateKey--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1718.4793667793274,
+    "avg_memory": 19958.617985551053,
+    "peak_memory": 41173.08984375
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

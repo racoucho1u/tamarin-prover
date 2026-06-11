@@ -1,0 +1,13 @@
+{
+  "task_id": "smartverif--pkcs11__backtrack--bad_keys--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7201.263476133347,
+    "avg_memory": 3492.9754227836647,
+    "peak_memory": 3534.15234375
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

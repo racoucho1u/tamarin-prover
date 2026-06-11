@@ -1,0 +1,13 @@
+{
+  "task_id": "sp14--GDH__backAndAvoid--key_reachable_2--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.464946985245,
+    "avg_memory": 531.3295382945945,
+    "peak_memory": 573.26171875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

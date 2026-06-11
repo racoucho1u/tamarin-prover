@@ -1,0 +1,23 @@
+{
+  "task_id": "smartverif--modersheim__backAndAvoid--Knows_Honest_Key_imp_Revoked--merged",
+  "warnings": [
+    "2 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 1.68,
+  "wrapper_measures": {
+    "time": 1.9246273040771484,
+    "avg_memory": 47.03125,
+    "peak_memory": 93.51953125
+  },
+  "output_spthy": "result_strategiesBenchmark_2/proofs/smartverif--modersheim__backAndAvoid--Knows_Honest_Key_imp_Revoked--merged.spthy",
+  "verified_lemma": {
+    "Knows_Honest_Key_imp_Revoked": {
+      "steps": 11,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

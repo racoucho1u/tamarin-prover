@@ -1,0 +1,19 @@
+{
+  "task_id": "sp14--GDH__escape--key_reachable_2--merged",
+  "warnings": [],
+  "tamarin_timing": 251.63,
+  "wrapper_measures": {
+    "time": 252.31237053871155,
+    "avg_memory": 3420.9051718749984,
+    "peak_memory": 6073.078125
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/sp14--GDH__escape--key_reachable_2--merged.spthy",
+  "verified_lemma": {
+    "key_reachable_2": {
+      "steps": 20,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": []
+}

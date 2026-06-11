@@ -1,0 +1,13 @@
+{
+  "task_id": "wisec--5G_handover_n2__collectAndRestart--injectiveagreement_tran_ue_k_gnb_star--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.633270263672,
+    "avg_memory": 4961.982637611253,
+    "peak_memory": 4978.3125
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

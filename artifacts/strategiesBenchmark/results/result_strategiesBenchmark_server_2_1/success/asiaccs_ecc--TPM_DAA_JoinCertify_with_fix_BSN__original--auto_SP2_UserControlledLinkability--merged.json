@@ -1,0 +1,48 @@
+{
+  "task_id": "asiaccs_ecc--TPM_DAA_JoinCertify_with_fix_BSN__original--auto_SP2_UserControlledLinkability--merged",
+  "warnings": [
+    "1 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 3.0,
+  "wrapper_measures": {
+    "time": 3.2807154655456543,
+    "avg_memory": 36.1953125,
+    "peak_memory": 72.27734375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/asiaccs_ecc--TPM_DAA_JoinCertify_with_fix_BSN__original--auto_SP2_UserControlledLinkability--merged.spthy",
+  "verified_lemma": {
+    "auto_SP2_UserControlledLinkability": {
+      "steps": 2,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "auto_bind_restriction",
+    "auto_restriction_one_host_per_tpm",
+    "auto_restriction_one_tpm_per_host",
+    "auto_restricition_pke_comes_from_tpm",
+    "auto_restriction_single_issuer",
+    "auto_verify_multiple_pkes",
+    "oracle_correctness_two_certs_same_credentials_same_bsn",
+    "oracle_correctness_two_certs_same_credentials_different_bsn",
+    "oracle_correctness_two_certs_different_credentials_same_bsn",
+    "oracle_correctness_two_certs_different_credentials_different_bsn",
+    "oracle_correctness_two_valid_linked_certs",
+    "oracle_correctness_two_valid_unlinked_certs",
+    "oracle_correctness_join_only",
+    "oracle_correctness_no_verify",
+    "oracle_correctness_with_verify",
+    "oracle_auth_aliveness_host_very_weak",
+    "oracle_auth_aliveness_host",
+    "oracle_auth_aliveness_issuer",
+    "oracle_auth_weak_agreement_host",
+    "oracle_auth_non_injective_agreement_host_issuer",
+    "oracle_auth_injective_agreement_host_issuer",
+    "oracle_auth_secrecy_cre",
+    "oracle_SP3_Unforgeability",
+    "oracle_SP4_NonFrameability"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--OTYT06__collectAndRestart--desynch_impossible--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.598518848419,
+    "avg_memory": 159.53102080959852,
+    "peak_memory": 245.73046875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

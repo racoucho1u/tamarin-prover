@@ -1,0 +1,62 @@
+digraph "trace_5G_aka_SL2-AS0-CL0-A1-C1-NB_weakagreement_seaf_hss_noAsyKeyRev_noSupiRev_noSqnRev_noKeyRev-seaf_receive_aca_case_1-seaf_receive_authResp_send_ac-receive_secure_case_2-receive_secure_case_2-fresh-c_SHA256-init_servNet" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n5[shape="record",label="{{<n0> St_3_SEAF( ~tid, ~idSN, \<'5G', ~idSN\>, conc_supi, b,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~RAND, RES_star, K_seaf\l)\l|<n1> RcvS( b, ~idSN,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'aca', 'confirm', supi\>\l)\l}|{<n2> #i : seaf_receive_aca[SEAF_End( ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idSN, supi, \<'UE', 'SEAF', 'K_seaf', K_seaf\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idSN, b, \<'HSS', 'SEAF', 'supi', supi\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Secret( \<'SEAF', ~idSN\>, 'key', K_seaf ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Secret( \<'SEAF', ~idSN\>, 'supi', supi ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( ~idSN, b, \<'SEAF', 'HSS', 'K_seaf', K_seaf\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( ~idSN, b, \<'SEAF', 'HSS', 'supi', supi\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( ~idSN, b, \<'SEAF', 'HSS', 'RES_star', RES_star\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( ~idSN, supi, \<'SEAF', 'UE', 'K_seaf', K_seaf\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( ~idSN, supi, \<'SEAF', 'UE', 'supi', supi\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( ~idSN, supi, \<'SEAF', 'UE', 'RES_star', RES_star\> ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( supi ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( b ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Honest( ~idSN )]\l}|{<n3> St_4_SEAF( ~tid, ~idSN, \<'5G', ~idSN\>, conc_supi, b, ~RAND,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RES_star, K_seaf, supi\l)\l|<n4> Out( f1(K_seaf,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'SEAF')\l)\l}}",fillcolor="#d5d897",style="filled",fontcolor="black",role="Undefined"];
+n6[label="#vf : isend",shape="ellipse"];
+n7[label="#vk : fresh[!KU( ~RAND )]",shape="ellipse"];
+n13[shape="record",label="{{<n8> St_2_SEAF( ~tid, ~idSN, \<'5G', ~idSN\>, conc_supi, b, ~RAND, SH1, K_seaf )|<n9> In( RES_star )}|{<n10> #vr : seaf_receive_authResp_send_ac[Running( ~idSN, b,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'HSS', 'SEAF', 'RES_star', RES_star\>\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)]\l}|{<n11> St_3_SEAF( ~tid, ~idSN, \<'5G', ~idSN\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;conc_supi, b, ~RAND, RES_star, K_seaf\l)\l|<n12> SndS( ~idSN, b,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'ac', RES_star, \<conc_supi, b\>, '5G', \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idSN\>\l)\l}}",fillcolor="#cad998",style="filled",fontcolor="black",role="Undefined"];
+n14[label="#vk.1 : c_SHA256[!KU( SH1 )]",shape="ellipse"];
+n20[shape="record",label="{{<n15> St_1_SEAF( ~tid, ~idSN, \<'5G', ~idSN\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;conc_supi, b\l)\l|<n16> RcvS( b, ~idSN,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'aia', ~RAND, SH1, K_seaf, AUTN\>\l)\l}|{<n17> #vr.1 : seaf_receive_aia_send_authReq[Out_Src( ~RAND, AUTN ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~idSN, b, \<'HSS', 'SEAF', 'K_seaf', K_seaf\> )]\l}|{<n18> St_2_SEAF( ~tid, ~idSN, \<'5G', ~idSN\>, conc_supi, b,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~RAND, SH1, K_seaf\l)\l|<n19> Out( \<~RAND, AUTN, '5G', \l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;~idSN\>\l)\l}}",fillcolor="#c5da98",style="filled",fontcolor="black",role="Undefined"];
+n21[label="#vf.2 : isend",shape="ellipse"];
+n22[label="#vk.2 : coerce[!KU( ~idSN )]",shape="ellipse"];
+n29[shape="record",label="{{<n23> !SEAF( ~idSN, \<'5G', ~idSN\> )|<n24> Fr( ~tid )|<n25> In( \<conc_supi, b\> )}|{<n26> #vr.2 : seaf_receive_attachReq_send_air[Start_SEAF_Session( ~idSN )]}|{<n27> St_1_SEAF( ~tid, ~idSN, \<'5G', ~idSN\>,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;conc_supi, b\l)\l|<n28> SndS( ~idSN, b,\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<'air', \<conc_supi, b\>, '5G', ~idSN\>\l)\l}}",fillcolor="#bfda99",style="filled",fontcolor="black",role="Undefined"];
+n34[shape="record",label="{{<n30> Fr( ~idSN )}|{<n31> #vr.3 : init_servNet[ServNet( ~idSN )]}|{<n32> !SEAF( ~idSN, \<'5G', ~idSN\> )|<n33> Out( \<'5G', ~idSN\> )}}",fillcolor="#badb99",style="filled",fontcolor="black",role="Undefined"];
+n35[label="#vf.4 : isend",shape="ellipse"];
+n39[shape="record",label="{{<n36> Sec( b, ~idSN, \<'aca', 'confirm', supi\> )}|{<n37> #vr.4 : receive_secure}|{<n38> RcvS( b, ~idSN, \<'aca', 'confirm', supi\> )}}",fillcolor="#a9dc9a",style="filled",fontcolor="black",role="Undefined"];
+n40[label="#vf.5 : isend",shape="ellipse"];
+n44[shape="record",label="{{<n41> In( \<b, ~idSN, 'aca', 'confirm', supi\> )}|{<n42> #vr.5 : secureChannel_compromised_in[Rev( b, SE1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Injected( \<'aca', 'confirm', supi\> )]\l}|{<n43> Sec( b, ~idSN, \<'aca', 'confirm', supi\> )}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n48[shape="record",label="{{<n45> Sec( b, ~idSN, \<'aia', ~RAND, SH1, K_seaf, AUTN\> )}|{<n46> #vr.6 : receive_secure}|{<n47> RcvS( b, ~idSN, \<'aia', ~RAND, SH1, K_seaf, AUTN\> )}}",fillcolor="#a9dc9a",style="filled",fontcolor="black",role="Undefined"];
+n52[shape="record",label="{{<n49> In( \<b, ~idSN, 'aia', ~RAND, SH1, K_seaf, AUTN\> )}|{<n50> #vr.7 : secureChannel_compromised_in[Rev( b, SE1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Injected( \<'aia', ~RAND, SH1, K_seaf, AUTN\> )]\l}|{<n51> Sec( b, ~idSN, \<'aia', ~RAND, SH1, K_seaf, AUTN\> )}}",fillcolor="#a4dd9b",style="filled",fontcolor="black",role="Undefined"];
+n53[label="!KU( RES_star ) @ #vk.6",shape="ellipse",color="gray"];
+n54[label="!KU( conc_supi ) @ #vk.8",shape="ellipse",color="gray"];
+n55[label="!KU( b ) @ #vk.9",shape="ellipse",color="gray"];
+n56[label="!KU( supi ) @ #vk.18",shape="ellipse",color="gray"];
+n57[label="!KU( K_seaf ) @ #vk.21",shape="ellipse",color="gray"];
+n58[label="!KU( AUTN ) @ #vk.22",shape="ellipse",color="gray"];
+n6 -> n13:n9[color="gray30"];
+n13:n11 -> n5:n0[style="bold",weight="10.0"];
+n20:n18 -> n13:n8[style="bold",weight="10.0"];
+n21 -> n29:n25[color="gray30"];
+n29:n27 -> n20:n15[style="bold",weight="10.0"];
+n34:n32 -> n29:n23[style="bold",weight="10.0",color="gray50"];
+n34:n33 -> n22[color="orangered2"];
+n35 -> n44:n41[color="gray30"];
+n39:n38 -> n5:n1[style="bold",weight="10.0"];
+n40 -> n52:n49[color="gray30"];
+n44:n43 -> n39:n36[style="bold",weight="10.0"];
+n48:n47 -> n20:n16[style="bold",weight="10.0"];
+n52:n51 -> n48:n45[style="bold",weight="10.0"];
+n7 -> n14[color="blue3",style="dashed"];
+n14 -> n40[color="red",style="dashed"];
+n22 -> n35[color="red",style="dashed"];
+n22 -> n40[color="red",style="dashed"];
+n53 -> n6[color="red",style="dashed"];
+n53 -> n14[color="red",style="dashed"];
+n54 -> n21[color="red",style="dashed"];
+n55 -> n21[color="red",style="dashed"];
+n55 -> n35[color="red",style="dashed"];
+n55 -> n40[color="red",style="dashed"];
+n56 -> n35[color="red",style="dashed"];
+n57 -> n40[color="red",style="dashed"];
+n58 -> n40[color="red",style="dashed"];
+{
+rank="sink";
+n59[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SE1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">'secureChannel'</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">SH1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">SHA256(RES_star, ~RAND)</TD></TR></TABLE>>];
+
+}
+n5:n2 -> n59[style="invis"];
+
+}

@@ -1,0 +1,25 @@
+{
+  "task_id": "smartverif--canauth__backtrack--Received_only_if_Send--merged",
+  "warnings": [
+    "4 wellformedness check failed!",
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 169.11,
+  "wrapper_measures": {
+    "time": 169.35212397575378,
+    "avg_memory": 232.1771460843374,
+    "peak_memory": 234.21484375
+  },
+  "output_spthy": "result_strategiesBenchmark_2/proofs/smartverif--canauth__backtrack--Received_only_if_Send--merged.spthy",
+  "verified_lemma": {
+    "Received_only_if_Send": {
+      "steps": 88,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "wellformed_Received"
+  ]
+}

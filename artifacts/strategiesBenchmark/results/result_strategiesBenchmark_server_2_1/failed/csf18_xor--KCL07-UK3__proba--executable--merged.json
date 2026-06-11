@@ -1,0 +1,13 @@
+{
+  "task_id": "csf18_xor--KCL07-UK3__proba--executable--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 2832.853765487671,
+    "avg_memory": 20423.18473289576,
+    "peak_memory": 41457.953125
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

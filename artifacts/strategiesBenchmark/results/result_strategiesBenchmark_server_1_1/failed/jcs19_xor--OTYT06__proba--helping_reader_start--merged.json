@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--OTYT06__proba--helping_reader_start--merged",
+  "error_description": "The task exceeded its memory limit. Review the memory limit setting for this task.",
+  "wrapper_measures": {
+    "time": 1493.4681861400604,
+    "avg_memory": 20377.836441186566,
+    "peak_memory": 41368.0390625
+  },
+  "return_code": -2,
+  "last_stderr_lines": [
+    "Process exceeded memory limit"
+  ]
+}

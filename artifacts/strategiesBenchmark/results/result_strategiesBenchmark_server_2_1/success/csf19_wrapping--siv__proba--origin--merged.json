@@ -1,0 +1,28 @@
+{
+  "task_id": "csf19_wrapping--siv__proba--origin--merged",
+  "warnings": [
+    "'maude --version' returned unsupported version '3.2'",
+    "Unsupported maude --version version: 3.2"
+  ],
+  "tamarin_timing": 64.43,
+  "wrapper_measures": {
+    "time": 64.88100743293762,
+    "avg_memory": 570.8104858398439,
+    "peak_memory": 1031.05859375
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/csf19_wrapping--siv__proba--origin--merged.spthy",
+  "verified_lemma": {
+    "origin": {
+      "steps": 2075,
+      "analysis_type": "all-traces"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "Counter_Monotonicity",
+    "IV_Uniqueness",
+    "Key_UsageImpliesInitialization",
+    "Key_IntegrityAndConfidentiality",
+    "Key_UniqueLevelandHandle"
+  ]
+}

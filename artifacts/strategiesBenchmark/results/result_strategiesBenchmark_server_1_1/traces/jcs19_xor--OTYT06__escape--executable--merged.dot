@@ -1,0 +1,39 @@
+digraph "trace_OTYT06_SL2-AS0-CL0-A1-C1-NB_executable-reader1-tag1-tag1-split_case_2-tag1-split_case_1-reader1-split_case_2-Setup-tag1-Setup" {
+nodesep="0.3";
+ranksep="0.3";
+node[fontsize="8",fontname="Helvetica",width="0.3",height="0.2"];
+edge[fontsize="8",fontname="Helvetica"];
+n7[shape="record",label="{{<n0> Initiated( ~r1 )|<n1> Reader( ~k, ~k )|<n2> In( H1 )|<n3> Fr( ~k1 )}|{<n4> #i : reader2[Reader( ~k, ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AliveTag( ~k, ~k, ~r1, (~k⊕~r1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commit( ~k, 'Reader', ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Response( ~k, 'Reader' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Eq( H1, H1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyS( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyS( ~k1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyS( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyD( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyX( (~k⊕~r1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OutK( (~k⊕~k1) ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ch( ~r1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reader2rule( )]\l}|{<n5> Out( (~k⊕~k1) )|<n6> Reader( ~k, ~k1 )}}",fillcolor="#d5d897",style="filled",fontcolor="black",role="Undefined"];
+n14[shape="record",label="{{<n8> In( ~r1 )|<n9> Tag( ~k, ~k )}|{<n10> #j : tag1[ResponseTag( ~k, ~k, ~r1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TagKey( ~k, ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Response( ~k, 'Tag' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ChallengeTag( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tag( ~k, ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running( ~k, 'Tag', ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyTag( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tag1rule( )]\l}|{<n11> Out( H1 )|<n12> Tag( ~k, ~k )|<n13> TagRunning( ~k, ~k )}}",fillcolor="#cdd998",style="filled",fontcolor="black",role="Undefined"];
+n15[label="#vf : isend",shape="ellipse"];
+n16[label="#vk : coerce[!KU( H1 )]",shape="ellipse"];
+n21[shape="record",label="{{<n17> Fr( ~r1 )}|{<n18> #vr : reader1[ChallengeReader( ~r1 ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ch( ~r1 )]\l}|{<n19> Out( ~r1 )|<n20> Initiated( ~r1 )}}",fillcolor="#beda99",style="filled",fontcolor="black",role="Undefined"];
+n26[shape="record",label="{{<n22> Fr( ~k )}|{<n23> #i.1 : Setup[Setup( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyS( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OnlyOnce( )]\l}|{<n24> Reader( ~k, ~k )|<n25> Tag( ~k, ~k )}}",fillcolor="#b6db99",style="filled",fontcolor="black",role="Undefined"];
+n32[shape="record",label="{{<n27> In( newkey )|<n28> Tag( ~k, ~k )|<n29> TagRunning( ~k, ~k )}|{<n30> #k.1 : tag2[Update( ~k, XO1, 'Tag' ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;AliveReader( ~k ),\l&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;KeyTag( XO1 )]\l}|{<n31> Tag( ~k, XO1 )}}",fillcolor="#aedc9a",style="filled",fontcolor="black",role="Undefined"];
+n33[label="#vk.1 : coerce[!KU( ~r1 )]",shape="ellipse"];
+n34[label="#vf.2 : isend",shape="ellipse"];
+n35[label="#vf.5 : isend",shape="ellipse"];
+n36[label="!KU( newkey ) @ #vk.2",shape="ellipse",color="gray"];
+n14:n11 -> n16[color="orangered2"];
+n14:n12 -> n32:n28[style="bold",weight="10.0"];
+n14:n13 -> n32:n29[style="bold",weight="10.0"];
+n15 -> n7:n2[color="gray30"];
+n21:n19 -> n33[color="orangered2"];
+n21:n20 -> n7:n0[style="bold",weight="10.0"];
+n26:n24 -> n7:n1[style="bold",weight="10.0"];
+n26:n25 -> n14:n9[style="bold",weight="10.0"];
+n34 -> n32:n27[color="gray30"];
+n35 -> n14:n8[color="gray30"];
+n16 -> n15[color="red",style="dashed"];
+n33 -> n35[color="red",style="dashed"];
+n36 -> n34[color="red",style="dashed"];
+{
+rank="sink";
+n37[shape="plain",label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="3" CELLPADDING="1"><TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">H1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">h((~k⊕~r1))</TD></TR>
+                                                                 <TR><TD ALIGN="LEFT" VALIGN="TOP"><FONT COLOR="#000000">XO1</FONT></TD> <TD ALIGN="LEFT" VALIGN="TOP">=</TD> <TD ALIGN="LEFT" VALIGN="TOP">(~k⊕newkey)</TD></TR></TABLE>>];
+
+}
+n7:n4 -> n37[style="invis"];
+n32:n30 -> n37[style="invis"];
+
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "jcs19_xor--OTYT06__backAndAvoid--recentalive_tag_bounded--merged",
+  "error_description": "The task timed out. Review the timeout setting for this task.",
+  "wrapper_measures": {
+    "time": 7200.612615823746,
+    "avg_memory": 257.9066014735201,
+    "peak_memory": 278.875
+  },
+  "return_code": -1,
+  "last_stderr_lines": [
+    "Process timed out"
+  ]
+}

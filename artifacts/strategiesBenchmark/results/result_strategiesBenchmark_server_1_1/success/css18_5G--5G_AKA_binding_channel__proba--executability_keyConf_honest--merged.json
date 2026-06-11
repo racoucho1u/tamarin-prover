@@ -1,0 +1,41 @@
+{
+  "task_id": "css18_5G--5G_AKA_binding_channel__proba--executability_keyConf_honest--merged",
+  "warnings": [],
+  "tamarin_timing": 109.61,
+  "wrapper_measures": {
+    "time": 109.9076497554779,
+    "avg_memory": 689.5581597222224,
+    "peak_memory": 1094.3671875
+  },
+  "output_spthy": "result_strategiesBenchmark_1/proofs/css18_5G--5G_AKA_binding_channel__proba--executability_keyConf_honest--merged.spthy",
+  "verified_lemma": {
+    "executability_keyConf_honest": {
+      "steps": 23,
+      "analysis_type": "exists-trace"
+    }
+  },
+  "falsified_lemma": {},
+  "unterminated_lemma": [
+    "dummy",
+    "rand_autn_src",
+    "sqn_ue_invariance",
+    "sqn_hss_invariance",
+    "sqn_ue_src",
+    "sqn_hss_src",
+    "sqn_ue_nodecrease",
+    "sqn_ue_unique",
+    "executability_honest",
+    "executability_desync",
+    "executability_resync",
+    "weakagreement_ue_seaf_noRev",
+    "weakagreement_ue_seaf_keyConf_noAsyKeyRev_noSupiRev_noSqnRev_noChanRev",
+    "weakagreement_ue_seaf_keyConf_noAsyKeyRev_noSupiRev_noSqnRev_noKeyRev",
+    "injectiveagreement_ue_seaf_kseaf_keyConf_noKeyRev_noChanRev",
+    "weakagreement_seaf_ue_noKeyRev_noAsyKeyRev_noSupiRev_noSqnRev",
+    "weakagreement_seaf_ue_noAsyKeyRev_noSupiRev_noSqnRev_noChanRev",
+    "injectiveagreement_seaf_ue_kseaf_noKeyRev_noChanRev",
+    "weakagreement_seaf_ue_KeyConf_noKeyRev_noAsyKeyRev_noSupiRev_noSqnRev",
+    "weakagreement_seaf_ue_KeyConf_noChanRev_noAsyKeyRev_noSupiRev_noSqnRev",
+    "injectiveagreement_seaf_ue_kseaf_keyConf_noKeyRev_noChanRev"
+  ]
+}
