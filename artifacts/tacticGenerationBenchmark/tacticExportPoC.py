@@ -1,10 +1,16 @@
 from collections import Counter
+import sys
 # import manipulateFile as mf
 
 filename = "source"
 spthyFile = "SourceOfUniqueness.spthy"
 
-
+def prettyPrintTactic(tactic,filename):
+	tacticRough = tactic.split("tactic:")[1]
+	deprios = tacticRough.replace("---","\n")
+	lemma_name_file = filename.split('.')[0].split("/")[-1]
+	tactic = "\ntactic: "+lemma_name_file+"\n"+deprios+"\n\n"
+	print(tactic)
 
 def prettyPrintDeprioTactic(sortedDic):
 	s = "tactic:"
@@ -44,7 +50,6 @@ def extractTacticsFile(filename):
 	tactic = ""
 	if sortedT:
 		tactic = prettyPrintDeprioTactic(sortedT)
-	# print(tactic)
 	return(tactic)
 
 def extractTacticsParams(lines):
@@ -60,5 +65,11 @@ def extractTacticsParams(lines):
 		tactic = prettyPrintDeprioTactic(sortedT)
 	return(tactic)
 
-# if __name__ == __main__:
-# 	extractTacticsFile(filename)
+if __name__ == "__main__":
+	if len(sys.argv) > 1:
+		filename = sys.argv[1]
+		tactic = extractTacticsFile(filename)
+		prettyPrintTactic(tactic,filename)
+	else:
+		print("Error: use python3 tacticExportPoC.py filenameWithRawData.spthy")
+	

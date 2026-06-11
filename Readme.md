@@ -1,17 +1,24 @@
 # Artifacts for "Adaptive Proof Strategies for Protocol Verification in Tamarin"
 
 This repository contains two folders:
-- tamarin-prover: fork of the tamarin-prover tool with integrated adaptive strategies (see [Experimenting with the tools](experimenting-with-the-tools) on how to use it)
-- artifacts: python scripts necessary to reproduce the experiences described in the paper (see [Benchmarks](benchmarks)) 
+- tamarin-prover: fork of the tamarin-prover tool with integrated adaptive strategies (see Experimenting with the tools on how to use it)
+- artifacts: python scripts necessary to reproduce the experiences described in the paper (see Benchmarks) 
 
 ## Experimenting with the tools
 All the information needed to install tamarin-prover can be found [here](https://tamarin-prover.com/install.html). To get the same version of tamarin-prover as used in this paper, you can go to the tamarin-prover subfolder of this archive and compile with the command `make`.
 
 ### Tamarin strategies
-This version of tamarin provides five new strategies
+This version of tamarin-prover provides five new strategies in addition to the usual behavior of the tool. They can be triggered with the flag --strategy[=STRATEGY]. By default, no strategy is used and tamarin uses its usual behavior.
+The following options are possible:
+    - Escape: Deprioritize goals in loop
+    - Probabilistic: Choose a problematic goal with decreasing probability. The seed of the PRNG used to choose whether or not to use a goal can be set with the optional flag `--seed[=Int]`.
+    - Backtrack: Backtracking to the goal before the loop
+    - BackAndAvoid: Backtracking and deprioritizing the goals responsible for backtracking
+    - CollectAndRestart: Deprioritize branches rather than goals
 
 ### Tactic generation
-Ou prendre le script + quelles options lui donner
+In order to generate tactics, tamarin-prover needs to run with one of the five strategies listed above. The default behavior does not detect loop and can as such not export 'problematic' goals. To activate the goal export during a proof, use the flag `--exportGoals`. 
+With this option set, tamarin-prover will write 'problematic' goals to a file under the `tacticGeneration/tacticBatch` folder. The file's name will follow the format: [strategy]_[lemma_name]_[file_name].spthy. To export this raw data as a tactic usable for a proof attempt, use the script `exportTacticPoC.py` available in the  `tacticGenerationBenchmark` folder with the command `python3 exportTacticPoC.py fileWithRawData.spthy`. The generated tactic can be pasted in the theory file and used immediately for a new attempt.
 
 ## Benchmarks
 
