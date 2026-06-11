@@ -2,34 +2,36 @@
 
 This repository contains two folders:
 - tamarin-prover: fork of the tamarin-prover tool with integrated adaptive strategies (see [Experimenting with the tools](experimenting-with-the-tools) on how to use it)
-- artifacs: python scripts necessary to reproduce the experiences described in the paper (see [Benchmarks](benchmarks)) 
+- artifacts: python scripts necessary to reproduce the experiences described in the paper (see [Benchmarks](benchmarks)) 
 
 ## Experimenting with the tools
-TODO: installation tamarin and compiler
-
+All the information needed to install tamarin-prover can be found [here](https://tamarin-prover.com/install.html). To get the same version of tamarin-prover as used in this paper, you can go to the tamarin-prover subfolder of this archive and compile with the command `make`.
 
 ### Tamarin strategies
-TODO options possibles et commandes associées
+This version of tamarin provides five new strategies
 
 ### Tactic generation
 Ou prendre le script + quelles options lui donner
 
 ## Benchmarks
-Since the benchmarks are very long to run and the results files are too heavy to be stored on a git, provide a file data.json that contains the data extracted from our results, before analysis.
-TODO: introducing data.json
 
 ### Strategies benchmark (strategiesBenchmark folder)
 
-#### Running the benchmarks
+We distinguish two benchmarks: benchmark of the strategies (can be found under `strategiesBenchmark`) and benchmark of the tactic generation (can be found under `tacticGeneration`).
+
+#### Running the benchmark
 Running the strategies benchmark requires the tool `batch-tamarin`. It can be installed with the following command `pip3 install batch-tamarin`.
 
-We propose two recipes for the benchmark (both can be found under the strategiesBenchmark folder):
--Full results (estimated running time, several weeks): recipeStrategiesBenchmark.json
--Sample from the full benchmark we used to confirm the results (estimated running time, 3 to 4 days): recipe__bigBenchEchantillon.json
+We provide a batch-tamarin recipe to reproduce the results discussed in Section 4: `recipe_strategy_benchmark.json` as well as a binary file with the version of tamarin-prover used for our benchmark (tamarin-prover-1.4.1-2468-g300638b4). 
 
-To run a recipe, the command is `batch-tamarin run [recipe.json]`. The results of the analysis are then stored under the result[name of the recipe] folder.
+How to run the recipe:
+ - copy the tamarin executable (tamarin-prover-1.4.1-2468-g300638b4) to [path_to_your_home]/.local/bin/
+ - add the binary file to the path: export PATH=$PATH:[path_to_your_home]/.local/bin/
+ - run the recipe with the command `batch-tamarin run [recipe.json]`.
 
-TODO: maybe need to change execution file in the recipe after make
+The results of the analysis are then stored under the `result_strategiesBenchmark` folder.
+
+Note: if you have installed tamarin-prover, you can also compile it with the version provided in this archive. You can then replace the path (tamarin_versions["merged"]["path"]) in the recipe file by the executable generated at the end of the make command.
 
 #### Analysing the results
 To analyse the results of these benchmark (and generate the graph and table presented in the paper), one can use the scripts available in the strategiesBenchmark/resultsAnalysisScripts folder.
@@ -37,12 +39,19 @@ First, run `python3 analyseResultsBatchTamarinMergedVersion.py [path to results 
 And then `python3 results.py [path to results folder]\execution_report_extracted.json`
 Results are generated in a strategiesBenchmark/resultsAnalysisScripts/results subfolder.
 
+The results discussed in Section 4 can already be found in strategiesBenchmark/resultsAnalysisScripts/results. The 6 subfolders come from the parallelization of the benchmark on three servers, as discussed in the paper. The results_merged folder contains the merged results of the 5 sub-experiments.
+
+Note: this version of the results will not include the results from the tactic generation benchmark.
+
 ### Tactic generation benchmark (tacticGenerationBenchmark folder)
+
+The goal of this benchmark is to see if tactic generation allows us to prove lemmas that none of the strategies managed to prove. The list of these lemmas has been extracted by the results.py step at the previous step. It is provided in the `lemmaToTactic.txt` file that can be found under the `tacticGenerationBenchmark` folder.
 
 #### Running the benchmark
 To run the tactic generation benchmark as presented in the paper, run the command `python3 tacticGenBench.py` in the tacticGenerationBenchmark folder. The results will be stored under the tacticGeneration/results folder. The script results give a textual summary of the lemmas proved (or failed) by the benchmark while the other files store the proofs and attack traces that have been reached for each lemma.
 
 #### Analysing the results
 
-To analyse the results, go in the resultsAnalysis folder and run `python3 results.py`. It will use the data.json file present (discussed above) in the folder to generate the tables and graphs shown in the paper. 
+To extract information from these results, you can run the script `python3 generateDataJson.py` that will generate the file data.json. This script uses the `result_strategiesBenchmark_merged.json` file that contains the results of the strategies benchmark and adds the results of the tactics generation benchmark.
+To analyse the results, run `python3 results.py`. It will use the data.json file present (discussed above) in the folder to generate the tables and graphs shown in the paper. 
 
