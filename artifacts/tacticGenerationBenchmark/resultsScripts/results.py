@@ -521,8 +521,8 @@ def selectLemma(targetLemma,noBaseLine,noExists,strategy,lem):
             # print(json.dumps(lemma[strategy]['lemmas'][lmName],indent=4))
             return(not dir=="emv" and not dir=="smartverif" and not n=="Observational_equivalence" and not "1" in t) 	
         else:
-            # return(not dir=="emv" and not dir=="smartverif" and not n=="Observational_equivalence")
-            return(not dir=="emv" and not "smartverif" in lmName and not n=="Observational_equivalence")
+            return(not dir=="emv" and not dir=="smartverif" and not n=="Observational_equivalence")
+            # return(not dir=="emv" and not "smartverif" in lmName and not n=="Observational_equivalence")
     
 if __name__ == "__main__":
 

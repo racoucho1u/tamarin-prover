@@ -10,11 +10,11 @@ All the information needed to install tamarin-prover can be found [here](https:/
 ### Tamarin strategies
 This version of tamarin-prover provides five new strategies in addition to the usual behavior of the tool. They can be triggered with the flag --strategy[=STRATEGY]. By default, no strategy is used and tamarin uses its usual behavior.
 The following options are possible:
-    - Escape: Deprioritize goals in loop
-    - Probabilistic: Choose a problematic goal with decreasing probability. The seed of the PRNG used to choose whether or not to use a goal can be set with the optional flag `--seed[=Int]`.
-    - Backtrack: Backtracking to the goal before the loop
-    - BackAndAvoid: Backtracking and deprioritizing the goals responsible for backtracking
-    - CollectAndRestart: Deprioritize branches rather than goals
+- Escape: Deprioritize goals in loop
+- Probabilistic: Choose a problematic goal with decreasing probability. The seed of the PRNG used to choose whether or not to use a goal can be set with the optional flag `--seed[=Int]`.
+- Backtrack: Backtracking to the goal before the loop
+- BackAndAvoid: Backtracking and deprioritizing the goals responsible for backtracking
+- CollectAndRestart: Deprioritize branches rather than goals
 
 ### Tactic generation
 In order to generate tactics, tamarin-prover needs to run with one of the five strategies listed above. The default behavior does not detect loop and can as such not export 'problematic' goals. To activate the goal export during a proof, use the flag `--exportGoals`. 
@@ -32,9 +32,9 @@ Running the strategies benchmark requires the tool `batch-tamarin`. It can be in
 We provide a batch-tamarin recipe to reproduce the results discussed in Section 4: `recipe_strategy_benchmark.json` as well as a binary file with the version of tamarin-prover used for our benchmark (tamarin-prover-1.4.1-2468-g300638b4). 
 
 How to run the recipe:
- - copy the tamarin executable (tamarin-prover-1.4.1-2468-g300638b4) to [path_to_your_home]/.local/bin/
- - add the binary file to the path: export PATH=$PATH:[path_to_your_home]/.local/bin/
- - run the recipe with the command `batch-tamarin run [recipe.json]`.
+- copy the tamarin executable (tamarin-prover-1.4.1-2468-g300638b4) to [path_to_your_home]/.local/bin/
+- add the binary file to the path: export PATH=$PATH:[path_to_your_home]/.local/bin/
+- run the recipe with the command `batch-tamarin run [recipe.json]`.
 
 The results of the analysis are then stored under the `result_strategiesBenchmark` folder.
 
