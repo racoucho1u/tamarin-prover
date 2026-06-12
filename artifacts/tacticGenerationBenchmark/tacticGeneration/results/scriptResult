@@ -94,3 +94,61 @@ Cannot prove lemma ballotsFromVoters (file:../files_to_benchmark/all/alethea_vot
 
 Cannot prove lemma Tall_As_Rec_7 (file:../files_to_benchmark/all/alethea_vot_ShHh.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
 
+Cannot prove lemma executability_old_kamf_new_kamf_no_id_req (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secret_k_gnb (file:../files_to_benchmark/all/5G_handover_5GS_to_EPS.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_new_kamf_new_kamf_no_id_req (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_new_kamf_old_kamf_no_id_req (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma injectiveagreement_cn_ue_k_amf (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_old_kamf_no_id_req (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secret_k_amf (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma injectiveagreement_tran_ue_k_gnb_star (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_new_kamf_id_req (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secret_k_gnb_star (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma injectiveagreement_ue_cn_k_amf (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma injectiveagreement_ue_tran_k_gnb_star (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_new_kamf_no_id_req (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secret_k_gnb (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_old_kamf_old_kamf_no_id_req (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secret_k_seaf (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma ValueOrigin (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_old_kamf_id_req (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secret_supi (file:../files_to_benchmark/all/5G_handover_n2.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_hkd_vkd (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma injectiveagreement_tran_ue_k_gnb (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secret_k_seaf (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secret_k_gnb_star (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_hkd_hkd (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_hkd_hkd_hkd (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_hkd_hkd_vkd (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma secret_k_gnb (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_hkd_vkd_hkd (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
+Cannot prove lemma executability_hkd_vkd_vkd (file:../files_to_benchmark/all/5G_handover_xn.spthy) after 3 attempts (timeout=7200s): attempts bound reached (3).
+
