@@ -5,10 +5,14 @@ This repository contains two folders:
 - artifacts: python scripts necessary to reproduce the experiences described in the paper (see Benchmarks) 
 
 ## Experimenting with the tools
-All the information needed to install tamarin-prover can be found [here](https://tamarin-prover.com/install.html). To get the same version of tamarin-prover as used in this paper, you can go to the tamarin-prover subfolder of this archive and compile with the command `make`.
+The version of Tamarin including the strategies is installed in the docker image provided with this artifact. 
+
+If you wish to run this version directly on your computer, all the information needed to install tamarin-prover can be found [here](https://tamarin-prover.com/install.html). To get the same version of tamarin-prover as used in this paper, you can go to the tamarin-prover subfolder of this archive and compile with the command `make`.
+
+To use the examples presented in this section, move to `cd tamarin-prover/tamarin-prover`. We propose using the toy example `SourceOfUniqueness.spthy` (provided in the tamarin-prover folder) for testing the tool. It can be replaced by any tamarin theory file (many can be found in the tamarin-prover/example folder).
 
 ### Tamarin strategies
-This version of tamarin-prover provides five new strategies in addition to the usual behavior of the tool. They can be triggered with the flag --strategy[=STRATEGY]. By default, no strategy is used and tamarin uses its usual behavior.
+This version of tamarin-prover provides five new strategies in addition to the usual behavior of the tool. They can be triggered with the flag --strategy[=STRATEGY] in the command line. By default, no strategy is used and tamarin uses its usual behavior.
 The following options are possible:
 - Escape: Deprioritize goals in loop
 - Probabilistic: Choose a problematic goal with decreasing probability. The seed of the PRNG used to choose whether or not to use a goal can be set with the optional flag `--seed[=Int]`.
@@ -16,9 +20,22 @@ The following options are possible:
 - BackAndAvoid: Backtracking and deprioritizing the goals responsible for backtracking
 - CollectAndRestart: Deprioritize branches rather than goals
 
+Example command:
+- Default strategy (does not finish): `tamarin-prover --prove SourceOfUniqueness.spthy`
+- Escape: `tamarin-prover --prove --strategy=Escape SourceOfUniqueness.spthy`
+- Proba (with a fixed randomness seed): `tamarin-prover --prove --strategy=Probabilistic --seed= 12 SourceOfUniqueness.spthy`
+
 ### Tactic generation
 In order to generate tactics, tamarin-prover needs to run with one of the five strategies listed above. The default behavior does not detect loop and can as such not export 'problematic' goals. To activate the goal export during a proof, use the flag `--exportGoals`. 
 With this option set, tamarin-prover will write 'problematic' goals to a file under the `tacticGeneration/tacticBatch` folder. The file's name will follow the format: [strategy]_[lemma_name]_[file_name].spthy. To export this raw data as a tactic usable for a proof attempt, use the script `exportTacticPoC.py` available in the  `tacticGenerationBenchmark` folder with the command `python3 exportTacticPoC.py fileWithRawData.spthy`. The generated tactic can be pasted in the theory file and used immediately for a new attempt.
+Example: 
+```bash
+tamarin-prover --prove --strategy=Escape --exportGoals SourceOfUniqueness.spthy
+cd ?
+python3 exportTacticPoC.py fileWithRawData.spthy
+tamarin-prover --prove SourceOfUniqueness.spthy
+```
+
 
 ## Benchmarks
 
@@ -27,9 +44,9 @@ With this option set, tamarin-prover will write 'problematic' goals to a file un
 We distinguish two benchmarks: benchmark of the strategies (can be found under `strategiesBenchmark`) and benchmark of the tactic generation (can be found under `tacticGeneration`).
 
 #### Running the benchmark
-Running the strategies benchmark requires the tool `batch-tamarin`. It can be installed with the following command `pip3 install batch-tamarin`.
+Running the strategies benchmark requires the tool `batch-tamarin`. It is provided with in the docker image or can be installed with the following command `pip3 install batch-tamarin`.
 
-We provide a batch-tamarin recipe to reproduce the results discussed in Section 4: `recipe_strategy_benchmark.json` as well as a binary file with the version of tamarin-prover used for our benchmark (tamarin-prover-1.4.1-2468-g300638b4). 
+We provide a batch-tamarin recipe to reproduce the results discussed in Section 4: `recipe_strategy_benchmark.json` as well as a binary file with the version of tamarin-prover used for our benchmark (tamarin-prover-1.4.1-2468-g300638b4).
 
 How to run the recipe:
 - copy the tamarin executable (tamarin-prover-1.4.1-2468-g300638b4) to [path_to_your_home]/.local/bin/
