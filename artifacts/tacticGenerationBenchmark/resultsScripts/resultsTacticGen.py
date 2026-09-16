@@ -1,4 +1,5 @@
 import os
+import argparse
 from enum import Enum
 from dataclasses import dataclass, asdict
 import json
@@ -11,8 +12,8 @@ import json
 
 
 
-def parse_tactic_gen(strat_dict,strategy_name,folder):
-    with open (folder+"/scriptResult") as tacGen:
+def parse_tactic_gen(strat_dict,strategy_name,filename):
+    with open(filename) as tacGen:
         lines = tacGen.readlines()
         for l in lines:
             #Cases where a proof has been reached
@@ -26,16 +27,17 @@ def parse_tactic_gen(strat_dict,strategy_name,folder):
                     reason = "proved"
                     # print(f"{lemma_name} {theory_file} {theory_dir} {tactic}")
                 else:
-                    splitLine = l.split(' ')
-                    # print(splitLine)
-                    lemma_name = splitLine[3].split('\t')[0]
-                    theory_file = splitLine[4].split('/')[-1].split('.')[0]
-                    # print(splitLine[4])
-                    # print(l)
-                    theory_dir	= splitLine[4].split('/')[-2]
-                    tactic = ""
-                    reason = ' '.join(splitLine[5:])[:-2]
-                    # print(f"{lemma_name} {theory_file} {theory_dir} {tactic}")
+                    if not 'Finished' in l:
+                        splitLine = l.split(' ')
+                        # print(splitLine)
+                        lemma_name = splitLine[3].split('\t')[0]
+                        theory_file = splitLine[4].split('/')[-1].split('.')[0]
+                        # print(splitLine[4])
+                        # print(l)
+                        theory_dir	= splitLine[4].split('/')[-2]
+                        tactic = ""
+                        reason = ' '.join(splitLine[5:])[:-2]
+                        # print(f"{lemma_name} {theory_file} {theory_dir} {tactic}")
             partialLemmaName = f"{theory_file}__{strategy_name}--{lemma_name}--merged"
             for l in strat_dict[strategy_name]['lemmas']:
                 if partialLemmaName in l:
@@ -45,12 +47,23 @@ def parse_tactic_gen(strat_dict,strategy_name,folder):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Benchmark for tactic generation"
+    )
+    parser.add_argument("file", help="path to target file")
+    parser.add_argument("--inputStrat",type=str, default='resultsScripts/result_strategiesBenchmark_merged.json', help="strategy results file")
+    parser.add_argument("--output",type=str, default='data.json', help="output file")
+    args = parser.parse_args()
+    filename = args.file
+    output = args.output
+    inputStrat = args.inputStrat
 
-    with open('result_strategiesBenchmark_merged.json', 'r') as file:
+
+    with open(inputStrat, 'r') as file:
         strat_dict = json.load(file)
 
-        parse_tactic_gen(strat_dict,"escape","../tacticGeneration/results")
+        parse_tactic_gen(strat_dict,"escape",filename)
         
 
-        with open('data.json', 'w') as file:
+        with open(output, 'w') as file:
             json.dump(strat_dict, file,indent=4)

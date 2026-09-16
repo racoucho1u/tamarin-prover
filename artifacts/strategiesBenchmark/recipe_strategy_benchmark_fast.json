@@ -1,0 +1,57 @@
+{
+  "config": {
+    "global_max_cores": 4,
+    "global_max_memory": 30,
+    "default_timeout": 200,
+    "output_directory": "./result_strategiesBenchmark_fast"
+  },
+  "tamarin_versions": {
+    "merged": {
+      "path": "tamarin-prover-1.4.1-2468-g300638b4"
+    }
+  },
+  "tasks": { 
+    "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__original": {
+      "theory_file": "../files_to_benchmark/asiaccs_ecc/SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["--diff","-d0"],
+      "output_file_prefix": "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__original",
+      "resources": { "max_memory": 30 }
+    },
+    "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__escape": {
+      "theory_file": "../files_to_benchmark/asiaccs_ecc/SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["--diff","-d0","--strategy=Escape"],
+      "output_file_prefix": "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__escape",
+      "resources": { "max_memory": 30 }
+    },
+    "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__proba": {
+      "theory_file": "../files_to_benchmark/asiaccs_ecc/SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["--diff","-d0","--strategy=Proba"],
+      "output_file_prefix": "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__proba",
+      "resources": { "max_memory": 30 }
+    },
+    "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__backtrack": {
+      "theory_file": "../files_to_benchmark/asiaccs_ecc/SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["--diff","-d0","--strategy=Backtrack"],
+      "output_file_prefix": "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__backtrack",
+      "resources": { "max_memory": 30 }
+    },
+    "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__backAndAvoid": {
+      "theory_file": "../files_to_benchmark/asiaccs_ecc/SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["--diff","-d0","--strategy=BackAndAvoid"],
+      "output_file_prefix": "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__backAndAvoid",
+      "resources": { "max_memory": 30 }
+    },
+    "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__collectAndRestart": {
+      "theory_file": "../files_to_benchmark/asiaccs_ecc/SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["--diff","-d0","--strategy=CollectAndRestart"],
+      "output_file_prefix": "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__collectAndRestart",
+      "resources": { "max_memory": 30 }
+    }
+  }
+}
