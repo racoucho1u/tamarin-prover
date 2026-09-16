@@ -35,15 +35,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Benchmark for tactic generation"
     )
+    parser.add_argument("file", help="path to target file, can be a spthy file or a batch-tamarin recipe")
     parser.add_argument("--strategy",type=str, default="Escape", help="strategy to use for the proof attempt")
+    parser.add_argument("-p",type=int, default=2, help="number of parallel attempts")
+    parser.add_argument("--output",type=str, default='tacticGeneration/results/scriptResult', help="file where the results will be written")
     args = parser.parse_args()
     strategy = args.strategy
+    file = args.file
+    ofilename = args.output
+    parallel = args.p
 
     benchmarkCase = "tacticGeneration/tamarin-prover"
     # file = "files_to_benchmark/input_lemmas_tacticGen.txt"
     # constructedInput = "files_to_benchmark/currentLemmaInput"
     # log = "files_to_benchmark/log"
-    file = "../files_to_benchmark/input_lemmas_tacticGen.txt"
+    # file = "../files_to_benchmark/input_lemmas_tacticGen_fast.txt"
     constructedInput = "../files_to_benchmark/currentLemmaInput"
     log = "../files_to_benchmark/log"
 
@@ -100,7 +106,7 @@ if __name__ == "__main__":
     if not os.path.isdir('tacticGeneration/generatedTactics'):
         os.mkdir('tacticGeneration/generatedTactics')
 
-    mf.parallelProving(parallel_input,2)
+    mf.parallelProving(parallel_input,ofilename,parallel)
     #print(parallel_input)
                     # mf.proveUntil(theoryfile,lemma,diff=bool(setDiff))
 				

@@ -87,6 +87,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libnuma1 \
     curl \
     python3\
+    pip\
     pipx\
     && rm -rf /var/lib/apt/lists/*
 
@@ -102,18 +103,25 @@ ENV PIPX_BIN_DIR=/home/tamarin/.local/bin
 RUN pipx install batch-tamarin==1.0.0
 ENV PATH=/home/tamarin/.local/bin:$PATH
 
-
-
+# Install python modules
+WORKDIR /workspace/tamarin-prover/tamarin-prover
+RUN python3 -m venv venv
+COPY /workspace/tamarin-prover/artifacts/strategiesBenchmark/tamarin-prover-1.4.1-2468-g300638b4 /home/tamarin/.local/bin/
+# RUN source venv/bin/activate
+# RUN pip install tabulate numpy matplotlib 
 
 # Switch to non-root user
-USER tamarin
-WORKDIR /workspace
+# USER tamarin
+# WORKDIR /workspace
 
 # Create workspace volume
 VOLUME /workspace
 
 # Verify installation works
 RUN tamarin-prover test
+
+# Getting the container ready for review
+WORKDIR /workspace/tamarin-prover
 
 # Default command
 CMD ["bash"]

@@ -89,7 +89,7 @@ if __name__ == '__main__':
         }
 
     data = loadData(filename)
-    metaData = loadData("metaData.json")
+    metaData = loadData("/workspace/tamarin-prover/artifacts/strategiesBenchmark/resultsAnalysisScripts/metaData.json")
     version = retrieveResults(data)
     completeMetaData(metaData,version)
     debugPrint(finalDict,4)
