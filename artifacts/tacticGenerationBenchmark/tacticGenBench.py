@@ -77,7 +77,7 @@ if __name__ == "__main__":
     #                 # print(theoryfile,lemma,bool(setDiff))
 
     metaData = loadData("metaData.json")
-    lemmaToTactic = "lemmaToTactic.txt"
+    lemmaToTactic = file
     with open(lemmaToTactic) as f:
         lines = f.readlines()
         for line in lines:
@@ -93,7 +93,7 @@ if __name__ == "__main__":
                     if isinstance(dicts["lemmas"][0]["macro"],str):
                         macro = dicts["lemmas"][0]["macro"]
             # parallel_input.append([f"../files_to_benchmark/all/{theoryfile}.spthy",lemma,macro,strategy,3,"s",900,diff])
-            parallel_input.append([f"../files_to_benchmark/all/{theoryfile}.spthy",lemma,macro,strategy,3,"s",10,diff])            
+            parallel_input.append([f"../files_to_benchmark/all/{theoryfile}.spthy",lemma,macro,strategy,3,"s",900,diff])            
 
 
 
