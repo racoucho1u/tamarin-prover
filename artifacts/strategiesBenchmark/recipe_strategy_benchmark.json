@@ -1,7 +1,7 @@
 {
   "config": {
-    "global_max_cores": 36,
-    "global_max_memory": 360,
+    "global_max_cores": 40,
+    "global_max_memory": 400,
     "default_timeout": 7200,
     "output_directory": "./result_strategiesBenchmark"
   },
