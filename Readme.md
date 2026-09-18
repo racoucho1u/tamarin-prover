@@ -71,6 +71,16 @@ With this option set, tamarin-prover will print 'problematic' goals in the termi
 tamarin-prover --prove --strategy=Escape --exportGoals SourceOfUniqueness.spthy 2> exportGoals.spthy
 python3 exportTactic.py exportGoals.spthy 
 ```
+
+The generated tactic should be
+```
+tactic: exportGoals
+deprio: 
+allGoal "DisjG (Disj {getDisj = [GGuarded Ex [(y,LSortMsg),(j,LSortNode)] [Action Bound 0 (Fact {factTag = ProtoFact Linear Complicated 1, factAnnotations = fromList [], factTerms = [Bound 1]})] (GAto (Less Bound 0 Free #j)),GGuarded Ex [(y,LSortMsg),(j,LSortNode)] [Action Bound 0 (Fact {factTag = ProtoFact Linear Simpleunique 1, factAnnotations = fromList [], factTerms = [Bound 1]})] (GAto (Less Bound 0 Free #j))]})"
+deprio: 
+allGoal "DisjG (Disj {getDisj = [GGuarded Ex [(y,LSortMsg),(j,LSortNode)] [Action Bound 0 (Fact {factTag = ProtoFact Linear Complicated 1, factAnnotations = fromList [], factTerms = [Bound 1]})] (GAto (Less Bound 0 Free #vr)),GGuarded Ex [(y,LSortMsg),(j,LSortNode)] [Action Bound 0 (Fact {factTag = ProtoFact Linear Simpleunique 1, factAnnotations = fromList [], factTerms = [Bound 1]})] (GAto (Less Bound 0 Free #vr))]})"
+```
+
 In order to automated this process, we also provide the script `tacticGeneration.py`. It takes as parameters the theory file as well as the lemma to be proven.  By default, this script will try to prove the lemma with the strategy Escape using a timeout of one hour. If the proof succeed, the process stops, otherwise, the script generates a tactic from the exported goals and retries the proof with the generated tactic. By default, this process is repeated two times (3 proofs attemps total, first one with no tactic and two times with generated tactics). The timeout parameter can be modified with the option `--timeout=[Int]` and the attempts number with the parameter `--bound=[Int]` (by default it is set to 3). Users can also specify the usual Tamarin options (heuristic, strategy...) with the usual syntax (eg. --strategy=Proba).
 ```bash
 #Example with a timeout of 1s. The first attempt should fail but the second should finish in less than a second.
