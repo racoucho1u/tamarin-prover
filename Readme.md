@@ -6,7 +6,7 @@ This repository contains two folders:
 
 To experiment with the tools presented in this paper and reproduce the experiments, we provide a Docker container that can be started by running the following commands from this directory:
 ```bash
-$ docker build -t tamarin:strategies -f ./Dockerfile .
+$ docker build --network=host -t tamarin:strategies -f ./Dockerfile .
 $ docker run -it -v "$PWD":/workspace/tamarin-prover tamarin:strategies
 ```
 
@@ -130,3 +130,4 @@ To analyse the results, run
 % python3 resultsScripts/results.py data_fast.json
 ```
 It will use the data.json file present (discussed above) in the folder to generate the tables and graphs shown in the paper. They can be found under `results`.
+
