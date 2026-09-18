@@ -7,7 +7,7 @@ This repository contains two folders:
 To experiment with the tools presented in this paper and reproduce the experiments, we provide a Docker container that can be started by running the following commands from this directory:
 ```bash
 $ docker build -t tamarin:strategies -f ./Dockerfile .
-$ docker run -it -v $(dirname "$PWD"):/workspace tamarin:strategies
+$ docker run -it -v "$PWD":/workspace/tamarin-prover tamarin:strategies
 ```
 
 ## Experimenting with the tools
@@ -58,7 +58,7 @@ With this option set, tamarin-prover will print 'problematic' goals in the termi
 In order to automated this process, we also provide the script `tacticGeneration.py`. It takes as parameters the theory file as well as the lemma to be proven.  By default, this script will try to prove the lemma with the strategy Escape using a timeout of one hour. If the proof succeed, the process stops, otherwise, the script generates a tactic from the exported goals and retries the proof with the generated tactic. By default, this process is repeated two times (3 proofs attemps total, first one with no tactic and two times with generated tactics). The timeout parameter can be modified with the option `--timeout=[Int]` and the attempts number with the parameter `--bound=[Int]` (by default it is set to 3). Users can also specify the usual Tamarin options (heuristic, strategy...) with the usual syntax (eg. --strategy=Proba).
 ```bash
 #Example with a timeout of 1s. The first attempt should fail but the second should finish in less than a second.
-% source venv/bin/activate
+% source /opt/venv/bin/activate
 % python3 tacticGeneration.py SourceOfUniqueness.spthy uniqueness --strategy=Proba --timeout=1
 ```
 
@@ -95,7 +95,7 @@ The results of the analysis are then stored under the `result_strategiesBenchmar
 #### Analysing the results
 To analyse the results of these benchmark (and generate the graph and table presented in the paper), one can use the scripts available in the strategiesBenchmark/resultsAnalysisScripts folder. Run the following:
 ```bash
-% source /workspace/tamarin-prover/tamarin-prover/venv/bin/activate
+% source /opt/venv/bin/activate
 % python3 resultsAnalysisScripts/analyseResultsBatchTamarinMergedVersion.py result_strategiesBenchmark_fast/execution_report.json
 % python3 resultsAnalysisScripts/results.py result_strategiesBenchmark_fast/execution_report_extracted.json
 ```
@@ -113,7 +113,7 @@ The goal of this benchmark is to see if tactic generation allows us to prove lem
 To run the tactic generation benchmark as presented in the paper, run the following commands 
 ```bash 
 % cd /workspace/tamarin-prover/artifacts/tacticGenerationBenchmark
-% source /workspace/tamarin-prover/tamarin-prover/venv/bin/activate
+% source /opt/venv/bin/activate
 % python3 tacticGenBench.py -p=1 lemmaToTactic_fast.txt
 ``` 
 The results will be stored under the `tacticGeneration/results` folder. The script results give a textual summary of the lemmas proved (or failed) by the benchmark while the other files store the proofs and attack traces that have been reached for each lemma.

@@ -101,21 +101,20 @@ COPY --from=builder --chown=tamarin:tamarin /home/tamarin/.local/bin/tamarin-pro
 ENV PIPX_HOME=/home/tamarin/.local/bin
 ENV PIPX_BIN_DIR=/home/tamarin/.local/bin
 RUN pipx install batch-tamarin==1.0.0
-ENV PATH=/home/tamarin/.local/bin:$PATH
 
-# Install python modules
-WORKDIR /workspace/tamarin-prover/tamarin-prover
-RUN python3 -m venv venv
-COPY /workspace/tamarin-prover/artifacts/strategiesBenchmark/tamarin-prover-1.4.1-2468-g300638b4 /home/tamarin/.local/bin/
-# RUN source venv/bin/activate
-# RUN pip install tabulate numpy matplotlib 
+# Install python modules.
+# NOTE: the venv MUST live outside /workspace: /workspace is bind-mounted at runtime,
+# so anything built there in the image is hidden by the host directory.
+RUN python3 -m venv /opt/venv \
+    && /opt/venv/bin/pip install --no-cache-dir \
+       tabulate numpy matplotlib pandas pydot pyparsing tree_sitter
+ENV PATH=/opt/venv/bin:/home/tamarin/.local/bin:$PATH
+
+COPY artifacts/strategiesBenchmark/tamarin-prover-1.4.1-2468-g300638b4 /home/tamarin/.local/bin/
 
 # Switch to non-root user
 # USER tamarin
 # WORKDIR /workspace
-
-# Create workspace volume
-VOLUME /workspace
 
 # Verify installation works
 RUN tamarin-prover test
