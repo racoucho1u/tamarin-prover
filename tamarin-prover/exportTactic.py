@@ -32,9 +32,7 @@ def prettyPrintPrioTactic(sortedDic):
 
 def extractTacticsFile(filename):
 	goals = []
-	print("éextratc")
 	try:
-		print(filename)
 		with open(filename, 'r') as f:
 			lines = f.readlines()
 			for l in lines:
