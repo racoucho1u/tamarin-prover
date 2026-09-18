@@ -88,13 +88,13 @@ deprio:
 allGoal "DisjG (Disj {getDisj = [GGuarded Ex [(y,LSortMsg),(j,LSortNode)] [Action Bound 0 (Fact {factTag = ProtoFact Linear Complicated 1, factAnnotations = fromList [], factTerms = [Bound 1]})] (GAto (Less Bound 0 Free #vr)),GGuarded Ex [(y,LSortMsg),(j,LSortNode)] [Action Bound 0 (Fact {factTag = ProtoFact Linear Simpleunique 1, factAnnotations = fromList [], factTerms = [Bound 1]})] (GAto (Less Bound 0 Free #vr))]})"
 ```
 
-## Reduced benchmark for artifact evaluation
+## Reduced benchmark (for artifact evaluation)
 
 We distinguish two benchmarks: benchmark of the strategies (can be found under `strategiesBenchmark`) and benchmark of the tactic generation (can be found under `tacticGeneration`).
 
-The results and experiments we present in the paper required around a week of running parallelized on three servers. For the sake of reproducibility, we present in this section a small scale version of the benchmark to illustrate the process. Please, note that the time constraint of 24 hours means we can only test a very small number of lemmas. Thus, the statistical results in the example are not exploitable.
+The results and experiments we present in the paper required around a week of running parallelized on three servers. For the sake of reproducibility, we present in this section a small scale version of the benchmark to illustrate the process. Please, note that the time constraint of 24 hours means we can only test a very small number of lemmas. Thus, the statistical results produced by the reduced benchmark do not reflect the ones in the paper.
 
-If the reader still wanted to rerun the full benchmark or look at the results we provide, we refer them to the next section (Benchmark, paper version).  
+To rerun the full benchmark or look at the results we provide, we refer the reader to section [Full benchmark (paper version)](#full-benchmark-paper-version) below.
 
 In order to run the benchmarks, go in the artifacts folder:
 ```bash
@@ -152,7 +152,8 @@ python3 resultsScripts/results.py data_fast.json
 ```
 It will use the data.json file present (discussed above) in the folder to generate the tables and graphs shown in the paper. They can be found under `results`.
 
-## Full benchmarks (paper version)
+
+## Full benchmark (paper version)
 
 ### Finding the results of the paper
 
@@ -175,16 +176,16 @@ If the reader is only interested in finding the results of our experiment, they 
 The full benchmark is run following the same steps as the small-scale benchmark. Execute the following commands:
 
 ```bash
-% cd /workspace/tamarin-prover/artifacts/strategiesBenchmark
-% batch-tamarin run recipe_strategy_benchmark.json
+cd /workspace/tamarin-prover/artifacts/strategiesBenchmark
+batch-tamarin run recipe_strategy_benchmark.json
 ```
 The results of the analysis are then stored under the `result_strategiesBenchmark` folder.
 
 For the results analysis:
 ```bash
-% source /opt/venv/bin/activate
-% python3 resultsAnalysisScripts/analyseResultsBatchTamarinMergedVersion.py result_strategiesBenchmark/execution_report.json
-% python3 resultsAnalysisScripts/results.py result_strategiesBenchmark/execution_report_extracted.json
+source /opt/venv/bin/activate
+python3 resultsAnalysisScripts/analyseResultsBatchTamarinMergedVersion.py result_strategiesBenchmark/execution_report.json
+python3 resultsAnalysisScripts/results.py result_strategiesBenchmark/execution_report_extracted.json
 ```
 
 ### Running the full scale tactic benchmark
@@ -193,14 +194,14 @@ For the results analysis:
 
 The full benchmark is run following the same steps as the small-scale benchmark. Execute the following commands:
 ```bash 
-% cd /workspace/tamarin-prover/artifacts/tacticGenerationBenchmark
-% source /opt/venv/bin/activate
-% python3 tacticGenBench.py -p=10 lemmaToTactic.txt
+cd /workspace/tamarin-prover/artifacts/tacticGenerationBenchmark
+source /opt/venv/bin/activate
+python3 tacticGenBench.py -p=10 lemmaToTactic.txt
 ``` 
 
 For the results analysis:
 ```bash
-% source /opt/venv/bin/activate
-% python3 resultsScripts/resultsTacticGen.py tacticGeneration/results/scriptResult --output=data_full.json
-% python3 resultsScripts/results.py data_full.json
+source /opt/venv/bin/activate
+python3 resultsScripts/resultsTacticGen.py tacticGeneration/results/scriptResult --output=data_full.json
+python3 resultsScripts/results.py data_full.json
 ``` 
