@@ -30,8 +30,4 @@ restriction complicate:
 lemma uniqueness:
  "All #i #j x. Unique(x)@i & Unique(x)@j ==> #i=#j"
 
-#include "tacticGeneration/generatedTactics/Escape_uniqueness_SourceOfUniqueness.spthy"
-
-#include "tacticGeneration/generatedTactics/Proba_uniqueness_SourceOfUniqueness.spthy"
-
 end
