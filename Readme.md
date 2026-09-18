@@ -180,7 +180,7 @@ If the reader is only interested in finding the results of our experiments, they
 ### Running the full scale strategy benchmark
 
 *Requirements:*  We assume the full benchmark would be run on a server and therefore require 40 cores and 400G. 
-**Warning:** The Docker we provide cannot guarantee these conditions. To install batch-tamarin and this paper version of Tamarin, see 
+**Warning:** The Docker we provide cannot guarantee these conditions. To install batch-tamarin and this paper version of Tamarin, see [Running the tool outside of Docker](running-the-tool-outside-of-docker)
 
 The full benchmark is run following the same steps as the small-scale benchmark. Execute the following commands:
 
