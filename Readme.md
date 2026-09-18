@@ -79,18 +79,18 @@ python3 tacticGeneration.py SourceOfUniqueness.spthy uniqueness --strategy=Proba
 ```
 
 
-## Benchmarks (small scale)
+## Reduced benchmark for artifact evaluation
+
+We distinguish two benchmarks: benchmark of the strategies (can be found under `strategiesBenchmark`) and benchmark of the tactic generation (can be found under `tacticGeneration`).
+
+The results and experiments we present in the paper required around a week of running parallelized on three servers. For the sake of reproducibility, we present in this section a small scale version of the benchmark to illustrate the process. Please, note that the time constraint of 24 hours means we can only test a very small number of lemmas. Thus, the statistical results in the example are not exploitable.
+
+If the reader still wanted to rerun the full benchmark or look at the results we provide, we refer them to the next section (Benchmark, paper version).  
 
 In order to run the benchmarks, go in the artifacts folder:
 ```bash
 cd /workspace/tamarin-prover/artifacts
 ```
-We distinguish two benchmarks: benchmark of the strategies (can be found under `strategiesBenchmark`) and benchmark of the tactic generation (can be found under `tacticGeneration`).
-
-The results and experiments we present in the paper required around a week of running parallelized on three servers. For the sake of reproducibility, we present in this section a small scale version of the benchmark to illustrate the process. Please, note that the time constraint of 24 hours means we can only test a very small number of lemmas. Thus, the statistical results in the example are not be exploitable.
-
-
-If the reader still wanted to rerun the full benchmark or look at the results we provide, we refer them to the next section (Benchmark, paper version).  
 
 ### Strategies benchmark (strategiesBenchmark folder)
 
@@ -143,7 +143,7 @@ python3 resultsScripts/results.py data_fast.json
 ```
 It will use the data.json file present (discussed above) in the folder to generate the tables and graphs shown in the paper. They can be found under `results`.
 
-## Benchmarks (paper version)
+## Full benchmarks (paper version)
 
 ### Finding the results of the paper
 
