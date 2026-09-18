@@ -1,5 +1,12 @@
 # Artifacts for "Adaptive Proof Strategies for Protocol Verification in Tamarin"
 
+- [How to use this artifact](how-to-use-this-artifact)
+- [Experimenting with the tools](experimenting-with-the-tools)
+- [Reduced benchmark for artifact evaluation](reduced-benchmark-for-artifact-evaluation)
+- [Full benchmarks (paper version)](full-benchmarks-paper-version)
+
+## How to use this artifact
+
 This repository contains two folders:
 - tamarin-prover: fork of the tamarin-prover tool with integrated adaptive strategies (see "Experimenting with the tools" on how to use it)
 - artifacts: python scripts necessary to reproduce the experiences described in the paper (see "Benchmarks") 
