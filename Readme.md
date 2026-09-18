@@ -180,7 +180,7 @@ If the reader is only interested in finding the results of our experiments, they
 ### Running the full scale strategy benchmark
 
 *Requirements:*  We assume the full benchmark would be run on a server and therefore require 40 cores and 400G. 
-**Warning:** The Docker we provide cannot guarantee these conditions. The recipe in this section calls to a binary provided in `artifacts/strategiesBenchmark` and only require the installation of batch-tamarin to run (see instructions [here](https://www.piwheels.org/project/batch-tamarin/)). Alternatively, see how to locally install Tamarin with the strategies, refer to [Running the tool outside of Docker](#running-the-tool-outside-of-docker).
+**Warning:** The Docker we provide cannot guarantee these conditions. To install batch-tamarin and this paper version of Tamarin, see 
 
 The full benchmark is run following the same steps as the small-scale benchmark. Execute the following commands:
 
@@ -217,9 +217,16 @@ python3 resultsScripts/results.py data_full.json
 
 ## Running the tool outside of Docker
 
+The recipe in this section calls to a binary provided in  and only require the installation of batch-tamarin to run (see instructions [here](https://www.piwheels.org/project/batch-tamarin/)). Alternatively, see how to locally install Tamarin with the strategies, refer to [Running the tool outside of Docker](#running-the-tool-outside-of-docker).
+
 ### Tamarin-prover with strategies
 
-If the reader wants to use the version of Tamarin outside of the provided Docker, they can follow the guide provided [here](https://tamarin-prover.com/install.html) to install the dependencies. After that, run the following from the root of this repository:
+We provide two options to run this paper's version on Tamarin outside of the Docker:
+- Binary version: we provide a binary file (`artifacts/strategiesBenchmark\tamarin-prover-1.4.1-2468-g300638b4`) that can be use directly to run Tamarin. To use it in a recipe with batch-tamarin, change the path in the recipe_X.json to "path": "tamarin-prover-1.4.1-2468-g300638b4" and add it to the PATH:
+```bash
+cp artifacts/strategiesBenchmark/tamarin-prover-1.4.1-2468-g300638b4 /home/tamarin/.local/bin/
+```
+- Compile from source: If the reader wants to use the version of Tamarin outside of the provided Docker, they can follow the guide provided [here](https://tamarin-prover.com/install.html) to install the dependencies. After that, run the following from the root of this repository:
 ```bash
 cd tamarin-prover
 make

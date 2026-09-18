@@ -110,7 +110,7 @@ RUN python3 -m venv /opt/venv \
        tabulate numpy matplotlib pandas pydot pyparsing tree_sitter
 ENV PATH=/opt/venv/bin:/home/tamarin/.local/bin:$PATH
 
-COPY artifacts/strategiesBenchmark/tamarin-prover-1.4.1-2468-g300638b4 /home/tamarin/.local/bin/
+# COPY artifacts/strategiesBenchmark/tamarin-prover-1.4.1-2468-g300638b4 /home/tamarin/.local/bin/
 
 # Switch to non-root user
 # USER tamarin

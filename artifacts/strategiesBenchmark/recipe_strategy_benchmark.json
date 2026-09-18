@@ -7,7 +7,7 @@
   },
   "tamarin_versions": {
     "merged": {
-      "path": "tamarin-prover-1.4.1-2468-g300638b4"
+      "path": "tamarin-prover"
     }
   },
   "tasks": { 
