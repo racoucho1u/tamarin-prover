@@ -105,7 +105,6 @@ def prove_with_tactic(q,filename,lemma_name,macro,strategy,heuristic,tactic_nb,d
     
     
 def proveUntil(file_path, lemma, macro, strategy, q, bound=3, heuristic="s", timeout=15, diff=False):
-    # print("Prove unit")
     tactic,tactic_updated, heuristic_old = "","new","old"
     proof_attempt = 0
     proved = False

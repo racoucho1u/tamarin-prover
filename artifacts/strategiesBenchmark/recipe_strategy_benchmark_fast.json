@@ -2,7 +2,7 @@
   "config": {
     "global_max_cores": 4,
     "global_max_memory": 30,
-    "default_timeout": 200,
+    "default_timeout": 3600,
     "output_directory": "./result_strategiesBenchmark_fast"
   },
   "tamarin_versions": {
@@ -52,6 +52,48 @@
       "tamarin_options": ["--diff","-d0","--strategy=CollectAndRestart"],
       "output_file_prefix": "asiaccs_ecc--SP6_UserControlledUnlinkability_CERTIFY_ObsEquiv_BSN__collectAndRestart",
       "resources": { "max_memory": 30 }
+    },     
+    "these_ls_chap5--Phoolproof_MA__original": {
+      "theory_file": "../files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["-d0"],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__original",
+      "resources": { "max_memory": 40 }
+    },
+    "these_ls_chap5--Phoolproof_MA__escape": {
+      "theory_file": "../files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["-d0","--strategy=Escape"],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__escape",
+      "resources": { "max_memory": 40 }
+    },
+    "these_ls_chap5--Phoolproof_MA__proba": {
+      "theory_file": "../files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["-d0","--strategy=Proba"],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__proba",
+      "resources": { "max_memory": 40 }
+    },
+    "these_ls_chap5--Phoolproof_MA__backtrack": {
+      "theory_file": "../files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["-d0","--strategy=Backtrack"],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__backtrack",
+      "resources": { "max_memory": 40 }
+    },
+    "these_ls_chap5--Phoolproof_MA__backAndAvoid": {
+      "theory_file": "../files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["-d0","--strategy=BackAndAvoid"],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__backAndAvoid",
+      "resources": { "max_memory": 40 }
+    },
+    "these_ls_chap5--Phoolproof_MA__collectAndRestart": {
+      "theory_file": "../files_to_benchmark/these_ls_chap5/Phoolproof_MA.spthy",
+      "tamarin_versions": ["merged"],
+      "tamarin_options": ["-d0","--strategy=CollectAndRestart"],
+      "output_file_prefix": "these_ls_chap5--Phoolproof_MA__collectAndRestart",
+      "resources": { "max_memory": 40 }
     }
   }
 }

@@ -43,7 +43,7 @@ if __name__ == "__main__":
     strategy = args.strategy
     file = args.file
     ofilename = args.output
-    parallel = args.p
+    parallel = 1+ args.p
 
     benchmarkCase = "tacticGeneration/tamarin-prover"
     # file = "files_to_benchmark/input_lemmas_tacticGen.txt"

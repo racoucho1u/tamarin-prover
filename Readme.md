@@ -4,6 +4,7 @@
 - [Experimenting with the tools](#experimenting-with-the-tools)
 - [Reduced benchmark for artifact evaluation](#reduced-benchmark-for-artifact-evaluation)
 - [Full benchmarks (paper version)](#full-benchmarks-paper-version)
+- [Running the tool outside of Docker](#running-the-tool-outside-of-docker)
 
 ## How to use this artifact
 
@@ -117,7 +118,7 @@ To run the benchmark, we use batch-tamarin, a wrapper that enables batch executi
 cd /workspace/tamarin-prover/artifacts/strategiesBenchmark
 batch-tamarin run recipe_strategy_benchmark_fast.json
 ```
-The results of the analysis are then stored under the `result_strategiesBenchmark` folder.
+The results of the analysis are then stored under the `result_strategiesBenchmark_fast` folder.
 
 
 #### Analysing the results
@@ -150,7 +151,7 @@ The results will be stored under the `tacticGeneration/results` folder. The scri
 
 To extract information from these results, run the following:
 ```bash
-python3 resultsScripts/resultsTacticGen.py tacticGeneration/results/scriptResult_fast --output=data_fast.json
+python3 resultsScripts/resultsTacticGen.py tacticGeneration/results/scriptResult --output=data_fast.json
 ``` 
 It will generate the file data.json. This script uses the `result_strategiesBenchmark_merged.json` file that contains the results of the strategies benchmark and adds the results of the tactics generation benchmark.
 To analyse the results, run 
@@ -164,7 +165,7 @@ It will use the data.json file present (discussed above) in the folder to genera
 
 ### Finding the results of the paper
 
-If the reader is only interested in finding the results of our experiment, they will be able to find them under the following directories:
+If the reader is only interested in finding the results of our experiments, they will be able to find them under the following directories:
 
 - For the strategy benchmark: /workspace/tamarin-prover/artifacts/strategiesBenchmark/results_fullscale
     - The subfolders `result_strategiesBenchmark_server_X` each contains a subset of the experience results. They are multiple because we did split the experiment in 5 batches across 3 servers. The denomination server_X_Y indicates that the Yth subset of the experiment has been run on server X.
@@ -178,7 +179,8 @@ If the reader is only interested in finding the results of our experiment, they 
 
 ### Running the full scale strategy benchmark
 
-*Requirements:*  We assume the full benchmark would be run on a server and therefore require 40 cores and 400G.
+*Requirements:*  We assume the full benchmark would be run on a server and therefore require 40 cores and 400G. 
+**Warning:** The Docker we provide cannot guarantee these conditions. The recipe in this section calls to a binary provided in `artifacts/strategiesBenchmark` and only require the installation of batch-tamarin to run (see instructions [here](https://www.piwheels.org/project/batch-tamarin/)). Alternatively, see how to locally install Tamarin with the strategies, refer to [Running the tool outside of Docker](#running-the-tool-outside-of-docker).
 
 The full benchmark is run following the same steps as the small-scale benchmark. Execute the following commands:
 
@@ -212,3 +214,16 @@ source /opt/venv/bin/activate
 python3 resultsScripts/resultsTacticGen.py tacticGeneration/results/scriptResult --output=data_full.json
 python3 resultsScripts/results.py data_full.json
 ``` 
+
+## Running the tool outside of Docker
+
+### Tamarin-prover with strategies
+
+If the reader wants to use the version of Tamarin outside of the provided Docker, they can follow the guide provided [here](https://tamarin-prover.com/install.html) to install the dependencies. After that, run the following from the root of this repository:
+```bash
+cd tamarin-prover
+make
+```
+
+### Batch-tamarin
+Instructions on how to install batch-tamarin can be found [here](https://github.com/tamarin-prover/batch-tamarin#installation) or [here](https://www.piwheels.org/project/batch-tamarin/)
