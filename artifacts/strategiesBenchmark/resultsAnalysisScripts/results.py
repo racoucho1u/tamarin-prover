@@ -23,7 +23,7 @@ def printExcel(rowsName,nbTypes,resS,respS):
         res.append([labels[t],nbTypes[t]]+resS[t])
         res.append(["%",""]+respS[t])
     res.append([])
-    with open("tables.csv", 'a') as csvfile: 
+    with open(f"results/{dirname}/tables.csv", 'a') as csvfile: 
         # creating a csv writer object 
         csvwriter = csv.writer(csvfile) 
         # writing the fields 
@@ -195,7 +195,7 @@ def noneProven(lm,listStatus,consType):
     for j in range(len(listStatus)):
         if listStatus[j] == "completed":
             return ()
-    with open("lemmaToTactic.txt", 'a') as lemmaToTactic: 
+    with open(f"results/{dirname}/lemmaToTactic.txt", 'a') as lemmaToTactic: 
         lemmaToTactic.write(f"{lm}\n")
 	
 
@@ -423,7 +423,7 @@ def resultApproach(onlyTarget,noExists,type,s):
 
 def printLatexWorkflow(dirname,ref,score,terminationRate,compareBase,compareBest):
     strat = ["Develop","Escape","Backtracking","BackAndAvoid","Proba","CollectAndRestart","SmartVerif"]
-    lines = [" & \\textbf{All} & \\textbf{Classic} & \\textbf{Exists} & \\textbf{Source} & \\textbf{Reuse} & \\textbf{Induction} \\\\"]
+    lines = [" & \\textbf{All} & \\textbf{Classic} & \\textbf{Exists} & \\textbf{Source} & \\textbf{Reuse} & \\textbf{Induction} \\\\\n"]
     resLen0 = len(ref[0])
     fstCol = [f"{i}. &" for i in range(1,resLen0+1)]+["\\begin{tabular}{l} \\textbf{Workflow} \\\\ \\textbf{success}\\end{tabular} & ","\\begin{tabular}{c} \\textbf{Termination rate} \\\\ \\textbf{in \\%}\\end{tabular} & ","\\begin{tabular}{c} \\textbf{Improvement in \\%} \\\\ \\textbf{(/baseline)}\\end{tabular} & ","\\begin{tabular}{c} \\textbf{Improvement in \\%} \\\\ \\textbf{(/best approach)}\\end{tabular}& "]
     prettyStrat = [[] for _ in range(len(ref))]
@@ -550,6 +550,10 @@ if __name__ == "__main__":
     # Path(f"tables/{dirname}").mkdir(parents=True, exist_ok=True)
     # Path(f"graphs/{dirname}").mkdir(parents=True, exist_ok=True)
     Path(f"results/{dirname}").mkdir(parents=True, exist_ok=True)
+    # Files written in append mode by the analysis: start from empty files so that
+    # re-running the analysis does not accumulate results from previous runs.
+    for appended in ["tables.csv", "lemmaToTactic.txt", "table3_timecomp"]:
+        open(f"results/{dirname}/{appended}", 'w').close()
 		
     strat = ["original","escape","backtrack","backAndAvoid","proba","collectAndRestart"]
     # labels = ["All","Classic","Exists","Diff","Source","Reuse","Induction"]

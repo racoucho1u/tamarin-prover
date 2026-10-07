@@ -17,9 +17,8 @@
 # USAGE:
 # 1. Place your tamarin-prover source code in the same directory as this Dockerfile
 # 2. Rename your tamarin source directory to "tamarin-prover" (or change the COPY line below)
-# 3. Build with: docker build -f local-tamarin.Dockerfile -t tamarin-prover:{version_tag} .
-
-# You can replace {version_tag} with a tag of your choice, i.e. tamarin-prover:local
+# 3. Build with: docker build --network=host -t tamarin:strategies -f ./Dockerfile .
+#    (see Readme.md for how to run the container)
 ############################################################################################
 
 FROM debian:sid AS builder

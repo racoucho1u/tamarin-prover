@@ -1,4 +1,5 @@
- & \textbf{All} & \textbf{Classic} & \textbf{Exists} & \textbf{Source} & \textbf{Reuse} & \textbf{Induction} \\1. &Escape & Escape & Develop & CollectAndRestart & CollectAndRestart & CollectAndRestart\\
+ & \textbf{All} & \textbf{Classic} & \textbf{Exists} & \textbf{Source} & \textbf{Reuse} & \textbf{Induction} \\
+1. &Escape & Escape & Develop & CollectAndRestart & CollectAndRestart & CollectAndRestart\\
 2. &CollectAndRestart & Backtracking & Escape & Develop & BackAndAvoid & Develop\\
 3. &Backtracking & CollectAndRestart & BackAndAvoid & Proba & Develop & BackAndAvoid\\
 4. &Develop & Develop & - & - & Escape & Escape\\

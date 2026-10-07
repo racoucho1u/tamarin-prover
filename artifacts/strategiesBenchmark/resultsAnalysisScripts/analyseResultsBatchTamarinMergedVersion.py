@@ -1,3 +1,4 @@
+import os
 import json
 import sys
 
@@ -89,7 +90,7 @@ if __name__ == '__main__':
         }
 
     data = loadData(filename)
-    metaData = loadData("/workspace/tamarin-prover/artifacts/strategiesBenchmark/resultsAnalysisScripts/metaData.json")
+    metaData = loadData(os.path.join(os.path.dirname(os.path.abspath(__file__)), "metaData.json"))
     version = retrieveResults(data)
     completeMetaData(metaData,version)
     debugPrint(finalDict,4)

@@ -1,6 +1,7 @@
 import sys
 import argparse
 import os
+import shutil
 import subprocess
 from collections import Counter
 
@@ -36,18 +37,30 @@ def extractTacticsFile(filename):
 		tactic = prettyPrintDeprioTactic(sortedT)
 	return(tactic)
 
+def working_copy(filename, strategy, lemma_name_file, fresh=False):
+    # Tactics are added to a private copy of the theory stored in
+    # tacticGeneration/theories/, so that the input theory file is never modified.
+    os.makedirs("tacticGeneration/theories", exist_ok=True)
+    work = f"tacticGeneration/theories/{strategy}_{lemma_name_file}_{os.path.basename(filename)}"
+    if fresh or not os.path.isfile(work):
+        shutil.copyfile(filename, work)
+    return work
+
 def add_tactic_to_file(filename,tacticFile):
-    inserTactic = "\n#include \""+tacticFile+"\"\n"
+    # #include paths are resolved by Tamarin relative to the including theory file
+    includePath = os.path.relpath(tacticFile, os.path.dirname(os.path.abspath(filename)))
+    inserTactic = "\n#include \""+includePath+"\"\n"
     with open(filename, "r") as f:
         contents = f.readlines()
 
-    last_line = len(contents)-1
-    while (not 'end' in contents[last_line]) and (last_line>0):
-        if ("tacticGeneration/generatedTactics/" in contents[last_line]):
-            contents.remove(contents[last_line])
-        last_line -= 1
-        
-    contents.insert(last_line-1, inserTactic)
+    # remove previously inserted tactic includes (keeps the function idempotent)
+    contents = [l for l in contents if not ("#include" in l and "generatedTactics/" in l)]
+
+    end_line = len(contents)-1
+    while end_line > 0 and contents[end_line].strip() != "end":
+        end_line -= 1
+
+    contents.insert(end_line, inserTactic)
 
     with open(filename, "w") as f:
         contents = "".join(contents)
@@ -73,7 +86,8 @@ def prove_with_tactic(filename,lemma_name,macro,strategy,heuristic,tactic_nb,dif
     if diff != False:
         diffFlag = "--diff"
     # print([filename, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"])
-    out, err = tamarin_wrapper_call([filename, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"],timeout)
+    workFile = working_copy(filename, strategy, lemma_name_file, fresh=(tactic_nb == 0))
+    out, err = tamarin_wrapper_call([workFile, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"],timeout)
     if err:
         print(
             "Sanity check failed for: "
@@ -109,9 +123,9 @@ def prove_with_tactic(filename,lemma_name,macro,strategy,heuristic,tactic_nb,dif
                 # print(tactic)
                 tacticFile = f"tacticGeneration/generatedTactics/{strategy}_{lemma_name_file}_{outputFile}"
                 print(os.path.isfile(tacticFile))
-                if not os.path.isfile(tacticFile):
-                    add_tactic_to_file(filename,tacticFile)
-                with open (tacticFile,'a') as f:
+                add_tactic_to_file(workFile,tacticFile)
+                # start a fresh tactic file for a new run (first attempt)
+                with open (tacticFile,'w' if tactic_nb == 0 else 'a') as f:
                     f.write(tactic)
                     f.write("\n")
 
