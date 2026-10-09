@@ -153,7 +153,7 @@ cd /workspace/tamarin-prover/artifacts
 
 ### Strategies benchmark (strategiesBenchmark folder)
 
-*Requirements:* we assume that the reduced benchmark is run on a laptop. Therefore, we only require 4 cores and 30 GB of memory. The reduced benchmark consists of 18 proof tasks (2 theories × 6 configurations: the default behaviour and the 5 strategies), each with a timeout of one hour; it therefore takes at most 18 hours.
+*Requirements:* we assume that the reduced benchmark is run on a laptop. Therefore, we only require 4 cores and 10 GB of memory. The reduced benchmark consists of 18 proof tasks (3 lemmas × 6 configurations: the default behaviour and the 5 strategies), each with a timeout of one hour; it therefore takes at most 18 hours.
 
 #### Running the benchmark
 
