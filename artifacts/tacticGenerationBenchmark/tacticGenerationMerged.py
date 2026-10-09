@@ -124,10 +124,10 @@ def proveUntil(file_path, lemma, macro, strategy, q, bound=3, heuristic="s", tim
             break 
         if tactic_updated == "":
             heuristic = heuristic_old
-        timeout *= 2
         print(f"Proving {lemma} ({file_path}) with heuristic: {heuristic}, timeout: {timeout}")
         tactic = tactic_updated
         status, tactic_updated = prove_with_tactic(q,file_path,lemma,macro,strategy,heuristic,proof_attempt,diff,timeout)
+        timeout *= 2
         if 'True' in status or 'False' in status:
             proved = True
             print(f"Prove lemma {lemma} (file:{file_path}) with heuristic: {heuristic}.\n")
