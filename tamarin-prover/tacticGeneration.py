@@ -122,7 +122,7 @@ def prove_with_tactic(filename,lemma_name,macro,strategy,heuristic,tactic_nb,dif
                 tactic = "\ntactic: "+lemma_name_file+"_"+str(tactic_nb)+"\n"+deprios+"\n\n"
                 # print(tactic)
                 tacticFile = f"tacticGeneration/generatedTactics/{strategy}_{lemma_name_file}_{outputFile}"
-                print(os.path.isfile(tacticFile))
+                # print(os.path.isfile(tacticFile))
                 add_tactic_to_file(workFile,tacticFile)
                 # start a fresh tactic file for a new run (first attempt)
                 with open (tacticFile,'w' if tactic_nb == 0 else 'a') as f:
@@ -213,7 +213,7 @@ if __name__ == '__main__':
     timeout = args.timeout
     diff = args.diff
 
-    print(timeout)
+    # print(timeout)
 
     if macro != "":
         macro = "-D"+macro
