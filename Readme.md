@@ -176,7 +176,7 @@ python3 resultsAnalysisScripts/analyseResultsBatchTamarinMergedVersion.py result
 python3 resultsAnalysisScripts/results.py result_strategiesBenchmark_fast/execution_report_extracted.json
 ```
 
-The results of the analysis (tables and graphs) are generated in `results/result_strategiesBenchmark_fast`. This folder also contains the file `lemmaToTactic.txt`, which lists the lemmas that none of the strategies managed to prove; these are the input of the tactic generation benchmark below.
+The results of the analysis (tables and graphs) are generated in `results/result_strategiesBenchmark_fast`. This folder also contains the file `lemmaToTactic.txt`, which lists the lemmas that none of the strategies managed to prove.
 
 The results discussed in Section 4 can be found in `strategiesBenchmark/results_fullscale` (see [Finding the results of the paper](#finding-the-results-of-the-paper)).
 
@@ -275,7 +275,7 @@ python3 resultsScripts/results.py data_full.json
 
 ## Running the tool outside of Docker
 
-The benchmarks only require the version of Tamarin with the strategies (see below), batch-tamarin, and Python 3 with the packages `tabulate numpy matplotlib pandas pydot pyparsing tree_sitter`. In the commands of the previous sections, replace `/workspace/tamarin-prover` with the path of this repository, and skip `source /opt/venv/bin/activate` if the Python packages are installed in your environment.
+The benchmarks only require the version of Tamarin with the strategies (see below), batch-tamarin, and Python 3.12 with the packages `tabulate numpy matplotlib pandas pydot pyparsing tree_sitter`. In the commands of the previous sections, replace `/workspace/tamarin-prover` with the path of this repository, and skip `source /opt/venv/bin/activate` if the Python packages are installed in your environment.
 
 ### Tamarin prover with strategies
 
