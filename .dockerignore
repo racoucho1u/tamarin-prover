@@ -1,0 +1,6 @@
+# Only tamarin-prover/ is copied into the image; the rest of the repository
+# (artifacts, results, git history) is bind-mounted at runtime instead.
+.git
+artifacts
+**/.stack-work
+**/__pycache__
