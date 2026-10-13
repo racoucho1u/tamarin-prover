@@ -205,7 +205,7 @@ The option `-p` sets the number of lemmas processed in parallel. The results are
 To extract information from these results, run the following:
 
 ```bash
-python3 resultsScripts/resultsTacticGen.py tacticGeneration/results/scriptResult --output=data_fast.json
+python3 resultsScripts/resultsTacticGen.py tacticGeneration_fast/results/scriptResult --output=data_fast.json
 ```
 
 It generates the file `data_fast.json`. This script takes the results of the full strategies benchmark of the paper (file `resultsScripts/result_strategiesBenchmark_merged.json`, which can be changed with the option `--inputStrat`) and adds to them the results of the tactic generation benchmark.
@@ -262,14 +262,14 @@ The full benchmark is run following the same steps as the reduced benchmark. Exe
 ```bash
 cd /workspace/tamarin-prover/artifacts/tacticGenerationBenchmark
 source /opt/venv/bin/activate
-python3 tacticGenBench.py -p=10 lemmaToTactic.txt
+python3 tacticGenBench.py -p=10 --output=full lemmaToTactic.txt
 ```
 
 To analyse the results:
 
 ```bash
 source /opt/venv/bin/activate
-python3 resultsScripts/resultsTacticGen.py tacticGeneration/results/scriptResult --output=data_full.json
+python3 resultsScripts/resultsTacticGen.py tacticGeneration_full/results/scriptResult --output=data_full.json
 python3 resultsScripts/results.py data_full.json
 ```
 

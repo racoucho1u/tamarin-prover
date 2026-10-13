@@ -38,11 +38,12 @@ if __name__ == "__main__":
     parser.add_argument("file", help="path to target file, can be a spthy file or a batch-tamarin recipe")
     parser.add_argument("--strategy",type=str, default="Escape", help="strategy to use for the proof attempt")
     parser.add_argument("-p",type=int, default=2, help="number of parallel attempts")
-    parser.add_argument("--output",type=str, default='tacticGeneration/results/scriptResult', help="file where the results will be written")
+    parser.add_argument("--output",type=str, default="fast", help="file where the results will be written")
     args = parser.parse_args()
     strategy = args.strategy
     file = args.file
-    ofilename = args.output
+    output = "tacticGeneration_"+args.output
+    ofilename = "tacticGeneration_"+args.output+"/results/scriptResult"
     parallel = 1+ args.p
 
     benchmarkCase = "tacticGeneration/tamarin-prover"
@@ -96,17 +97,16 @@ if __name__ == "__main__":
             parallel_input.append([f"../files_to_benchmark/all/{theoryfile}.spthy",lemma,macro,strategy,3,"s",900,diff])            
 
 
+    if not os.path.isdir(output):
+        os.mkdir(output)
+    if not os.path.isdir(output+'/results'):
+        os.mkdir(output+'/results')
+    if not os.path.isdir(output+'/tacticBatch'):
+        os.mkdir(output+'/tacticBatch')
+    if not os.path.isdir(output+'/generatedTactics'):
+        os.mkdir(output+'/generatedTactics')
 
-    if not os.path.isdir('tacticGeneration'):
-        os.mkdir('tacticGeneration')
-    if not os.path.isdir('tacticGeneration/results'):
-        os.mkdir('tacticGeneration/results')
-    if not os.path.isdir('tacticGeneration/tacticBatch'):
-        os.mkdir('tacticGeneration/tacticBatch')
-    if not os.path.isdir('tacticGeneration/generatedTactics'):
-        os.mkdir('tacticGeneration/generatedTactics')
-
-    mf.parallelProving(parallel_input,ofilename,parallel)
+    mf.parallelProving(parallel_input,ofilename,output,parallel)
     #print(parallel_input)
                     # mf.proveUntil(theoryfile,lemma,diff=bool(setDiff))
 				

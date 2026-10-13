@@ -56,7 +56,7 @@ def tamarin_wrapper_call(arg_list, time_out=6000):
         stderr=subprocess.PIPE,
     ).communicate()
 
-def prove_with_tactic(q,filename,lemma_name,macro,strategy,heuristic,tactic_nb,diff,timeout=6000):
+def prove_with_tactic(q,filename,lemma_name,macro,strategy,heuristic,tactic_nb,diff,timeout=6000,odir="tacticGeneration"):
 
     outputFile = filename.split("/")[-1]
     lemma_name_file = lemma_name.split(" ")[0]
@@ -65,7 +65,7 @@ def prove_with_tactic(q,filename,lemma_name,macro,strategy,heuristic,tactic_nb,d
         diffFlag = "--diff"
     # print([filename, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"])
     workFile = working_copy(filename, strategy, lemma_name_file, fresh=(tactic_nb == 0))
-    out, err = tamarin_wrapper_call([workFile, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output=tacticGeneration/results/{strategy}_{lemma_name_file}_{outputFile}  2>> tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"],timeout)
+    out, err = tamarin_wrapper_call([workFile, "-s", f"--lemma={lemma_name}",f"--tam=--heuristic={heuristic} {macro} --strategy={strategy} --exportGoals {diffFlag} --output={odir}/results/{strategy}_{lemma_name_file}_{outputFile}  2>> {odir}/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}"],timeout)
     if err:
         print(
             "Sanity check failed for: "
@@ -93,13 +93,13 @@ def prove_with_tactic(q,filename,lemma_name,macro,strategy,heuristic,tactic_nb,d
         # total_time += float(data[2])
         
         try:
-            tactic = te.extractTacticsFile(f"tacticGeneration/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}")
+            tactic = te.extractTacticsFile(f"{odir}/tacticBatch/{strategy}_{lemma_name_file}_{outputFile}")
             if tactic != "":   
                 tacticRough = tactic.split("tactic:")[1]
                 deprios = tacticRough.replace("---","\n")
                 tactic = "\ntactic: "+lemma_name_file+"_"+str(tactic_nb)+"\n"+deprios+"\n\n"
                 print(tactic)
-                tacticFile = f"tacticGeneration/generatedTactics/{strategy}_{lemma_name_file}_{outputFile}"
+                tacticFile = f"{odir}/generatedTactics/{strategy}_{lemma_name_file}_{outputFile}"
                 add_tactic_to_file(workFile,tacticFile)
                 # start a fresh tactic file for a new run (first attempt)
                 with open (tacticFile,'w' if tactic_nb == 0 else 'a') as f:
@@ -107,7 +107,7 @@ def prove_with_tactic(q,filename,lemma_name,macro,strategy,heuristic,tactic_nb,d
                     f.write("\n")
 
         except Exception:
-            with open ("tacticGeneration/debugFile",'a') as df:
+            with open (f"{odir}/debugFile",'a') as df:
                 df.write(f"Tactic generation error: {filename}\n")
             tactic = "Error in generation"
 
@@ -115,7 +115,7 @@ def prove_with_tactic(q,filename,lemma_name,macro,strategy,heuristic,tactic_nb,d
 
     
     
-def proveUntil(file_path, lemma, macro, strategy, q, bound=3, heuristic="s", timeout=15, diff=False):
+def proveUntil(file_path, lemma, macro, strategy, q, bound=3, heuristic="s", timeout=15, diff=False, odir='tacticGeneration'):
     tactic,tactic_updated, heuristic_old = "","new","old"
     proof_attempt = 0
     proved = False
@@ -126,7 +126,7 @@ def proveUntil(file_path, lemma, macro, strategy, q, bound=3, heuristic="s", tim
             heuristic = heuristic_old
         print(f"Proving {lemma} ({file_path}) with heuristic: {heuristic}, timeout: {timeout}")
         tactic = tactic_updated
-        status, tactic_updated = prove_with_tactic(q,file_path,lemma,macro,strategy,heuristic,proof_attempt,diff,timeout)
+        status, tactic_updated = prove_with_tactic(q,file_path,lemma,macro,strategy,heuristic,proof_attempt,diff,timeout,odir)
         timeout *= 2
         if 'True' in status or 'False' in status:
             proved = True
@@ -175,6 +175,7 @@ def parallelInput(inputs,q):
     heuristic= inputs[5]
     timeout= inputs[6]
     diff= inputs[7]
+    odir = inputs[8]
 
     splitLemma = lemma.split(" ")
     if len(splitLemma)>1:
@@ -182,7 +183,7 @@ def parallelInput(inputs,q):
         macro = splitLemma[1]
 
     #print(file_path, lemma, bound, heuristic, timeout, diff)
-    proveUntil(file_path, lemma, macro, strategy, q, bound, heuristic, timeout, diff)
+    proveUntil(file_path, lemma, macro, strategy, q, bound, heuristic, timeout, diff, odir)
 
 def listener(q,filename):
     '''listens for messages on the q, writes to file. '''
@@ -196,7 +197,7 @@ def listener(q,filename):
             f.write(str(m) + '\n')
             f.flush()
 
-def parallelProving(inputs_parallel,filename='tacticGeneration/results/scriptResult',N=5):
+def parallelProving(inputs_parallel,filename='tacticGeneration/results/scriptResult',odir='tacticGeneration',N=5):
     #https://stackoverflow.com/questions/13446445/python-multiprocessing-safely-writing-to-a-file
     manager = multiprocessing.Manager()
     q = manager.Queue()
@@ -208,7 +209,7 @@ def parallelProving(inputs_parallel,filename='tacticGeneration/results/scriptRes
     #fire off workers
     jobs = []
     for i in inputs_parallel:
-        job = pool.apply_async(parallelInput, (i, q))
+        job = pool.apply_async(parallelInput, (i+[odir], q))
         jobs.append(job)
 
     # collect results from the workers through the pool result queue
