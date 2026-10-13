@@ -21,7 +21,7 @@
 #    (see Readme.md for how to run the container)
 ############################################################################################
 
-FROM debian:sid AS builder
+FROM debian:trixie AS builder
 
 # Set environment variables for non-interactive installation
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -66,7 +66,7 @@ RUN stack setup && \
 RUN /home/tamarin/.local/bin/tamarin-prover test
 
 # Runtime stage
-FROM debian:sid AS runtime
+FROM debian:trixie AS runtime
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
