@@ -212,7 +212,7 @@ It generates the file `data_fast.json`. This script takes the results of the ful
 To analyse the results, run:
 
 ```bash
-python3 resultsScripts/results.py data_fast.json
+python3 resultsScripts/results.py data_fast.json fast
 ```
 
 It uses the `data_fast.json` file generated above to produce the tables and graphs shown in the paper. They can be found in the `results` folder.
@@ -270,7 +270,7 @@ To analyse the results:
 ```bash
 source /opt/venv/bin/activate
 python3 resultsScripts/resultsTacticGen.py tacticGeneration_full/results/scriptResult --output=data_full.json
-python3 resultsScripts/results.py data_full.json
+python3 resultsScripts/results.py data_full.json full
 ```
 
 ## Running the tool outside of Docker

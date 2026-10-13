@@ -8,7 +8,7 @@ def printPretty(dirname,fstline,nbTypes,resS,respS,filename):
     for i in range(len(fstline)):
         fstline[i] = fstline[i].ljust(14)
     fstline = "".join(fstline)
-    with open(f"results/{dirname}/{filename}",'w') as f:
+    with open(f"results_{output}/{dirname}/{filename}",'w') as f:
         f.write(fstline+"\n")
         for t in range(len(nbTypes)):
             for i in range(len(resS[t])):
@@ -23,7 +23,7 @@ def printExcel(rowsName,nbTypes,resS,respS):
         res.append([labels[t],nbTypes[t]]+resS[t])
         res.append(["%",""]+respS[t])
     res.append([])
-    with open(f"results/{dirname}/tables.csv", 'a') as csvfile: 
+    with open(f"results_{output}/{dirname}/tables.csv", 'a') as csvfile: 
         # creating a csv writer object 
         csvwriter = csv.writer(csvfile) 
         # writing the fields 
@@ -52,7 +52,7 @@ def printStratResults(dirname,resp,noBaseLine,noExists):
             for j in range(len(resp)):
                 printableData[i].append(resp[j][i])
         strats = ["Baseline","Escape","Backtracking","BackAndAvoid","Probabilistic","CollectAndRestart","Combined\n strategies"]
-        plot.generatePlotGeneral(printableData,strats,labels,saveFile=f"results/{dirname}/resByType.png")
+        plot.generatePlotGeneral(printableData,strats,labels,saveFile=f"results_{output}/{dirname}/resByType.png")
 
 def printTacticResults(resp):
     printableData = [[] for i in resp[0][:-1]]
@@ -195,7 +195,7 @@ def noneProven(lm,listStatus,consType):
     for j in range(len(listStatus)):
         if listStatus[j] == "completed":
             return ()
-    with open(f"results/{dirname}/lemmaToTactic.txt", 'a') as lemmaToTactic: 
+    with open(f"results_{output}/{dirname}/lemmaToTactic.txt", 'a') as lemmaToTactic: 
         lemmaToTactic.write(f"{lm}\n")
 	
 
@@ -245,7 +245,7 @@ def compareN(dirname,onlyTarget,noExists,consType,label,indexes):
         # print(f"{strt[k]} total time: {round(totTime[k],2)}")
         rtotTime.append(str(round(totTime[k],2)))
 
-    with open(f"results/{dirname}/table3_timecomp",'a') as f:
+    with open(f"results_{output}/{dirname}/table3_timecomp",'a') as f:
         f.write(f"{label}\n")
         f.write("\\textbf{Only} & "+" & ".join(list(map(str,only)))+"\\\\\n")
         f.write("\\textbf{Faster} & "+" & ".join(list(map(str,timeComp)))+"\\\\\n")
@@ -296,7 +296,7 @@ def compare2by2(dirname,onlyTarget,noExists,t,stratToComp):
         howmuch.append(howmuch2)
         # print(i,casesConsidered,prop1faster,prop2faster)
 
-    with open(f"results/{dirname}/table3_timecomp",'a') as f:
+    with open(f"results_{output}/{dirname}/table3_timecomp",'a') as f:
         f.write("\\textbf{Only} & "+" & ".join(only)+" \\\\\n")
         f.write("\\textbf{Faster} & "+" & ".join(faster)+" \\\\\n")
         f.write("{\\small \\textbf{How much faster}} & "+" & ".join(howmuch)+" \\\\\n\n")
@@ -441,7 +441,7 @@ def printLatexWorkflow(dirname,ref,score,terminationRate,compareBase,compareBest
     lines.append(fstCol[resLen0+1]+" & ".join(terminationRate)+"\\\\\n")
     lines.append(fstCol[resLen0+2]+" & ".join(compareBase)+"\\\\\n")
     lines.append(fstCol[resLen0+3]+" & ".join(compareBest)+"\\\\\n")
-    with open(f"results/{dirname}/table5_workflow",'w') as f:
+    with open(f"results_{output}/{dirname}/table5_workflow",'w') as f:
         for l in lines: 
             f.write(l)
 
@@ -529,6 +529,9 @@ if __name__ == "__main__":
     filename = 'data.json'
     if len(sys.argv) > 1:
         filename = sys.argv[1]
+    if len(sys.argv) > 2:
+        output = sys.argv[2]
+    
 	
     with open(filename,'r') as file:
         lemma =json.load(file)
@@ -549,11 +552,11 @@ if __name__ == "__main__":
         dirname = dirname+"_noExists"
     # Path(f"tables/{dirname}").mkdir(parents=True, exist_ok=True)
     # Path(f"graphs/{dirname}").mkdir(parents=True, exist_ok=True)
-    Path(f"results/{dirname}").mkdir(parents=True, exist_ok=True)
+    Path(f"results_{output}/{dirname}").mkdir(parents=True, exist_ok=True)
     # Files written in append mode by the analysis: start from empty files so that
     # re-running the analysis does not accumulate results from previous runs.
     for appended in ["tables.csv", "lemmaToTactic.txt", "table3_timecomp"]:
-        open(f"results/{dirname}/{appended}", 'w').close()
+        open(f"results_{output}/{dirname}/{appended}", 'w').close()
 		
     strat = ["original","escape","backtrack","backAndAvoid","proba","collectAndRestart"]
     # labels = ["All","Classic","Exists","Diff","Source","Reuse","Induction"]
